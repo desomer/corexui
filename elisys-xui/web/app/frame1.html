@@ -1,0 +1,38 @@
+<xui-factory version="1.0">
+    <xui-import xui-path="app/vue2frame.html"></xui-import>
+
+    <frame-vuetify-1 xid="root"></frame-vuetify-1>
+
+    <frame-vuetify-1-design xid="rootweb"></frame-vuetify-1-design>
+
+    <xui-design xid="root">
+        <xui-prop id="titleApp" val="Ecran de demonstration"></xui-prop>
+        <xui-prop id="colorApp" val="red"></xui-prop>
+        <xui-prop id="colorBg" val="white"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="rootweb">
+        <xui-prop id="titleApp" val="Ecran de demonstration"></xui-prop>
+        <xui-prop id="colorApp" val="red"></xui-prop>
+        <xui-prop id="colorBg" val="white"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="main">
+
+        <v-tabs>
+            <v-tab><xui-slot xid="a-tab-1" xui-slot-name="Tab"></xui-slot></v-tab>
+            <v-tab-item><xui-slot xid="a-tab-item-1" xui-slot-name="Tab Content"></xui-slot></v-tab-item>
+            <v-tab>b</v-tab>
+            <v-tab-item>b</v-tab-item>
+        </v-tabs>
+
+        <span  xui-nb=5  xui-for="__nb__"  xid="__pxid__-span-__idx__"> une boucle </span>
+
+    </xui-design>
+    
+    <xui-design xid="a-tab-1">TITRE</xui-design>
+    <xui-design xid="a-tab-item-1">Contenu</xui-design>
+
+</xui-factory>

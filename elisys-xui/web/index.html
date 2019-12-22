@@ -1,0 +1,50 @@
+<html style="height:100vh; overflow:auto;" data-xid="frame-vuetify-1-root">
+   <head data-xid="header-vuetify">
+      <title>XUIDesigner - VueJS</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" data-xid="viewport-no-zoom"></meta>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"></link>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
+      <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+   </head>
+   <script defer src="libxui.dart.js"></script>
+   <script>
+			window._app={};
+			window._app.load=(html)=>{
+			  console.debug("load", html);
+  
+			  window.document.body.innerHTML=html;
+			  $xui.loadTemplate();
+			};
+		</script>
+   <script data-xid="xui-script-data">
+		$xui={};
+		$xui.rootdata={ 
+			dark:true, 
+			heightHeader:32, 
+			heightFooter:32, 
+			ContentfillPage:true };
+
+		console.debug("$xui", $xui);
+	</script>
+   <script>
+Vue.config.devtools = true;
+Vue.config.productionTip = false;
+
+$xui.loadTemplate= ()=>
+{
+	$xui.vuejs = new Vue(
+	{
+		template:'#xui-rootTemplate', 
+		el: '#app', 
+		vuetify: new Vuetify(), 
+		data: $xui.rootdata,
+		computed: {
+			$xui : function(){
+				return window.$xui;
+			}
+		}
+	});
+}   </script>
+</html>

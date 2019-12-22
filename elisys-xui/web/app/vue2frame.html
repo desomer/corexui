@@ -1,0 +1,113 @@
+<xui-factory version="1.0">
+			
+	<html xid="frame-vuetify-1-root" xui-mode="final" style="height:100vh; overflow:auto;">
+		<xui-prop id="titleApp" val="XUIDesigner - VueJS"></xui-prop>
+		
+		<head xid="header-vuetify"></head>
+
+		<script defer src="libxui.dart.js"></script>
+		<script>
+			window._app={};
+			window._app.load=(html)=>{
+			  console.debug("load", html);
+  
+			  window.document.body.innerHTML=html;
+			  $xui.loadTemplate();
+			};
+		</script>
+	
+		<xui-script-data></xui-script-data>
+
+		<script>
+			<xui-inject xui-path="app/vuetify.js"></xui-inject>
+		</script>
+	</html>
+
+	<html xid="frame-vuetify-1" xui-mode="final" style="height:100vh; overflow:auto;" xui-slot-name="Page">
+		<head xid="header-vuetify"></head>
+		<body xid="body-vuetify" style="height:100vh"></body>
+		<xui-script-data></xui-script-data>
+		<xui-init-vuetify></xui-init-vuetify>	
+		<script xid="script-aftervue"></script>
+		<script xid="json-design-info"></script>
+	</html>
+
+	<div xid="frame-vuetify-1-design" xui-mode="design" xui-slot-name="Page">
+		<div xid="body-vuetify" style="height:100vh"></div>
+		<script xid="script-aftervue"></script>
+		<script xid="json-design-info"></script>
+	</div>
+	
+	<xui-design xid="header-vuetify">
+		<title>__titleApp__</title>
+		<viewport-no-zoom></viewport-no-zoom>
+	
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"/>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"/>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"/>
+		
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+		
+		<xui-slot xid="inject-other-header"></xui-slot>
+	</xui-design>
+	
+	<meta xid="viewport-no-zoom" name="viewport" 
+		content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+	</meta>
+	
+	<xui-design xid="maincontent" >
+		<xui-slot xid="inject-design-ui" ></xui-slot>
+		<vue-toolbar-1></vue-toolbar-1>
+		<vue-content-1></vue-content-1>
+		<vue-footer-1></vue-footer-1>
+	</xui-design>
+			
+	<v-app-bar xid="vue-toolbar-1"  xui-slot-name="Toolbar" fixed app :dark="dark" :height="heightHeader" color="__colorApp__">
+		<v-app-bar-nav-icon></v-app-bar-nav-icon>
+		<v-toolbar-title>__titleApp__</v-toolbar-title>
+		<v-spacer></v-spacer>
+		<xui-slot xid="slot-action-app" xui-slot-name="Action"></xui-slot>
+	</v-app-bar>
+	
+
+	<v-content xid="vue-content-1">
+		<v-container xid="container"  xui-slot-name="Main content" fluid :fill-height="ContentfillPage" class="pa-0" style="align-items:start">
+			<xui-slot xui-full xid="main" xui-slot-name="Content"></xui-slot>
+		</v-container>
+	</v-content>
+	
+	<v-footer xid="vue-footer-1"  xui-slot-name="Footer" inset app :height="heightFooter" :dark="dark" color="__colorApp__">
+	    <xui-slot xid="slot-action-footer" xui-slot-name="Action"></xui-slot>
+	    <v-spacer></v-spacer>
+		<span>&amp;copy;&amp;nbsp;__copyrightApp__</span>
+	</v-footer>
+
+    <xui-design xid="body-vuetify">
+		<template id = "xui-rootTemplate">
+			<v-app xid="maincontent"  style="background:__colorBg__"></v-app>
+		</template>
+		
+		<div id="app" ></div>
+		
+	</xui-design>
+	
+	<script xid="xui-script-data" >
+		$xui={};
+		$xui.rootdata={ 
+			dark:true, 
+			heightHeader:32, 
+			heightFooter:32, 
+			ContentfillPage:true };
+
+		console.debug("$xui", $xui);
+	</script>
+
+	<script xid="xui-init-vuetify">
+		
+		 <xui-inject xui-path="app/vuetify.js"></xui-inject>
+		 
+		 $xui.loadTemplate();
+	</script>
+
+</xui-factory>
