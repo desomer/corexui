@@ -12,7 +12,7 @@ external void load(obj);
 
 void main() async {
 
-   String str = await FirstApp().start();
+  String str = await FirstApp().start();
 
-    load(str);
+  load(str);
 }
