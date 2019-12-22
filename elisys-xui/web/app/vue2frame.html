@@ -1,5 +1,6 @@
 <xui-factory version="1.0">
-			
+	
+	<!--  gestion page designer sous dart -->
 	<html xid="frame-vuetify-1-root" xui-mode="final" style="height:100vh; overflow:auto;">
 		<xui-prop id="titleApp" val="XUIDesigner - VueJS"></xui-prop>
 		
@@ -23,6 +24,7 @@
 		</script>
 	</html>
 
+	<!--  gestion page autonome -->
 	<html xid="frame-vuetify-1" xui-mode="final" style="height:100vh; overflow:auto;" xui-slot-name="Page">
 		<head xid="header-vuetify"></head>
 		<body xid="body-vuetify" style="height:100vh"></body>
@@ -32,6 +34,7 @@
 		<script xid="json-design-info"></script>
 	</html>
 
+	<!--  gestion pour designer -->
 	<div xid="frame-vuetify-1-design" xui-mode="design" xui-slot-name="Page">
 		<div xid="body-vuetify" style="height:100vh"></div>
 		<script xid="script-aftervue"></script>
@@ -104,9 +107,7 @@
 	</script>
 
 	<script xid="xui-init-vuetify">
-		
 		 <xui-inject xui-path="app/vuetify.js"></xui-inject>
-		 
 		 $xui.loadTemplate();
 	</script>
 
