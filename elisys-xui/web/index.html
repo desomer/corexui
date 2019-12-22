@@ -10,8 +10,8 @@
    </head>
    <script defer src="libxui.dart.js"></script>
    <script>
-			window._app={};
-			window._app.load=(html)=>{
+			window.$xui={};
+			window.$xui.load=(html)=>{
 			  console.debug("load", html);
   
 			  window.document.body.innerHTML=html;
@@ -19,7 +19,7 @@
 			};
 		</script>
    <script data-xid="xui-script-data">
-		$xui={};
+		$xui=$xui!=null?$xui:{};
 		$xui.rootdata={ 
 			dark:true, 
 			heightHeader:32, 
@@ -34,9 +34,14 @@ Vue.config.productionTip = false;
 
 $xui.loadTemplate= ()=>
 {
+	if ($xui.vuejs!=null)
+		$xui.vuejs.$destroy();
+
+    str =document.querySelector("#xui-rootTemplate").innerHTML;
+
 	$xui.vuejs = new Vue(
 	{
-		template:'#xui-rootTemplate', 
+		template: str,   // pas de cache car en string
 		el: '#app', 
 		vuetify: new Vuetify(), 
 		data: $xui.rootdata,
@@ -46,5 +51,6 @@ $xui.loadTemplate= ()=>
 			}
 		}
 	});
-}   </script>
+}
+   </script>
 </html>

@@ -51,13 +51,20 @@ class HTMLReader {
     //   print("---------------");
     var xmlelem = XMLElem();
 
-    //   print(elem.runtimeType);
+   
     if (elem is Element) {
       xmlelem.tag = elem.localName;
-    }
-
-    if (elem is Text) {
+    } else if (elem is Text) {
       xmlelem.text = elem.text;
+    } 
+    else if (elem is Comment)
+    {
+      // un commentaire
+      return Future.value();
+    }
+    else 
+    {
+      print(elem);
     }
 
     xmlelem.attributs = elem.attributes;

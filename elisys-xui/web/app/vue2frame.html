@@ -8,8 +8,8 @@
 
 		<script defer src="libxui.dart.js"></script>
 		<script>
-			window._app={};
-			window._app.load=(html)=>{
+			window.$xui={};
+			window.$xui.load=(html)=>{
 			  console.debug("load", html);
   
 			  window.document.body.innerHTML=html;
@@ -96,7 +96,7 @@
 	</xui-design>
 	
 	<script xid="xui-script-data" >
-		$xui={};
+		$xui=$xui!=null?$xui:{};
 		$xui.rootdata={ 
 			dark:true, 
 			heightHeader:32, 
