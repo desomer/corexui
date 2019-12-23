@@ -70,6 +70,10 @@ class XUIModel implements Comparable<XUIModel> {
     // lance les design (pour affectation property utilise)
     if (elem.xid != null && this is! XUIDesign) {
       var dico = xuifile.searchDesign(elem.xid);
+
+      if (elem.xid=="inject-after-body")
+          elem=elem;
+
       if (dico != null) {
         for (var item in dico.sort()) {
           await item.processPhase1(xuifile, elemHtml);

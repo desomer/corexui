@@ -4,17 +4,19 @@ import '../core/XUIFactory.dart';
 import '../core/parser/HTMLReader.dart';
 import '../core/parser/ProviderAjax.dart';
 
-class FirstApp {
-  Future<String> start() async {
+class PageManager {
+
+  Future<String> getHtml(String uri, String xid) async {
 
     var provider = ProviderAjax();
 
-    var reader = HTMLReader('app/frame1.html', provider);
+    var reader = HTMLReader(uri, provider);
 
     var bufferHtml = XUIHtmlBuffer();
 
-    await XUIEngine().start(reader, bufferHtml, "rootweb");
+    await XUIEngine().start(reader, bufferHtml, xid);
 
     return Future.sync(() => bufferHtml.html.toString());
   }
+  
 }

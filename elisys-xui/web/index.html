@@ -1,6 +1,6 @@
-<html style="height:100vh; overflow:auto;" data-xid="frame-vuetify-1-root">
+<html data-slot="Page" style="height:100vh; overflow:auto;" data-xid="root">
    <head data-xid="header-vuetify">
-      <title>XUIDesigner - VueJS</title>
+      <title>Designer XUI</title>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" data-xid="viewport-no-zoom"></meta>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"></link>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
@@ -8,18 +8,44 @@
       <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
    </head>
-   <script defer src="libxui.dart.js"></script>
+   <body style="height:100vh" data-xid="body-vuetify">
+      <template id="xui-rootTemplate">
+         <v-app style="background:white" data-xid="maincontent">
+            <v-app-bar app fixed :height="heightHeader" data-slot="Toolbar" color="blue" :dark="dark" data-xid="vue-toolbar-1">
+               <v-app-bar-nav-icon></v-app-bar-nav-icon>
+               <v-toolbar-title>Designer XUI</v-toolbar-title>
+               <v-spacer></v-spacer>
+            </v-app-bar>
+            <v-content data-xid="vue-content-1">
+               <v-container data-slot="Main content" fluid style="align-items:start" :fill-height="ContentfillPage" class="pa-0" data-xid="container">
+                  <iframe data-xid-impl="main" style="width:100%;height:100%;position:absolute" id="rootFrame"></iframe>
+               </v-container>
+            </v-content>
+            <v-footer app :height="heightFooter" inset data-slot="Footer" color="blue" :dark="dark" data-xid="vue-footer-1">
+               <v-spacer></v-spacer>
+               <span>&copy;&nbsp;Elisys 2019</span>
+            </v-footer>
+         </v-app>
+      </template>
+      <div id="app"></div>
+   </body>
+   <script src="libxui.dart.js"></script>
    <script>
-			window.$xui={};
-			window.$xui.load=(html)=>{
-			  console.debug("load", html);
-  
-			  window.document.body.innerHTML=html;
-			  $xui.loadTemplate();
-			};
-		</script>
+            window.$xui={};
+            window.$xui.load=(html)=>{
+               // console.debug("load", html);
+                document.querySelector("#rootFrame").srcdoc =html;
+            };
+
+            window.$xui.changeTemplate=(html)=>{
+                //console.debug("change template", html);
+                document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":html }, "*");
+            };
+        </script>
    <script data-xid="xui-script-data">
-		$xui=$xui!=null?$xui:{};
+		if (typeof $xui === 'undefined')
+			$xui={};
+
 		$xui.rootdata={ 
 			dark:true, 
 			heightHeader:32, 
@@ -28,9 +54,19 @@
 
 		console.debug("$xui", $xui);
 	</script>
-   <script>
+   <script data-xid="xui-init-vuetify">
 Vue.config.devtools = true;
 Vue.config.productionTip = false;
+
+window.addEventListener('message',function(e) {
+	var data = e.data;
+	if (data.action=="changeTemplate")
+	{
+		var template = data.template;
+		this.document.body.innerHTML=template;
+		$xui.loadTemplate();
+	}
+});
 
 $xui.loadTemplate= ()=>
 {
@@ -52,5 +88,9 @@ $xui.loadTemplate= ()=>
 		}
 	});
 }
-   </script>
+
+		 $xui.loadTemplate();
+	   </script>
+   <script data-xid="script-aftervue"></script>
+   <script data-xid="json-design-info"></script>
 </html>

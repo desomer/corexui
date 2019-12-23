@@ -1,0 +1,33 @@
+<xui-factory version="1.0">
+    <xui-import xui-path="app/vue2frame.html"></xui-import>
+
+    <frame-vuetify-1 xid="root"></frame-vuetify-1>
+
+    <xui-design xid="root">
+        <xui-prop id="titleApp" val="Designer XUI"></xui-prop>
+        <xui-prop id="colorApp" val="blue"></xui-prop>
+        <xui-prop id="colorBg" val="white"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2019"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="main">
+        <iframe style="width:100%;height:100%;position:absolute" id='rootFrame'></iframe>
+    </xui-design>
+    
+    <xui-design xid="inject-after-body">
+        <script src="libxui.dart.js"></script>
+        <script>
+            window.$xui={};
+            window.$xui.load=(html)=>{
+               // console.debug("load", html);
+                document.querySelector("#rootFrame").srcdoc =html;
+            };
+
+            window.$xui.changeTemplate=(html)=>{
+                //console.debug("change template", html);
+                document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":html }, "*");
+            };
+        </script>
+    </xui-design>
+
+</xui-factory>

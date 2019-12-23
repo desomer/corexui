@@ -136,14 +136,20 @@ class XUIResource extends XMLElemReader {
       if (element.tag.toString().toLowerCase() == TAG_DESIGN) {
         // gestion des design
         elemXui.tag = null; // pas de tag a affecter si cest le tag design
-        designs[elemXui.xid] ??= DicoOrdered()..add(XUIDesign(elemXui));
+        if (elemXui.xid!=null)
+        {
+            designs[elemXui.xid] ??= DicoOrdered();
+            designs[elemXui.xid].add(XUIDesign(elemXui));
+        }
+
       } else {
         if (elemXui.xid != null) {
           // gestion des xui
           var elemParent = parent as XUIElementXUI;
           // ajoute en tant que composant uniquement si parent factory
           if (elemParent.tag.toString().toLowerCase() == TAG_FACTORY) {
-               components[elemXui.xid] ??= DicoOrdered()..add(XUIComponent(elemXui));
+               components[elemXui.xid] ??= DicoOrdered();
+               components[elemXui.xid].add(XUIComponent(elemXui));
           }
         }
       }

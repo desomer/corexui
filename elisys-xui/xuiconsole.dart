@@ -21,30 +21,28 @@ void main() async {
 
   var provider = ProviderFile('C:/src_dart/elisys-xui/web/');
 
-  var reader = HTMLReader('app/frame1.html', provider); //vue2frame.html
   var bufferHtml = XUIHtmlBuffer();
 
-  bool designer = true;
+  bool designer = false;
 
   if (designer) {
-    await XUIEngine().start(reader, bufferHtml, "frame-vuetify-1-root");
+    var reader = HTMLReader('app/frameDesigner.html', provider);
+    await XUIEngine().start(reader, bufferHtml, "root");
+
     print(bufferHtml.html);
 
     print("write ok size=${bufferHtml.html.length}");
-    new File('C:/src_dart/elisys-xui/web/index.html')
-        .writeAsStringSync(bufferHtml.html.toString());
+    var path = 'C:/src_dart/elisys-xui/web/index.html';
+    new File(path).writeAsStringSync(bufferHtml.html.toString());
+
   } else {
-    await XUIEngine().start(reader, bufferHtml, "root"); //frame-vuetify-1
+    var reader = HTMLReader('app/frame1.html', provider);
+    await XUIEngine().start(reader, bufferHtml, "root-designer");
 
     print(bufferHtml.html);
 
     print("write ok size=${bufferHtml.html.length}");
-//   new File('c:/src_dart/elisys-xui/web/test.html').writeAsStringSync(bufferHtml.html.toString());
-    new File('c:/xui/assets/test.html')
-        .writeAsStringSync(bufferHtml.html.toString());
+    var path = 'c:/xui/assets/test.html';
+    new File(path).writeAsStringSync(bufferHtml.html.toString());
   }
-// } catch (e) {
-//     e.
-//     print(e);
-// }
 }

@@ -41,7 +41,6 @@ class HTMLReader {
     this.content = text;
 
     var document = Element.html(this.content);
-    _parseElem(document, null, elemReader);
 
     return _parseElem(document, null, elemReader);
   }
