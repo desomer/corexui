@@ -1,7 +1,7 @@
 <xui-factory version="1.0">
 	
 	<!--  gestion page autonome -->
-	<html xid="frame-vuetify-1" xui-mode="final" style="height:100vh; overflow:auto;" xui-slot-name="Page">
+	<html xid="frame-vuetify-1" style="height:100vh; overflow:auto;" xui-slot-name="Page">
 		<head xid="header-vuetify"></head>
 		<body xid="body-vuetify" style="height:100vh"></body>
 		<xui-slot xid="inject-after-body"></xui-slot>
@@ -18,7 +18,7 @@
 
 	
 	<xui-design xid="header-vuetify">
-		<title>__titleApp__</title>
+		<title>[[titleApp]]</title>
 		<viewport-no-zoom></viewport-no-zoom>
 	
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"/>
@@ -42,9 +42,9 @@
 		<vue-footer-1></vue-footer-1>
 	</xui-design>
 			
-	<v-app-bar xid="vue-toolbar-1"  xui-slot-name="Toolbar" fixed app :dark="dark" :height="heightHeader" color="__colorApp__">
+	<v-app-bar xid="vue-toolbar-1"  xui-slot-name="Toolbar" fixed app :dark="dark" :height="heightHeader" color="[[colorApp]]">
 		<v-app-bar-nav-icon></v-app-bar-nav-icon>
-		<v-toolbar-title>__titleApp__</v-toolbar-title>
+		<v-toolbar-title>[[titleApp]]</v-toolbar-title>
 		<v-spacer></v-spacer>
 		<xui-slot xid="slot-action-app" xui-slot-name="Action"></xui-slot>
 	</v-app-bar>
@@ -56,15 +56,15 @@
 		</v-container>
 	</v-content>
 	
-	<v-footer xid="vue-footer-1"  xui-slot-name="Footer" inset app :height="heightFooter" :dark="dark" color="__colorApp__">
+	<v-footer xid="vue-footer-1"  xui-slot-name="Footer" inset app :height="heightFooter" :dark="dark" color="[[colorApp]]">
 	    <xui-slot xid="slot-action-footer" xui-slot-name="Action"></xui-slot>
 	    <v-spacer></v-spacer>
-		<span>&amp;copy;&amp;nbsp;__copyrightApp__</span>
+		<span>&amp;copy;&amp;nbsp;[[copyrightApp]]</span>
 	</v-footer>
 
     <xui-design xid="body-vuetify">
 		<template id = "xui-rootTemplate">
-			<v-app xid="maincontent"  style="background:__colorBg__"></v-app>
+			<v-app xid="maincontent"  style="background:--colorBg--"></v-app>
 		</template>
 		
 		<div id="app" ></div>
@@ -81,7 +81,6 @@
 			heightFooter:32, 
 			ContentfillPage:true };
 
-		console.debug("$xui", $xui);
 	</script>
 
 	<script xid="xui-init-vuetify">

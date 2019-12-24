@@ -1,5 +1,6 @@
 <xui-factory version="1.0">
     <xui-import xui-path="app/vue2frame.html"></xui-import>
+    <xui-import xui-path="app/cmp2vuetify.html"></xui-import>
 
     <frame-vuetify-1 xid="root" xui-mode="final"></frame-vuetify-1>
     <template-vuetify-1 xid="root-designer" xui-mode="design"></template-vuetify-1>
@@ -19,22 +20,33 @@
     </xui-design>
 
     <xui-design xid="main">
-
-        <v-tabs>
-            <v-tab><xui-slot xid="a-tab-1" xui-slot-name="Tab"></xui-slot></v-tab>
-            <v-tab-item><xui-slot xid="a-tab-item-1" xui-slot-name="Tab Content"></xui-slot></v-tab-item>
-            <v-tab>b</v-tab>
-            <v-tab-item>b</v-tab-item>
-        </v-tabs>
-
-        <xui-slot xui-for="idx" xui-nb="5">
-            <span  xid="__parent-xid__-span-__idx__"> une boucle </span>
-        </xui-slot>
-
+        <xui-tabs xid="a">
+            <xui-prop id="nb" val="2"></xui-prop>
+        </xui-tabs>
 
     </xui-design>
-    
-    <xui-design xid="a-tab-1">TITRE</xui-design>
+
+    <xui-design xid="a-tab-0">Onglet 1</xui-design>
+    <xui-design xid="a-tab-item-0">
+        <xui-grid xid="grid1">
+            <xui-prop id="nb" val="2"></xui-prop>
+        </xui-grid>
+    </xui-design>
+
+    <xui-design xid="a-tab-1">TITRE B</xui-design>
     <xui-design xid="a-tab-item-1">Contenu</xui-design>
+
+    <xui-design xid="grid1-row-0">
+        <xui-prop id="nb" val="2"></xui-prop>
+    </xui-design>
+    <xui-design xid="grid1-row-0-col-0">COL 11</xui-design>
+    <xui-design xid="grid1-row-0-col-1">COL 12</xui-design>
+
+    <xui-design xid="grid1-row-1">
+        <xui-prop id="nb" val="3"></xui-prop>
+    </xui-design>
+    <xui-design xid="grid1-row-1-col-0">COL 21</xui-design>
+    <xui-design xid="grid1-row-1-col-1">COL 22</xui-design>
+    <xui-design xid="grid1-row-1-col-2">COL 23</xui-design>
 
 </xui-factory>

@@ -13,10 +13,20 @@ class XUIProperty {
 
   static int _parseNext(StringBuffer parsebuilder, int idx, Function action) {
     String parse = parsebuilder.toString();
-    int next = parse.indexOf("__", idx);
+    String startTag= "[[";
+    String endTag= "]]";
+
+    int next = parse.indexOf(startTag, idx);
+    if (next==-1)
+    {
+        startTag="--";
+        endTag= "--";
+        next = parse.indexOf(startTag, idx);
+    }
+    
     int nextEnd = next;
     if (next >= 0) {
-      nextEnd = parse.indexOf("__", next+1);
+      nextEnd = parse.indexOf(endTag, next+1);
     }
 
     if (next >= 0 && nextEnd > 0) {

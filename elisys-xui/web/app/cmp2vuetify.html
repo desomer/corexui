@@ -1,0 +1,25 @@
+<xui-factory version="1.0">
+    <!-------------------------- XUI-TABS -------------------------------->
+    <v-tabs xid="xui-tabs" xui-for="idx" xui-slot-name="Tab">
+        <v-tab>
+            <xui-slot xid="[[parent-xid]]-tab-[[idx]]" xui-slot-name="Tab [[idx]]"></xui-slot>
+        </v-tab>
+        <v-tab-item>
+            <xui-slot xid="[[parent-xid]]-tab-item-[[idx]]" xui-slot-name="Tab Content [[idx]]"></xui-slot>
+        </v-tab-item>
+    </v-tabs>
+
+    <!--------------------------  XUI-GRID   ----------------------------->
+    <v-container xid="xui-grid" xui-for="idx" xui-slot-name="Grid">
+        <v-row>
+            <xui-col xid="[[parent-xid]]-row-[[idx]]" xui-slot-name="Grid row [[idx]]"></xui-col>
+        </v-row>
+    </v-container>
+
+    <xui-slot xid="xui-col" xui-for="idxc">
+        <v-col>
+            <xui-slot xid="[[parent-xid]]-col-[[idxc]]" xui-slot-name="Grid row [[idx]] col [[idxc]]"></xui-slot>
+        </v-col>
+    </xui-slot>
+    
+</xui-factory>

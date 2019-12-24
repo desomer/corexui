@@ -5,43 +5,44 @@ import '../XUIFactory.dart';
 import '../element/XUIElement.dart';
 import '../element/XUIProperty.dart';
 
-class NativeRegister
-{
-
-  NativeRegister( XUIResource reader)
-  {
-      addNativeComponentInject(reader);
-      addNativeComponentSlot(reader);
+class NativeRegister {
+  NativeRegister(XUIResource reader) {
+    addNativeComponentInject(reader);
+    addNativeComponentSlot(reader);
   }
 
   void addNativeComponentInject(XUIResource reader) {
     var aComponent = XUIElementNative();
 
-    aComponent.fctPhase1 =  (XUIResource xuifile, XUIElementNative elem, XUIElementHTML html) async {
+    aComponent.fctPhase1 = (XUIResource xuifile, XUIElementNative elem,
+        XUIElementHTML html) async {
       var root = XUIElementXUI();
       root.tag = TAG_NO_DOM;
 
       var aText = XUIElementText();
       var idResource = html.origin.propertiesXUI["path"].content;
 
-      aText.content = await xuifile.reader.provider.getResourceFutur(idResource);
+      aText.content =
+          await xuifile.reader.provider.getResourceFutur(idResource);
       root.children ??= []..add(aText);
 
-      Future<XUIModel> f = Future.sync(()=>XUIModel(root));
+      Future<XUIModel> f = Future.sync(() => XUIModel(root));
       return f;
     };
 
-    reader.components["xui-inject"] ??= DicoOrdered()..add(XUIComponent(aComponent));
+    reader.components["xui-inject"] ??= DicoOrdered()
+      ..add(XUIComponent(aComponent));
   }
 
   void addNativeComponentSlot(XUIResource reader) {
     var aComponent = XUIElementNative();
 
-    aComponent.fctPhase1 =
-         (XUIResource xuifile, XUIElementNative elem, XUIElementHTML html) async {
+    aComponent.fctPhase1 = (XUIResource xuifile, XUIElementNative elem,
+        XUIElementHTML html) async {
       var root = XUIElementXUI();
       root.tag = TAG_NO_DOM;
-      Future<XUIModel> f = Future.sync(()=>XUIModel(root));
+      
+      Future<XUIModel> f = Future.sync(() => XUIModel(root));
       return f;
     };
 
@@ -60,7 +61,7 @@ class NativeRegister
       });
     };
 
-    reader.components["xui-slot"] ??= DicoOrdered()..add(XUIComponent(aComponent));
+    reader.components["xui-slot"] ??= DicoOrdered()
+      ..add(XUIComponent(aComponent));
   }
-
 }
