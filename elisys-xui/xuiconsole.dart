@@ -5,6 +5,8 @@ import 'web/core/parser/HTMLReader.dart';
 import 'web/core/XUIEngine.dart';
 import 'web/core/XUIFactory.dart';
 import 'web/core/parser/ProviderFile.dart';
+import 'web/core/XUIEngine.dart' as Const;
+
 
 /**
  * 
@@ -23,11 +25,14 @@ void main() async {
 
   var bufferHtml = XUIHtmlBuffer();
 
-  bool designer = false;
+  bool designer = true;
 
   if (designer) {
     var reader = HTMLReader('app/frameDesigner.html', provider);
-    await XUIEngine().start(reader, bufferHtml, "root");
+    var xuiEngine = XUIEngine();
+    var ctx = XUIContext(Const.MODE_FINAL);
+    await xuiEngine.start(reader, ctx);
+    await xuiEngine.toHTMLString(bufferHtml, "root", ctx);
 
     print(bufferHtml.html);
 
@@ -37,7 +42,10 @@ void main() async {
 
   } else {
     var reader = HTMLReader('app/frame1.html', provider);
-    await XUIEngine().start(reader, bufferHtml, "root-designer");
+    var xuiEngine = XUIEngine();
+    var ctx = XUIContext(Const.MODE_TEMPLATE);
+    await xuiEngine.start(reader, ctx);
+    await xuiEngine.toHTMLString(bufferHtml, "root", ctx);
 
     print(bufferHtml.html);
 

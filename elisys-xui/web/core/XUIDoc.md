@@ -10,4 +10,6 @@ Factory =
 
 Element =
     -   convertion de elemnentHTML en code HTML au travers du XUIHtmlBuffer
-    -   applique les propertiesXUI dans les __xxx__
+    -   applique les propertiesXUI dans les __xxx__  ou [[xxx]]
+
+    

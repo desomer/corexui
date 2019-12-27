@@ -1,25 +1,43 @@
 <xui-factory version="1.0">
     <!-------------------------- XUI-TABS -------------------------------->
-    <v-tabs xid="xui-tabs" xui-for="idx" xui-slot-name="Tab">
+    <v-tabs xid="xui-tabs" xui-for="idx" xui-slot-name="tab">
         <v-tab>
-            <xui-slot xid="[[parent-xid]]-tab-[[idx]]" xui-slot-name="Tab [[idx]]"></xui-slot>
+            <xui-slot xid="[[parent-xid]]-tab-[[idx]]" xui-slot-name="tab [[idx]]"></xui-slot>
         </v-tab>
         <v-tab-item>
-            <xui-slot xid="[[parent-xid]]-tab-item-[[idx]]" xui-slot-name="Tab Content [[idx]]"></xui-slot>
+            <xui-slot xid="[[parent-xid]]-tab-item-[[idx]]" xui-slot-name="tab content [[idx]]"></xui-slot>
         </v-tab-item>
     </v-tabs>
 
     <!--------------------------  XUI-GRID   ----------------------------->
-    <v-container xid="xui-grid" xui-for="idx" xui-slot-name="Grid">
+    <v-container xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
         <v-row>
-            <xui-col xid="[[parent-xid]]-row-[[idx]]" xui-slot-name="Grid row [[idx]]"></xui-col>
+            <xui-col xid="[[parent-xid]]-row-[[idxr]]" xui-slot-name="row [[idxr]]"></xui-col>
         </v-row>
     </v-container>
 
     <xui-slot xid="xui-col" xui-for="idxc">
-        <v-col>
-            <xui-slot xid="[[parent-xid]]-col-[[idxc]]" xui-slot-name="Grid row [[idx]] col [[idxc]]"></xui-slot>
+        <v-col class="xui-grid-col">
+            <xui-slot xid="[[parent-xid]]-col-[[idxc]]" xui-slot-name="row [[idxr]] col [[idxc]]"></xui-slot>
         </v-col>
     </xui-slot>
+
+    <xui-design xid="inject-other-header">
+        <style>
+            .xui-grid-col.col { padding:0px 0px; }
+        </style>
+    </xui-design>
+
+
+    <!--------------------------  XUI-SLOT   ----------------------------->
+    <div xid="xui-div-slot" class="xui-class-slot" ></div>
+
+    <xui-design xid="inject-other-header" xui-mode="design;template">
+        <style>
+            .xui-class-slot { border : 1px dashed lightgray; box-sizing: border-box; min-height: 20px; min-width: 20px; text-decoration: underline dotted;font-style: italic; user-select:none; }
+            .xui-class-slot-full { height:100%; width:100% }
+            .xui-class-slot:hover { border : 1px dashed blue; box-sizing: border-box; }
+        </style>
+    </xui-design>
     
 </xui-factory>

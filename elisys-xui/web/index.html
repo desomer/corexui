@@ -1,27 +1,27 @@
-<html data-slot="Page" style="height:100vh; overflow:auto;" data-xid="root">
-   <head data-xid="header-vuetify">
+<html style="height:100vh; overflow:auto;" data-xui-slot-name="page">
+   <head>
       <title>Designer XUI</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" data-xid="viewport-no-zoom"></meta>
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"></meta>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"></link>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
       <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
    </head>
-   <body style="height:100vh" data-xid="body-vuetify">
+   <body style="height:100vh">
       <template id="xui-rootTemplate">
-         <v-app style="background:white" data-xid="maincontent">
-            <v-app-bar app fixed :height="heightHeader" data-slot="Toolbar" color="blue" :dark="dark" data-xid="vue-toolbar-1">
+         <v-app style="background:white">
+            <v-app-bar app color="blue" fixed :dark="dark" :height="heightHeader" data-xui-slot-name="toolbar">
                <v-app-bar-nav-icon></v-app-bar-nav-icon>
                <v-toolbar-title>Designer XUI</v-toolbar-title>
                <v-spacer></v-spacer>
             </v-app-bar>
-            <v-content data-xid="vue-content-1">
-               <v-container data-slot="Main content" fluid style="align-items:start" :fill-height="ContentfillPage" class="pa-0" data-xid="container">
-                  <iframe data-xid-impl="main" style="width:100%;height:100%;position:absolute" id="rootFrame"></iframe>
+            <v-content>
+               <v-container fluid style="align-items:start" :fill-height="ContentfillPage" class="pa-0" data-xui-slot-name="main content">
+                  <iframe data-xui-slot-xid="main" style="width:100%;height:100%;position:absolute" class="xui-class-slot-full" id="rootFrame" data-xui-slot-name="content"></iframe>
                </v-container>
             </v-content>
-            <v-footer app :height="heightFooter" inset data-slot="Footer" color="blue" :dark="dark" data-xid="vue-footer-1">
+            <v-footer app color="blue" :dark="dark" :height="heightFooter" data-xui-slot-name="footer" inset>
                <v-spacer></v-spacer>
                <span>&copy;&nbsp;Elisys 2019</span>
             </v-footer>
@@ -42,7 +42,7 @@
                 document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":html }, "*");
             };
         </script>
-   <script data-xid="xui-script-data">
+   <script>
 		if (typeof $xui === 'undefined')
 			$xui={};
 
@@ -53,7 +53,7 @@
 			ContentfillPage:true };
 
 	</script>
-   <script data-xid="xui-init-vuetify">
+   <script>
 Vue.config.devtools = true;
 Vue.config.productionTip = false;
 
@@ -90,6 +90,6 @@ $xui.loadTemplate= ()=>
 
 		 $xui.loadTemplate();
 	   </script>
-   <script data-xid="script-aftervue"></script>
-   <script data-xid="json-design-info"></script>
+   <script></script>
+   <script></script>
 </html>

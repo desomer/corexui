@@ -6,7 +6,7 @@ import '../core/parser/ProviderAjax.dart';
 
 class PageManager {
 
-  Future<String> getHtml(String uri, String xid) async {
+  Future<String> getHtml( XUIContext ctx, String uri, String xid) async {
 
     var provider = ProviderAjax();
 
@@ -14,9 +14,12 @@ class PageManager {
 
     var bufferHtml = XUIHtmlBuffer();
 
-    await XUIEngine().start(reader, bufferHtml, xid);
 
-    return Future.sync(() => bufferHtml.html.toString());
+    var xuiEngine = XUIEngine();
+    await xuiEngine.start(reader, ctx);
+    await xuiEngine.toHTMLString(bufferHtml, xid, ctx);
+
+    return Future.value(bufferHtml.html.toString());
   }
   
 }

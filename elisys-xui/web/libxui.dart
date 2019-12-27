@@ -3,6 +3,7 @@ library xuiapp;
 
 import 'package:js/js.dart';
 import 'app/PageManager.dart';
+import 'core/XUIEngine.dart';
 
 
 @JS()
@@ -15,7 +16,7 @@ external void changeTemplate(obj);
 external set _refresh(void Function() f);
 
 void refresh() async {
-  String str = await PageManager().getHtml('app/frame1.html', 'root-designer');
+  String str = await PageManager().getHtml(XUIContext(MODE_TEMPLATE), 'app/frame1.html', 'root');
 //  print(str);
   changeTemplate(str);
 }
@@ -25,7 +26,7 @@ void refresh() async {
 void main() async {
   _refresh = allowInterop(refresh);
 
- String str = await PageManager().getHtml('app/frame1.html', 'root');
+ String str = await PageManager().getHtml(XUIContext(MODE_DESIGN), 'app/frame1.html', 'root');
   // print(str);
   load(str);
 }

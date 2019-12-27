@@ -10,6 +10,7 @@ import 'parser/HTMLReader.dart';
 
 const ATTR_XID = "xid";
 const ATTR_SLOT_NAME = "slot-name";
+const ATTR_MODE = "mode";
 
 const TAG_ESCAPE = "xui-escape-";
 const TAG_NO_DOM = "xui-no-dom";
@@ -17,25 +18,55 @@ const TAG_NO_DOM = "xui-no-dom";
 const TAG_DESIGN = "xui-design";
 const TAG_FACTORY = "xui-factory";
 const TAG_IMPORT = "xui-import";
+const TAG_DIV_SLOT = "xui-div-slot";
 const TAG_PROP = "xui-prop";
+
+const MODE_ALL = "";
+const MODE_FINAL = "final";
+const MODE_TEMPLATE = "template";
+const MODE_DESIGN = "design";
 
 /*************************************************************************** */
 abstract class Provider {
   Future<String> getResourceFutur(String id);
 }
 
-class DicoOrdered<T> {
+class XUIContext {
+  String mode;
+  XUIContext(this.mode);
+}
+
+class DicoOrdered<T extends XUIModel> {
   List<T> list = [];
   bool mustSort = true;
+  var listByMode = LinkedHashMap<String, List<T> >();
 
   add(T elem) {
     mustSort = true;
     list.add(elem);
   }
 
-  List<T> sort() {
-    if (mustSort) list.sort();
-    return list;
+  List<T> sort(XUIContext ctx) {
+    if (mustSort) 
+    {
+        list.sort();
+        listByMode.clear();
+    }
+
+    var ret = listByMode[ctx.mode];
+    if (ret==null)
+    {
+         ret=[];
+         listByMode[ctx.mode]=ret;
+         for (XUIModel item in list) {
+           if (item.mode==MODE_ALL || item.mode.contains(ctx.mode))
+           {
+               ret.add(item);
+           }
+         }
+    }
+
+    return ret;
   }
 }
 
@@ -43,15 +74,17 @@ class DicoOrdered<T> {
 /* converti les xml en xui 
 *
 ****************************************************************************************/
+
 class XUIResource extends XMLElemReader {
   var components = LinkedHashMap<String, DicoOrdered<XUIComponent>>();
   var designs = LinkedHashMap<String, DicoOrdered<XUIDesign>>();
+
   HTMLReader reader;
   List<XUIResource> listSubXUIResource = [];
+  XUIContext context;
 
-  XUIResource(HTMLReader reader) {
-    this.reader = reader;
-  }
+  /**************************************************************/
+  XUIResource(this.reader, this.context);
 
   Future parse() {
     NativeRegister(this);
@@ -60,24 +93,22 @@ class XUIResource extends XMLElemReader {
 
   DicoOrdered<XUIComponent> searchComponent(String tag) {
     var cmp = components[tag];
-    if (cmp==null)
-    {
-        for (var subFile in listSubXUIResource) {
-            cmp = subFile.searchComponent(tag);
-            if (cmp!=null) break;
-        }
+    if (cmp == null) {
+      for (var subFile in listSubXUIResource) {
+        cmp = subFile.searchComponent(tag);
+        if (cmp != null) break;
+      }
     }
     return cmp;
   }
 
-    DicoOrdered<XUIDesign> searchDesign(String tag) {
+  DicoOrdered<XUIDesign> searchDesign(String tag) {
     var cmp = designs[tag];
-    if (cmp==null)
-    {
-        for (var subFile in listSubXUIResource) {
-            cmp = subFile.searchDesign(tag);
-            if (cmp!=null) break;
-        }
+    if (cmp == null) {
+      for (var subFile in listSubXUIResource) {
+        cmp = subFile.searchDesign(tag);
+        if (cmp != null) break;
+      }
     }
     return cmp;
   }
@@ -96,89 +127,114 @@ class XUIResource extends XMLElemReader {
       elemXui = XUIElementText();
       (elemXui as XUIElementText).content = element.text;
     } else {
-      if (element.tag==TAG_IMPORT)
-      {
-        var subReader = HTMLReader(element.attributs["xui-path"], reader.provider);
-        XUIResource subFile =XUIResource(subReader);
+      if (element.tag == TAG_IMPORT) {
+        var subReader =
+            HTMLReader(element.attributs["xui-path"], reader.provider);
+        XUIResource subFile = XUIResource(subReader, context);
         await subFile.parse();
-        subFile.reader.content=null;
+        subFile.reader.content = null;
         listSubXUIResource.add(subFile);
         return Future.value(null);
-      }
-      else if (element.tag==TAG_PROP)
-      {
+      } else if (element.tag == TAG_PROP) {
         XUIElementXUI p = parent;
         p.propertiesXUI ??= HashMap<String, XUIProperty>();
-        p.propertiesXUI[element.attributs["id"]] = XUIProperty(element.attributs["val"]);
+        p.propertiesXUI[element.attributs["id"]] =
+            XUIProperty(element.attributs["val"]);
         return Future.value(null);
       }
 
       // cas d'un elem
       elemXui = XUIElementXUI();
 
+      // gestion des tag escape (HTML, HEAD, ETC...)
       elemXui.tag = element.tag.startsWith(TAG_ESCAPE)
           ? element.tag.substring(TAG_ESCAPE.length)
           : element.tag;
+
       elemXui.xid = element.attributs[ATTR_XID];
       element.attributs.remove(ATTR_XID);
 
-      element.attributs.entries.forEach((f) {
-        if (f.key.toString().startsWith("xui-")) {
-          elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
-          elemXui.propertiesXUI[f.key.toString().substring(4)] = XUIProperty(f.value);
-        } else {
-          elemXui.attributes ??= HashMap<String, XUIProperty>();
-          elemXui.attributes[f.key] =
-              XUIProperty(f.value == "" ? null : f.value);
-        }
-      });
+      processAttributs(element, elemXui);
+
+      String mode = MODE_ALL;
+      if (elemXui.propertiesXUI != null) {
+        var attr = elemXui.propertiesXUI[ATTR_MODE];
+        mode = attr == null ? mode : attr.content.toString();
+      }
 
       if (element.tag.toString().toLowerCase() == TAG_DESIGN) {
         // gestion des design
         elemXui.tag = null; // pas de tag a affecter si cest le tag design
-        if (elemXui.xid!=null)
-        {
-            designs[elemXui.xid] ??= DicoOrdered();
-            designs[elemXui.xid].add(XUIDesign(elemXui));
+        if (elemXui.xid != null) {
+          designs[elemXui.xid] ??= DicoOrdered();
+          designs[elemXui.xid].add(XUIDesign(elemXui, mode));
         }
-
       } else {
         if (elemXui.xid != null) {
-          // gestion des xui
-          var elemParent = parent as XUIElementXUI;
           // ajoute en tant que composant uniquement si parent factory
-          if (elemParent.tag.toString().toLowerCase() == TAG_FACTORY) {
-               components[elemXui.xid] ??= DicoOrdered();
-               components[elemXui.xid].add(XUIComponent(elemXui));
+          if ((parent as XUIElementXUI).tag.toString().toLowerCase() ==
+              TAG_FACTORY) {
+            components[elemXui.xid] ??= DicoOrdered();
+            components[elemXui.xid].add(XUIComponent(elemXui, mode));
           }
         }
       }
     }
 
+    // ajo
     (parent as XUIElement)?.children ??= [];
     (parent as XUIElement)?.children?.add(elemXui);
 
     return Future.value(elemXui);
+  }
+
+  void processAttributs(XMLElem element, XUIElementXUI elemXui) {
+    element.attributs.entries.forEach((f) {
+      if (f.key.toString().startsWith("xui-")) {
+        // les xui- sont des properties
+        elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
+        elemXui.propertiesXUI[f.key.toString().substring(4)] =
+            XUIProperty(f.value);
+      } else {
+        elemXui.attributes ??= HashMap<String, XUIProperty>();
+        elemXui.attributes[f.key] = XUIProperty(f.value == "" ? null : f.value);
+      }
+    });
   }
 }
 
 /************************************************************************************** */
 
 class XUIEngine {
-  Future start(HTMLReader reader, XUIHtmlBuffer writer, String xid) async {
-    var xuiFile = XUIResource(reader);
+
+  XUIResource xuiFile;
+
+  Future start(HTMLReader reader, XUIContext ctx) async {
+    xuiFile =  XUIResource(reader, ctx);
 
     await xuiFile.parse();
+    await addDesign("b-tab-item-0", "<div><h1>test</h1></div>");
 
-    XUIComponent root = xuiFile.searchComponent(xid).list.first;
+    return Future.value();
+  }
 
+  toHTMLString(XUIHtmlBuffer writer, String xid, XUIContext ctx) async {
+    XUIComponent root = xuiFile.searchComponent(xid).sort(ctx).first;
+    
     XUIElementHTML htmlRoot = XUIElementHTML();
-
+    
     await root.processPhase1(xuiFile, htmlRoot);
-    root.processPhase2(xuiFile, htmlRoot);
+    await root.processPhase2(xuiFile, htmlRoot);
+    
+    return Future.sync(() => htmlRoot.toHTMLString(writer));
+  }
 
-    return Future.sync(()=>htmlRoot.toHTMLString(writer));
+  void addDesign(String xid, String html) async
+  {
+    XUIResource res = XUIResource(null, xuiFile.context);
 
+    dynamic ret = await xuiFile.reader.parseString(html, res);
 
+    xuiFile.designs[xid] ??= DicoOrdered()..add(XUIDesign(ret, MODE_ALL));
   }
 }

@@ -45,6 +45,12 @@ class HTMLReader {
     return _parseElem(document, null, elemReader);
   }
 
+  Future parseString(String str, XMLElemReader elemReader) async {
+    var document = Element.html(str);
+
+    return _parseElem(document, null, elemReader);
+  }
+
   /******************************************************/
   Future _parseElem(Node elem, dynamic parent, XMLElemReader elemReader) async {
     //   print("---------------");
@@ -74,6 +80,6 @@ class HTMLReader {
       await _parseElem(child, e, elemReader);
     }
 
-    return Future.value();
+    return Future.value(e);
   }
 }

@@ -1,7 +1,7 @@
 <xui-factory version="1.0">
 	
 	<!--  gestion page autonome -->
-	<html xid="frame-vuetify-1" style="height:100vh; overflow:auto;" xui-slot-name="Page">
+	<html xid="frame-vuetify-1" xui-mode="final;design" style="height:100vh; overflow:auto;" xui-slot-name="page">
 		<head xid="header-vuetify"></head>
 		<body xid="body-vuetify" style="height:100vh"></body>
 		<xui-slot xid="inject-after-body"></xui-slot>
@@ -12,7 +12,7 @@
 	</html>
 
 	<!--  gestion template reload -->
-	<xui-slot xid="template-vuetify-1">
+	<xui-slot xid="frame-vuetify-1" xui-mode="template" xui-slot-name="page">
 		<body xid="body-vuetify" style="height:100vh"></body>
 	</xui-slot>
 
@@ -42,22 +42,21 @@
 		<vue-footer-1></vue-footer-1>
 	</xui-design>
 			
-	<v-app-bar xid="vue-toolbar-1"  xui-slot-name="Toolbar" fixed app :dark="dark" :height="heightHeader" color="[[colorApp]]">
+	<v-app-bar xid="vue-toolbar-1"  xui-slot-name="toolbar" fixed app :dark="dark" :height="heightHeader" color="[[colorApp]]">
 		<v-app-bar-nav-icon></v-app-bar-nav-icon>
 		<v-toolbar-title>[[titleApp]]</v-toolbar-title>
 		<v-spacer></v-spacer>
-		<xui-slot xid="slot-action-app" xui-slot-name="Action"></xui-slot>
+		<xui-slot xid="slot-action-app" xui-slot-name="action header"></xui-slot>
 	</v-app-bar>
 	
-
 	<v-content xid="vue-content-1">
-		<v-container xid="container"  xui-slot-name="Main content" fluid :fill-height="ContentfillPage" class="pa-0" style="align-items:start">
-			<xui-slot xui-full xid="main" xui-slot-name="Content"></xui-slot>
+		<v-container xid="container"  xui-slot-name="main content" fluid :fill-height="ContentfillPage" class="pa-0" style="align-items:start">
+			<xui-slot class="xui-class-slot-full" xid="main" xui-slot-name="content"></xui-slot>
 		</v-container>
 	</v-content>
 	
-	<v-footer xid="vue-footer-1"  xui-slot-name="Footer" inset app :height="heightFooter" :dark="dark" color="[[colorApp]]">
-	    <xui-slot xid="slot-action-footer" xui-slot-name="Action"></xui-slot>
+	<v-footer xid="vue-footer-1"  xui-slot-name="footer" inset app :height="heightFooter" :dark="dark" color="[[colorApp]]">
+	    <xui-slot xid="slot-action-footer" xui-slot-name="action footer"></xui-slot>
 	    <v-spacer></v-spacer>
 		<span>&amp;copy;&amp;nbsp;[[copyrightApp]]</span>
 	</v-footer>
