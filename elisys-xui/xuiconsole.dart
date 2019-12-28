@@ -25,7 +25,7 @@ void main() async {
 
   var bufferHtml = XUIHtmlBuffer();
 
-  bool designer = true;
+  bool designer = false;
 
   if (designer) {
     var reader = HTMLReader('app/frameDesigner.html', provider);

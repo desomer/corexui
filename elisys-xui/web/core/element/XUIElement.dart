@@ -107,8 +107,13 @@ class XUIElementHTMLText extends XUIElementHTML {
  */
 abstract class XUIElementNative extends XUIElementXUI {
   Future<XUIModel> doProcessPhase1(
-      XUIResource xuifile, XUIElementHTML html) async { return Future.value(null);}
-  Future doProcessPhase2(XUIResource xuifile, XUIElementHTML html) async {  return Future.value(); }
+      XUIResource xuifile, XUIElementHTML html) async {
+    return Future.value(null);
+  }
+
+  Future doProcessPhase2(XUIResource xuifile, XUIElementHTML html) async {
+    return Future.value();
+  }
 
   void register(XUIResource reader) {
     reader.components[xid] ??= DicoOrdered()..add(XUIComponent(this, MODE_ALL));
@@ -125,4 +130,5 @@ class XUIElementText extends XUIElementXUI {
  */
 class XUIElementXUI extends XUIElement {
   String xid;
+  String idRessource;
 }

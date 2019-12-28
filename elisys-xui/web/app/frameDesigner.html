@@ -13,9 +13,13 @@
     <xui-design xid="main">
         <iframe style="width:100%;height:100%;position:absolute" id='rootFrame'></iframe>
     </xui-design>
+
+    <xui-design xid="slot-action-header">
+        <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.refresh()"><v-icon>mdi-refresh</v-icon></v-btn>
+        <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.save()"><v-icon>mdi-content-save</v-icon></v-btn>
+    </xui-design>
     
     <xui-design xid="inject-after-body">
-        <script src="libxui.dart.js"></script>
         <script>
             window.$xui={};
             window.$xui.load=(html)=>{
@@ -27,7 +31,43 @@
                 //console.debug("change template", html);
                 document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":html }, "*");
             };
+
+            window.$xui.save=()=>{
+                console.debug("save")
+            }
+        
         </script>
+        <script src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
+        <script src="libxui.dart.js"></script>
+        <!-- <script>
+                 setTimeout( ()=> {
+                    q = faunadb.query;
+                    var client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
+
+                    client.query(
+                    q.Get(q.Ref(q.Collection('Filexui'), '252953488011559426'))
+                    )
+                    .then((ret) => console.log(ret))
+
+
+                    client.query(
+                    q.Create(
+                        q.Collection('Filexui'),
+                        { data: { id: 2, html:"super" } },
+                    )
+                    )
+                    .then((ret) => console.log(ret))
+
+                    client.query(
+                        q.Get(
+                            q.Match(q.Index('all_filexui'))
+                        )
+                        )
+                        .then((ret) => console.log(ret))
+
+                 }, 2000)
+ 
+        </script> -->
     </xui-design>
 
 </xui-factory>

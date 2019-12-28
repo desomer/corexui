@@ -10,7 +10,7 @@
     </v-tabs>
 
     <!--------------------------  XUI-GRID   ----------------------------->
-    <v-container class="xui-grid" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
+    <v-container xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
         <v-row>
             <xui-col xid="[[parent-xid]]-row-[[idxr]]" xui-slot-name="row [[idxr]]"></xui-col>
         </v-row>
@@ -25,7 +25,6 @@
     <xui-design xid="inject-other-header">
         <style>
             .xui-grid-col.col { padding:0px 0px; }
-            .xui-grid.container {max-width: 100%; }
         </style>
     </xui-design>
 

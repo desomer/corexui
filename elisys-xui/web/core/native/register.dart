@@ -43,13 +43,13 @@ class NativeSlot extends XUIElementNative {
     html.children?.forEach((childHtml) {
       // affecte les attribut du slot sur les enfants
       var model = XUIElementXUI();
-      model.attributes = html.attributes;
+
       XUIModel(model, MODE_ALL).processAttributes(childHtml);
 
       // affecte le nom du slot sur les enfants si doit etre accessible (avoir un slot name)
-      if (slotName != null) {
+      if (slotName != null && xuifile.context.mode != MODE_FINAL) {
         childHtml.attributes ??= HashMap<String, XUIProperty>();
-        childHtml.attributes["data-xui-slot-xid"] =
+        childHtml.attributes["data-xid-slot"] =
             XUIProperty(html.origin.xid);
       }
     });
@@ -64,6 +64,8 @@ class NativeInjectFile extends XUIElementNative {
     this.xid = "xui-inject";
   }
 
+  var cacheText;
+
   @override
   Future<XUIModel> doProcessPhase1(
       XUIResource xuifile, XUIElementHTML html) async {
@@ -73,7 +75,11 @@ class NativeInjectFile extends XUIElementNative {
     var aText = XUIElementText();
     var idResource = html.origin.propertiesXUI["path"].content;
 
-    aText.content = await xuifile.reader.provider.getResourceFutur(idResource);
+    if (cacheText==null)
+        cacheText = await xuifile.reader.provider.getResourceFutur(idResource);
+        
+    aText.content=cacheText;
+
     root.children ??= []..add(aText);
 
     Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));

@@ -1,4 +1,4 @@
-<html style="height:100vh; overflow:auto;">
+<html style="height:100vh; overflow:auto;" data-xui-slot-name="page">
    <head>
       <title>Designer XUI</title>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"></meta>
@@ -11,23 +11,17 @@
    <body style="height:100vh">
       <template id="xui-rootTemplate">
          <v-app style="background:white">
-            <v-app-bar app color="blue" fixed :dark="dark" :height="heightHeader">
+            <v-app-bar app color="blue" fixed :dark="dark" :height="heightHeader" data-xui-slot-name="toolbar">
                <v-app-bar-nav-icon></v-app-bar-nav-icon>
                <v-toolbar-title>Designer XUI</v-toolbar-title>
                <v-spacer></v-spacer>
-               <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.refresh()">
-                  <v-icon>mdi-refresh</v-icon>
-               </v-btn>
-               <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.save()">
-                  <v-icon>mdi-content-save</v-icon>
-               </v-btn>
             </v-app-bar>
             <v-content>
-               <v-container fluid style="align-items:start" :fill-height="ContentfillPage" class="pa-0">
-                  <iframe style="width:100%;height:100%;position:absolute" id="rootFrame"></iframe>
+               <v-container fluid style="align-items:start" :fill-height="ContentfillPage" class="pa-0" data-xui-slot-name="main content">
+                  <iframe data-xui-slot-xid="main" style="width:100%;height:100%;position:absolute" class="xui-class-slot-full" id="rootFrame" data-xui-slot-name="content"></iframe>
                </v-container>
             </v-content>
-            <v-footer app color="blue" :dark="dark" :height="heightFooter" inset>
+            <v-footer app color="blue" :dark="dark" :height="heightFooter" data-xui-slot-name="footer" inset>
                <v-spacer></v-spacer>
                <span>&copy;&nbsp;Elisys 2019</span>
             </v-footer>
@@ -46,13 +40,7 @@
                 //console.debug("change template", html);
                 document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":html }, "*");
             };
-
-            window.$xui.save=()=>{
-                console.debug("save")
-            }
-        
         </script>
-   <script src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
    <script src="libxui.dart.js"></script>
    <script>
 		if (typeof $xui === 'undefined')

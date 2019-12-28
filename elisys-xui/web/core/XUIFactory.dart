@@ -30,6 +30,10 @@ class XUIDesign extends XUIModel {
   XUIDesign(e, m) : super(e, m);
 }
 
+class XUIChild extends XUIModel {
+  XUIChild(e, m) : super(e, m);
+}
+
 /************************************************************** */
 /**
  * gestion des designs ou des components
@@ -65,24 +69,26 @@ class XUIModel implements Comparable<XUIModel> {
     processAttributes(elemHtml);
 
     // properties
-    processProperties(elemHtml);
+    processProperties(elemHtml, xuifile);
 
     // lance les children
     await processChildren(elemHtml, xuifile);
 
     // calcul le xid  (ex : __parentxid__ , __idx__)
-    var xid = calculateXid(elemXUI.xid, elemHtml);
+    var xidCal = calculateProp(elemXUI.xid, elemHtml);
 
     // lance les design (pour affectation property utilise)
-    await processDesign(xid, xuifile, elemHtml);
+    await processDesign(xidCal, xuifile, elemHtml);
 
     // lance implementation xui si affecter par le design (ex: remplace un slot par un div)
     await processComponent(xuifile, elemHtml);
 
-    // affecte les xid
-    if (elemXUI.xid != null && xuifile.context.mode!=MODE_FINAL) {
+    // affecte les xid uniquement si child (pas design ni component)
+    if (elemXUI.xid != null && xuifile.context.mode != MODE_FINAL) {
       elemHtml.attributes ??= HashMap<String, XUIProperty>();
-      elemHtml.attributes["data-xid"] = XUIProperty(xid);
+      if (this is! XUIComponent && this is! XUIDesign) {
+        elemHtml.attributes["data-xid"] = XUIProperty(xidCal);
+      }
     }
 
     return Future.value();
@@ -114,16 +120,16 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  String calculateXid(String xid, XUIElementHTML elemHtml) {
-    if (xid != null) {
-      StringBuffer buf = StringBuffer(xid);
+  String calculateProp(String prop, XUIElementHTML elemHtml) {
+    if (prop != null) {
+      StringBuffer buf = StringBuffer(prop);
       XUIProperty.parse(buf, (String tag) {
         var ret = elemHtml.searchPropertyXUI(tag);
         return ret != null ? ret : "[" + tag + "]";
       });
-      xid = buf.toString();
+      prop = buf.toString();
     }
-    return xid;
+    return prop;
   }
 
   Future processChildren(XUIElementHTML elemHtml, XUIResource xuifile) async {
@@ -147,7 +153,7 @@ class XUIModel implements Comparable<XUIModel> {
             item.propertiesXUI ??= HashMap<String, XUIProperty>();
             item.propertiesXUI[varIdx] = XUIProperty(i.toString());
             item.propertiesXUI["parent-xid"] =
-                XUIProperty(calculateXid(elemHtml.origin.xid, elemHtml));
+                XUIProperty(calculateProp(elemHtml.origin.xid, elemHtml));
           }
           await doChild(item, elemHtml, xuifile);
         }
@@ -170,7 +176,7 @@ class XUIModel implements Comparable<XUIModel> {
         childHtml.parent = elemHtml;
         childHtml.origin = childXUI;
 
-        var model = XUIModel(childXUI, MODE_ALL);
+        var model = XUIChild(childXUI, MODE_ALL);
         await model.processPhase1(xuifile, childHtml);
       }
 
@@ -209,23 +215,30 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  void processProperties(XUIElementHTML elemHtml) {
+  void processProperties(XUIElementHTML elemHtml, XUIResource xuifile) {
     if (elemXUI.propertiesXUI != null) {
       elemXUI.propertiesXUI.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
 
-        elemHtml.propertiesXUI[prop.key] = prop.value;
+        if (prop.key.toLowerCase() != Const.ATTR_XID) {
+          // n'affecte pas le XID car gerer par attribut xid
+          elemHtml.propertiesXUI[prop.key] = prop.value;
+        }
 
-        if (prop.key.toLowerCase() == Const.ATTR_SLOT_NAME) {
+        if (prop.key.toLowerCase() == Const.ATTR_SLOT_NAME &&
+            xuifile.context.mode != MODE_FINAL) {
           // affecte le nom du slot en data-
           elemHtml.attributes ??= HashMap<String, XUIProperty>();
-          elemHtml.attributes["data-xui-slot-name"] = XUIProperty(prop.value.content);
+          elemHtml.attributes["data-xui-slot-name"] =
+              XUIProperty(prop.value.content);
         }
       });
     }
   }
 
-  Future processPhase2(XUIResource xuifile, XUIElementHTML elemHtml) async {
+  Future processPhase2(
+      XUIResource xuifile, XUIElementHTML elemHtml, String parentXId) async {
+    // gestion appel des native
     if (elemHtml.implementBy != null)
       for (var cmp in elemHtml.implementBy) {
         if (cmp.elemXUI is XUIElementNative) {
@@ -234,18 +247,84 @@ class XUIModel implements Comparable<XUIModel> {
         }
       }
 
-    if (elemHtml.children != null)
-      for (var child in elemHtml.children) {
-        await processPhase2(xuifile, child);
-      }
 
-    //TODO genere les infos de design (info, doc, etc...)
+    var slotInfo = SlotInfo();
+
+    if (elemHtml?.attributes != null && elemHtml is! XUIElementHTMLText) {
+      slotInfo.xid = elemHtml.attributes["data-xid"]?.content;
+      if (slotInfo.xid != null) {
+        if (elemHtml?.propertiesXUI != null) {
+          slotInfo.slotname = elemHtml?.propertiesXUI[ATTR_SLOT_NAME]?.content;
+        }
+      }
+    }
+
+    // boucle sur les enfant
+    if (elemHtml.children != null) {
+      for (var child in elemHtml.children) {
+        await processPhase2(xuifile, child, slotInfo.slotname==null?parentXId:slotInfo.xid);
+      }
+    }
+    //genere les infos de design (info, doc, etc...)
+
+    if (slotInfo.xid != null) {
+      if (slotInfo.slotname != null) {
+        slotInfo.slotname = calculateProp(slotInfo.slotname, elemHtml);
+        slotInfo.parentXid=parentXId;
+        slotInfo.docId = getDocumentationID(elemHtml);
+        slotInfo.idRessource=elemHtml.origin.idRessource;
+        slotInfo.elementHTML=elemHtml;
+
+        // print("xid=<" +
+        //     (slotInfo.xid ?? "") +
+        //     "> pxid=<" +
+        //     (slotInfo.parentXid ?? "") +
+        //     "> slotname=<" +
+        //     slotInfo.slotname +
+        //     "> docId=<" +
+        //     slotInfo.docId +
+        //     "> origin=<" +
+        //     slotInfo.idRessource +
+        //     ">");
+
+        if (elemHtml.origin.tag == "xui-slot") {
+         var a = elemHtml.parent.tag;
+        }
+      }
+    }
 
     return Future.value();
+  }
+
+  String getDocumentationID(XUIElementHTML elemHtml) {
+    var docId = elemHtml.implementBy.first.elemXUI.xid;
+    if (docId == "xui-slot") {
+      docId = elemHtml.parent.tag;
+      var parent = elemHtml.parent;
+      while (parent != null) {
+        if (parent.implementBy != null) {
+          docId = docId + ":" + parent.implementBy.first.elemXUI.xid;
+          break;
+        }
+        parent = parent.parent;
+      }
+    }
+    return docId;
   }
 
   @override
   int compareTo(XUIModel other) {
     return priority.compareTo(other.priority);
   }
+}
+
+/************************************************************* */
+class SlotInfo
+{
+    String xid;
+    String parentXid;
+    String slotname;
+    String docId;
+    String idRessource;
+    XUIElementHTML elementHTML;
 }

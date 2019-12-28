@@ -146,6 +146,8 @@ class XUIResource extends XMLElemReader {
       // cas d'un elem
       elemXui = XUIElementXUI();
 
+      elemXui.idRessource= reader?.id;
+
       // gestion des tag escape (HTML, HEAD, ETC...)
       elemXui.tag = element.tag.startsWith(TAG_ESCAPE)
           ? element.tag.substring(TAG_ESCAPE.length)
@@ -181,7 +183,7 @@ class XUIResource extends XMLElemReader {
       }
     }
 
-    // ajo
+    // ajout des enfants
     (parent as XUIElement)?.children ??= [];
     (parent as XUIElement)?.children?.add(elemXui);
 
@@ -213,8 +215,6 @@ class XUIEngine {
     xuiFile =  XUIResource(reader, ctx);
 
     await xuiFile.parse();
-    await addDesign("b-tab-item-0", "<div><h1>test</h1></div>");
-
     return Future.value();
   }
 
@@ -224,7 +224,8 @@ class XUIEngine {
     XUIElementHTML htmlRoot = XUIElementHTML();
     
     await root.processPhase1(xuiFile, htmlRoot);
-    await root.processPhase2(xuiFile, htmlRoot);
+    await root.processPhase2(xuiFile, htmlRoot, null);
+    print("-----------------------------------------------");
     
     return Future.sync(() => htmlRoot.toHTMLString(writer));
   }
@@ -235,6 +236,7 @@ class XUIEngine {
 
     dynamic ret = await xuiFile.reader.parseString(html, res);
 
-    xuiFile.designs[xid] ??= DicoOrdered()..add(XUIDesign(ret, MODE_ALL));
+    if (xid!=null)
+      xuiFile.designs[xid] ??= DicoOrdered()..add(XUIDesign(ret, MODE_ALL));
   }
 }
