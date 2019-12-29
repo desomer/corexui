@@ -4,7 +4,7 @@
         <v-tab>
             <xui-slot xid="[[parent-xid]]-tab-[[idx]]" xui-slot-name="tab [[idx]]"></xui-slot>
         </v-tab>
-        <v-tab-item>
+        <v-tab-item eager="true">    <!-- eager="true"   desactive le lazyloading -->
             <xui-slot xid="[[parent-xid]]-tab-item-[[idx]]" xui-slot-name="tab content [[idx]]"></xui-slot>
         </v-tab-item>
     </v-tabs>
@@ -17,18 +17,36 @@
     </v-container>
 
     <xui-slot xid="xui-col" xui-for="idxc">
-        <v-col class="xui-grid-col">
+        <v-col>
             <xui-slot xid="[[parent-xid]]-col-[[idxc]]" xui-slot-name="row [[idxr]] col [[idxc]]"></xui-slot>
         </v-col>
     </xui-slot>
 
     <xui-design xid="inject-other-header">
         <style>
-            .xui-grid-col.col { padding:0px 0px; }
+            .xui-grid { padding-top: 0px; padding-bottom: 0px; }
+            .xui-grid .col { padding:0px 0px; }
             .xui-grid.container {max-width: 100%; }
         </style>
     </xui-design>
+    
+    <!-------------------------------- V-CARD ---------------------------->
+    <v-card xid="xui-card-1"  xui-for="idxc" class="mx-auto" xui-slot-name="Card">
+        <v-img src="https://cdn.vuetifyjs.com/images/cards/store.jpg"
+               class="white--text align-end"
+               height="100px">
+               <v-card-title> title </v-card-title>
+        </v-img>
+        
+        <v-card-text>
+            <xui-slot xid="[[parent-xid]]-card-main" xui-slot-name="Card Content [[parent-xid]]"></xui-slot>
+        </v-card-text>
+        
+        <v-card-actions>
+            <v-btn text="" color="deep-purple">Learn More</v-btn>
+        </v-card-actions>
 
+    </v-card> 
 
     <!--------------------------  XUI-SLOT   ----------------------------->
     <div xid="xui-div-slot" class="xui-class-slot" ></div>

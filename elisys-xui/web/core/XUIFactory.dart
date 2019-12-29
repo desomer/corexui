@@ -225,28 +225,27 @@ class XUIModel implements Comparable<XUIModel> {
           elemHtml.propertiesXUI[prop.key] = prop.value;
         }
 
-        if (prop.key.toLowerCase() == Const.ATTR_SLOT_NAME &&
-            xuifile.context.mode != MODE_FINAL) {
-          // affecte le nom du slot en data-
-          elemHtml.attributes ??= HashMap<String, XUIProperty>();
-          elemHtml.attributes["data-xui-slot-name"] =
-              XUIProperty(prop.value.content);
-        }
+        // if (prop.key.toLowerCase() == Const.ATTR_SLOT_NAME &&
+        //     xuifile.context.mode != MODE_FINAL) {
+        //   // affecte le nom du slot en data-
+        //   elemHtml.attributes ??= HashMap<String, XUIProperty>();
+        //   elemHtml.attributes["data-xui-slot-name"] =
+        //       XUIProperty(prop.value.content);
+        // }
       });
     }
   }
 
   Future processPhase2(
-      XUIResource xuifile, XUIElementHTML elemHtml, String parentXId) async {
+      XUIEngine engine, XUIElementHTML elemHtml, String parentXId) async {
     // gestion appel des native
     if (elemHtml.implementBy != null)
       for (var cmp in elemHtml.implementBy) {
         if (cmp.elemXUI is XUIElementNative) {
           await (cmp.elemXUI as XUIElementNative)
-              .doProcessPhase2(xuifile, elemHtml);
+              .doProcessPhase2(engine.xuiFile, elemHtml);
         }
       }
-
 
     var slotInfo = SlotInfo();
 
@@ -256,13 +255,20 @@ class XUIModel implements Comparable<XUIModel> {
         if (elemHtml?.propertiesXUI != null) {
           slotInfo.slotname = elemHtml?.propertiesXUI[ATTR_SLOT_NAME]?.content;
         }
+      } else {
+        // affecte pour le designer un xid sur les slot sans xid
+        var xidslot = elemHtml.attributes["data-xid-slot"]?.content;
+        if (xidslot != null) {
+          elemHtml.attributes["data-xid"] = XUIProperty("_" + xidslot);
+        }
       }
     }
 
     // boucle sur les enfant
     if (elemHtml.children != null) {
       for (var child in elemHtml.children) {
-        await processPhase2(xuifile, child, slotInfo.slotname==null?parentXId:slotInfo.xid);
+        await processPhase2(engine, child,
+            slotInfo.slotname == null ? parentXId : slotInfo.xid);
       }
     }
     //genere les infos de design (info, doc, etc...)
@@ -270,10 +276,12 @@ class XUIModel implements Comparable<XUIModel> {
     if (slotInfo.xid != null) {
       if (slotInfo.slotname != null) {
         slotInfo.slotname = calculateProp(slotInfo.slotname, elemHtml);
-        slotInfo.parentXid=parentXId;
+        slotInfo.parentXid = parentXId;
         slotInfo.docId = getDocumentationID(elemHtml);
-        slotInfo.idRessource=elemHtml.origin.idRessource;
-        slotInfo.elementHTML=elemHtml;
+        slotInfo.idRessource = elemHtml.origin.idRessource;
+        slotInfo.elementHTML = elemHtml;
+
+        engine.mapInfo[slotInfo.xid] = slotInfo;
 
         // print("xid=<" +
         //     (slotInfo.xid ?? "") +
@@ -282,14 +290,14 @@ class XUIModel implements Comparable<XUIModel> {
         //     "> slotname=<" +
         //     slotInfo.slotname +
         //     "> docId=<" +
-        //     slotInfo.docId +
+        //     (slotInfo.docId ?? "-") +
         //     "> origin=<" +
-        //     slotInfo.idRessource +
+        //     (slotInfo.idRessource ?? "-") +
         //     ">");
 
-        if (elemHtml.origin.tag == "xui-slot") {
-         var a = elemHtml.parent.tag;
-        }
+        // if (elemHtml.origin.tag == "xui-slot") {
+        //  var a = elemHtml.parent.tag;
+        // }
       }
     }
 
@@ -319,12 +327,11 @@ class XUIModel implements Comparable<XUIModel> {
 }
 
 /************************************************************* */
-class SlotInfo
-{
-    String xid;
-    String parentXid;
-    String slotname;
-    String docId;
-    String idRessource;
-    XUIElementHTML elementHTML;
+class SlotInfo {
+  String xid;
+  String parentXid;
+  String slotname;
+  String docId;
+  String idRessource;
+  XUIElementHTML elementHTML;
 }

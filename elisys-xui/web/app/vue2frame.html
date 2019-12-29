@@ -1,22 +1,41 @@
 <xui-factory version="1.0">
 	
 	<!--  gestion page autonome -->
-	<html xid="frame-vuetify-1" xui-mode="final;design" style="height:100vh; overflow:auto;" xui-slot-name="page">
+	<html xid="frame-vuetify-1" xui-mode="final;design" style="height:100vh;" xui-slot-name="page">
 		<head xid="header-vuetify"></head>
 		<body xid="body-vuetify" style="height:100vh"></body>
 		<xui-slot xid="inject-after-body"></xui-slot>
 		<xui-script-data></xui-script-data>
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
 		<xui-init-vuetify></xui-init-vuetify>	
-		<script xid="script-aftervue"></script>
-		<script xid="json-design-info"></script>
+		<xui-init-designer></xui-init-designer>
 	</html>
 
-	<!--  gestion template reload -->
+	<!--  gestion du designer -->
 	<xui-slot xid="frame-vuetify-1" xui-mode="template" xui-slot-name="page">
 		<body xid="body-vuetify" style="height:100vh"></body>
 	</xui-slot>
 
-	
+	<script xid="xui-init-designer" xui-mode="design">
+		document.addEventListener('click', function(e) {    //dblclick
+			let targetAction=e.target.closest("[data-xid]");
+			var message = {action:"select", xid: targetAction.dataset.xid, xid_slot: targetAction.dataset.xidSlot };
+			window.parent.postMessage(message, "*");
+		});
+
+		window.addEventListener('message',function(e) {
+			var data = e.data;
+			if (data.action=="changeTemplate")
+			{
+				var template = data.template;
+				this.document.body.innerHTML=template;
+				$xui.loadTemplate();
+			}
+		});
+	</script>
+	<!--  ---------------------------------------------- -->
+
 	<xui-design xid="header-vuetify">
 		<title>[[titleApp]]</title>
 		<viewport-no-zoom></viewport-no-zoom>
@@ -24,10 +43,7 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"/>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"/>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"/>
-		
-		<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
-		
+				
 		<xui-slot xid="inject-other-header"></xui-slot>
 	</xui-design>
 	
@@ -55,7 +71,7 @@
 		</v-container>
 	</v-content>
 	
-	<v-footer xid="vue-footer-1"  xui-slot-name="footer bar" inset app :height="heightFooter" :dark="dark" color="[[colorApp]]">
+	<v-footer xid="vue-footer-1"  xui-slot-name="footer bar" inset app :height="heightFooter" :dark="dark" color="[[colorApp]]" style="padding: 0px 10px;">
 	    <xui-slot xid="slot-action-footer" xui-slot-name="action footer"></xui-slot>
 	    <v-spacer></v-spacer>
 		<span>&amp;copy;&amp;nbsp;[[copyrightApp]]</span>
@@ -83,8 +99,8 @@
 	</script>
 
 	<script xid="xui-init-vuetify">
-		 <xui-inject xui-path="app/vuetify.js"></xui-inject>
-		 $xui.loadTemplate();
+<xui-inject xui-path="app/vuetify.js"></xui-inject>
+$xui.loadTemplate();
 	</script>
 
 </xui-factory>

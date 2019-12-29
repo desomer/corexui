@@ -1,35 +1,165 @@
-<html style="height:100vh; overflow:auto;">
+<html style="height:100vh;">
    <head>
-      <title>Designer XUI</title>
+      <title>XUI {{selectedxui}}</title>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"></meta>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"></link>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
-      <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css"></link>
+      <style>
+            html::-webkit-scrollbar {
+                 width: 0px;  /*pas de scrollbar */
+            }
+            .main-tab .v-tab {
+                min-width: 40px;
+                width: 40px;
+                height: 40px !important;
+            }
+
+            .main-container { 
+                height: calc(100vh - 64px);
+                width: 100%;
+                display: grid; 
+                grid-template-columns: 0px auto 200px;
+                grid-template-rows: 100%; 
+                }
+            .main-item-2 {
+                border: 1px solid #e0e0e0;
+            }
+
+            .main-code {
+                height: calc(100vh - 64px);
+                width: 100%;
+            }
+            pre, code {
+                font-family: monospace, monospace;
+            }
+            pre {
+                overflow: auto;
+            }
+            pre > code {
+                display: block;
+                padding: 1rem;
+                word-wrap: normal;
+                position: absolute;
+                right: 0px;
+                height: 100%;
+                width: 100%;
+                overflow: auto;
+                color: black !important;
+                white-space: unset !important;
+                font-weight: unset !important;
+            }
+
+            .btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
+        </style>
    </head>
    <body style="height:100vh">
       <template id="xui-rootTemplate">
          <v-app style="background:white">
-            <v-app-bar app color="blue" fixed :dark="dark" :height="heightHeader">
+            <v-app-bar app color="#1d9da0" fixed :dark="dark" :height="heightHeader">
                <v-app-bar-nav-icon></v-app-bar-nav-icon>
-               <v-toolbar-title>Designer XUI</v-toolbar-title>
+               <v-toolbar-title>XUI {{selectedxui}}</v-toolbar-title>
                <v-spacer></v-spacer>
-               <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.refresh()">
+               <v-btn small class="btn-action" @click="$xui.save()">
+                  <v-icon>mdi-television-play</v-icon>
+               </v-btn>
+               <v-btn small class="btn-action" @click="$xui.save()">
+                  <v-icon>mdi-monitor-cellphone</v-icon>
+               </v-btn>
+               <v-btn small class="btn-action" @click="$xui.save()">
+                  <v-icon>mdi-autorenew</v-icon>
+               </v-btn>
+               <v-btn small class="btn-action" @click="$xui.refresh('template')">
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
-               <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.save()">
+               <v-btn small class="btn-action" @click="$xui.refresh('final')">
                   <v-icon>mdi-content-save</v-icon>
                </v-btn>
             </v-app-bar>
             <v-content>
                <v-container fluid style="align-items:start" :fill-height="ContentfillPage" class="pa-0">
-                  <iframe style="width:100%;height:100%;position:absolute" id="rootFrame"></iframe>
+                  <v-tabs vertical class="main-tab" dark>
+                     <v-tab>
+                        <v-icon>mdi-square-edit-outline</v-icon>
+                     </v-tab>
+                     <v-tab-item eager="true">
+                        <div class="main-container">
+                           <div class="main-item main-item-1"></div>
+                           <div class="main-item main-item-2">
+                              <iframe style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" id="rootFrame"></iframe>
+                           </div>
+                           <div class="main-item main-item-3">
+                              <v-tabs class="action-tab" dark>
+                                 <v-tab>
+                                    <v-icon>mdi-layers-triple</v-icon>
+                                 </v-tab>
+                                 <v-tab-item eager="true">
+Comming soon...                                 </v-tab-item>
+                                 <v-tab>
+                                    <v-icon>mdi-plus-box-multiple</v-icon>
+                                 </v-tab>
+                                 <v-tab-item eager="true">
+Comming soon...                                 </v-tab-item>
+                                 <v-tab>
+                                    <v-icon>mdi-file-tree</v-icon>
+                                 </v-tab>
+                                 <v-tab-item eager="true">
+Comming soon...                                 </v-tab-item>
+                              </v-tabs>
+                           </div>
+                        </div>
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-code-tags</v-icon>
+                     </v-tab>
+                     <v-tab-item eager="true">
+                        <div class="main-code">
+                           <pre>
+                              <code spellcheck="false" id="xui-code-html"></code>
+                           </pre>
+                        </div>
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-api</v-icon>
+                     </v-tab>
+                     <v-tab-item eager="true">
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-database</v-icon>
+                     </v-tab>
+                     <v-tab-item eager="true">
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-apps</v-icon>
+                     </v-tab>
+                     <v-tab-item eager="true">
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-image-filter</v-icon>
+                     </v-tab>
+                     <v-tab-item eager="true">
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-border-inside</v-icon>
+                     </v-tab>
+                     <v-tab-item eager="true">
+                     </v-tab-item>
+                  </v-tabs>
                </v-container>
             </v-content>
-            <v-footer app color="blue" :dark="dark" :height="heightFooter" inset>
+            <v-footer app color="#1d9da0" :dark="dark" style="padding: 0px 10px;" :height="heightFooter" inset>
+               <v-btn small class="btn-action" @click="$xui.save()">
+                  <v-icon>mdi-settings</v-icon>
+               </v-btn>
+               <v-btn small class="btn-action" @click="$xui.save()">
+                  <v-icon>mdi-note-multiple</v-icon>
+               </v-btn>
+               <v-btn small class="btn-action" @click="$xui.save()">
+                  <v-icon>mdi-new-box</v-icon>
+               </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2019</span>
+               <span>&copy;&nbsp;Elisys 2019 v0.1.0</span>
             </v-footer>
          </v-app>
       </template>
@@ -40,19 +170,42 @@
             window.$xui.load=(html)=>{
                // console.debug("load", html);
                 document.querySelector("#rootFrame").srcdoc =html;
+                $xui.loadCode(html);
             };
 
-            window.$xui.changeTemplate=(html)=>{
-                //console.debug("change template", html);
-                document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":html }, "*");
+            window.$xui.loadCode=(strCode)=>{
+                var codeElem = document.querySelector("#xui-code-html");
+                if (codeElem!=null) {
+                    const code = Prism.highlight(strCode, Prism.languages.html, 'html');
+                    codeElem.innerHTML=code;
+                }
+            }
+
+            window.$xui.changeTemplate=(param)=>{
+                console.debug("change template", param);
+                if (param.mode=="template") {    
+                    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":param.html }, "*");
+                }
+
+                $xui.loadCode(param.html);
             };
 
             window.$xui.save=()=>{
                 console.debug("save")
             }
         
+            window.addEventListener('message',function(e) {
+                var data = e.data;
+                if (data.action=="select")
+                {
+                    $xui.info = $xui.getInfo(data.xid, data.xid_slot);
+                    console.debug(data, $xui.info);
+                    $xui.rootdata.selectedxui=$xui.info.xid + " > " + $xui.info.docId + " > " + $xui.info.slotname ;
+                }
+            });
         </script>
-   <script src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
+   <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.x/prism.min.js"></script>
    <script src="libxui.dart.js"></script>
    <script>
 		if (typeof $xui === 'undefined')
@@ -64,27 +217,23 @@
 			heightFooter:32, 
 			ContentfillPage:true };
 
-	</script>
+	
+        $xui.rootdata=Object.assign($xui.rootdata, 
+                { selectedxui : "Vuetify Designer"}
+                );  ;
+    </script>
+   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
    <script>
 Vue.config.devtools = true;
 Vue.config.productionTip = false;
-
-window.addEventListener('message',function(e) {
-	var data = e.data;
-	if (data.action=="changeTemplate")
-	{
-		var template = data.template;
-		this.document.body.innerHTML=template;
-		$xui.loadTemplate();
-	}
-});
 
 $xui.loadTemplate= ()=>
 {
 	if ($xui.vuejs!=null)
 		$xui.vuejs.$destroy();
 
-    str =document.querySelector("#xui-rootTemplate").innerHTML;
+	var str =document.querySelector("#xui-rootTemplate").innerHTML;
 
 	$xui.vuejs = new Vue(
 	{
@@ -100,8 +249,7 @@ $xui.loadTemplate= ()=>
 	});
 }
 
-		 $xui.loadTemplate();
+$xui.loadTemplate();
 	   </script>
-   <script></script>
-   <script></script>
+   <xui-init-designer></xui-init-designer>
 </html>

@@ -39,7 +39,7 @@ class XUIContext {
 class DicoOrdered<T extends XUIModel> {
   List<T> list = [];
   bool mustSort = true;
-  var listByMode = LinkedHashMap<String, List<T> >();
+  var listByMode = LinkedHashMap<String, List<T>>();
 
   add(T elem) {
     mustSort = true;
@@ -47,23 +47,20 @@ class DicoOrdered<T extends XUIModel> {
   }
 
   List<T> sort(XUIContext ctx) {
-    if (mustSort) 
-    {
-        list.sort();
-        listByMode.clear();
+    if (mustSort) {
+      list.sort();
+      listByMode.clear();
     }
 
     var ret = listByMode[ctx.mode];
-    if (ret==null)
-    {
-         ret=[];
-         listByMode[ctx.mode]=ret;
-         for (XUIModel item in list) {
-           if (item.mode==MODE_ALL || item.mode.contains(ctx.mode))
-           {
-               ret.add(item);
-           }
-         }
+    if (ret == null) {
+      ret = [];
+      listByMode[ctx.mode] = ret;
+      for (XUIModel item in list) {
+        if (item.mode == MODE_ALL || item.mode.contains(ctx.mode)) {
+          ret.add(item);
+        }
+      }
     }
 
     return ret;
@@ -146,7 +143,7 @@ class XUIResource extends XMLElemReader {
       // cas d'un elem
       elemXui = XUIElementXUI();
 
-      elemXui.idRessource= reader?.id;
+      elemXui.idRessource = reader?.id;
 
       // gestion des tag escape (HTML, HEAD, ETC...)
       elemXui.tag = element.tag.startsWith(TAG_ESCAPE)
@@ -208,35 +205,41 @@ class XUIResource extends XMLElemReader {
 /************************************************************************************** */
 
 class XUIEngine {
-
   XUIResource xuiFile;
+  var mapInfo = HashMap<String, SlotInfo>();
 
   Future start(HTMLReader reader, XUIContext ctx) async {
-    xuiFile =  XUIResource(reader, ctx);
+    xuiFile = XUIResource(reader, ctx);
 
     await xuiFile.parse();
     return Future.value();
   }
 
   toHTMLString(XUIHtmlBuffer writer, String xid, XUIContext ctx) async {
+    xuiFile.context = ctx;
     XUIComponent root = xuiFile.searchComponent(xid).sort(ctx).first;
-    
+
     XUIElementHTML htmlRoot = XUIElementHTML();
-    
+    if (ctx.mode != MODE_FINAL) {
+      htmlRoot.attributes ??= HashMap<String, XUIProperty>();
+      htmlRoot.attributes["data-xid"] = XUIProperty(xid);
+      htmlRoot.origin = root.elemXUI;
+    }
+
+    mapInfo.clear();
     await root.processPhase1(xuiFile, htmlRoot);
-    await root.processPhase2(xuiFile, htmlRoot, null);
+    await root.processPhase2(this, htmlRoot, null);
     print("-----------------------------------------------");
-    
+
     return Future.sync(() => htmlRoot.toHTMLString(writer));
   }
 
-  void addDesign(String xid, String html) async
-  {
+  void addDesign(String xid, String html) async {
     XUIResource res = XUIResource(null, xuiFile.context);
 
     dynamic ret = await xuiFile.reader.parseString(html, res);
 
-    if (xid!=null)
+    if (xid != null)
       xuiFile.designs[xid] ??= DicoOrdered()..add(XUIDesign(ret, MODE_ALL));
   }
 }

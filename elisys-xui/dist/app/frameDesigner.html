@@ -1,17 +1,33 @@
 <xui-factory version="1.0">
     <xui-import xui-path="app/vue2frame.html"></xui-import>
+    <xui-import xui-path="app/cmp2vuetify.html"></xui-import>
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
 
     <xui-design xid="root">
-        <xui-prop id="titleApp" val="Designer XUI"></xui-prop>
+        <xui-prop id="titleApp" val="XUI Designer vuetify"></xui-prop>
         <xui-prop id="colorApp" val="blue"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2019"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2019 v0.1"></xui-prop>
     </xui-design>
 
     <xui-design xid="main">
+        <xui-grid xid="main-grid">
+            <xui-prop id="nb" val="1"></xui-prop>
+        </xui-grid>  
+    </xui-design>
+
+    <xui-design xid="main-grid-row-0">
+        <xui-prop id="nb" val="2"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="main-grid-row-0-col-1">
         <iframe style="width:100%;height:100%;position:absolute" id='rootFrame'></iframe>
+    </xui-design>
+
+    <xui-design xid="slot-action-header">
+        <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.refresh()"><v-icon>mdi-refresh</v-icon></v-btn>
+        <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.save()"><v-icon>mdi-content-save</v-icon></v-btn>
     </xui-design>
     
     <xui-design xid="inject-after-body">
@@ -26,8 +42,43 @@
                 //console.debug("change template", html);
                 document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":html }, "*");
             };
+
+            window.$xui.save=()=>{
+                console.debug("save")
+            }
+        
         </script>
+        <script src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
         <script src="libxui.dart.js"></script>
+        <!-- <script>
+                 setTimeout( ()=> {
+                    q = faunadb.query;
+                    var client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
+
+                    client.query(
+                    q.Get(q.Ref(q.Collection('Filexui'), '252953488011559426'))
+                    )
+                    .then((ret) => console.log(ret))
+
+
+                    client.query(
+                    q.Create(
+                        q.Collection('Filexui'),
+                        { data: { id: 2, html:"super" } },
+                    )
+                    )
+                    .then((ret) => console.log(ret))
+
+                    client.query(
+                        q.Get(
+                            q.Match(q.Index('all_filexui'))
+                        )
+                        )
+                        .then((ret) => console.log(ret))
+
+                 }, 2000)
+ 
+        </script> -->
     </xui-design>
 
 </xui-factory>

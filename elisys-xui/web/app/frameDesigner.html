@@ -1,44 +1,176 @@
 <xui-factory version="1.0">
     <xui-import xui-path="app/vue2frame.html"></xui-import>
+    <xui-import xui-path="app/cmp2vuetify.html"></xui-import>
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
 
     <xui-design xid="root">
-        <xui-prop id="titleApp" val="Designer XUI"></xui-prop>
-        <xui-prop id="colorApp" val="blue"></xui-prop>
+        <xui-prop id="titleApp" val="XUI {{selectedxui}}"></xui-prop>
+        <xui-prop id="colorApp" val="#1d9da0"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2019"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2019 v0.1.0"></xui-prop>
     </xui-design>
 
     <xui-design xid="main">
-        <iframe style="width:100%;height:100%;position:absolute" id='rootFrame'></iframe>
+        <xui-tabs xid="main-tab" xui-nb="7" vertical dark class="main-tab"></xui-tabs>
     </xui-design>
 
+    <xui-design xid="main-tab-tab-0"><v-icon>mdi-square-edit-outline</v-icon></xui-design>
+    <xui-design xid="main-tab-tab-1"><v-icon>mdi-code-tags</v-icon></xui-design>
+    <xui-design xid="main-tab-tab-2"><v-icon>mdi-api</v-icon></xui-design>
+    <xui-design xid="main-tab-tab-3"><v-icon>mdi-database</v-icon></xui-design>
+    <xui-design xid="main-tab-tab-4"><v-icon>mdi-apps</v-icon></xui-design>
+    <xui-design xid="main-tab-tab-5"><v-icon>mdi-image-filter</v-icon></xui-design>
+    <xui-design xid="main-tab-tab-6"><v-icon>mdi-border-inside</v-icon></xui-design>
+   
+    <xui-design xid="main-tab-tab-item-0">
+        <div class="main-container">
+            <div class="main-item main-item-1"></div>
+            <div class="main-item main-item-2">
+                <iframe 
+                    style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" 
+                    id='rootFrame'>
+                </iframe>
+            </div>
+            <div class="main-item main-item-3">
+                <design-action xid="action-tab"></design-action>
+            </div>
+        </div>
+    </xui-design>
+
+    <xui-design xid="main-tab-tab-item-1">
+        <div class="main-code">
+            <pre>
+                <code id="xui-code-html" spellcheck="false"></code>
+            </pre>
+        </div>
+    </xui-design>
+
+    <xui-tabs xid="design-action" dark xui-nb="3" class="action-tab">
+    </xui-tabs>
+
+    <xui-design xid="action-tab-tab-0"><v-icon>mdi-layers-triple</v-icon></xui-design>
+    <xui-design xid="action-tab-tab-1"><v-icon>mdi-plus-box-multiple</v-icon></xui-design>
+    <xui-design xid="action-tab-tab-2"><v-icon>mdi-file-tree</v-icon></xui-design>
+    <xui-design xid="action-tab-tab-item-0">Comming soon...</xui-design>
+    <xui-design xid="action-tab-tab-item-1">Comming soon...</xui-design>
+    <xui-design xid="action-tab-tab-item-2">Comming soon...</xui-design>
+
     <xui-design xid="slot-action-header">
-        <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.refresh()"><v-icon>mdi-refresh</v-icon></v-btn>
-        <v-btn small color="#ffffff00" style="min-width:30px;padding:0px" @click="$xui.save()"><v-icon>mdi-content-save</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-television-play</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-monitor-cellphone</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-autorenew</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.refresh('template')"><v-icon>mdi-refresh</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.refresh('final')"><v-icon>mdi-content-save</v-icon></v-btn>
+    </xui-design>
+
+    <xui-design xid="slot-action-footer">
+        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-settings</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-note-multiple</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-new-box</v-icon></v-btn>
+    </xui-design>
+
+    <xui-design xid="xui-script-data">
+        $xui.rootdata=Object.assign($xui.rootdata, 
+                { selectedxui : "Vuetify Designer"}
+                );  ;
     </xui-design>
     
+    <xui-design xid="inject-other-header">
+        <link href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css" rel="stylesheet" />
+        <style>
+            html::-webkit-scrollbar {
+                 width: 0px;  /*pas de scrollbar */
+            }
+            .main-tab .v-tab {
+                min-width: 40px;
+                width: 40px;
+                height: 40px !important;
+            }
+
+            .main-container { 
+                height: calc(100vh - 64px);
+                width: 100%;
+                display: grid; 
+                grid-template-columns: 0px auto 200px;
+                grid-template-rows: 100%; 
+                }
+            .main-item-2 {
+                border: 1px solid #e0e0e0;
+            }
+
+            .main-code {
+                height: calc(100vh - 64px);
+                width: 100%;
+            }
+            pre, code {
+                font-family: monospace, monospace;
+            }
+            pre {
+                overflow: auto;
+            }
+            pre > code {
+                display: block;
+                padding: 1rem;
+                word-wrap: normal;
+                position: absolute;
+                right: 0px;
+                height: 100%;
+                width: 100%;
+                overflow: auto;
+                color: black !important;
+                white-space: unset !important;
+                font-weight: unset !important;
+            }
+
+            .btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
+        </style>
+    </xui-design>
+
     <xui-design xid="inject-after-body">
         <script>
             window.$xui={};
             window.$xui.load=(html)=>{
                // console.debug("load", html);
                 document.querySelector("#rootFrame").srcdoc =html;
+                $xui.loadCode(html);
             };
 
-            window.$xui.changeTemplate=(html)=>{
-                //console.debug("change template", html);
-                document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":html }, "*");
+            window.$xui.loadCode=(strCode)=>{
+                var codeElem = document.querySelector("#xui-code-html");
+                if (codeElem!=null) {
+                    const code = Prism.highlight(strCode, Prism.languages.html, 'html');
+                    codeElem.innerHTML=code;
+                }
+            }
+
+            window.$xui.changeTemplate=(param)=>{
+                console.debug("change template", param);
+                if (param.mode=="template") {    
+                    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":param.html }, "*");
+                }
+
+                $xui.loadCode(param.html);
             };
 
             window.$xui.save=()=>{
                 console.debug("save")
             }
         
+            window.addEventListener('message',function(e) {
+                var data = e.data;
+                if (data.action=="select")
+                {
+                    $xui.info = $xui.getInfo(data.xid, data.xid_slot);
+                    console.debug(data, $xui.info);
+                    $xui.rootdata.selectedxui=$xui.info.xid + " > " + $xui.info.docId + " > " + $xui.info.slotname ;
+                }
+            });
         </script>
-        <script src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
+        <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.x/prism.min.js"></script>
         <script src="libxui.dart.js"></script>
+
         <!-- <script>
                  setTimeout( ()=> {
                     q = faunadb.query;
