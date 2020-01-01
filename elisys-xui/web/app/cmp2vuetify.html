@@ -18,7 +18,7 @@
         <xui-prop id="name">Tab</xui-prop>
         <xui-prop id="desc">Titre de l'onglet</xui-prop>
 
-        <xui-prop var="title" editor="String">titre en format text</xui-prop>
+        <xui-prop var="title" editor="text">titre en format text</xui-prop>
     </xui-doc>  
 
     <xui-doc xid="v-tab-item:xui-tabs">
@@ -43,20 +43,20 @@
         <xui-prop id="desc">Une grille</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
 
-        <xui-prop var="nb" def="1">nb de lignes</xui-prop>
+        <xui-prop var="nb" def="1" editor="int">nb de lignes</xui-prop>
     </xui-doc>
     
     <xui-doc xid="xui-row">
         <xui-prop id="name">Row</xui-prop>
         <xui-prop id="desc">Une ligne</xui-prop>
-        <xui-prop var="nb" def="1">nb col dans la ligne</xui-prop>
-        <xui-prop var="height">Hauteur de ligne</xui-prop>
+        <xui-prop var="nb" def="1" editor="int">nb col dans la ligne</xui-prop>
+        <xui-prop var="height" editor="height">Hauteur de ligne</xui-prop>
     </xui-doc>
 
     <xui-doc xid="v-col:xui-row">
         <xui-prop id="name">Column</xui-prop>
         <xui-prop id="desc">Une colonne</xui-prop>
-        <xui-prop var="width">Largueur de colonne</xui-prop>
+        <xui-prop var="width"  editor="width">Largueur de colonne</xui-prop>
     </xui-doc>
 
     <v-container class="xui-grid" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">

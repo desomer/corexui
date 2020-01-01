@@ -5,6 +5,7 @@
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
 
     <xui-design xid="root">
+        <xui-prop id="title" val="PWA Designer"></xui-prop>
         <xui-prop id="titleApp" val="{{selectedxui}}"></xui-prop>
         <xui-prop id="colorApp" val="#1d9da0"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
@@ -46,7 +47,7 @@
         </div>
     </xui-design>
 
-    <xui-tabs xid="design-action" dark xui-nb="3">
+    <xui-tabs xid="design-action" dark height="38px" xui-nb="3">
     </xui-tabs>
 
     <xui-design xid="action-tab-tab-0"><v-icon>mdi-layers-triple</v-icon></xui-design>
@@ -57,11 +58,11 @@
     <xui-design xid="action-tab-tab-item-2">Comming soon...</xui-design>
 
     <xui-design xid="slot-action-header">
-        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-television-play</v-icon></v-btn>
-        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-monitor-cellphone</v-icon></v-btn>
-        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-autorenew</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.fullScreen()"><v-icon>mdi-television-play</v-icon></v-btn>
+        <v-btn small class="btn-action" ><v-icon>mdi-monitor-cellphone</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.refresh('final')"><v-icon>mdi-autorenew</v-icon></v-btn>
         <v-btn small class="btn-action" @click="$xui.refresh('template')"><v-icon>mdi-refresh</v-icon></v-btn>
-        <v-btn small class="btn-action" @click="$xui.refresh('final')"><v-icon>mdi-content-save</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-content-save</v-icon></v-btn>
     </xui-design>
 
     <xui-design xid="slot-action-footer">
@@ -79,10 +80,8 @@
     <xui-design xid="inject-other-header">
         <link href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css" rel="stylesheet" />
         <style>
-
-
             .barcustom::-webkit-scrollbar {
-                width: 12px;
+                width: 10px;
             }
             
             .barcustom::-webkit-scrollbar-track {
@@ -91,8 +90,15 @@
             }
             
             .barcustom::-webkit-scrollbar-thumb {
-                border-radius: 10px;
                 box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+                border-radius: 10px;
+            }
+
+            .xui-style-prop {    
+                background: #f9f9f9;
+                height: 24px;
+                color: #696969 !important;
+                padding: 0px 5px;
             }
 
             html::-webkit-scrollbar {

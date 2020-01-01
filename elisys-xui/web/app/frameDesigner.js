@@ -26,39 +26,41 @@ window.$xui.changeTemplate = (param) => {
 };
 
 window.$xui.save = () => {
-    console.debug("save")
+    console.debug("save", $xui.propertiesDesign.json);
+    $xui.setDesignProperties("save", $xui.propertiesDesign.json);
 }
+
+window.$xui.fullScreen = () => {
+    window.document.documentElement.requestFullscreen();
+}
+
 
 window.addEventListener('message', function (e) {
     var data = e.data;
     if (data.action == "select") {
-        var info = $xui.getInfo(data.xid, data.xid_slot);
-        $xui.propertiesDesign = $xui.getDesignProperties(data.xid, data.xid_slot);
-        console.debug(data, info, $xui.propertiesDesign);
-        // $xui.rootdata.selectedxui=$xui.info.xid + " > " + $xui.info.docId + " > " + $xui.info.slotname ;
-        $xui.rootdata.selectedxui = $xui.propertiesDesign.data;
-
-        var i = 0;
-        var dataProp = [{ label: info.slotname, value: true }];
-        template = "<v-switch dense class='ma-2' hide-details inset :label='data[" + i + "].label' v-model='data[" + i + "].value'></v-switch>";
-
-        $xui.rootDataProperties = { data: dataProp };
-        if ($xui.vuejsDesign != null) {
-            $xui.vuejsAppPropertiesSetting.$destroy();
-        }
-
-        $xui.vuejsAppPropertiesSetting = new Vue(
-            {
-                template: "<div class='barcustom' id='AppPropertiesSetting' style='overflow-y: scroll; height: calc(100% - 50px);'>" + template + "</div>",
-                el: '#AppPropertiesSetting',
-                vuetify: new Vuetify(),
-                data: $xui.rootDataProperties,
-                computed: {
-                    $xui: function () {
-                        return window.$xui;
-                    }
-                }
-            });
-
+        //  var info = $xui.getInfo(data.xid, data.xid_slot);
+        $xui.displayProperties(data.xid, data.xid_slot);
     }
 });
+
+$xui.displayProperties = (xid, xid_slot) => {
+    $xui.propertiesDesign = $xui.getDesignProperties(xid, xid_slot);
+    console.debug($xui.propertiesDesign);
+    $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
+    $xui.propertiesDesign.json = JSON.parse($xui.propertiesDesign.data);
+    $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
+    if ($xui.vuejsDesign != null) {
+        $xui.vuejsAppPropertiesSetting.$destroy();
+    }
+    $xui.vuejsAppPropertiesSetting = new Vue({
+        template: "<div class='barcustom' id='AppPropertiesSetting' style='overflow-y: scroll; height: calc(100% - 38px);'>" + $xui.propertiesDesign.template + "</div>",
+        el: '#AppPropertiesSetting',
+        vuetify: new Vuetify(),
+        data: $xui.rootDataProperties,
+        computed: {
+            $xui: function () {
+                return window.$xui;
+            }
+        }
+    });
+}

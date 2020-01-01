@@ -1,16 +1,14 @@
 <html style="height:100vh;">
    <head>
-      <title>{{selectedxui}}</title>
+      <title>PWA Designer</title>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"></meta>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"></link>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css"></link>
       <style>
-
-
             .barcustom::-webkit-scrollbar {
-                width: 12px;
+                width: 10px;
             }
             
             .barcustom::-webkit-scrollbar-track {
@@ -19,8 +17,15 @@
             }
             
             .barcustom::-webkit-scrollbar-thumb {
-                border-radius: 10px;
                 box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+                border-radius: 10px;
+            }
+
+            .xui-style-prop {    
+                background: #f9f9f9;
+                height: 24px;
+                color: #696969 !important;
+                padding: 0px 5px;
             }
 
             html::-webkit-scrollbar {
@@ -77,19 +82,19 @@
                <v-app-bar-nav-icon></v-app-bar-nav-icon>
                <v-toolbar-title>{{selectedxui}}</v-toolbar-title>
                <v-spacer></v-spacer>
-               <v-btn small class="btn-action" @click="$xui.save()">
+               <v-btn small class="btn-action" @click="$xui.fullScreen()">
                   <v-icon>mdi-television-play</v-icon>
                </v-btn>
-               <v-btn small class="btn-action" @click="$xui.save()">
+               <v-btn small class="btn-action">
                   <v-icon>mdi-monitor-cellphone</v-icon>
                </v-btn>
-               <v-btn small class="btn-action" @click="$xui.save()">
+               <v-btn small class="btn-action" @click="$xui.refresh('final')">
                   <v-icon>mdi-autorenew</v-icon>
                </v-btn>
                <v-btn small class="btn-action" @click="$xui.refresh('template')">
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
-               <v-btn small class="btn-action" @click="$xui.refresh('final')">
+               <v-btn small class="btn-action" @click="$xui.save()">
                   <v-icon>mdi-content-save</v-icon>
                </v-btn>
             </v-app-bar>
@@ -106,7 +111,7 @@
                               <iframe style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" id="rootFrame"></iframe>
                            </div>
                            <div class="main-item main-item-3">
-                              <v-tabs dark>
+                              <v-tabs dark height="38px">
                                  <v-tab>
                                     <v-icon>mdi-layers-triple</v-icon>
                                  </v-tab>
@@ -211,42 +216,45 @@ window.$xui.changeTemplate = (param) => {
 };
 
 window.$xui.save = () => {
-    console.debug("save")
+    console.debug("save", $xui.propertiesDesign.json);
+    $xui.setDesignProperties("save", $xui.propertiesDesign.json);
 }
+
+window.$xui.fullScreen = () => {
+    window.document.documentElement.requestFullscreen();
+}
+
 
 window.addEventListener('message', function (e) {
     var data = e.data;
     if (data.action == "select") {
-        var info = $xui.getInfo(data.xid, data.xid_slot);
-        $xui.propertiesDesign = $xui.getDesignProperties(data.xid, data.xid_slot);
-        console.debug(data, info, $xui.propertiesDesign);
-        // $xui.rootdata.selectedxui=$xui.info.xid + " > " + $xui.info.docId + " > " + $xui.info.slotname ;
-        $xui.rootdata.selectedxui = $xui.propertiesDesign.data;
-
-        var i = 0;
-        var dataProp = [{ label: info.slotname, value: true }];
-        template = "<v-switch dense class='ma-2' hide-details inset :label='data[" + i + "].label' v-model='data[" + i + "].value'></v-switch>";
-
-        $xui.rootDataProperties = { data: dataProp };
-        if ($xui.vuejsDesign != null) {
-            $xui.vuejsAppPropertiesSetting.$destroy();
-        }
-
-        $xui.vuejsAppPropertiesSetting = new Vue(
-            {
-                template: "<div class='barcustom' id='AppPropertiesSetting' style='overflow-y: scroll; height: calc(100% - 50px);'>" + template + "</div>",
-                el: '#AppPropertiesSetting',
-                vuetify: new Vuetify(),
-                data: $xui.rootDataProperties,
-                computed: {
-                    $xui: function () {
-                        return window.$xui;
-                    }
-                }
-            });
-
+        //  var info = $xui.getInfo(data.xid, data.xid_slot);
+        $xui.displayProperties(data.xid, data.xid_slot);
     }
-});   </script>
+});
+
+$xui.displayProperties = (xid, xid_slot) => {
+    $xui.propertiesDesign = $xui.getDesignProperties(xid, xid_slot);
+    console.debug($xui.propertiesDesign);
+    $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
+    $xui.propertiesDesign.json = JSON.parse($xui.propertiesDesign.data);
+    $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
+    if ($xui.vuejsDesign != null) {
+        $xui.vuejsAppPropertiesSetting.$destroy();
+    }
+    $xui.vuejsAppPropertiesSetting = new Vue({
+        template: "<div class='barcustom' id='AppPropertiesSetting' style='overflow-y: scroll; height: calc(100% - 38px);'>" + $xui.propertiesDesign.template + "</div>",
+        el: '#AppPropertiesSetting',
+        vuetify: new Vuetify(),
+        data: $xui.rootDataProperties,
+        computed: {
+            $xui: function () {
+                return window.$xui;
+            }
+        }
+    });
+}
+   </script>
    <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.x/prism.min.js"></script>
    <script src="libxui.dart.js"></script>

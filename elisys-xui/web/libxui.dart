@@ -3,7 +3,7 @@ library xuiapp;
 
 import 'package:js/js.dart';
 
-import 'PageManager.dart';
+import 'core/XUIDesignManager.dart';
 import 'core/XUIEngine.dart';
 import 'core/XUIJSInterface.dart';
 
@@ -12,6 +12,10 @@ external void load(obj);
 
 @JS()
 external void changeTemplate(obj);
+
+@JS()
+external void displayProperties(xid, xid_slot);
+
 
 @JS('refresh')
 external set _refresh(void Function(String) f);
@@ -25,19 +29,27 @@ external set _getInfo(dynamic Function(String, String) f);
 @JS('getDesignProperties')
 external set _getDesignProperties(dynamic Function(String, String) f);
 
-@JS()
-@anonymous
-class Options {
-  external String get mode;
-  external String get html;
-  external void set html(String html);
-  external void set mode(String mode);
-  external factory Options({String mode, dynamic html});
-}
+@JS('setDesignProperties')
+external set _setDesignProperties(dynamic Function(String, dynamic) f);
+
 
 /**************************************************************************** */
+dynamic setDesignProperties(String id, dynamic ret) async {
+    List listDesign = ret;
+    for (ObjectDesign item in listDesign) {
+         if (item.value!=item.value_orig)
+         {
+              designManager.changeProperty(item.xid, item.variable, item.value);
+         }
+    }
+    await refresh("template");
+    var xid = (listDesign[0] as ObjectDesign).xid;
+    displayProperties(xid, xid);
+}
+
+
 dynamic getInfo(String id, String idslot) {
-  var info = pageManager.xuiEngine.getSlotInfo(id, idslot);
+  var info = designManager.xuiEngine.getSlotInfo(id, idslot);
 
   var InfoJS = SlotInfoJS();
   if (info != null) {
@@ -51,51 +63,49 @@ dynamic getInfo(String id, String idslot) {
 }
 
 dynamic getDesign(String id, String idslot) {
-  var designs = pageManager.xuiEngine.getDesignInfo(id, idslot);
+  var designInfo = designManager.getJSDesignInfo(id, idslot);
   var vueParamJS = VueParamJS();
 
-  var buf = StringBuffer();
-
-  designs.reversed.forEach((design) {
-    if (buf.length > 0) buf.write(" > ");
-    buf.write(design.docInfo?.name ?? design.slotInfo.docId);
-  });
-
-  vueParamJS.data = buf.toString();
+  vueParamJS.data = "["+designInfo.bufData.toString()+"]";
+  vueParamJS.template = designInfo.bufTemplate.toString();
+  vueParamJS.path = designInfo.bufPath.toString();
   return vueParamJS;
 }
 
 void addDesign(String id, String template) async {
-  await pageManager.addDesign(id, template);
+  await designManager.addDesign(id, template);
 }
 
-void refresh(String mode) async {
-  await addDesign(
-      "grid-1-row-2-col-0", "<xui-design><h1>test</h1></xui-design>");
-  await addDesign("onglet-tab-0", "<xui-design><span>Info<span></xui-design>");
-  await addDesign("onglet-tab-1", "<xui-design><span>Titre<span></xui-design>");
-  await addDesign("grid-1-row-1", "<xui-design xui-nb=\"5\"></xui-design>");
-  await addDesign("grid-1-row-1-col-2",
-      "<xui-design><xui-card-1 xid=\"titi\"></xui-card-1><xui-card-1 xid=\"toto\"></xui-card-1></xui-design>");
+Future refresh(String mode) async {
+  // await addDesign(
+  //     "grid-1-row-2-col-0", "<xui-design><h1>test</h1></xui-design>");
+  // await addDesign("onglet-tab-0", "<xui-design><span>Info<span></xui-design>");
+  // await addDesign("onglet-tab-1", "<xui-design><span>Titre<span></xui-design>");
+  // await addDesign("grid-1-row-1", "<xui-design xui-nb=\"5\"></xui-design>");
+  // await addDesign("grid-1-row-1-col-2",
+  //     "<xui-design><xui-card-1 xid=\"titi\"></xui-card-1><xui-card-1 xid=\"toto\"></xui-card-1></xui-design>");
 
-  String str =
-      await pageManager.reloadHtml(XUIContext(mode), 'app/frame1.html', 'root');
+  var ctx = XUIContext(mode); 
+  var str = await designManager.reloadHtml(ctx, 'app/frame1.html', 'root');
   var ret = new Options(mode: mode, html: str);
 
   changeTemplate(ret);
+
+  return Future.value();
 }
 
-//document.querySelector("#rootFrame").contentWindow.postMessage({ "json_example": true }, "*");
 
-PageManager pageManager = PageManager();
+var designManager = XUIDesignManager();
+
 
 void main() async {
   _refresh = allowInterop(refresh);
   _addDesign = allowInterop(addDesign);
   _getInfo = allowInterop(getInfo);
   _getDesignProperties = allowInterop(getDesign);
+  _setDesignProperties = allowInterop(setDesignProperties);
 
-  String str = await pageManager.getHtml(
+  String str = await designManager.getHtml(
       XUIContext(MODE_DESIGN), 'app/frame1.html', 'root');
   load(str);
 }

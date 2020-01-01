@@ -1,10 +1,11 @@
 <xui-factory version="1.0">
 
 	<xui-doc xid="page">
-		<xui-prop var="titleApp" editor="String">titre de la page</xui-prop>
-		<xui-prop var="colorApp" editor="String">couleur primaire</xui-prop>
-		<xui-prop var="colorBg" editor="String">couleur fond de page</xui-prop>
-		<xui-prop var="copyrightApp" editor="String">Copyright</xui-prop>
+		<xui-prop var="title" editor="string">titre</xui-prop>
+		<xui-prop var="titleApp" editor="string">titre de l'entete</xui-prop>
+		<xui-prop var="colorApp" editor="string">couleur primaire</xui-prop>
+		<xui-prop var="colorBg" editor="string">couleur fond de page</xui-prop>
+		<xui-prop var="copyrightApp" editor="string">copyright de l'appli</xui-prop>
 
 		<xui-prop id="name">Page</xui-prop>
 		<xui-prop id="desc">La page</xui-prop>
@@ -84,7 +85,7 @@
 	<!--  ---------------------------------------------- -->
 
 	<xui-design xid="header-vuetify">
-		<title>[[titleApp]]</title>
+		<title>[[title]]</title>
 		<viewport-no-zoom></viewport-no-zoom>
 	
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"/>

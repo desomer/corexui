@@ -24,8 +24,30 @@ class VueParamJS {
   external String get target;
   external String get template;
   external String get data;
+  external String get path;
 
   external void set target(String xid);
   external void set template(String xid);
   external void set data(String xid);
+  external void set path(String path);
+}
+
+@JS()
+@anonymous
+class Options {
+  external String get mode;
+  external String get html;
+  external void set html(String html);
+  external void set mode(String mode);
+  external factory Options({String mode, dynamic html});
+}
+
+@JS()
+@anonymous
+class ObjectDesign {
+  external String get xid;
+  external String get variable;
+  external String get value;
+  external String get value_orig;
+  external bool get exist;
 }
