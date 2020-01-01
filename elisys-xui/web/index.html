@@ -1,12 +1,28 @@
 <html style="height:100vh;">
    <head>
-      <title>XUI {{selectedxui}}</title>
+      <title>{{selectedxui}}</title>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"></meta>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"></link>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css"></link>
       <style>
+
+
+            .barcustom::-webkit-scrollbar {
+                width: 12px;
+            }
+            
+            .barcustom::-webkit-scrollbar-track {
+                box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+                border-radius: 10px;
+            }
+            
+            .barcustom::-webkit-scrollbar-thumb {
+                border-radius: 10px;
+                box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+            }
+
             html::-webkit-scrollbar {
                  width: 0px;  /*pas de scrollbar */
             }
@@ -20,7 +36,7 @@
                 height: calc(100vh - 64px);
                 width: 100%;
                 display: grid; 
-                grid-template-columns: 0px auto 200px;
+                grid-template-columns: 0px auto 250px;
                 grid-template-rows: 100%; 
                 }
             .main-item-2 {
@@ -59,7 +75,7 @@
          <v-app style="background:white">
             <v-app-bar app color="#1d9da0" fixed :dark="dark" :height="heightHeader">
                <v-app-bar-nav-icon></v-app-bar-nav-icon>
-               <v-toolbar-title>XUI {{selectedxui}}</v-toolbar-title>
+               <v-toolbar-title>{{selectedxui}}</v-toolbar-title>
                <v-spacer></v-spacer>
                <v-btn small class="btn-action" @click="$xui.save()">
                   <v-icon>mdi-television-play</v-icon>
@@ -83,29 +99,30 @@
                      <v-tab>
                         <v-icon>mdi-square-edit-outline</v-icon>
                      </v-tab>
-                     <v-tab-item eager="true">
+                     <v-tab-item eager>
                         <div class="main-container">
                            <div class="main-item main-item-1"></div>
                            <div class="main-item main-item-2">
                               <iframe style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" id="rootFrame"></iframe>
                            </div>
                            <div class="main-item main-item-3">
-                              <v-tabs class="action-tab" dark>
+                              <v-tabs dark>
                                  <v-tab>
                                     <v-icon>mdi-layers-triple</v-icon>
                                  </v-tab>
-                                 <v-tab-item eager="true">
-Comming soon...                                 </v-tab-item>
+                                 <v-tab-item eager>
+                                    <div id="AppPropertiesSetting"></div>
+                                 </v-tab-item>
                                  <v-tab>
                                     <v-icon>mdi-plus-box-multiple</v-icon>
                                  </v-tab>
-                                 <v-tab-item eager="true">
-Comming soon...                                 </v-tab-item>
+                                 <v-tab-item eager>
+                                 </v-tab-item>
                                  <v-tab>
                                     <v-icon>mdi-file-tree</v-icon>
                                  </v-tab>
-                                 <v-tab-item eager="true">
-Comming soon...                                 </v-tab-item>
+                                 <v-tab-item eager>
+                                 </v-tab-item>
                               </v-tabs>
                            </div>
                         </div>
@@ -113,7 +130,7 @@ Comming soon...                                 </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-code-tags</v-icon>
                      </v-tab>
-                     <v-tab-item eager="true">
+                     <v-tab-item eager>
                         <div class="main-code">
                            <pre>
                               <code spellcheck="false" id="xui-code-html"></code>
@@ -123,27 +140,27 @@ Comming soon...                                 </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-api</v-icon>
                      </v-tab>
-                     <v-tab-item eager="true">
+                     <v-tab-item eager>
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-database</v-icon>
                      </v-tab>
-                     <v-tab-item eager="true">
+                     <v-tab-item eager>
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-apps</v-icon>
                      </v-tab>
-                     <v-tab-item eager="true">
+                     <v-tab-item eager>
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-image-filter</v-icon>
                      </v-tab>
-                     <v-tab-item eager="true">
+                     <v-tab-item eager>
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-border-inside</v-icon>
                      </v-tab>
-                     <v-tab-item eager="true">
+                     <v-tab-item eager>
                      </v-tab-item>
                   </v-tabs>
                </v-container>
@@ -166,44 +183,70 @@ Comming soon...                                 </v-tab-item>
       <div id="app"></div>
    </body>
    <script>
-            window.$xui={};
-            window.$xui.load=(html)=>{
-               // console.debug("load", html);
-                document.querySelector("#rootFrame").srcdoc =html;
-                $xui.loadCode(html);
-            };
+if (typeof $xui === 'undefined')
+    $xui = {};
 
-            window.$xui.loadCode=(strCode)=>{
-                var codeElem = document.querySelector("#xui-code-html");
-                if (codeElem!=null) {
-                    const code = Prism.highlight(strCode, Prism.languages.html, 'html');
-                    codeElem.innerHTML=code;
-                }
-            }
 
-            window.$xui.changeTemplate=(param)=>{
-                console.debug("change template", param);
-                if (param.mode=="template") {    
-                    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template":param.html }, "*");
-                }
+window.$xui.load = (html) => {
+    // console.debug("load", html);
+    document.querySelector("#rootFrame").srcdoc = html;
+    $xui.loadCode(html);
+};
 
-                $xui.loadCode(param.html);
-            };
+window.$xui.loadCode = (strCode) => {
+    var codeElem = document.querySelector("#xui-code-html");
+    if (codeElem != null) {
+        const code = Prism.highlight(strCode, Prism.languages.html, 'html');
+        codeElem.innerHTML = code;
+    }
+}
 
-            window.$xui.save=()=>{
-                console.debug("save")
-            }
-        
-            window.addEventListener('message',function(e) {
-                var data = e.data;
-                if (data.action=="select")
-                {
-                    $xui.info = $xui.getInfo(data.xid, data.xid_slot);
-                    console.debug(data, $xui.info);
-                    $xui.rootdata.selectedxui=$xui.info.xid + " > " + $xui.info.docId + " > " + $xui.info.slotname ;
+window.$xui.changeTemplate = (param) => {
+    console.debug("change template", param);
+    if (param.mode == "template") {
+        document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template": param.html }, "*");
+    }
+
+    $xui.loadCode(param.html);
+};
+
+window.$xui.save = () => {
+    console.debug("save")
+}
+
+window.addEventListener('message', function (e) {
+    var data = e.data;
+    if (data.action == "select") {
+        var info = $xui.getInfo(data.xid, data.xid_slot);
+        $xui.propertiesDesign = $xui.getDesignProperties(data.xid, data.xid_slot);
+        console.debug(data, info, $xui.propertiesDesign);
+        // $xui.rootdata.selectedxui=$xui.info.xid + " > " + $xui.info.docId + " > " + $xui.info.slotname ;
+        $xui.rootdata.selectedxui = $xui.propertiesDesign.data;
+
+        var i = 0;
+        var dataProp = [{ label: info.slotname, value: true }];
+        template = "<v-switch dense class='ma-2' hide-details inset :label='data[" + i + "].label' v-model='data[" + i + "].value'></v-switch>";
+
+        $xui.rootDataProperties = { data: dataProp };
+        if ($xui.vuejsDesign != null) {
+            $xui.vuejsAppPropertiesSetting.$destroy();
+        }
+
+        $xui.vuejsAppPropertiesSetting = new Vue(
+            {
+                template: "<div class='barcustom' id='AppPropertiesSetting' style='overflow-y: scroll; height: calc(100% - 50px);'>" + template + "</div>",
+                el: '#AppPropertiesSetting',
+                vuetify: new Vuetify(),
+                data: $xui.rootDataProperties,
+                computed: {
+                    $xui: function () {
+                        return window.$xui;
+                    }
                 }
             });
-        </script>
+
+    }
+});   </script>
    <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.x/prism.min.js"></script>
    <script src="libxui.dart.js"></script>
@@ -219,7 +262,7 @@ Comming soon...                                 </v-tab-item>
 
 	
         $xui.rootdata=Object.assign($xui.rootdata, 
-                { selectedxui : "Vuetify Designer"}
+                { selectedxui : "PWA Designer"}
                 );  ;
     </script>
    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>

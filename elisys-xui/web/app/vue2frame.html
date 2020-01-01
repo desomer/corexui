@@ -1,7 +1,54 @@
 <xui-factory version="1.0">
+
+	<xui-doc xid="page">
+		<xui-prop var="titleApp" editor="String">titre de la page</xui-prop>
+		<xui-prop var="colorApp" editor="String">couleur primaire</xui-prop>
+		<xui-prop var="colorBg" editor="String">couleur fond de page</xui-prop>
+		<xui-prop var="copyrightApp" editor="String">Copyright</xui-prop>
+
+		<xui-prop id="name">Page</xui-prop>
+		<xui-prop id="desc">La page</xui-prop>
+	</xui-doc>  
+
+	<xui-doc xid="v-container:vue-content-1">
+        <xui-prop id="favorite">container</xui-prop>
+        <xui-prop id="exclude"></xui-prop>
+        <xui-prop id="include"></xui-prop>
+
+		<xui-prop id="name">Content</xui-prop>
+		<xui-prop id="desc">Contenu de la page</xui-prop>
+	</xui-doc>
+
+	<xui-doc xid="vue-toolbar-1">
+		<xui-prop id="name">Header</xui-prop>
+		<xui-prop id="desc">Entete</xui-prop>
+	</xui-doc>
+
+	<xui-doc xid="v-app-bar:vue-toolbar-1">
+        <xui-prop id="favorite">action</xui-prop>
+        <xui-prop id="exclude"></xui-prop>
+        <xui-prop id="include"></xui-prop>
+
+		<xui-prop id="name">Toolbar</xui-prop>
+		<xui-prop id="desc">Toolbar de l'entete</xui-prop>
+	</xui-doc>
+
+	<xui-doc xid="vue-footer-1">
+		<xui-prop id="name">Footer</xui-prop>
+		<xui-prop id="desc">Pied de page</xui-prop>
+	</xui-doc>
+
+	<xui-doc xid="v-footer:vue-footer-1">
+        <xui-prop id="favorite">action</xui-prop>
+        <xui-prop id="exclude"></xui-prop>
+        <xui-prop id="include"></xui-prop>
+
+		<xui-prop id="name">Toolbar</xui-prop>
+		<xui-prop id="desc">Toolbar du pied de page</xui-prop>
+	</xui-doc>
 	
 	<!--  gestion page autonome -->
-	<html xid="frame-vuetify-1" xui-mode="final;design" style="height:100vh;" xui-slot-name="page">
+	<html xid="frame-vuetify-1" xui-mode="final;design" style="height:100vh;" xui-slot-name="page" xui-doc-id="page" >
 		<head xid="header-vuetify"></head>
 		<body xid="body-vuetify" style="height:100vh"></body>
 		<xui-slot xid="inject-after-body"></xui-slot>
@@ -13,7 +60,7 @@
 	</html>
 
 	<!--  gestion du designer -->
-	<xui-slot xid="frame-vuetify-1" xui-mode="template" xui-slot-name="page">
+	<xui-slot xid="frame-vuetify-1" xui-mode="template" xui-slot-name="page" xui-doc-id="page">
 		<body xid="body-vuetify" style="height:100vh"></body>
 	</xui-slot>
 
@@ -66,8 +113,8 @@
 	</v-app-bar>
 	
 	<v-content xid="vue-content-1">
-		<v-container xid="container" fluid :fill-height="ContentfillPage" class="pa-0" style="align-items:start">
-			<xui-slot class="xui-class-slot-full" xid="main" xui-slot-name="page content"></xui-slot>
+		<v-container fluid :fill-height="ContentfillPage" class="pa-0" style="align-items:start">
+			<xui-slot xui-slot-full xid="main" xui-slot-name="page content"></xui-slot>
 		</v-container>
 	</v-content>
 	

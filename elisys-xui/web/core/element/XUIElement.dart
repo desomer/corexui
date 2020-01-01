@@ -27,6 +27,16 @@ class XUIElementHTML extends XUIElement {
   List<XUIComponent> implementBy;
   List<XUIDesign> designBy;
 
+  int getNbChild()
+  {
+     int nb=0;
+     children?.forEach((c) {
+        if (c is! XUIElementHTMLText)
+            nb++;
+     });
+     return nb;
+  }
+
   dynamic searchPropertyXUI(String tag) {
     XUIProperty prop = propertiesXUI == null ? null : propertiesXUI[tag];
     if (prop != null)
@@ -107,11 +117,11 @@ class XUIElementHTMLText extends XUIElementHTML {
  */
 abstract class XUIElementNative extends XUIElementXUI {
   Future<XUIModel> doProcessPhase1(
-      XUIResource xuifile, XUIElementHTML html) async {
+     XUIEngine engine, XUIElementHTML html) async {
     return Future.value(null);
   }
 
-  Future doProcessPhase2(XUIResource xuifile, XUIElementHTML html) async {
+  Future doProcessPhase2(XUIEngine engine, XUIElementHTML html) async {
     return Future.value();
   }
 

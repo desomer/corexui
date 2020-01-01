@@ -1,19 +1,16 @@
-
 import './core/XUIEngine.dart';
 import './core/XUIFactory.dart';
 import './core/parser/HTMLReader.dart';
 import './core/parser/ProviderAjax.dart';
 
 class PageManager {
-
   var xuiEngine = XUIEngine();
 
-  Future<String> getHtml( XUIContext ctx, String uri, String xid) async {
-
+  Future<String> getHtml(XUIContext ctx, String uri, String xid) async {
     var provider = ProviderAjax();
 
     var reader = HTMLReader(uri, provider);
-    await xuiEngine.start(reader, ctx);
+    await xuiEngine.initialize(reader, ctx);
 
     var bufferHtml = XUIHtmlBuffer();
     await xuiEngine.toHTMLString(bufferHtml, xid, ctx);
@@ -21,8 +18,7 @@ class PageManager {
     return Future.value(bufferHtml.html.toString());
   }
 
-  Future<String> reloadHtml( XUIContext ctx, String uri, String xid) async {
-
+  Future<String> reloadHtml(XUIContext ctx, String uri, String xid) async {
     var bufferHtml = XUIHtmlBuffer();
     await xuiEngine.toHTMLString(bufferHtml, xid, ctx);
 
@@ -30,10 +26,10 @@ class PageManager {
   }
 
   Future addDesign(String id, String template) async {
-
     await xuiEngine.addDesign(id, template);
-  
+
     return Future.value();
   }
-  
 }
+
+

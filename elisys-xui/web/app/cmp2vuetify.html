@@ -1,22 +1,71 @@
 <xui-factory version="1.0">
     <!-------------------------- XUI-TABS -------------------------------->
+    <xui-doc xid="xui-tabs">
+        <xui-prop id="name">Tabs</xui-prop>
+        <xui-prop id="icon">mdi-tab</xui-prop>
+        <xui-prop id="desc">Des onglets</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="nb" def="1" editor="int">Nb d'onglet</xui-prop>
+        <xui-prop var="vertical" def="false" editor="bool">Onglet vertical</xui-prop>
+    </xui-doc>
+    
+    <xui-doc xid="v-tab:xui-tabs">
+        <xui-prop id="favorite">text;icon;composer</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+        <xui-prop id="include"></xui-prop>
+
+        <xui-prop id="name">Tab</xui-prop>
+        <xui-prop id="desc">Titre de l'onglet</xui-prop>
+
+        <xui-prop var="title" editor="String">titre en format text</xui-prop>
+    </xui-doc>  
+
+    <xui-doc xid="v-tab-item:xui-tabs">
+        <xui-prop id="name">Tab Item</xui-prop>
+        <xui-prop id="desc">Contenu de l'onglet</xui-prop>
+        <xui-prop id="favorite">container</xui-prop>
+    </xui-doc>
+
     <v-tabs xid="xui-tabs" xui-for="idx" xui-slot-name="tab">
         <v-tab>
             <xui-slot xid="[[parent-xid]]-tab-[[idx]]" xui-slot-name="tab [[idx]]"></xui-slot>
         </v-tab>
-        <v-tab-item eager="true">    <!-- eager="true"   desactive le lazyloading -->
+        <v-tab-item eager>    <!-- eager  desactive le lazyloading -->
             <xui-slot xid="[[parent-xid]]-tab-item-[[idx]]" xui-slot-name="tab content [[idx]]"></xui-slot>
         </v-tab-item>
     </v-tabs>
 
     <!--------------------------  XUI-GRID   ----------------------------->
+    <xui-doc xid="xui-grid">
+        <xui-prop id="name">Grid</xui-prop>
+        <xui-prop id="icon">mdi-tab</xui-prop>
+        <xui-prop id="desc">Une grille</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="nb" def="1">nb de lignes</xui-prop>
+    </xui-doc>
+    
+    <xui-doc xid="xui-row">
+        <xui-prop id="name">Row</xui-prop>
+        <xui-prop id="desc">Une ligne</xui-prop>
+        <xui-prop var="nb" def="1">nb col dans la ligne</xui-prop>
+        <xui-prop var="height">Hauteur de ligne</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="v-col:xui-row">
+        <xui-prop id="name">Column</xui-prop>
+        <xui-prop id="desc">Une colonne</xui-prop>
+        <xui-prop var="width">Largueur de colonne</xui-prop>
+    </xui-doc>
+
     <v-container class="xui-grid" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
         <v-row>
-            <xui-col xid="[[parent-xid]]-row-[[idxr]]" xui-slot-name="row [[idxr]]"></xui-col>
+            <xui-row xid="[[parent-xid]]-row-[[idxr]]" xui-slot-name="row [[idxr]]"></xui-row>
         </v-row>
     </v-container>
 
-    <xui-slot xid="xui-col" xui-for="idxc">
+    <xui-slot xid="xui-row" xui-for="idxc">
         <v-col>
             <xui-slot xid="[[parent-xid]]-col-[[idxc]]" xui-slot-name="row [[idxr]] col [[idxc]]"></xui-slot>
         </v-col>
