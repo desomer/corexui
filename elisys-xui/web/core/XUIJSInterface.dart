@@ -25,11 +25,13 @@ class VueParamJS {
   external String get template;
   external String get data;
   external String get path;
+  external String get xid;
 
   external void set target(String xid);
   external void set template(String xid);
   external void set data(String xid);
   external void set path(String path);
+  external void set xid(String xid);
 }
 
 @JS()

@@ -79,8 +79,28 @@
 				var template = data.template;
 				this.document.body.innerHTML=template;
 				$xui.loadTemplate();
+				setTimeout( $xui.initDrag , 1000);
 			}
 		});
+
+		$xui.initDrag = ()=> { 
+				console.debug("ok", document.querySelector('.xui-class-slot') );
+				document.querySelectorAll('.xui-class-slot').forEach(e => { 
+					e.addEventListener('dragover', function(e) {
+						e.preventDefault(); // Annule l'interdiction de drop
+					}); 
+					e.addEventListener('drop', function(e) {
+						e.preventDefault(); // Annule l'interdiction de drop
+						var idCmp = e.dataTransfer.getData('text/plain');
+						let targetAction=e.target.closest("[data-xid]");
+						console.debug("drop ", idCmp, targetAction);
+						var message = {action:"drop", xid: targetAction.dataset.xid, xid_slot: targetAction.dataset.xidSlot };
+						window.parent.postMessage(message, "*");
+					}); 
+				});
+			}
+
+		setTimeout( $xui.initDrag , 1000);		
 	</script>
 	<!--  ---------------------------------------------- -->
 

@@ -1,7 +1,10 @@
+import 'dart:collection';
+
 import './XUIEngine.dart';
 import './XUIFactory.dart';
 import './parser/HTMLReader.dart';
 import './parser/ProviderAjax.dart';
+import 'element/XUIProperty.dart';
 
 class XUIDesignManager {
   var xuiEngine = XUIEngine();
@@ -31,11 +34,65 @@ class XUIDesignManager {
     return Future.value();
   }
 
-  void changeProperty(String xid, String variable, dynamic value) {
-    print( "${xid} a changer l'attribut ${variable} par ${value}");
-    var xuiModel = xuiEngine.xuiFile.designs[xid].sort(xuiEngine.xuiFile.context).first;
-    print( xuiModel.elemXUI.propertiesXUI[variable].content);
+  Future changeProperty(String xid, String variable, dynamic value) async {
+    print("${xid} a changer l'attribut ${variable} par ${value}");
+    var listDesign = xuiEngine.xuiFile.designs[xid];
+    if (listDesign == null) {
+      await addDesign(xid, "<xui-design></xui-design>");
+      listDesign = xuiEngine.xuiFile.designs[xid];
+    }
+
+    var xuiModel = listDesign.sort(xuiEngine.xuiFile.context).first;
+    //print(xuiModel.elemXUI.propertiesXUI[variable].content);
+    xuiModel.elemXUI.propertiesXUI ??= HashMap<String, XUIProperty>();
+    if (xuiModel.elemXUI.propertiesXUI[variable] == null)
+      xuiModel.elemXUI.propertiesXUI[variable] = XUIProperty(null);
     xuiModel.elemXUI.propertiesXUI[variable].content = value;
+
+    return Future.value();
+  }
+
+  JSDesignInfo getJSComponentInfo(String id, String idslot) {
+    
+    String cmp = """<v-list-item v-for="(item, i) in data" :key="i" >
+        <v-list-item-content draggable=true @dragstart="\$xui.dragStart(item, \$event)">
+          <v-list-item-title v-text="item.text"></v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>""";
+
+// <v-list-item
+//           v-for="(item, i) in items"
+//           :key="i"
+//         >
+//           <v-list-item-icon>
+//             <v-icon v-text="item.icon"></v-icon>
+//           </v-list-item-icon>
+//           <v-list-item-content>
+//             <v-list-item-title v-text="item.text"></v-list-item-title>
+//           </v-list-item-content>
+//         </v-list-item>
+
+    var ret = JSDesignInfo();
+    ret.bufTemplate.write("<v-list dense><v-list-item-group v-model='item' color='primary'>");
+    ret.bufTemplate.write(cmp);
+    ret.bufTemplate.write("</v-list-item-group></v-list>");
+
+    int i = 0;
+    var listCmp = [
+      {"tag": "xui-card-1"},
+      {"tag": "xui-tabs"},
+      {"tag": "xui-grid"}
+    ];
+
+    for (var item in listCmp) {
+      if (i > 0) ret.bufData.write(",");
+      ret.bufData.write("{\"text\":\"${item["tag"]}\"}");
+      i++;
+    }
+
+    ret.xid= id.startsWith("_")?idslot:id;
+
+    return ret;
   }
 
   JSDesignInfo getJSDesignInfo(String id, String idslot) {
@@ -124,6 +181,7 @@ class XUIDesignManager {
 }
 
 class JSDesignInfo {
+  String xid;
   var bufPath = StringBuffer();
   var bufData = StringBuffer();
   var bufTemplate = StringBuffer();
