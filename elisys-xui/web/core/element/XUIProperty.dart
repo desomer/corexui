@@ -6,13 +6,13 @@ class XUIProperty {
   }
 
 
-  static parse(StringBuffer parse, Function action) {
+  static parse(ParseInfo parseInfo, Function action) {
     int idx = 0;
-    while ((idx = _parseNext(parse, idx, action)) >= 0) {}
+    while ((idx = _parseNext(parseInfo, idx, action)) >= 0) {}
   }
 
-  static int _parseNext(StringBuffer parsebuilder, int idx, Function action) {
-    String parse = parsebuilder.toString();
+  static int _parseNext(ParseInfo parseInfo, int idx, Function action) {
+    String parse = parseInfo.parsebuilder.toString();
     String startTag= "[[";
     String endTag= "]]";
 
@@ -30,17 +30,34 @@ class XUIProperty {
     }
 
     if (next >= 0 && nextEnd > 0) {
+      parseInfo.nbTag++;
       String strStart = parse.substring(0, next);
       String strEnd = parse.substring(nextEnd + 2, parse.length);
       String tag = parse.substring(next + 2, nextEnd);
-      tag = action(tag);
-      parsebuilder.clear();
+      tag = action(tag).toString(); 
+      parseInfo.parsebuilder.clear();
       nextEnd = (strStart + tag).length;
-      parsebuilder.write(strStart + tag + strEnd);
+      parseInfo.parsebuilder.write(strStart + tag + strEnd);
       return nextEnd;
-    } else
+    } else {
       return -1;
+    }
   }
 }
 
-/***************************************************************************** */
+///--------------------------------------------------------------------
+
+enum ParseInfoMode { CONTENT, PROP, KEY, ATTR}
+
+class ParseInfo
+{
+    StringBuffer parsebuilder;
+    int nbTag=0;
+    ParseInfoMode mode;
+
+    ParseInfo(String content, ParseInfoMode mode)
+    {
+        parsebuilder = StringBuffer(content);
+        this.mode=mode;
+    }
+}

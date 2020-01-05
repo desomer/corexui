@@ -11,11 +11,11 @@ class SlotInfoJS {
   external String get slotname;
   external String get docId;
   external String get idRessource;
-  external void set xid(String xid);
-  external void set parentXid(String xid);
-  external void set slotname(String xid);
-  external void set docId(String xid);
-  external void set idRessource(String xid);
+  external set xid(String xid);
+  external set parentXid(String xid);
+  external set slotname(String xid);
+  external set docId(String xid);
+  external set idRessource(String xid);
 }
 
 @JS()
@@ -27,11 +27,11 @@ class VueParamJS {
   external String get path;
   external String get xid;
 
-  external void set target(String xid);
-  external void set template(String xid);
-  external void set data(String xid);
-  external void set path(String path);
-  external void set xid(String xid);
+  external set target(String xid);
+  external set template(String xid);
+  external set data(String xid);
+  external set path(String path);
+  external set xid(String xid);
 }
 
 @JS()
@@ -39,8 +39,8 @@ class VueParamJS {
 class Options {
   external String get mode;
   external String get html;
-  external void set html(String html);
-  external void set mode(String mode);
+  external set html(String html);
+  external set mode(String mode);
   external factory Options({String mode, dynamic html});
 }
 

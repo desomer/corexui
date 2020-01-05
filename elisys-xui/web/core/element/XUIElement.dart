@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
-import '../XUIEngine.dart' as Const;
+import '../XUIEngine.dart' as cst;
 import '../XUIEngine.dart';
 import '../XUIFactory.dart';
 import 'XUIProperty.dart';
@@ -18,6 +18,11 @@ abstract class XUIElement {
 
   // les prop xui
   HashMap<String, XUIProperty> propertiesXUI;
+
+  bool isEmpty()
+  {
+      return attributes==null && children==null && propertiesXUI==null;
+  }
 }
 
 class XUIElementHTML extends XUIElement {
@@ -27,36 +32,43 @@ class XUIElementHTML extends XUIElement {
   List<XUIComponent> implementBy;
   List<XUIDesign> designBy;
 
-  int getNbChild()
-  {
-     int nb=0;
-     children?.forEach((c) {
-        if (c is! XUIElementHTMLText)
-            nb++;
-     });
-     return nb;
+  int getNbChild() {
+    int nb = 0;
+    children?.forEach((c) {
+      if (c is! XUIElementHTMLText) {
+        nb++;
+      }
+    });
+    return nb;
   }
 
   dynamic searchPropertyXUI(String tag) {
     XUIProperty prop = propertiesXUI == null ? null : propertiesXUI[tag];
-    if (prop != null)
+    if (prop != null) {
       return prop.content;
-    else if (parent != null) return parent.searchPropertyXUI(tag);
+    } else if (parent != null) return parent.searchPropertyXUI(tag);
   }
 
-  dynamic processContent(String content) {
-    StringBuffer buf = StringBuffer(content);
-    XUIProperty.parse(buf, (String tag) {
-      var ret = searchPropertyXUI(tag);
-      return ret != null ? ret : "[" + tag + "]";
-    });
-    return buf.toString();
+  dynamic processContent(String content, ParseInfoMode mode) {
+    ParseInfo parseInfo = ParseInfo(content, mode);
+    try {
+      XUIProperty.parse(parseInfo, (String tag) {
+        var ret = searchPropertyXUI(tag);
+        return ret != null ? ret : ( (mode==ParseInfoMode.CONTENT?("[" + tag + "]"):"") );
+      });
+    } catch (e, s) {
+      print("pb parse $e $s");
+      print(content);
+      rethrow;
+    }
+
+    return parseInfo.parsebuilder.toString();
   }
 
-  void toHTMLString(XUIHtmlBuffer buffer) {
-    if (tag == Const.TAG_NO_DOM) {
+  void processPhase3(XUIHtmlBuffer buffer) {
+    if (tag == cst.TAG_NO_DOM) {
       // cas des slot
-      toChildrenHTMLString(buffer);
+      toChildrenPhase3(buffer);
       return;
     }
 
@@ -64,15 +76,45 @@ class XUIElementHTML extends XUIElement {
     buffer.html.write('<' + this.tag);
 
     this.attributes?.entries?.forEach((f) {
-      buffer.html.write(" ");
-      buffer.html.write(f.key);
       var c = f.value.content;
-      if (c != null) {
-        buffer.html.write("=");
+      var keyAttr = processContent(f.key, ParseInfoMode.KEY);
+
+      if (keyAttr!="" && c != null) {
         if (c is String) {
-          buffer.html.write('"' + processContent(c) + '"');
-        } else
+          var valProp = processContent(c, ParseInfoMode.ATTR);
+          bool mustAdd = true;
+          bool isBool = false;
+          if (c != valProp) {
+            // transformation par recherche de tag
+            if (valProp == "" || valProp == "false") {
+              mustAdd = false; // pas d'ajout si vide ou false
+            }
+          }
+          if (mustAdd) {
+            if (valProp == "true" || valProp == "false") {
+              isBool = true;
+            }
+            buffer.html.write(" ");
+            buffer.html.write(keyAttr);
+            if (!isBool) {
+              /// pas d'ajout de valeur si boolean
+              buffer.html.write("=");
+              isBool
+                  ? (buffer.html.write(valProp))
+                  : (buffer.html.write('"' + valProp + '"'));
+            }
+          }
+        } else {
+          // attribut boolean
+          buffer.html.write(" ");
+          buffer.html.write(keyAttr);
+          buffer.html.write("=");
           buffer.html.write(c);
+        }
+      } else if (keyAttr!="") {
+        // attribut sans valeur (ex  : <v-btn dark>)
+        buffer.html.write(" ");
+        buffer.html.write(keyAttr);
       }
     });
 
@@ -86,19 +128,20 @@ class XUIElementHTML extends XUIElement {
     if (hasChidren) buffer.html.write('\n');
 
     buffer.tab(1);
-    toChildrenHTMLString(buffer);
+    toChildrenPhase3(buffer);
     buffer.tab(-1);
 
     if (hasChidren) buffer.addTab();
     buffer.html.write('</' + this.tag + '>\n');
   }
 
-  void toChildrenHTMLString(XUIHtmlBuffer buffer) {
+  void toChildrenPhase3(XUIHtmlBuffer buffer) {
     this.children?.forEach((c) {
       if (c is XUIElementHTMLText) {
-        c.content.trim().isNotEmpty ? c.toHTMLString(buffer) : null;
-      } else
-        (c as XUIElementHTML).toHTMLString(buffer);
+        c.content.trim().isNotEmpty ? c.processPhase3(buffer) : null;
+      } else {
+        (c as XUIElementHTML).processPhase3(buffer);
+      }
     });
   }
 }
@@ -107,17 +150,15 @@ class XUIElementHTMLText extends XUIElementHTML {
   String content;
 
   @override
-  void toHTMLString(XUIHtmlBuffer buffer) {
-    buffer.html.write(processContent(content));
+  void processPhase3(XUIHtmlBuffer buffer) {
+    buffer.html.write(processContent(content, ParseInfoMode.CONTENT));
   }
 }
 
-/**
- *  provient d'un provider interne
- */
+/// provient d'un provider interne
 abstract class XUIElementNative extends XUIElementXUI {
   Future<XUIModel> doProcessPhase1(
-     XUIEngine engine, XUIElementHTML html) async {
+      XUIEngine engine, XUIElementHTML html) async {
     return Future.value(null);
   }
 
@@ -130,14 +171,12 @@ abstract class XUIElementNative extends XUIElementXUI {
   }
 }
 
-/** uniquement un text */
+///  uniquement un text
 class XUIElementText extends XUIElementXUI {
   String content;
 }
 
-/**
- *   provient d'un provider fichier XUI
- */
+///   provient d'un provider fichier XUI
 class XUIElementXUI extends XUIElement {
   String xid;
   String idRessource;

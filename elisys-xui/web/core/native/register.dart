@@ -5,7 +5,7 @@ import '../XUIFactory.dart';
 import '../element/XUIElement.dart';
 import '../element/XUIProperty.dart';
 
-/************************************************************************************** */
+///------------------------------------------------------------------
 class NativeSlot extends XUIElementNative {
   NativeSlot() {
     this.xid = "xui-slot";
@@ -23,7 +23,7 @@ class NativeSlot extends XUIElementNative {
   @override
   Future doProcessPhase2(XUIEngine engine, XUIElementHTML html) async {
     // recherche le nom du slot
-    var slotName = null;
+    var slotName;
     bool isFull = false;
     html?.propertiesXUI?.entries?.forEach((f) {
       if (f.key.toLowerCase() == ATTR_SLOT_NAME) {
@@ -65,10 +65,11 @@ class NativeSlot extends XUIElementNative {
             XUIModel(html.origin, null).calculateProp(html.origin.xid, html);
         childHtml.attributes["data-" + ATTR_XID_SLOT] = XUIProperty(xidCal);
         if (isFull && nb==1) {
-          if (childHtml.attributes["class"]==null)
+          if (childHtml.attributes["class"]==null) {
             childHtml.attributes["class"] = XUIProperty("xui-class-slot-full");
-          else
+          } else {
             childHtml.attributes["class"] = XUIProperty(childHtml.attributes["class"].content+" xui-class-slot-full");
+          }
         }
       }
     });
@@ -77,7 +78,7 @@ class NativeSlot extends XUIElementNative {
   }
 }
 
-/************************************************************************************** */
+///------------------------------------------------------------------
 class NativeInjectFile extends XUIElementNative {
 
   // dictionnaire de cache de fichier
@@ -96,9 +97,10 @@ class NativeInjectFile extends XUIElementNative {
     var aText = XUIElementText();
     var idResource = html.origin.propertiesXUI["path"].content;
 
-    if (cacheText[idResource] == null)
+    if (cacheText[idResource] == null) {
       cacheText[idResource] =
           await engine.xuiFile.reader.provider.getResourceFutur(idResource);
+    }
 
     aText.content = cacheText[idResource];
 
@@ -109,7 +111,7 @@ class NativeInjectFile extends XUIElementNative {
   }
 }
 
-/************************************************************************************** */
+///------------------------------------------------------------------
 class NativeRegister {
   NativeRegister(XUIResource reader) {
     NativeInjectFile().register(reader);

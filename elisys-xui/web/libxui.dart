@@ -22,6 +22,9 @@ external set _refresh(void Function(String) f);
 @JS('addDesign')
 external set _addDesign(void Function(String, String) f);
 
+@JS('removeDesign')
+external set _removeDesign(void Function(String, String) f);
+
 @JS('getInfo')
 external set _getInfo(dynamic Function(String, String) f);
 
@@ -34,7 +37,8 @@ external set _getDesignProperties(dynamic Function(String, String) f);
 @JS('setDesignProperties')
 external set _setDesignProperties(dynamic Function(String, dynamic) f);
 
-/**************************************************************************** */
+///------------------------------------------------------------------
+
 dynamic setDesignProperties(String id, dynamic ret) async {
   List listDesign = ret;
   for (ObjectDesign item in listDesign) {
@@ -86,7 +90,17 @@ void addDesign(String id, String template) async {
   var mode = "template";
   var ctx = XUIContext(mode);
   var str = await designManager.reloadHtml(ctx, 'app/frame1.html', 'root');
-  var ret = new Options(mode: mode, html: str);
+  var ret = Options(mode: mode, html: str);
+
+  changeTemplate(ret);
+}
+
+void removeDesign(String id, String modeDelete) async {
+  designManager.removeDesign(id, modeDelete);
+  var mode = "template";
+  var ctx = XUIContext(mode);
+  var str = await designManager.reloadHtml(ctx, 'app/frame1.html', 'root');
+  var ret = Options(mode: mode, html: str);
 
   changeTemplate(ret);
 }
@@ -102,7 +116,7 @@ Future refresh(String mode) async {
 
   var ctx = XUIContext(mode);
   var str = await designManager.reloadHtml(ctx, 'app/frame1.html', 'root');
-  var ret = new Options(mode: mode, html: str);
+  var ret = Options(mode: mode, html: str);
 
   changeTemplate(ret);
 
@@ -114,6 +128,7 @@ var designManager = XUIDesignManager();
 void main() async {
   _refresh = allowInterop(refresh);
   _addDesign = allowInterop(addDesign);
+  _removeDesign = allowInterop(removeDesign);
   _getInfo = allowInterop(getInfo);
   _getDesignProperties = allowInterop(getDesign);
   _setDesignProperties = allowInterop(setDesignProperties);

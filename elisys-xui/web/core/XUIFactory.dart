@@ -1,11 +1,11 @@
 import 'dart:collection';
 
-import 'XUIEngine.dart' as Const;
+import 'XUIEngine.dart' as cst;
 import 'XUIEngine.dart';
 import 'element/XUIElement.dart';
 import 'element/XUIProperty.dart';
 
-/************************************************************* */
+///------------------------------------------------------------------
 class XUIHtmlBuffer {
   var html = StringBuffer();
   int idxTab = 0;
@@ -21,7 +21,7 @@ class XUIHtmlBuffer {
   }
 }
 
-/************************************************************* */
+///------------------------------------------------------------------
 class XUIComponent extends XUIModel {
   XUIComponent(e, m) : super(e, m);
 }
@@ -34,10 +34,12 @@ class XUIChild extends XUIModel {
   XUIChild(e, m) : super(e, m);
 }
 
-/************************************************************** */
-/**
- * gestion des designs ou des components
- */
+///------------------------------------------------------------------
+///
+/// gestion des designs ou des components
+/// 
+///------------------------------------------------------------------
+
 class XUIModel implements Comparable<XUIModel> {
   int priority = 0; // gestion de la priorité d'application
   XUIElementXUI elemXUI;
@@ -49,10 +51,11 @@ class XUIModel implements Comparable<XUIModel> {
     var tag = elemXUI.tag;
 
     /********** AFFECTE LES INFO POUR LE DESIGNER *************/
-    if (this is XUIComponent)
+    if (this is XUIComponent) {
       elemHtml.implementBy = (elemHtml.implementBy ?? [])..add(this);
-    else if (this is XUIDesign)
+    } else if (this is XUIDesign) {
       elemHtml.designBy = (elemHtml.designBy ?? [])..add(this);
+    }
 
     /*********** EXECUTE LES NATIVES ********/
     if (elemXUI is XUIElementNative) {
@@ -122,12 +125,12 @@ class XUIModel implements Comparable<XUIModel> {
 
   String calculateProp(String prop, XUIElementHTML elemHtml) {
     if (prop != null) {
-      StringBuffer buf = StringBuffer(prop);
-      XUIProperty.parse(buf, (String tag) {
+      ParseInfo parseInfo = ParseInfo(prop, ParseInfoMode.PROP);
+      XUIProperty.parse(parseInfo, (String tag) {
         var ret = elemHtml.searchPropertyXUI(tag);
         return ret != null ? ret : "[" + tag + "]";
       });
-      prop = buf.toString();
+      prop = parseInfo.parsebuilder.toString();
     }
 
     return prop;
@@ -136,7 +139,7 @@ class XUIModel implements Comparable<XUIModel> {
   Future processChildren(XUIElementHTML elemHtml, XUIEngine engine) async {
     /**************** FOR  *****************/
     int nb = 1;
-    String varIdx = null;
+    String varIdx;
     if (elemXUI?.propertiesXUI != null) {
       XUIProperty xuifor = elemHtml.propertiesXUI["for"];
       if (xuifor != null) {
@@ -201,17 +204,18 @@ class XUIModel implements Comparable<XUIModel> {
           // complete les classes
           XUIProperty classe = elemHtml.attributes[f.key];
           completeAttribut(classe, elemHtml, f, v, " ");
-        } else
+        } else {
           elemHtml.attributes[f.key] = XUIProperty(v);
+        }
       });
     }
   }
 
   void completeAttribut(XUIProperty style, XUIElementHTML elemHtml,
       MapEntry<String, XUIProperty> f, String v, String sep) {
-    if (style == null)
+    if (style == null) {
       elemHtml.attributes[f.key] = XUIProperty(v);
-    else {
+    } else {
       elemHtml.attributes[f.key].content += sep + v;
     }
   }
@@ -221,7 +225,7 @@ class XUIModel implements Comparable<XUIModel> {
       elemXUI.propertiesXUI.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
 
-        if (prop.key.toLowerCase() != Const.ATTR_XID) {
+        if (prop.key.toLowerCase() != cst.ATTR_XID) {
           // n'affecte pas le XID car gerer par attribut xid
           elemHtml.propertiesXUI[prop.key] = prop.value;
         }
@@ -240,13 +244,14 @@ class XUIModel implements Comparable<XUIModel> {
   Future processPhase2(
       XUIEngine engine, XUIElementHTML elemHtml, String parentXId) async {
     // gestion appel des native
-    if (elemHtml.implementBy != null)
+    if (elemHtml.implementBy != null) {
       for (var cmp in elemHtml.implementBy) {
         if (cmp.elemXUI is XUIElementNative) {
           await (cmp.elemXUI as XUIElementNative)
               .doProcessPhase2(engine, elemHtml);
         }
       }
+    }
 
     var slotInfo = SlotInfo();
 
@@ -272,8 +277,8 @@ class XUIModel implements Comparable<XUIModel> {
             slotInfo.slotname == null ? parentXId : slotInfo.xid);
       }
     }
-    //genere les infos de design (info, doc, etc...)
 
+    //genere les infos de design (info, doc, etc...)
     if (slotInfo.xid != null) {
       if (slotInfo.slotname != null) {
         slotInfo.slotname = calculateProp(slotInfo.slotname, elemHtml);
@@ -283,22 +288,6 @@ class XUIModel implements Comparable<XUIModel> {
         slotInfo.elementHTML = elemHtml;
 
         engine.mapInfo[slotInfo.xid] = slotInfo;
-
-        // print("xid=<" +
-        //     (slotInfo.xid ?? "") +
-        //     "> pxid=<" +
-        //     (slotInfo.parentXid ?? "") +
-        //     "> slotname=<" +
-        //     slotInfo.slotname +
-        //     "> docId=<" +
-        //     (slotInfo.docId ?? "-") +
-        //     "> origin=<" +
-        //     (slotInfo.idRessource ?? "-") +
-        //     ">");
-
-        // if (elemHtml.origin.tag == "xui-slot") {
-        //  var a = elemHtml.parent.tag;
-        // }
       }
     }
 

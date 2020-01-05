@@ -11,7 +11,7 @@ class ProviderFile extends Provider
 
   @override
   Future<String> getResourceFutur(String id) {
-    return new File(path+id).readAsString();
+    return File(path+id).readAsString();
   }
   
 }

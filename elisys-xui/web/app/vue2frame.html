@@ -47,7 +47,7 @@
 		<xui-prop id="name">Toolbar</xui-prop>
 		<xui-prop id="desc">Toolbar du pied de page</xui-prop>
 	</xui-doc>
-	
+	<!---------------------------------------------------------------------------------------------------->
 	<!--  gestion page autonome -->
 	<html xid="frame-vuetify-1" xui-mode="final;design" style="height:100vh;" xui-slot-name="page" xui-doc-id="page" >
 		<head xid="header-vuetify"></head>
@@ -66,9 +66,20 @@
 	</xui-slot>
 
 	<script xid="xui-init-designer" xui-mode="design">
+		<xui-inject xui-path="app/cmpDesignDrop.js"></xui-inject>
+
 		document.addEventListener('click', function(e) {    //dblclick
 			let targetAction=e.target.closest("[data-xid]");
-			var message = {action:"select", xid: targetAction.dataset.xid, xid_slot: targetAction.dataset.xidSlot };
+
+			let elemRect = targetAction.getBoundingClientRect();
+
+			var message = {
+				action:"select", 
+				xid: targetAction.dataset.xid, 
+				xid_slot: targetAction.dataset.xidSlot, 
+				position: elemRect	
+			};
+			console.debug("message", message);
 			window.parent.postMessage(message, "*");
 		});
 
@@ -79,28 +90,8 @@
 				var template = data.template;
 				this.document.body.innerHTML=template;
 				$xui.loadTemplate();
-				setTimeout( $xui.initDrag , 1000);
 			}
 		});
-
-		$xui.initDrag = ()=> { 
-				console.debug("ok", document.querySelector('.xui-class-slot') );
-				document.querySelectorAll('.xui-class-slot').forEach(e => { 
-					e.addEventListener('dragover', function(e) {
-						e.preventDefault(); // Annule l'interdiction de drop
-					}); 
-					e.addEventListener('drop', function(e) {
-						e.preventDefault(); // Annule l'interdiction de drop
-						var idCmp = e.dataTransfer.getData('text/plain');
-						let targetAction=e.target.closest("[data-xid]");
-						console.debug("drop ", idCmp, targetAction);
-						var message = {action:"drop", xid: targetAction.dataset.xid, xid_slot: targetAction.dataset.xidSlot };
-						window.parent.postMessage(message, "*");
-					}); 
-				});
-			}
-
-		setTimeout( $xui.initDrag , 1000);		
 	</script>
 	<!--  ---------------------------------------------- -->
 

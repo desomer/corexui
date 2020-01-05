@@ -14,11 +14,11 @@ class XMLElem {
   LinkedHashMap<dynamic, String> attributs;
 }
 
-/***************************************************************************/
+///------------------------------------------------------------------
 class HTMLReader {
   Provider provider;
   var id;
-  var content;
+ // var content;
 
   HTMLReader(String id, Provider provider) {
     this.provider=provider;
@@ -38,9 +38,9 @@ class HTMLReader {
     text = text.replaceAll("<script", "<xui-escape-script");
     text = text.replaceAll("</script", "</xui-escape-script");
     
-    this.content = text;
+  //  this.content = text;
 
-    var document = Element.html(this.content);
+    var document = Element.html(text);
 
     return _parseElem(document, null, elemReader);
   }
@@ -51,7 +51,7 @@ class HTMLReader {
     return _parseElem(document, null, elemReader);
   }
 
-  /******************************************************/
+  ///------------------------------------------------------------------
   Future _parseElem(Node elem, dynamic parent, XMLElemReader elemReader) async {
     //   print("---------------");
     var xmlelem = XMLElem();
