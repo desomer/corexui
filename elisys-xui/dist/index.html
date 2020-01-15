@@ -122,6 +122,7 @@
                                     <v-icon>mdi-plus-box-multiple</v-icon>
                                  </v-tab>
                                  <v-tab-item eager>
+                                    <div id="AppComponents"></div>
                                  </v-tab-item>
                                  <v-tab>
                                     <v-icon>mdi-file-tree</v-icon>
@@ -138,7 +139,7 @@
                      <v-tab-item eager>
                         <div class="main-code">
                            <pre>
-                              <code spellcheck="false" id="xui-code-html"></code>
+                              <code spellcheck id="xui-code-html"></code>
                            </pre>
                         </div>
                      </v-tab-item>
@@ -171,13 +172,23 @@
                </v-container>
             </v-content>
             <v-footer app color="#1d9da0" :dark="dark" style="padding: 0px 10px;" :height="heightFooter" inset>
-               <v-btn small class="btn-action" @click="$xui.save()">
+               <v-btn small class="btn-action" @click="$xui.deleteCmp()">
+                  <v-icon>mdi-delete</v-icon>
+               </v-btn>
+               <v-btn small class="btn-action">
+                  <v-icon>mdi-content-cut</v-icon>
+               </v-btn>
+               <v-btn small class="btn-action">
+                  <v-icon>mdi-content-paste</v-icon>
+               </v-btn>
+               <span style="width:50px"></span>
+               <v-btn small class="btn-action">
                   <v-icon>mdi-settings</v-icon>
                </v-btn>
-               <v-btn small class="btn-action" @click="$xui.save()">
+               <v-btn small class="btn-action">
                   <v-icon>mdi-note-multiple</v-icon>
                </v-btn>
-               <v-btn small class="btn-action" @click="$xui.save()">
+               <v-btn small class="btn-action">
                   <v-icon>mdi-new-box</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
@@ -187,77 +198,9 @@
       </template>
       <div id="app"></div>
    </body>
-   <script>
-if (typeof $xui === 'undefined')
-    $xui = {};
-
-
-window.$xui.load = (html) => {
-    // console.debug("load", html);
-    document.querySelector("#rootFrame").srcdoc = html;
-    $xui.loadCode(html);
-};
-
-window.$xui.loadCode = (strCode) => {
-    var codeElem = document.querySelector("#xui-code-html");
-    if (codeElem != null) {
-        const code = Prism.highlight(strCode, Prism.languages.html, 'html');
-        codeElem.innerHTML = code;
-    }
-}
-
-window.$xui.changeTemplate = (param) => {
-    console.debug("change template", param);
-    if (param.mode == "template") {
-        document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "template": param.html }, "*");
-    }
-
-    $xui.loadCode(param.html);
-};
-
-window.$xui.save = () => {
-    console.debug("save", $xui.propertiesDesign.json);
-    $xui.setDesignProperties("save", $xui.propertiesDesign.json);
-}
-
-window.$xui.fullScreen = () => {
-    window.document.documentElement.requestFullscreen();
-}
-
-
-window.addEventListener('message', function (e) {
-    var data = e.data;
-    if (data.action == "select") {
-        //  var info = $xui.getInfo(data.xid, data.xid_slot);
-        $xui.displayProperties(data.xid, data.xid_slot);
-    }
-});
-
-$xui.displayProperties = (xid, xid_slot) => {
-    $xui.propertiesDesign = $xui.getDesignProperties(xid, xid_slot);
-    console.debug($xui.propertiesDesign);
-    $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
-    $xui.propertiesDesign.json = JSON.parse($xui.propertiesDesign.data);
-    $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
-    if ($xui.vuejsDesign != null) {
-        $xui.vuejsAppPropertiesSetting.$destroy();
-    }
-    $xui.vuejsAppPropertiesSetting = new Vue({
-        template: "<div class='barcustom' id='AppPropertiesSetting' style='overflow-y: scroll; height: calc(100% - 38px);'>" + $xui.propertiesDesign.template + "</div>",
-        el: '#AppPropertiesSetting',
-        vuetify: new Vuetify(),
-        data: $xui.rootDataProperties,
-        computed: {
-            $xui: function () {
-                return window.$xui;
-            }
-        }
-    });
-}
-   </script>
-   <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
+   <script defer src="app/frameDesigner.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.x/prism.min.js"></script>
-   <script src="libxui.dart.js"></script>
+   <script defer src="libxui.dart.js"></script>
    <script>
 		if (typeof $xui === 'undefined')
 			$xui={};
@@ -270,7 +213,7 @@ $xui.displayProperties = (xid, xid_slot) => {
 
 	
         $xui.rootdata=Object.assign($xui.rootdata, 
-                { selectedxui : "PWA Designer"}
+                { selectedxui : "PWA Code Generator"}
                 );  ;
     </script>
    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>

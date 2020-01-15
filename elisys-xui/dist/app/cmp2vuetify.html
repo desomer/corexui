@@ -6,8 +6,8 @@
         <xui-prop id="desc">Des onglets</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
 
-        <xui-prop var="nb" def="1" editor="int">Nb d'onglet</xui-prop>
-        <xui-prop var="vertical" def="false" editor="bool">Onglet vertical</xui-prop>
+        <xui-prop var="nb" def="3" editor="int">Nb d'onglet</xui-prop>
+        <xui-prop var="vertical" editor="bool">Onglet vertical</xui-prop>
     </xui-doc>
     
     <xui-doc xid="v-tab:xui-tabs">
@@ -17,8 +17,6 @@
 
         <xui-prop id="name">Tab</xui-prop>
         <xui-prop id="desc">Titre de l'onglet</xui-prop>
-
-        <xui-prop var="title" editor="text">titre en format text</xui-prop>
     </xui-doc>  
 
     <xui-doc xid="v-tab-item:xui-tabs">
@@ -36,20 +34,65 @@
         </v-tab-item>
     </v-tabs>
 
-    <!--------------------------  XUI-GRID   ----------------------------->
+    <!--------------------------  XUI-TITRE   ---------------------------->
+    <xui-doc xid="xui-title-1">
+        <xui-prop id="name">Title</xui-prop>
+        <xui-prop id="icon">mdi-format-title</xui-prop>
+        <xui-prop id="desc">Un titre simple</xui-prop>
+        <xui-prop id="componentAs">text</xui-prop>
+
+        <xui-prop var="text" editor="text">texte</xui-prop>
+    </xui-doc>
+
+    <span xid="xui-title-1" xui-slot-name="title">[[text]]</span>
+
+    <!--------------------------  XUI-BTN   ---------------------------->
+    <xui-doc xid="xui-btn-1">
+        <xui-prop id="name">Button</xui-prop>
+        <xui-prop id="icon">mdi-gesture-tap-button</xui-prop>
+        <xui-prop id="desc">Un bouton</xui-prop>
+        <xui-prop id="componentAs">action</xui-prop>
+
+        <xui-prop var="text" editor="text">text</xui-prop>
+        <xui-prop var="color" editor="text">text color</xui-prop>
+        <xui-prop var="dark" def="false" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" def="false" editor="bool">on light</xui-prop>
+        <xui-prop var="btn-type" editor="editor">depressed/outlined/rounded/text/tile/icon/fab</xui-prop>
+    </xui-doc>
+
+    <v-btn xid="xui-btn-1" [[btn-type]] xui-slot-name="Btn" color="[[color]]" dark="[[dark]]" light="[[light]]">[[text]]</v-btn>
+    
+    <!--------------------------  XUI-BTN-ICON-1   ---------------------------->
+    <xui-doc xid="xui-btn-icon-1">
+        <xui-prop id="name">Button Icon</xui-prop>
+        <xui-prop id="icon">mdi-gesture-tap-button</xui-prop>
+        <xui-prop id="desc">Un bouton Icon</xui-prop>
+        <xui-prop id="componentAs">action</xui-prop>
+
+        <xui-prop var="text" def=" " editor="text">text</xui-prop>
+        <xui-prop var="icon" def="web" editor="text">icon</xui-prop>
+        <xui-prop var="color" editor="text">text color</xui-prop>
+        <xui-prop var="dark" def="false" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" def="false" editor="bool">on light</xui-prop>
+        <xui-prop var="btn-type" def="icon" editor="editor">depressed/outlined/rounded/text/tile/icon/fab</xui-prop>
+    </xui-doc>
+
+    <v-btn xid="xui-btn-icon-1" [[btn-type]] xui-slot-name="Btn" color="[[color]]" dark="[[dark]]" light="[[light]]">[[text]]<v-icon>mdi-[[icon]]</v-icon></v-icon></v-btn>
+
+    <!--------------------------  XUI-GRID   ------------------------------->
     <xui-doc xid="xui-grid">
         <xui-prop id="name">Grid</xui-prop>
-        <xui-prop id="icon">mdi-tab</xui-prop>
+        <xui-prop id="icon">mdi-apps</xui-prop>
         <xui-prop id="desc">Une grille</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
 
-        <xui-prop var="nb" def="1" editor="int">nb de lignes</xui-prop>
+        <xui-prop var="nb" def="3" editor="int">nb de lignes</xui-prop>
     </xui-doc>
     
     <xui-doc xid="xui-row">
         <xui-prop id="name">Row</xui-prop>
         <xui-prop id="desc">Une ligne</xui-prop>
-        <xui-prop var="nb" def="1" editor="int">nb col dans la ligne</xui-prop>
+        <xui-prop var="nb" editor="int">nb col dans la ligne</xui-prop>
         <xui-prop var="height" editor="height">Hauteur de ligne</xui-prop>
     </xui-doc>
 
@@ -60,7 +103,7 @@
     </xui-doc>
 
     <v-container class="xui-grid" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
-        <v-row>
+        <v-row no-gutters>
             <xui-row xid="[[parent-xid]]-row-[[idxr]]" xui-slot-name="row [[idxr]]"></xui-row>
         </v-row>
     </v-container>
@@ -73,26 +116,33 @@
 
     <xui-design xid="inject-other-header">
         <style>
-            .xui-grid { padding-top: 0px; padding-bottom: 0px; }
-            .xui-grid .col { padding:0px 0px; }
-            .xui-grid.container {max-width: 100%; }
+            .xui-grid { padding:0px 0px; margin: 0px 0px; max-width:unset; }
+           /* .xui-grid.container {max-width: 100%; }*/
         </style>
     </xui-design>
     
     <!-------------------------------- V-CARD ---------------------------->
+    <xui-doc xid="xui-card-1">
+        <xui-prop id="name">Card</xui-prop>
+        <xui-prop id="icon">mdi-smart-card</xui-prop>
+        <xui-prop id="desc">Une Card</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="height" def="100px" editor="text">hauteur header</xui-prop>
+    </xui-doc>
+
     <v-card xid="xui-card-1"  xui-for="idxc" class="mx-auto" xui-slot-name="Card">
         <v-img src="https://cdn.vuetifyjs.com/images/cards/store.jpg"
-               class="white--text align-end"
-               height="100px">
-               <v-card-title> title </v-card-title>
+               class="white--text align-end" height="[[height]]">
+               <v-card-title><xui-slot xid="[[parent-xid]]-card-title" xui-slot-name="Card Title"></xui-slot> </v-card-title>
         </v-img>
         
         <v-card-text>
-            <xui-slot xid="[[parent-xid]]-card-main" xui-slot-name="Card Content [[parent-xid]]"></xui-slot>
+            <xui-slot xid="[[parent-xid]]-card-main" xui-slot-name="Card Content"></xui-slot>
         </v-card-text>
         
         <v-card-actions>
-            <v-btn text="" color="deep-purple">Learn More</v-btn>
+            <xui-slot xid="[[parent-xid]]-card-actions" xui-slot-name="Card Actions"></xui-slot>
         </v-card-actions>
 
     </v-card> 
@@ -103,8 +153,9 @@
     <xui-design xid="inject-other-header" xui-mode="design;template">
         <style>
             .xui-class-slot { border : 1px dashed lightgray; box-sizing: border-box; min-height: 20px; min-width: 20px; text-decoration: underline dotted;font-style: italic; user-select:none; }
-            .xui-class-slot-full { height:100%; width:100% }
-            .xui-class-slot:hover { border : 1px dashed blue; box-sizing: border-box; }
+            .xui-class-slot-full { height:100%; width:100%;}
+            .xui-class-slot:hover { border : 1px dashed blue; }
+            .xui-class-dragover { border : 1px dashed blue !important;}
         </style>
     </xui-design>
     

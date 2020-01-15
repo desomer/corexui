@@ -54,7 +54,7 @@
     <xui-design xid="action-tab-tab-1"><v-icon>mdi-plus-box-multiple</v-icon></xui-design>
     <xui-design xid="action-tab-tab-2"><v-icon>mdi-file-tree</v-icon></xui-design>
     <xui-design xid="action-tab-tab-item-0"><div id="AppPropertiesSetting"></div></xui-design>
-    <xui-design xid="action-tab-tab-item-1">Comming soon...</xui-design>
+    <xui-design xid="action-tab-tab-item-1"><div id="AppComponents"></div></xui-design>
     <xui-design xid="action-tab-tab-item-2">Comming soon...</xui-design>
 
     <xui-design xid="slot-action-header">
@@ -66,14 +66,20 @@
     </xui-design>
 
     <xui-design xid="slot-action-footer">
-        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-settings</v-icon></v-btn>
-        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-note-multiple</v-icon></v-btn>
-        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-new-box</v-icon></v-btn>
+        <v-btn small class="btn-action" @click="$xui.deleteCmp()"><v-icon>mdi-delete</v-icon></v-btn>
+        <v-btn small class="btn-action"><v-icon>mdi-content-cut</v-icon></v-btn>
+        <v-btn small class="btn-action"><v-icon>mdi-content-paste</v-icon></v-btn>
+
+        <span style="width:50px"></span>
+
+        <v-btn small class="btn-action"><v-icon>mdi-settings</v-icon></v-btn>
+        <v-btn small class="btn-action"><v-icon>mdi-note-multiple</v-icon></v-btn>
+        <v-btn small class="btn-action"><v-icon>mdi-new-box</v-icon></v-btn>
     </xui-design>
 
     <xui-design xid="xui-script-data">
         $xui.rootdata=Object.assign($xui.rootdata, 
-                { selectedxui : "PWA Designer"}
+                { selectedxui : "PWA Code Generator"}
                 );  ;
     </xui-design>
     
@@ -150,13 +156,11 @@
     </xui-design>
 
     <xui-design xid="inject-after-body">
-        <script>
-<xui-inject xui-path="app/frameDesigner.js"></xui-inject>
-        </script>
-        <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
+        <script defer src="app/frameDesigner.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.x/prism.min.js"></script>
-        <script src="libxui.dart.js"></script>
+        <script defer src="libxui.dart.js"></script>
 
+        <!-- <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script> -->
         <!-- <script>
                  setTimeout( ()=> {
                     q = faunadb.query;

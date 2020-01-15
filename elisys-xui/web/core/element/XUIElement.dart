@@ -19,9 +19,8 @@ abstract class XUIElement {
   // les prop xui
   HashMap<String, XUIProperty> propertiesXUI;
 
-  bool isEmpty()
-  {
-      return attributes==null && children==null && propertiesXUI==null;
+  bool isEmpty() {
+    return attributes == null && children == null && propertiesXUI == null;
   }
 }
 
@@ -42,7 +41,27 @@ class XUIElementHTML extends XUIElement {
     return nb;
   }
 
+  XUIElementHTML firstChildNoText() {
+    if (children != null) {
+      for (var item in children) {
+         if (item is! XUIElementHTMLText) {
+           return item;
+         }
+      }
+    }
+    return null;
+  }
+
   dynamic searchPropertyXUI(String tag) {
+    if (tag.contains("@")) {
+      var atTag = tag.split("@");
+      tag = atTag[0];
+      var atHtml = atTag[1];
+      if (atHtml == "-1") {
+        return firstChildNoText().searchPropertyXUI(tag);
+      }
+    }
+
     XUIProperty prop = propertiesXUI == null ? null : propertiesXUI[tag];
     if (prop != null) {
       return prop.content;
@@ -54,7 +73,9 @@ class XUIElementHTML extends XUIElement {
     try {
       XUIProperty.parse(parseInfo, (String tag) {
         var ret = searchPropertyXUI(tag);
-        return ret != null ? ret : ( (mode==ParseInfoMode.CONTENT?("[" + tag + "]"):"") );
+        return ret != null
+            ? ret
+            : ((mode == ParseInfoMode.CONTENT ? ("[" + tag + "]") : ""));
       });
     } catch (e, s) {
       print("pb parse $e $s");
@@ -79,7 +100,7 @@ class XUIElementHTML extends XUIElement {
       var c = f.value.content;
       var keyAttr = processContent(f.key, ParseInfoMode.KEY);
 
-      if (keyAttr!="" && c != null) {
+      if (keyAttr != "" && c != null) {
         if (c is String) {
           var valProp = processContent(c, ParseInfoMode.ATTR);
           bool mustAdd = true;
@@ -111,7 +132,7 @@ class XUIElementHTML extends XUIElement {
           buffer.html.write("=");
           buffer.html.write(c);
         }
-      } else if (keyAttr!="") {
+      } else if (keyAttr != "") {
         // attribut sans valeur (ex  : <v-btn dark>)
         buffer.html.write(" ");
         buffer.html.write(keyAttr);
