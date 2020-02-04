@@ -77,8 +77,35 @@
         <xui-prop var="btn-type" def="icon" editor="editor">depressed/outlined/rounded/text/tile/icon/fab</xui-prop>
     </xui-doc>
 
-    <v-btn xid="xui-btn-icon-1" [[btn-type]] xui-slot-name="Btn" color="[[color]]" dark="[[dark]]" light="[[light]]">[[text]]<v-icon>mdi-[[icon]]</v-icon></v-icon></v-btn>
+    <v-btn xid="xui-btn-icon-1" [[btn-type]] xui-slot-name="Btn" color="[[color]]" dark="[[dark]]" light="[[light]]">[[text]]<v-icon>mdi-[[icon]]</v-icon></v-btn>
+    <!--------------------------  XUI-ICON-1   ---------------------------->
+    <xui-doc xid="xui-icon-1">
+        <xui-prop id="name">Icon</xui-prop>
+        <xui-prop id="icon">mdi-numeric-1-circle-outline</xui-prop>
+        <xui-prop id="desc">Un Icon</xui-prop>
+        <xui-prop id="componentAs">action</xui-prop>
 
+        <xui-prop var="icon" def="web" editor="text">icon</xui-prop>
+        <xui-prop var="color" editor="text">text color</xui-prop>
+        <xui-prop var="dark" def="false" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" def="false" editor="bool">on light</xui-prop>
+    </xui-doc>
+
+    <v-icon xid="xui-icon-1" xui-slot-name="Icon" color="[[color]]" dark="[[dark]]" light="[[light]]">mdi-[[icon]]</v-icon>
+
+    <!--------------------------  XUI-FLOW   ------------------------------->
+    <xui-doc xid="xui-flow">
+        <xui-prop id="name">Flow</xui-prop>
+        <xui-prop id="icon">mdi-transfer-right</xui-prop>
+        <xui-prop id="desc">Flows</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop var="nb" def="3" editor="int">nb colonnes</xui-prop>
+    </xui-doc>
+
+    
+    <xui-slot xid="xui-flow" xui-for="idxf" xui-slot-name="Flow">
+        <xui-slot xid="[[parent-xid]]-col-[[idxf]]" xui-slot-name="Flow [[idxf]]"></xui-slot>
+    </xui-slot>
     <!--------------------------  XUI-GRID   ------------------------------->
     <xui-doc xid="xui-grid">
         <xui-prop id="name">Grid</xui-prop>
@@ -99,7 +126,7 @@
     <xui-doc xid="v-col:xui-row">
         <xui-prop id="name">Column</xui-prop>
         <xui-prop id="desc">Une colonne</xui-prop>
-        <xui-prop var="width"  editor="width">Largueur de colonne</xui-prop>
+        <xui-prop var="cols"  editor="text">Larg. de col sur 12</xui-prop>
     </xui-doc>
 
     <v-container class="xui-grid" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
@@ -109,7 +136,7 @@
     </v-container>
 
     <xui-slot xid="xui-row" xui-for="idxc">
-        <v-col>
+        <v-col cols="[[cols@-1]]">
             <xui-slot xid="[[parent-xid]]-col-[[idxc]]" xui-slot-name="row [[idxr]] col [[idxc]]"></xui-slot>
         </v-col>
     </xui-slot>
