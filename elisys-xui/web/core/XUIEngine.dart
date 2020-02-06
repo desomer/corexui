@@ -40,7 +40,7 @@ class XUIContext {
 class DicoOrdered<T extends XUIModel> {
   List<T> list = [];
   bool mustSort = true;
-  var listByMode = LinkedHashMap<String, List<T>>();
+  var listByMode = LinkedHashMap<String, List<T>>(); //cache
 
   add(T elem) {
     mustSort = true;
@@ -69,13 +69,16 @@ class DicoOrdered<T extends XUIModel> {
 }
 
 ///------------------------------------------------------------------
-///      converti les xml en xui
+///  represente un fichier XUI
+///      converti les xml en xui (XUIComponent, XUIDesign, XUIModel)
 ///------------------------------------------------------------------
 
 class XUIResource extends XMLElemReader {
   var components = LinkedHashMap<String, DicoOrdered<XUIComponent>>();
   var designs = LinkedHashMap<String, DicoOrdered<XUIDesign>>();
   var documentation = LinkedHashMap<String, DicoOrdered<XUIModel>>();
+
+  /// les imports
   List<XUIResource> listImport = [];
 
   HTMLReader reader;
@@ -83,6 +86,38 @@ class XUIResource extends XMLElemReader {
 
   ///------------------------------------------------------------------
   XUIResource(this.reader, this.context);
+
+  dynamic getObject() {
+    var ret = {};
+    var import = [];
+
+    for (var anImport in listImport) {
+      import.add({"name": anImport.reader.id});
+    }
+
+    var design = [];
+    designs.forEach((k, v) {
+      for (XUIDesign item in v.list) {
+        var des = {};
+        des["xid"] = item.elemXUI.xid;
+
+        if (item.elemXUI.propertiesXUI != null) {
+          var prop = [];
+          item.elemXUI.propertiesXUI.forEach((k, v) {
+            prop.add({"id": k, "val": v.content.toString()});
+          });
+
+          des["props"] = prop;
+        }
+
+        design.add(des);
+      }
+    });
+
+    ret["import"] = import;
+    ret["design"] = design;
+    return ret;
+  }
 
   Future parse() {
     NativeRegister(this);
@@ -185,10 +220,9 @@ class XUIResource extends XMLElemReader {
             HTMLReader(element.attributs["xui-path"], reader.provider);
         XUIResource subFile = XUIResource(subReader, context);
         await subFile.parse();
-       // subFile.reader.content = null;
+        // subFile.reader.content = null;
         listImport.add(subFile);
         return Future.value(null);
-
       } else if (element.tag == TAG_PROP &&
           (parent as XUIElementXUI).tag.toString().toLowerCase() != TAG_DOC) {
         //***************   LES PROPERTIES EN ATTRIBUT SAUF SI DOCUMENTATION *****************************/

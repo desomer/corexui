@@ -10,7 +10,7 @@ import 'element/XUIProperty.dart';
 class XUIDesignManager {
   var xuiEngine = XUIEngine();
 
-///------------------------------------------------------------------------------------------
+  ///------------------------------------------------------------------------------------------
   Future<String> getHtml(XUIContext ctx, String uri, String xid) async {
     var provider = ProviderAjax();
 
@@ -22,7 +22,8 @@ class XUIDesignManager {
 
     return Future.value(bufferHtml.html.toString());
   }
-///------------------------------------------------------------------------------------------
+
+  ///------------------------------------------------------------------------------------------
   Future<String> reloadHtml(XUIContext ctx, String uri, String xid) async {
     var bufferHtml = XUIHtmlBuffer();
     await xuiEngine.toHTMLString(bufferHtml, xid, ctx);
@@ -30,8 +31,9 @@ class XUIDesignManager {
     return Future.value(bufferHtml.html.toString());
   }
 
-///------------------------------------------------------------------------------------------
+  ///------------------------------------------------------------------------------------------
   Future addDesign(String id, String template) async {
+    print("add design on ${id}  template ${template}");
     await XUIActionManager(xuiEngine).addDesign(id, template);
     return Future.value();
   }
@@ -39,7 +41,8 @@ class XUIDesignManager {
   void removeDesign(String id, String template) {
     XUIActionManager(xuiEngine).removeDesign(id, template);
   }
-///------------------------------------------------------------------------------------------
+
+  ///------------------------------------------------------------------------------------------
   Future changeProperty(String xid, String variable, dynamic value) async {
     print("${xid} a changer l'attribut ${variable} par ${value}");
     var listDesign = xuiEngine.xuiFile.designs[xid];
@@ -59,9 +62,8 @@ class XUIDesignManager {
     return Future.value();
   }
 
-///------------------------------------------------------------------------------------------
+  ///------------------------------------------------------------------------------------------
   JSDesignInfo getJSComponentInfo(String id, String idslot) {
-    
     String cmp = """<v-list-item v-for="(item, i) in data" :key="i" >
         <v-list-item-icon draggable=true  @dragstart="\$xui.dragStart(item, \$event)">
           <v-icon v-text="item.icon"></v-icon>
@@ -71,27 +73,27 @@ class XUIDesignManager {
         </v-list-item-content>
       </v-list-item>""";
 
-
     var ret = JSDesignInfo();
-    ret.bufTemplate.write("<v-list dense><v-list-item-group v-model='item' color='primary'>");
+    ret.bufTemplate.write(
+        "<v-list dense><v-list-item-group v-model='item' color='primary'>");
     ret.bufTemplate.write(cmp);
     ret.bufTemplate.write("</v-list-item-group></v-list>");
-
 
     var listCmp = xuiEngine.getComponentsFor(id, idslot);
     var i = 0;
     for (var item in listCmp) {
       if (i > 0) ret.bufData.write(",");
-      ret.bufData.write('{"name":"${item.name}", "xid":"${item.xid}", "icon":"${item.icon}" }');
+      ret.bufData.write(
+          '{"name":"${item.name}", "xid":"${item.xid}", "icon":"${item.icon}" }');
       i++;
     }
 
-    ret.xid= id.startsWith("_")?idslot:id;
+    ret.xid = id.startsWith("_") ? idslot : id;
 
     return ret;
   }
 
-///------------------------------------------------------------------------------------------
+  ///------------------------------------------------------------------------------------------
   JSDesignInfo getJSDesignInfo(String id, String idslot) {
     var ret = JSDesignInfo();
     var designs = xuiEngine.getDesignInfo(id, idslot);

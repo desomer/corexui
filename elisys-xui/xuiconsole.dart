@@ -44,8 +44,6 @@ void main() async {
 
   } else {
 
-
-
     var reader = HTMLReader('app/frame1.html', provider);
     var xuiEngine = XUIEngine();
     var ctx = XUIContext(cst.MODE_TEMPLATE);

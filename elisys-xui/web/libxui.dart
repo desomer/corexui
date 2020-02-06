@@ -1,11 +1,15 @@
 @JS("\$xui")
 library xuiapp;
 
+import 'dart:convert';
+
 import 'package:js/js.dart';
 
 import 'core/XUIDesignManager.dart';
 import 'core/XUIEngine.dart';
 import 'core/XUIJSInterface.dart';
+
+import 'package:yamlicious/yamlicious.dart' show toYamlString;
 
 @JS()
 external void load(obj);
@@ -92,7 +96,7 @@ void addDesign(String id, String template) async {
   var str = await designManager.reloadHtml(ctx, 'app/frame1.html', 'root');
   var ret = Options(mode: mode, html: str);
 
-  changeTemplate(ret);
+  reload(ret);
 }
 
 void removeDesign(String id, String modeDelete) async {
@@ -102,25 +106,29 @@ void removeDesign(String id, String modeDelete) async {
   var str = await designManager.reloadHtml(ctx, 'app/frame1.html', 'root');
   var ret = Options(mode: mode, html: str);
 
-  changeTemplate(ret);
+  reload(ret);
 }
 
 Future refresh(String mode) async {
-  // await addDesign(
-  //     "grid-1-row-2-col-0", "<xui-design><h1>test</h1></xui-design>");
-  // await addDesign("onglet-tab-0", "<xui-design><span>Info<span></xui-design>");
-  // await addDesign("onglet-tab-1", "<xui-design><span>Titre<span></xui-design>");
-  // await addDesign("grid-1-row-1", "<xui-design xui-nb=\"5\"></xui-design>");
-  // await addDesign("grid-1-row-1-col-2",
-  //     "<xui-design><xui-card-1 xid=\"titi\"></xui-card-1><xui-card-1 xid=\"toto\"></xui-card-1></xui-design>");
-
   var ctx = XUIContext(mode);
   var str = await designManager.reloadHtml(ctx, 'app/frame1.html', 'root');
   var ret = Options(mode: mode, html: str);
 
-  changeTemplate(ret);
+  reload(ret);
 
   return Future.value();
+}
+
+void reload(ret) {
+  dynamic obj = designManager.xuiEngine.xuiFile.getObject();
+
+  final jsond = json.encode(obj);
+  print('json=' + jsond.toString());
+
+  final yamld = toYamlString(obj);
+  print(yamld.toString());
+
+  changeTemplate(ret);
 }
 
 var designManager = XUIDesignManager();
@@ -136,5 +144,14 @@ void main() async {
 
   String str = await designManager.getHtml(
       XUIContext(MODE_DESIGN), 'app/frame1.html', 'root');
+
+  dynamic obj = designManager.xuiEngine.xuiFile.getObject();
+
+  final jsond = json.encode(obj);
+  print('json=' + jsond.toString());
+
+  final yamld = toYamlString(obj);
+  print(yamld.toString());
+
   load(str);
 }

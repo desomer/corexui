@@ -17,8 +17,9 @@ class XUIActionManager {
         await engine.xuiFile.reader.parseString(html, res);
 
     if (xid != null) {
-      engine.xuiFile.designs[xid] ??= DicoOrdered()
-        ..add(XUIDesign(xuidesign, MODE_ALL));
+      xuidesign.xid = xid;
+      engine.xuiFile.designs[xid] ??= DicoOrdered();
+      engine.xuiFile.designs[xid].add(XUIDesign(xuidesign, MODE_ALL));
     }
 
     if (xuidesign.children != null) {
@@ -38,7 +39,7 @@ class XUIActionManager {
   }
 
   /// gestion du remove
-  UndoAction removeDesign(String xid, String mode, [bool withChild=true]) {
+  UndoAction removeDesign(String xid, String mode, [bool withChild = true]) {
     SlotInfo info = engine.getSlotInfo(xid, xid);
     if (info == null) {
       throw "xid inconnu $xid";
@@ -52,17 +53,21 @@ class XUIActionManager {
           int nbChildNoText = 0;
           int idx = 0;
           int idxToDelete = -1;
-          for (var child in design.elemXUI.children) {
-            if (child is XUIElementText && !hasText) {
-              hasText = child.content.trim().isNotEmpty;
-            } else if (child is XUIElementXUI) {
-              nbChildNoText++;
-              if (child.xid == xid) {
-                idxToDelete = idx;
+
+          if (design.elemXUI.children != null) {
+            for (var child in design.elemXUI.children) {
+              if (child is XUIElementText && !hasText) {
+                hasText = child.content.trim().isNotEmpty;
+              } else if (child is XUIElementXUI) {
+                nbChildNoText++;
+                if (child.xid == xid) {
+                  idxToDelete = idx;
+                }
               }
+              idx++;
             }
-            idx++;
           }
+          
           if (nbChildNoText == 1 && idxToDelete >= 0 && !hasText) {
             design.elemXUI.children = null;
             print("remove all <$xid> on parent <$xidParent>");
@@ -75,7 +80,7 @@ class XUIActionManager {
             print("delete design parent <$xidParent>");
             engine.xuiFile.designs.remove(xidParent);
           }
-          
+
           print("delete design <$xid>");
           engine.xuiFile.designs.remove(xid);
         }
@@ -92,28 +97,26 @@ class XUIActionManager {
   void _removeChild(XUIElementHTML elem, String mode) {
     if (elem.children != null) {
       for (var childHtml in elem.children) {
-          if (childHtml is XUIElementHTML)
-          {
-            if (childHtml.designBy!=null)
-            {
-                for (var design in childHtml.designBy) {
-                     if (mode == null || design.mode == mode) {
-                        // remode all children
-                        if (design.elemXUI.children!=null) {
-                          for (var childDesign in design.elemXUI.children) {
-                              if (childDesign is XUIElementXUI  && childDesign.xid!=null)
-                              {
-                                  removeDesign(childDesign.xid, mode, false);
-                              }
-                          }
-                        }
-
-                       // removeDesign(design.elemXUI.xid, mode, false);
-                     }
+        if (childHtml is XUIElementHTML) {
+          if (childHtml.designBy != null) {
+            for (var design in childHtml.designBy) {
+              if (mode == null || design.mode == mode) {
+                // remode all children
+                if (design.elemXUI.children != null) {
+                  for (var childDesign in design.elemXUI.children) {
+                    if (childDesign is XUIElementXUI &&
+                        childDesign.xid != null) {
+                      removeDesign(childDesign.xid, mode, false);
+                    }
+                  }
                 }
+
+                // removeDesign(design.elemXUI.xid, mode, false);
+              }
             }
-            _removeChild(childHtml, mode);
           }
+          _removeChild(childHtml, mode);
+        }
       }
     }
   }

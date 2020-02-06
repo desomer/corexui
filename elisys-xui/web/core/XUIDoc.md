@@ -3,7 +3,8 @@ PAGE MANAGENENT SYSTEM
 
 
 Engine = converti les fichiers XML vers XUIResource de design et component XUI
-    -    XUIResource : utilise les parser
+    -    XUIResource :  correspond à un fichier XML 
+                        utilise les parser
     
 Factory =
     -   process phase 1 : creation de element HTML a partir des XUI

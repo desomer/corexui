@@ -24,6 +24,7 @@ abstract class XUIElement {
   }
 }
 
+///*************************************************************** 
 class XUIElementHTML extends XUIElement {
   XUIElementHTML parent;
 
@@ -192,6 +193,9 @@ abstract class XUIElementNative extends XUIElementXUI {
   }
 }
 
+
+///*************************************************************** 
+///
 ///  uniquement un text
 class XUIElementText extends XUIElementXUI {
   String content;
