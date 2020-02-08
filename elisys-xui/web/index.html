@@ -111,7 +111,7 @@
                               <iframe style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" id="rootFrame"></iframe>
                            </div>
                            <div class="main-item main-item-3">
-                              <v-tabs dark height="38px">
+                              <v-tabs v-model="activeAction" dark height="38px">
                                  <v-tab>
                                     <v-icon>mdi-layers-triple</v-icon>
                                  </v-tab>
@@ -213,7 +213,7 @@
 
 	
         $xui.rootdata=Object.assign($xui.rootdata, 
-                { selectedxui : "PWA Code Generator"}
+                { selectedxui : "PWA Code Generator", activeAction : 0}
                 );  ;
     </script>
    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>

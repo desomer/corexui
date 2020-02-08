@@ -88,7 +88,7 @@ class XUIDesignManager {
       i++;
     }
 
-    ret.xid = id.startsWith("_") ? idslot : id;
+    ret.xid = id.startsWith(SLOT_PREFIX) ? idslot : id;
 
     return ret;
   }
@@ -104,8 +104,8 @@ class XUIDesignManager {
       // todo creer le template avec xui  (fichier templateEditor.html)
 
       var titleCmp = design?.docInfo?.name ?? design.slotInfo.docId;
-      String header = "<v-subheader class='elevation-2 xui-style-prop'>" +
-          titleCmp +
+      String header = "<v-subheader @click='\$xui.selectCmp(\"${design.slotInfo.xid}\", \"${design.slotInfo.xid}\")' class='elevation-2 xui-style-prop'>" +
+          titleCmp + "<v-spacer></v-spacer><v-icon>mdi-dots-horizontal</v-icon>"
           "</v-subheader><v-divider></v-divider>";
       ret.bufTemplate.write(header);
 

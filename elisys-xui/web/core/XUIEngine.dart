@@ -27,6 +27,8 @@ const MODE_FINAL = "final";
 const MODE_TEMPLATE = "template";
 const MODE_DESIGN = "design";
 
+const SLOT_PREFIX = "_slot-";
+
 ///------------------------------------------------------------------
 abstract class Provider {
   Future<String> getResourceFutur(String id);
@@ -108,6 +110,18 @@ class XUIResource extends XMLElemReader {
           });
 
           des["props"] = prop;
+        }
+
+        if (item.elemXUI.children != null) {
+          var children = [];
+          for (XUIElementXUI aChild in item.elemXUI.children) {
+            if (aChild is! XUIElementText) {
+              children.add({"tag": aChild.tag, "xid": aChild.xid});
+            }
+          }
+          if (children.isNotEmpty) {
+            des["children"] = children;
+          }
         }
 
         design.add(des);

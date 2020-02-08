@@ -265,7 +265,7 @@ class XUIModel implements Comparable<XUIModel> {
         // affecte pour le designer un xid sur les slot sans xid
         var xidslot = elemHtml.attributes["data-"+ATTR_XID_SLOT]?.content;
         if (xidslot != null) {
-          elemHtml.attributes["data-"+ATTR_XID] = XUIProperty("_" + xidslot);
+          elemHtml.attributes["data-"+ATTR_XID] = XUIProperty(SLOT_PREFIX + xidslot);
         }
       }
     }

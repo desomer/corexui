@@ -13,7 +13,7 @@ window.$xui.load = (html) => {
 
     setTimeout(() => {
         $xui.loadCode(html);
-    }, 2000);
+    }, 1000);
 };
 
 window.$xui.changeTemplate = (param) => {
@@ -27,6 +27,7 @@ window.$xui.changeTemplate = (param) => {
 };
 
 window.$xui.loadCode = (strCode) => {
+    $xui.unDisplaySelector();
     var codeElem = document.querySelector("#xui-code-html");
     if (codeElem != null) {
         const code = Prism.highlight(strCode, Prism.languages.html, 'html');
@@ -40,15 +41,18 @@ window.$xui.save = () => {
 }
 
 window.$xui.fullScreen = () => {
+    window.$xui.unDisplaySelector();
     window.document.documentElement.requestFullscreen();
 }
 
 window.$xui.addCmp = (cmp) => {
+    window.$xui.unDisplaySelector();
     console.debug(cmp, $xui.propertiesComponent);
-    $xui.addDesign($xui.propertiesComponent.xid, "<xui-design xid="+$xui.propertiesComponent.xid+"><"+cmp.xid+" xid=\""+($xui.propertiesComponent.xid+"-"+cmp.xid)+"\"></"+cmp.xid+"></xui-design>")
+    $xui.addDesign($xui.propertiesComponent.xid, "<xui-design xid="+$xui.propertiesComponent.xid+"><"+cmp.xid+" xid=\""+($xui.propertiesComponent.xid+"-"+cmp.xid)+"\"></"+cmp.xid+"></xui-design>");
 }
 
 window.$xui.deleteCmp = (cmp) => {
+    window.$xui.unDisplaySelector();
     console.debug(cmp, $xui.propertiesDesign);
     $xui.removeDesign($xui.propertiesDesign.xid, null);
 }
@@ -56,11 +60,21 @@ window.$xui.deleteCmp = (cmp) => {
 window.$xui.dragStart = (item, e)=> {
     $xui.dragItem = item;
     e.dataTransfer.setData('text/plain', ""+item.xid);
-    var node = document.getElementById("xui-display-selector");
-	if (node!=null) {
-        node.style.display="none";
-    }
+    window.$xui.unDisplaySelector();
 }
+
+/******************************************************************/
+window.$xui.selectCmp = (xid, xid_slot)=>{
+    $xui.displayProperties(xid, xid_slot);
+    $xui.unDisplaySelector();
+}
+
+window.$xui.unDisplaySelector = ()=>{ 
+	var node = document.getElementById("xui-display-selector");
+	if (node!=null) {
+        node.style.display="none"; 
+    }
+};
 
 window.$xui.displaySelector = (position)=>{
 
@@ -72,7 +86,7 @@ window.$xui.displaySelector = (position)=>{
 		node.style="position: absolute;background: rgba(204, 205, 255, 0.59); border: 1px solid rgb(64, 37, 226); padding: 5px;  z-index: 1000;";	
         document.body.appendChild(node); 
         node.addEventListener("click", (e)=> {
-              e.target.style.display="none";
+              e.target.style.display="none";   // retire sur le click
         }, {capture: false})
     }
 
@@ -82,7 +96,9 @@ window.$xui.displaySelector = (position)=>{
     node.style.left = (position.left+posFrame.left)+"px";
     node.style.top = (position.top+posFrame.top)+"px";
     node.style.width = position.width+"px";
-    node.style.display=null;
+    node.style.display=null;   //affiche la div de selection
+
+    $xui.rootdata.activeAction=0;
 
 }
 
