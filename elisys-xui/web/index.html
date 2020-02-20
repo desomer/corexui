@@ -6,74 +6,7 @@
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css"></link>
-      <style>
-            .barcustom::-webkit-scrollbar {
-                width: 10px;
-            }
-            
-            .barcustom::-webkit-scrollbar-track {
-                box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-                border-radius: 10px;
-            }
-            
-            .barcustom::-webkit-scrollbar-thumb {
-                box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
-                border-radius: 10px;
-            }
-
-            .xui-style-prop {    
-                background: #f9f9f9;
-                height: 24px;
-                color: #696969 !important;
-                padding: 0px 5px;
-            }
-
-            html::-webkit-scrollbar {
-                 width: 0px;  /*pas de scrollbar */
-            }
-            .main-tab .v-tab {
-                min-width: 40px;
-                width: 40px;
-                height: 40px !important;
-            }
-
-            .main-container { 
-                height: calc(100vh - 64px);
-                width: 100%;
-                display: grid; 
-                grid-template-columns: 0px auto 250px;
-                grid-template-rows: 100%; 
-                }
-            .main-item-2 {
-                border: 1px solid #e0e0e0;
-            }
-
-            .main-code {
-                height: calc(100vh - 64px);
-                width: 100%;
-            }
-            pre, code {
-                font-family: monospace, monospace;
-            }
-            pre {
-                overflow: auto;
-            }
-            pre > code {
-                display: block;
-                padding: 1rem;
-                word-wrap: normal;
-                position: absolute;
-                right: 0px;
-                height: 100%;
-                width: 100%;
-                overflow: auto;
-                color: black !important;
-                white-space: unset !important;
-                font-weight: unset !important;
-            }
-
-            .btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
-        </style>
+      <link rel="stylesheet" href="app/frameDesigner.css"></link>
    </head>
    <body style="height:100vh">
       <template id="xui-rootTemplate">
@@ -82,66 +15,109 @@
                <v-app-bar-nav-icon></v-app-bar-nav-icon>
                <v-toolbar-title>{{selectedxui}}</v-toolbar-title>
                <v-spacer></v-spacer>
-               <v-btn small class="btn-action" @click="$xui.fullScreen()">
+               <v-btn small class="xui-btn-action" @click="$xui.fullScreen()">
                   <v-icon>mdi-television-play</v-icon>
                </v-btn>
-               <v-btn small class="btn-action">
+               <v-btn small class="xui-btn-action" @click="$xui.modePreview()">
                   <v-icon>mdi-monitor-cellphone</v-icon>
                </v-btn>
-               <v-btn small class="btn-action" @click="$xui.refresh('final')">
+               <v-btn small class="xui-btn-action" @click="$xui.refreshAction('final')">
                   <v-icon>mdi-autorenew</v-icon>
                </v-btn>
-               <v-btn small class="btn-action" @click="$xui.refresh('template')">
+               <v-btn small class="xui-btn-action" @click="$xui.refreshAction('template')">
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
-               <v-btn small class="btn-action" @click="$xui.save()">
+               <v-btn small class="xui-btn-action" @click="$xui.save()">
                   <v-icon>mdi-content-save</v-icon>
                </v-btn>
             </v-app-bar>
             <v-content>
                <v-container fluid style="align-items:start" :fill-height="ContentfillPage" class="pa-0">
-                  <v-tabs vertical class="main-tab" dark>
+                  <v-tabs v-model="activeTab" vertical class="main-tab" dark>
                      <v-tab>
                         <v-icon>mdi-square-edit-outline</v-icon>
                      </v-tab>
                      <v-tab-item eager>
-                        <div class="main-container">
-                           <div class="main-item main-item-1"></div>
-                           <div class="main-item main-item-2">
-                              <iframe style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" id="rootFrame"></iframe>
-                           </div>
-                           <div class="main-item main-item-3">
-                              <v-tabs v-model="activeAction" dark height="38px">
-                                 <v-tab>
-                                    <v-icon>mdi-layers-triple</v-icon>
-                                 </v-tab>
-                                 <v-tab-item eager>
-                                    <div id="AppPropertiesSetting"></div>
-                                 </v-tab-item>
-                                 <v-tab>
-                                    <v-icon>mdi-plus-box-multiple</v-icon>
-                                 </v-tab>
-                                 <v-tab-item eager>
-                                    <div id="AppComponents"></div>
-                                 </v-tab-item>
-                                 <v-tab>
-                                    <v-icon>mdi-file-tree</v-icon>
-                                 </v-tab>
-                                 <v-tab-item eager>
-                                 </v-tab-item>
-                              </v-tabs>
-                           </div>
-                        </div>
+                        <v-tabs class="tab-editor" dark height="32px">
+                           <v-tab>
+                              <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
+                              <span style="margin-left: 5px;">frame1</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div class="main-container">
+                                 <div class="main-item main-item-1"></div>
+                                 <div class="main-item main-item-2">
+                                    <iframe style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" id="rootFrame"></iframe>
+                                 </div>
+                                 <div class="main-item main-item-3">
+                                    <v-tabs v-model="activeAction" class="tab-action" dark height="35px">
+                                       <v-tab>
+                                          <v-icon>mdi-layers-triple</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="AppPropertiesSetting"></div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-palette-swatch</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div>Coming soon...</div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-plus-box-multiple</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="AppComponents"></div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-file-tree</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div>Coming soon...</div>
+.                                       </v-tab-item>
+                                    </v-tabs>
+                                 </div>
+                              </div>
+                           </v-tab-item>
+                           <v-tab>
+                              <v-icon>mdi-palette</v-icon>
+                              <span>style1</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div>Coming soon...</div>
+                           </v-tab-item>
+                           <v-tab>
+                           </v-tab>
+                           <v-tab-item eager>
+                           </v-tab-item>
+                        </v-tabs>
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-code-tags</v-icon>
                      </v-tab>
                      <v-tab-item eager>
-                        <div class="main-code">
-                           <pre>
-                              <code spellcheck id="xui-code-html"></code>
-                           </pre>
-                        </div>
+                        <v-tabs class="tab-code" dark height="32px">
+                           <v-tab>
+                              <div> Html </div>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div class="main-code">
+                                 <pre>
+                                    <code spellcheck id="xui-code-html"></code>
+                                 </pre>
+                              </div>
+                           </v-tab-item>
+                           <v-tab>
+                              <div> YAML </div>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div class="main-code">
+                                 <pre>
+                                    <code spellcheck id="xui-code-yaml"></code>
+                                 </pre>
+                              </div>
+                           </v-tab-item>
+                        </v-tabs>
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-api</v-icon>
@@ -172,35 +148,32 @@
                </v-container>
             </v-content>
             <v-footer app color="#1d9da0" :dark="dark" style="padding: 0px 10px;" :height="heightFooter" inset>
-               <v-btn small class="btn-action" @click="$xui.deleteCmp()">
+               <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
-               <v-btn small class="btn-action">
+               <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-content-cut</v-icon>
                </v-btn>
-               <v-btn small class="btn-action">
+               <v-btn small class="xui-btn-action" @click="$xui.moveTo()">
                   <v-icon>mdi-content-paste</v-icon>
                </v-btn>
                <span style="width:50px"></span>
-               <v-btn small class="btn-action">
+               <v-btn small class="xui-btn-action">
                   <v-icon>mdi-settings</v-icon>
                </v-btn>
-               <v-btn small class="btn-action">
+               <v-btn small class="xui-btn-action">
                   <v-icon>mdi-note-multiple</v-icon>
                </v-btn>
-               <v-btn small class="btn-action">
+               <v-btn small class="xui-btn-action">
                   <v-icon>mdi-new-box</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2019 v0.1.0</span>
+               <span>&copy;&nbsp;Elisys 2020 v0.1.4</span>
             </v-footer>
          </v-app>
       </template>
       <div id="app"></div>
    </body>
-   <script defer src="app/frameDesigner.js"></script>
-   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.x/prism.min.js"></script>
-   <script defer src="libxui.dart.js"></script>
    <script>
 		if (typeof $xui === 'undefined')
 			$xui={};
@@ -212,38 +185,24 @@
 			ContentfillPage:true };
 
 	
-        $xui.rootdata=Object.assign($xui.rootdata, 
-                { selectedxui : "PWA Code Generator", activeAction : 0}
-                );  ;
+        var json = { 
+            selectedxui : "PWA Code Generator", 
+            activeTab : 0,
+            activeAction : 0
+        };
+        $xui.rootdata= { ...$xui.rootdata, ...json};
     </script>
-   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
-   <script>
-Vue.config.devtools = true;
-Vue.config.productionTip = false;
-
-$xui.loadTemplate= ()=>
-{
-	if ($xui.vuejs!=null)
-		$xui.vuejs.$destroy();
-
-	var str =document.querySelector("#xui-rootTemplate").innerHTML;
-
-	$xui.vuejs = new Vue(
-	{
-		template: str,   // pas de cache car en string
-		el: '#app', 
-		vuetify: new Vuetify(), 
-		data: $xui.rootdata,
-		computed: {
-			$xui : function(){
-				return window.$xui;
-			}
-		}
-	});
-}
-
-$xui.loadTemplate();
-	   </script>
-   <xui-init-designer></xui-init-designer>
+   <script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+   <script defer src="app/frameDesigner.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-yaml.min.js"></script>
+   <script defer src="libxui.dart.js"></script>
+   <script defer src="app/frameDesignerWatch.js"></script>
+   <script type="module">
+		import "./app/vue2frame.js";
+		$xui.loadApplicationJS();
+	
+            $xui.initVuejs($xui.vuejs);
+    </script>
 </html>

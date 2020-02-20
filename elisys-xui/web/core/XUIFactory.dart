@@ -127,7 +127,7 @@ class XUIModel implements Comparable<XUIModel> {
     if (prop != null) {
       ParseInfo parseInfo = ParseInfo(prop, ParseInfoMode.PROP);
       XUIProperty.parse(parseInfo, (String tag) {
-        var ret = elemHtml.searchPropertyXUI(tag);
+        var ret = elemHtml.searchPropertyXUI(tag, -1);
         return ret != null ? ret : "[" + tag + "]";
       });
       prop = parseInfo.parsebuilder.toString();
@@ -218,6 +218,12 @@ class XUIModel implements Comparable<XUIModel> {
     } else {
       elemHtml.attributes[f.key].content += sep + v;
     }
+  }
+
+  void addProperties(String key, String value)
+  {
+      elemXUI.propertiesXUI ??= HashMap<String, XUIProperty>();
+      elemXUI.propertiesXUI[key]=XUIProperty(value);
   }
 
   void processProperties(XUIElementHTML elemHtml, XUIResource xuifile) {

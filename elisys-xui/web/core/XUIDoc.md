@@ -2,6 +2,10 @@ PAGE MANAGENENT SYSTEM
     eXtends User Inteface = XUI
 
 
+DesignManager  = identifie un onglet de design
+    - dictionnaire des Engine
+    - gestion d'un cache des fichiers parser
+
 Engine = converti les fichiers XML vers XUIResource de design et component XUI
     -    XUIResource :  correspond à un fichier XML 
                         utilise les parser

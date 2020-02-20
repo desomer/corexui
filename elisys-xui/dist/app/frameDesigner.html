@@ -25,6 +25,11 @@
     <xui-design xid="main-tab-tab-6"><v-icon>mdi-border-inside</v-icon></xui-design>
    
     <xui-design xid="main-tab-tab-item-0">
+        <xui-tabs xid="tab-editor" class="tab-editor" dark height="32px" xui-nb="3"></xui-tabs>
+    </xui-design>
+
+    <xui-design xid="tab-editor-tab-0"><v-icon>mdi-monitor-screenshot</v-icon><span style='margin-left: 5px;'>frame1</span></xui-design>
+    <xui-design xid="tab-editor-tab-item-0">
         <div class="main-container">
             <div class="main-item main-item-1"></div>
             <div class="main-item main-item-2">
@@ -39,6 +44,9 @@
         </div>
     </xui-design>
 
+    <xui-design xid="tab-editor-tab-1"><v-icon>mdi-palette</v-icon><span>style1</span></xui-design>
+    <xui-design xid="tab-editor-tab-item-1"><div>Coming soon...</div></xui-design>
+
     <xui-design xid="main-tab-tab-item-1">
         <div class="main-code">
             <pre>
@@ -47,39 +55,45 @@
         </div>
     </xui-design>
 
-    <xui-tabs xid="design-action" dark height="38px" xui-nb="3">
+    <xui-tabs xid="design-action" v-model="activeAction" dark class="tab-action" height="35px" xui-nb="4">
     </xui-tabs>
 
     <xui-design xid="action-tab-tab-0"><v-icon>mdi-layers-triple</v-icon></xui-design>
-    <xui-design xid="action-tab-tab-1"><v-icon>mdi-plus-box-multiple</v-icon></xui-design>
-    <xui-design xid="action-tab-tab-2"><v-icon>mdi-file-tree</v-icon></xui-design>
+    <xui-design xid="action-tab-tab-1"><v-icon>mdi-palette-swatch</v-icon></xui-design>
+    <xui-design xid="action-tab-tab-2"><v-icon>mdi-plus-box-multiple</v-icon></xui-design>
+    <xui-design xid="action-tab-tab-3"><v-icon>mdi-file-tree</v-icon></xui-design>
+
     <xui-design xid="action-tab-tab-item-0"><div id="AppPropertiesSetting"></div></xui-design>
-    <xui-design xid="action-tab-tab-item-1"><div id="AppComponents"></div></xui-design>
-    <xui-design xid="action-tab-tab-item-2">Comming soon...</xui-design>
+    <xui-design xid="action-tab-tab-item-1"><div>Coming soon...</div></xui-design>
+    <xui-design xid="action-tab-tab-item-2"><div id="AppComponents"></div></xui-design>
+    <xui-design xid="action-tab-tab-item-3"><div>Coming soon...</div>.</xui-design>
 
     <xui-design xid="slot-action-header">
-        <v-btn small class="btn-action" @click="$xui.fullScreen()"><v-icon>mdi-television-play</v-icon></v-btn>
-        <v-btn small class="btn-action" ><v-icon>mdi-monitor-cellphone</v-icon></v-btn>
-        <v-btn small class="btn-action" @click="$xui.refresh('final')"><v-icon>mdi-autorenew</v-icon></v-btn>
-        <v-btn small class="btn-action" @click="$xui.refresh('template')"><v-icon>mdi-refresh</v-icon></v-btn>
-        <v-btn small class="btn-action" @click="$xui.save()"><v-icon>mdi-content-save</v-icon></v-btn>
+        <v-btn small class="xui-btn-action" @click="$xui.fullScreen()"><v-icon>mdi-television-play</v-icon></v-btn>
+        <v-btn small class="xui-btn-action" ><v-icon>mdi-monitor-cellphone</v-icon></v-btn>
+        <v-btn small class="xui-btn-action" @click="$xui.refresh('final')"><v-icon>mdi-autorenew</v-icon></v-btn>
+        <v-btn small class="xui-btn-action" @click="$xui.refresh('template')"><v-icon>mdi-refresh</v-icon></v-btn>
+        <v-btn small class="xui-btn-action" @click="$xui.save()"><v-icon>mdi-content-save</v-icon></v-btn>
     </xui-design>
 
     <xui-design xid="slot-action-footer">
-        <v-btn small class="btn-action" @click="$xui.deleteCmp()"><v-icon>mdi-delete</v-icon></v-btn>
-        <v-btn small class="btn-action"><v-icon>mdi-content-cut</v-icon></v-btn>
-        <v-btn small class="btn-action"><v-icon>mdi-content-paste</v-icon></v-btn>
+        <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()"><v-icon>mdi-delete</v-icon></v-btn>
+        <v-btn small class="xui-btn-action"><v-icon>mdi-content-cut</v-icon></v-btn>
+        <v-btn small class="xui-btn-action"><v-icon>mdi-content-paste</v-icon></v-btn>
 
         <span style="width:50px"></span>
 
-        <v-btn small class="btn-action"><v-icon>mdi-settings</v-icon></v-btn>
-        <v-btn small class="btn-action"><v-icon>mdi-note-multiple</v-icon></v-btn>
-        <v-btn small class="btn-action"><v-icon>mdi-new-box</v-icon></v-btn>
+        <v-btn small class="xui-btn-action"><v-icon>mdi-settings</v-icon></v-btn>
+        <v-btn small class="xui-btn-action"><v-icon>mdi-note-multiple</v-icon></v-btn>
+        <v-btn small class="xui-btn-action"><v-icon>mdi-new-box</v-icon></v-btn>
     </xui-design>
 
     <xui-design xid="xui-script-data">
         $xui.rootdata=Object.assign($xui.rootdata, 
-                { selectedxui : "PWA Code Generator"}
+                { 
+                    selectedxui : "PWA Code Generator", 
+                    activeAction : 0
+                }
                 );  ;
     </xui-design>
     
@@ -110,14 +124,26 @@
             html::-webkit-scrollbar {
                  width: 0px;  /*pas de scrollbar */
             }
+
             .main-tab .v-tab {
                 min-width: 40px;
                 width: 40px;
                 height: 40px !important;
             }
 
+            .tab-editor .v-tab {
+                min-width: auto;
+                width: auto;
+                height: 30px !important;
+            }
+
+            .tab-action .v-tab {
+                min-width: 40px;
+                width: 40px;
+            }
+
             .main-container { 
-                height: calc(100vh - 64px);
+                height: calc(100vh - 64px - 32px);
                 width: 100%;
                 display: grid; 
                 grid-template-columns: 0px auto 250px;
@@ -151,7 +177,7 @@
                 font-weight: unset !important;
             }
 
-            .btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
+            .xui-btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
         </style>
     </xui-design>
 

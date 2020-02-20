@@ -31,14 +31,26 @@
             html::-webkit-scrollbar {
                  width: 0px;  /*pas de scrollbar */
             }
+
             .main-tab .v-tab {
                 min-width: 40px;
                 width: 40px;
                 height: 40px !important;
             }
 
+            .tab-editor .v-tab {
+                min-width: auto;
+                width: auto;
+                height: 30px !important;
+            }
+
+            .tab-action .v-tab {
+                min-width: 40px;
+                width: 40px;
+            }
+
             .main-container { 
-                height: calc(100vh - 64px);
+                height: calc(100vh - 64px - 32px);
                 width: 100%;
                 display: grid; 
                 grid-template-columns: 0px auto 250px;
@@ -105,33 +117,59 @@
                         <v-icon>mdi-square-edit-outline</v-icon>
                      </v-tab>
                      <v-tab-item eager>
-                        <div class="main-container">
-                           <div class="main-item main-item-1"></div>
-                           <div class="main-item main-item-2">
-                              <iframe style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" id="rootFrame"></iframe>
-                           </div>
-                           <div class="main-item main-item-3">
-                              <v-tabs dark height="38px">
-                                 <v-tab>
-                                    <v-icon>mdi-layers-triple</v-icon>
-                                 </v-tab>
-                                 <v-tab-item eager>
-                                    <div id="AppPropertiesSetting"></div>
-                                 </v-tab-item>
-                                 <v-tab>
-                                    <v-icon>mdi-plus-box-multiple</v-icon>
-                                 </v-tab>
-                                 <v-tab-item eager>
-                                    <div id="AppComponents"></div>
-                                 </v-tab-item>
-                                 <v-tab>
-                                    <v-icon>mdi-file-tree</v-icon>
-                                 </v-tab>
-                                 <v-tab-item eager>
-                                 </v-tab-item>
-                              </v-tabs>
-                           </div>
-                        </div>
+                        <v-tabs class="tab-editor" dark height="32px">
+                           <v-tab>
+                              <v-icon>mdi-monitor-screenshot</v-icon>
+                              <span style="margin-left: 5px;">frame1</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div class="main-container">
+                                 <div class="main-item main-item-1"></div>
+                                 <div class="main-item main-item-2">
+                                    <iframe style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" id="rootFrame"></iframe>
+                                 </div>
+                                 <div class="main-item main-item-3">
+                                    <v-tabs v-model="activeAction" class="tab-action" dark height="35px">
+                                       <v-tab>
+                                          <v-icon>mdi-layers-triple</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="AppPropertiesSetting"></div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-palette-swatch</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div>Coming soon...</div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-plus-box-multiple</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="AppComponents"></div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-file-tree</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div>Coming soon...</div>
+.                                       </v-tab-item>
+                                    </v-tabs>
+                                 </div>
+                              </div>
+                           </v-tab-item>
+                           <v-tab>
+                              <v-icon>mdi-palette</v-icon>
+                              <span>style1</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div>Coming soon...</div>
+                           </v-tab-item>
+                           <v-tab>
+                           </v-tab>
+                           <v-tab-item eager>
+                           </v-tab-item>
+                        </v-tabs>
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-code-tags</v-icon>
@@ -213,7 +251,10 @@
 
 	
         $xui.rootdata=Object.assign($xui.rootdata, 
-                { selectedxui : "PWA Code Generator"}
+                { 
+                    selectedxui : "PWA Code Generator", 
+                    activeAction : 0
+                }
                 );  ;
     </script>
    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>

@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'package:yamlicious/yamlicious.dart';
+
 import 'XUIFactory.dart';
 import 'element/XUIElement.dart';
 import 'element/XUIProperty.dart';
@@ -26,6 +28,7 @@ const MODE_ALL = "";
 const MODE_FINAL = "final";
 const MODE_TEMPLATE = "template";
 const MODE_DESIGN = "design";
+const MODE_PREVIEW = "preview";
 
 const SLOT_PREFIX = "_slot-";
 
@@ -128,8 +131,19 @@ class XUIResource extends XMLElemReader {
       }
     });
 
+    var compo = [];
+    components.forEach((k, v) {
+      for (XUIComponent item in v.list) {
+        var des = {};
+        des["xid"] = item.elemXUI.xid;
+        des["mode"] = item.mode;
+        compo.add(des);
+      }
+    });
+
     ret["import"] = import;
     ret["design"] = design;
+    ret["component"] = compo;
     return ret;
   }
 
@@ -323,11 +337,19 @@ class XUIEngine {
   var mapInfo = HashMap<String, SlotInfo>();
   var docInfo = HashMap<String, DocInfo>();
 
+  String lastDeleteXid;
+
   Future initialize(HTMLReader reader, XUIContext ctx) async {
     xuiFile = XUIResource(reader, ctx);
 
     await xuiFile.parse();
     xuiFile.generateDocumentation(this);
+
+    dynamic obj = xuiFile.getObject();
+
+    final yamld = toYamlString(obj);
+    print("initialize ${reader.id} ok\n" + yamld.toString());
+
     return Future.value();
   }
 
@@ -369,7 +391,17 @@ class XUIEngine {
 
   toHTMLString(XUIHtmlBuffer writer, String xid, XUIContext ctx) async {
     xuiFile.context = ctx;
-    XUIComponent root = xuiFile.searchComponent(xid).sort(ctx).first;
+    var listCmp = xuiFile.searchComponent(xid);
+    if (listCmp == null) {
+      dynamic obj = xuiFile.getObject();
+
+      final yamld = toYamlString(obj);
+      print("xid inconnu $xid\n" + yamld.toString());
+
+      throw "xid inconnu $xid";
+    }
+
+    XUIComponent root = listCmp.sort(ctx).first;
 
     XUIElementHTML htmlRoot = XUIElementHTML();
     if (ctx.mode != MODE_FINAL) {

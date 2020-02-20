@@ -26,12 +26,16 @@ class VueParamJS {
   external String get data;
   external String get path;
   external String get xid;
+  external String get xidSlot;
+  external bool get isSlot;
 
   external set target(String xid);
   external set template(String xid);
   external set data(String xid);
   external set path(String path);
   external set xid(String xid);
+  external set xidSlot(String xidSlot);
+  external set isSlot(bool isSlot);
 }
 
 @JS()
@@ -52,4 +56,16 @@ class ObjectDesign {
   external String get value;
   external String get value_orig;
   external bool get exist;
+}
+
+@JS()
+@anonymous
+class FileDesignInfo {
+  external String get file;
+  external String get xid;
+  external String get mode; 
+
+  external set file(String file);
+  external set xid(String xid);
+  external set mode(String mode);
 }

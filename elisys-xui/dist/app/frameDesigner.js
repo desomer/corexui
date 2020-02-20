@@ -27,6 +27,7 @@ window.$xui.changeTemplate = (param) => {
 };
 
 window.$xui.loadCode = (strCode) => {
+    $xui.unDisplaySelector();
     var codeElem = document.querySelector("#xui-code-html");
     if (codeElem != null) {
         const code = Prism.highlight(strCode, Prism.languages.html, 'html');
@@ -40,27 +41,44 @@ window.$xui.save = () => {
 }
 
 window.$xui.fullScreen = () => {
+    window.$xui.unDisplaySelector();
     window.document.documentElement.requestFullscreen();
 }
 
 window.$xui.addCmp = (cmp) => {
+    window.$xui.unDisplaySelector();
     console.debug(cmp, $xui.propertiesComponent);
-    $xui.addDesign($xui.propertiesComponent.xid, "<xui-design xid="+$xui.propertiesComponent.xid+"><"+cmp.xid+" xid=\""+($xui.propertiesComponent.xid+"-"+cmp.xid)+"\"></"+cmp.xid+"></xui-design>")
+    $xui.addDesign($xui.propertiesComponent.xid, "<xui-design xid="+$xui.propertiesComponent.xid+"><"+cmp.xid+" xid=\""+($xui.propertiesComponent.xid+"-"+cmp.xid)+"\"></"+cmp.xid+"></xui-design>");
 }
 
 window.$xui.deleteCmp = (cmp) => {
+    window.$xui.unDisplaySelector();
     console.debug(cmp, $xui.propertiesDesign);
     $xui.removeDesign($xui.propertiesDesign.xid, null);
+}
+
+window.$xui.selectCmp = (xid, xid_slot)=>{
+    $xui.displayProperties(xid, xid_slot);
+    $xui.unDisplaySelector();
+    var node = document.querySelector("#rootFrame").contentDocument.querySelector("[data-xid="+xid+"]")
+    let elemRect = node.getBoundingClientRect();
+    $xui.displaySelector(elemRect);
 }
 
 window.$xui.dragStart = (item, e)=> {
     $xui.dragItem = item;
     e.dataTransfer.setData('text/plain', ""+item.xid);
-    var node = document.getElementById("xui-display-selector");
-	if (node!=null) {
-        node.style.display="none";
-    }
+    window.$xui.unDisplaySelector();
 }
+
+/******************************************************************/
+
+window.$xui.unDisplaySelector = ()=>{ 
+	var node = document.getElementById("xui-display-selector");
+	if (node!=null) {
+        node.style.display="none"; 
+    }
+};
 
 window.$xui.displaySelector = (position)=>{
 
@@ -70,19 +88,28 @@ window.$xui.displaySelector = (position)=>{
 		node = document.createElement("div");           
 		node.id="xui-display-selector";
 		node.style="position: absolute;background: rgba(204, 205, 255, 0.59); border: 1px solid rgb(64, 37, 226); padding: 5px;  z-index: 1000;";	
-        document.body.appendChild(node); 
         node.addEventListener("click", (e)=> {
-              e.target.style.display="none";
+              e.currentTarget.style.display="none";   // retire sur le click
         }, {capture: false})
+
+        var nodeAction = document.createElement("div");           
+        nodeAction.id="xui-display-selector-action";	
+        node.appendChild(nodeAction); 
+
+        document.body.appendChild(node); 
     }
 
     var posFrame = rootFrame.getBoundingClientRect();
-    node.innerHTML = text;
+    //node.innerHTML = text;
     node.style.height = position.height+"px";
     node.style.left = (position.left+posFrame.left)+"px";
     node.style.top = (position.top+posFrame.top)+"px";
     node.style.width = position.width+"px";
-    node.style.display=null;
+    node.style.display=null;   //affiche la div de selection
+
+    $xui.rootdata.activeAction=0;
+
+    $xui.displayAction($xui.propertiesDesign.xid, null);
 
 }
 
@@ -103,7 +130,7 @@ window.addEventListener('message', function (e) {
 
 $xui.displayProperties = (xid, xid_slot) => {
     $xui.propertiesDesign = $xui.getDesignProperties(xid, xid_slot);
-    console.debug($xui.propertiesDesign);
+    console.debug("displayProperties", $xui.propertiesDesign);
     $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
     $xui.propertiesDesign.json = $xui.parseJson($xui.propertiesDesign.data);
     $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
@@ -133,7 +160,7 @@ $xui.parseJson = (str) => {
 
 $xui.displayComponents = (xid, xid_slot) => {
     $xui.propertiesComponent = $xui.getComponents(xid, xid_slot);
-    console.debug($xui.propertiesComponent);
+    console.debug("displayComponents", $xui.propertiesComponent);
     $xui.propertiesComponent.json = $xui.parseJson($xui.propertiesComponent.data);
     $xui.rootDataComponents = { data: $xui.propertiesComponent.json, item:null };
     if ($xui.vuejsDesign != null) {
@@ -150,4 +177,30 @@ $xui.displayComponents = (xid, xid_slot) => {
             }
         }
     });
+}
+
+$xui.callHtml= (str) =>
+{
+    console.debug(str);
+    $xui.rootDataAction = { };
+    if ($xui.vuejsAppCmpAction != null) {
+        $xui.vuejsAppCmpAction.$destroy();
+    }
+    $xui.vuejsAppCmpAction = new Vue({
+        template: "<div id='xui-display-selector-action' style='position:absolute;bottom:-20px;left: 0px;background: rgba(204, 205, 255, 1); border: 1px solid rgb(64, 37, 226); padding: 0px 5px;  z-index: 1000;'>"+str+"</div>",
+        el: '#xui-display-selector-action',
+        vuetify: new Vuetify(),
+        data: $xui.rootDataAction,
+        computed: {
+            $xui: function () {
+                return window.$xui;
+            }
+        }
+    });
+}
+
+$xui.displayAction= (xid, xid_slot) => {
+
+    $xui.getHtmlFrom('final','app/cmpDesignEditor.html', 'bottom-editor');
+
 }

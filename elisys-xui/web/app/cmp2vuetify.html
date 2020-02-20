@@ -7,7 +7,9 @@
         <xui-prop id="componentAs">container</xui-prop>
 
         <xui-prop var="nb" def="3" editor="int">Nb d'onglet</xui-prop>
-        <xui-prop var="vertical" editor="bool">Onglet vertical</xui-prop>
+        <xui-prop var="vertical" editor="bool">onglet vertical</xui-prop>
+        <xui-prop var="dark" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" editor="bool">on light</xui-prop>
     </xui-doc>
     
     <xui-doc xid="v-tab:xui-tabs">
@@ -25,7 +27,7 @@
         <xui-prop id="favorite">container</xui-prop>
     </xui-doc>
 
-    <v-tabs xid="xui-tabs" xui-for="idx" xui-slot-name="tab">
+    <v-tabs xid="xui-tabs" vertical=[[vertical@0]] dark="[[dark@0]]" light="[[light@0]]" xui-for="idx" xui-slot-name="tab">
         <v-tab>
             <xui-slot xid="[[parent-xid]]-tab-[[idx]]" xui-slot-name="tab [[idx]]"></xui-slot>
         </v-tab>
@@ -57,7 +59,7 @@
         <xui-prop var="color" editor="text">text color</xui-prop>
         <xui-prop var="dark" def="false" editor="bool">on dark</xui-prop>
         <xui-prop var="light" def="false" editor="bool">on light</xui-prop>
-        <xui-prop var="btn-type" editor="editor">depressed/outlined/rounded/text/tile/icon/fab</xui-prop>
+        <xui-prop var="btn-type" editor="combo">depressed/outlined/rounded/text/tile/icon/fab</xui-prop>
     </xui-doc>
 
     <v-btn xid="xui-btn-1" [[btn-type]] xui-slot-name="Btn" color="[[color]]" dark="[[dark]]" light="[[light]]">[[text]]</v-btn>
@@ -74,7 +76,7 @@
         <xui-prop var="color" editor="text">text color</xui-prop>
         <xui-prop var="dark" def="false" editor="bool">on dark</xui-prop>
         <xui-prop var="light" def="false" editor="bool">on light</xui-prop>
-        <xui-prop var="btn-type" def="icon" editor="editor">depressed/outlined/rounded/text/tile/icon/fab</xui-prop>
+        <xui-prop var="btn-type" def="text" editor="combo">depressed/outlined/rounded/text/tile/icon/fab</xui-prop>
     </xui-doc>
 
     <v-btn xid="xui-btn-icon-1" [[btn-type]] xui-slot-name="Btn" color="[[color]]" dark="[[dark]]" light="[[light]]">[[text]]<v-icon>mdi-[[icon]]</v-icon></v-btn>
@@ -119,24 +121,25 @@
     <xui-doc xid="xui-row">
         <xui-prop id="name">Row</xui-prop>
         <xui-prop id="desc">Une ligne</xui-prop>
+        <xui-prop var="style" editor="text">style</xui-prop>
         <xui-prop var="nb" editor="int">nb col dans la ligne</xui-prop>
-        <xui-prop var="height" editor="height">Hauteur de ligne</xui-prop>
     </xui-doc>
 
     <xui-doc xid="v-col:xui-row">
         <xui-prop id="name">Column</xui-prop>
         <xui-prop id="desc">Une colonne</xui-prop>
         <xui-prop var="cols"  editor="text">Larg. de col sur 12</xui-prop>
+        <xui-prop var="style" editor="style">style</xui-prop>
     </xui-doc>
 
     <v-container class="xui-grid" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
-        <v-row no-gutters>
+        <v-row no-gutters -style="[[style@-1]]">
             <xui-row xid="[[parent-xid]]-row-[[idxr]]" xui-slot-name="row [[idxr]]"></xui-row>
         </v-row>
     </v-container>
 
     <xui-slot xid="xui-row" xui-for="idxc">
-        <v-col cols="[[cols@-1]]">
+        <v-col cols="[[cols@-1]]" -style="[[style@-1]]">
             <xui-slot xid="[[parent-xid]]-col-[[idxc]]" xui-slot-name="row [[idxr]] col [[idxc]]"></xui-slot>
         </v-col>
     </xui-slot>
@@ -144,7 +147,6 @@
     <xui-design xid="inject-other-header">
         <style>
             .xui-grid { padding:0px 0px; margin: 0px 0px; max-width:unset; }
-           /* .xui-grid.container {max-width: 100%; }*/
         </style>
     </xui-design>
     

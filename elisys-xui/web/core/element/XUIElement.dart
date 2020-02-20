@@ -53,27 +53,30 @@ class XUIElementHTML extends XUIElement {
     return null;
   }
 
-  dynamic searchPropertyXUI(String tag) {
+  dynamic searchPropertyXUI(String tag, int deep) {
     if (tag.contains("@")) {
       var atTag = tag.split("@");
       tag = atTag[0];
       var atHtml = atTag[1];
       if (atHtml == "-1") {
-        return firstChildNoText().searchPropertyXUI(tag);
+        return firstChildNoText().searchPropertyXUI(tag, 0);
+      }
+      if (atHtml == "0") {
+        return searchPropertyXUI(tag, 0);
       }
     }
 
     XUIProperty prop = propertiesXUI == null ? null : propertiesXUI[tag];
     if (prop != null) {
       return prop.content;
-    } else if (parent != null) return parent.searchPropertyXUI(tag);
+    } else if (parent != null && (deep<0 || deep>0 )) return parent.searchPropertyXUI(tag, deep-1);
   }
 
   dynamic processContent(String content, ParseInfoMode mode) {
     ParseInfo parseInfo = ParseInfo(content, mode);
     try {
       XUIProperty.parse(parseInfo, (String tag) {
-        var ret = searchPropertyXUI(tag);
+        var ret = searchPropertyXUI(tag, -1);
         return ret != null
             ? ret
             : ((mode == ParseInfoMode.CONTENT ? ("[" + tag + "]") : ""));
@@ -117,7 +120,11 @@ class XUIElementHTML extends XUIElement {
               isBool = true;
             }
             buffer.html.write(" ");
-            buffer.html.write(keyAttr);
+            if (keyAttr.toString().startsWith("-")) {
+              buffer.html.write(keyAttr.toString().substring(1));
+            } else {
+              buffer.html.write(keyAttr);
+            }
             if (!isBool) {
               /// pas d'ajout de valeur si boolean
               buffer.html.write("=");
