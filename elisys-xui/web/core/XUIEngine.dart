@@ -9,6 +9,7 @@ import 'native/register.dart';
 import 'parser/HTMLReader.dart';
 
 const ATTR_XID = "xid";
+const ATTR_PARENT_XID = "parent-xid";
 const ATTR_SLOT_NAME = "slot-name";
 const ATTR_SLOT_FULL = "slot-full";
 const ATTR_XID_SLOT = "xid-slot";
@@ -210,6 +211,9 @@ class XUIResource extends XMLElemReader {
         propDoc.id = prop.attributes["var"]?.content;
         propDoc.def = prop.attributes["def"]?.content;
         propDoc.editor = prop.attributes["editor"]?.content;
+        propDoc.link = prop.attributes["link"]?.content;
+        propDoc.list = prop.attributes["list"]?.content;
+        propDoc.cat = prop.attributes["cat"]?.content;
         propDoc.doc = (prop.children.first as XUIElementText).content;
         doc.variables.add(propDoc);
       }
@@ -389,6 +393,11 @@ class XUIEngine {
     return listDesignInfo;
   }
 
+  bool isModeDesign() {
+    return xuiFile.context.mode != MODE_FINAL &&
+        xuiFile.context.mode != MODE_PREVIEW;
+  }
+
   toHTMLString(XUIHtmlBuffer writer, String xid, XUIContext ctx) async {
     xuiFile.context = ctx;
     var listCmp = xuiFile.searchComponent(xid);
@@ -404,16 +413,19 @@ class XUIEngine {
     XUIComponent root = listCmp.sort(ctx).first;
 
     XUIElementHTML htmlRoot = XUIElementHTML();
-    if (ctx.mode != MODE_FINAL) {
+    if (isModeDesign()) {
       htmlRoot.attributes ??= HashMap<String, XUIProperty>();
       htmlRoot.attributes["data-" + ATTR_XID] = XUIProperty(xid);
       htmlRoot.origin = root.elemXUI;
     }
 
-    mapInfo.clear();
+    if (isModeDesign()) {
+      mapInfo.clear();
+    }
+
     await root.processPhase1(this, htmlRoot);
     await root.processPhase2(this, htmlRoot, null);
-    print("-----------------------------------------------");
+    // print("------------------- $xid --------------------");
 
     return Future.sync(() => htmlRoot.processPhase3(writer));
   }
@@ -443,6 +455,9 @@ class DocVariables {
   String def;
   String editor;
   String doc;
+  String link;
+  String list; // pour les combox
+  String cat; // la categorie  layout/style
 }
 
 ///------------------------------------------------------------------

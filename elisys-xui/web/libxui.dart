@@ -54,12 +54,12 @@ external set _getDesignProperties(
 
 @JS('setDesignProperties')
 external set _setDesignProperties(
-    dynamic Function(FileDesignInfo, String, dynamic) f);
+    dynamic Function(FileDesignInfo, String, dynamic, String) f);
 
 ///------------------------------------------------------------------
 
 void setDesignProperties(
-    FileDesignInfo fileInfo, String idAction, dynamic listDesg) async {
+    FileDesignInfo fileInfo, String idAction, dynamic listDesg, String idPromise) async {
   List listDesign = listDesg;
   for (ObjectDesign item in listDesign) {
     if (item.value != item.value_orig) {
@@ -69,8 +69,10 @@ void setDesignProperties(
   }
   fileInfo.mode = "template";
   await refresh(fileInfo);
+
   var xidProp = (listDesign[0] as ObjectDesign).xid;
-  displayPropertiesJS(xidProp, xidProp);
+  context["\$xui"].callMethod("doPromise", [idPromise, xidProp]);
+
 }
 
 void getDesignProperties(
@@ -124,23 +126,26 @@ void addDesign(FileDesignInfo fileInfo, String id, String template) async {
 }
 
 void removeDesign(FileDesignInfo fileInfo, String id) async {
-  String moveTo = "xui-trashcan-slot";
 
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
   if (designMgr.xuiEngine.lastDeleteXid != null) {
+    // supprime la vielle trashcan 
     designMgr.removeDesign(designMgr.xuiEngine.lastDeleteXid, null);
   }
 
+  // ajoute un design a la trashcan
+  String moveToTrachcan = "xui-trashcan-slot";
   designMgr.xuiEngine.lastDeleteXid = id;
-  String slot = "<xui-design xid=\"" + moveTo + "\"></xui-design>";
-  await addDesign(fileInfo, moveTo, slot);
+  String slot = "<xui-design xid=\"" + moveToTrachcan + "\"></xui-design>";
+  await addDesign(fileInfo, moveToTrachcan, slot);
 
-  designMgr.moveDesign(id, null, moveTo);
+  // move id vers la trashcan
+  designMgr.moveDesign(id, null, moveToTrachcan);
+
   var ctx = XUIContext(fileInfo.mode);
   var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
   var ret = Options(mode: fileInfo.mode, html: str);
-
   _reload(fileInfo, ret);
 }
 
@@ -174,12 +179,12 @@ Future refresh(FileDesignInfo fileInfo) async {
   return Future.value();
 }
 
-void getHtmlFrom(FileDesignInfo fileInfo, String mthId) async {
+void getHtmlFrom(FileDesignInfo fileInfo, String idPromise) async {
   var ctx = XUIContext(fileInfo.mode);
-  var str = await getDesignManager(fileInfo)
+  var html = await getDesignManager(fileInfo)
       .getHtml(ctx, fileInfo.file, fileInfo.xid);
 
-  context["\$xui"].callMethod(mthId, [str]);
+  context["\$xui"].callMethod("doPromise", [idPromise, html]);
 }
 
 void _reload(FileDesignInfo fileInfo, var options) {
@@ -199,8 +204,8 @@ XUIDesignManager getDesignManager(FileDesignInfo fileInfo) {
 }
 
 void main() async {
-  print("-------------- start xui 1");
-  context['console'].callMethod('log', ["------------ start xui 2"]);
+  print("-------------- start xui ----------------");
+  // context['console'].callMethod('log', ["------------ start xui 2"]);
 
   _refresh = allowInterop(refresh);
   _addDesign = allowInterop(addDesign);

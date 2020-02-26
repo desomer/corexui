@@ -24,7 +24,7 @@ abstract class XUIElement {
   }
 }
 
-///*************************************************************** 
+///***************************************************************
 class XUIElementHTML extends XUIElement {
   XUIElementHTML parent;
 
@@ -32,7 +32,7 @@ class XUIElementHTML extends XUIElement {
   List<XUIComponent> implementBy;
   List<XUIDesign> designBy;
 
-  int getNbChild() {
+  int getNbChildNoText() {
     int nb = 0;
     children?.forEach((c) {
       if (c is! XUIElementHTMLText) {
@@ -45,15 +45,32 @@ class XUIElementHTML extends XUIElement {
   XUIElementHTML firstChildNoText() {
     if (children != null) {
       for (var item in children) {
-         if (item is! XUIElementHTMLText) {
-           return item;
-         }
+        if (item is! XUIElementHTMLText) {
+          return item;
+        }
       }
     }
     return null;
   }
 
+  String calculateProp(String prop) {
+    if (prop != null) {
+      ParseInfo parseInfo = ParseInfo(prop, ParseInfoMode.PROP);
+      XUIProperty.parse(parseInfo, (String tag) {
+        var ret = searchPropertyXUI(tag, -1);
+        return ret != null ? ret : "[" + tag + "]";
+      });
+      prop = parseInfo.parsebuilder.toString();
+    }
+
+    return prop;
+  }
+
   dynamic searchPropertyXUI(String tag, int deep) {
+    if (tag == cst.ATTR_XID) {
+      return calculateProp(this.origin.xid);
+    }
+
     if (tag.contains("@")) {
       var atTag = tag.split("@");
       tag = atTag[0];
@@ -69,7 +86,9 @@ class XUIElementHTML extends XUIElement {
     XUIProperty prop = propertiesXUI == null ? null : propertiesXUI[tag];
     if (prop != null) {
       return prop.content;
-    } else if (parent != null && (deep<0 || deep>0 )) return parent.searchPropertyXUI(tag, deep-1);
+    } else if (parent != null && (deep < 0 || deep > 0)) {
+      return parent.searchPropertyXUI(tag, deep - 1);
+    }
   }
 
   dynamic processContent(String content, ParseInfoMode mode) {
@@ -200,8 +219,7 @@ abstract class XUIElementNative extends XUIElementXUI {
   }
 }
 
-
-///*************************************************************** 
+///***************************************************************
 ///
 ///  uniquement un text
 class XUIElementText extends XUIElementXUI {

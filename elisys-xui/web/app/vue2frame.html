@@ -3,8 +3,8 @@
 	<xui-doc xid="page">
 		<xui-prop var="title" editor="string">titre</xui-prop>
 		<xui-prop var="titleApp" editor="string">titre de l'entete</xui-prop>
-		<xui-prop var="colorApp" editor="string">couleur primaire</xui-prop>
-		<xui-prop var="colorBg" editor="string">couleur fond de page</xui-prop>
+		<xui-prop var="colorApp" editor="string" link="https://materialdesignicons.com/">couleur primaire</xui-prop>
+		<xui-prop var="colorBg" editor="string" link="https://materialdesignicons.com/">couleur fond de page</xui-prop>
 		<xui-prop var="copyrightApp" editor="string">copyright de l'appli</xui-prop>
 
 		<xui-prop id="name">Page</xui-prop>
@@ -92,7 +92,7 @@
 			
 	<v-app-bar xid="vue-toolbar-1"  xui-slot-name="header bar" fixed app :dark="dark" :height="heightHeader" color="[[colorApp]]">
 		<v-app-bar-nav-icon></v-app-bar-nav-icon>
-		<v-toolbar-title>[[titleApp]]</v-toolbar-title>
+		<v-toolbar-title xid="xui-toolbar-title">[[titleApp]]</v-toolbar-title>
 		<v-spacer></v-spacer>
 		<xui-slot xid="slot-action-header" xui-slot-name="action header"></xui-slot>
 	</v-app-bar>
@@ -164,31 +164,6 @@
 
 	<script xid="xui-init-designer" xui-mode="design">
 		<xui-inject xui-path="app/cmpDesignDrop.js"></xui-inject>
-
-		document.addEventListener('click', function(e) {    //dblclick
-			let targetAction=e.target.closest("[data-xid]");
-
-			let elemRect = targetAction.getBoundingClientRect();
-
-			var message = {
-				action:"select", 
-				xid: targetAction.dataset.xid, 
-				xid_slot: targetAction.dataset.xidSlot, 
-				position: elemRect	
-			};
-			//console.debug("message", message);
-			window.parent.postMessage(message, "*");
-		});
-
-		window.addEventListener('message',function(e) {
-			var data = e.data;
-			if (data.action=="changeTemplate")
-			{
-				var template = data.template;
-				this.document.body.innerHTML=template;
-				$xui.loadApplicationJS();
-			}
-		});
 	</script>
 
 </xui-factory>

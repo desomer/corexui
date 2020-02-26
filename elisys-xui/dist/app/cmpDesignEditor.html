@@ -6,4 +6,32 @@
         <v-icon style="font-size:18px">mdi-pencil</v-icon>
     </div>
 
+    <xui-slot xid="editor-header">
+        <v-subheader @click='[[selectAction]]' class='elevation-2 xui-style-prop'>[[title]]<v-spacer></v-spacer>
+            <v-icon>mdi-dots-horizontal</v-icon>
+        </v-subheader>
+        <v-divider></v-divider>
+    </xui-slot>
+
+    <v-text-field xid="editor-text" dense class='mx-1 mt-3' hide-details clearable
+        :label='[[label]]' 
+        v-model='[[value]]'>
+    </v-text-field>";
+
+    <v-text-field xid="editor-int" class='ma-1' hide-details clearable type='number' min='0' max='99' 
+        :label='[[label]]' 
+        v-model='[[value]]'>
+    </v-text-field>";
+
+    <v-switch xid="editor-bool" dense style='margin: 4px 0px 2px 6px !important; padding: 0px 0px !important;' hide-details inset
+        :label='[[label]]'
+        v-model='[[value]]'>
+    </v-switch>
+
+    <v-combobox xid="editor-combo" dense class='mx-1 mt-3' hide-details clearable
+        :items='[[items]]'
+        :label='[[label]]' 
+        v-model='[[value]]'>
+    </v-combobox>
+
 </xui-factory>

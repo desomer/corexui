@@ -178,12 +178,13 @@ class XUIDesignManager {
       XUIComponent cmp =
           await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
       cmp.addProperties("selectAction",
-          "\$xui.selectCmp('${design.slotInfo.xid}', '${design.slotInfo.xid}')");
+          "\$xui.displaySelectorByXid('${design.slotInfo.xid}', '${design.slotInfo.xid}')");
       cmp.addProperties("title", titleCmp);
       String header = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
+      ret.bufTemplate.write("<div class='xui-over-prop-xid' id='${design.slotInfo.xid}'>");
       ret.bufTemplate.write(header);
 
-      for (var varCmp in design?.docInfo?.variables ?? const []) {
+      for (DocVariables varCmp in design?.docInfo?.variables ?? const []) {
         var istr = i.toString();
         String template;
         String extend = "";
@@ -197,18 +198,7 @@ class XUIDesignManager {
           XUIComponent cmp =
               await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
           cmp.addProperties("items", "data[${istr}].items");
-
-          var it = [
-            "depressed",
-            "outlined",
-            "rounded",
-            "text",
-            "tile",
-            "icon",
-            "fab"
-          ];
-
-          extend = ", \"items\":" + json.encode(it);
+          extend = ", \"items\":" + varCmp.list;
         } else {
           fi.xid = 'editor-text';
         }
@@ -228,7 +218,7 @@ class XUIDesignManager {
               (design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]?.content);
           if (valInCmp != null && varCmp.editor == "bool") {
             value = valInCmp;
-          } else if (valInCmp != null) value = "\"" + valInCmp + "\"";
+          } else if (valInCmp != null) value =  jsonEncode(valInCmp.toString());
         }
 
         bool exist = value != null;
@@ -255,6 +245,8 @@ class XUIDesignManager {
             "}");
         i++;
       }
+
+       ret.bufTemplate.write("</div>");
     }
 
     designs.reversed.forEach((design) {

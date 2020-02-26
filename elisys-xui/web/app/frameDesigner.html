@@ -14,6 +14,9 @@
         <xui-prop id="copyrightApp" val="Elisys 2020 v0.1.4"></xui-prop>
     </xui-design>
 
+    <xui-design xid="xui-toolbar-title" class="xui-path-component">
+    </xui-design>
+
     <xui-design xid="main">
         <xui-tabs xid="main-tab" xui-nb="7" xui-vertical=true xui-dark=true v-model="activeTab" class="main-tab"></xui-tabs>
     </xui-design>
@@ -36,7 +39,6 @@
             <div class="main-item main-item-1"></div>
             <div class="main-item main-item-2">
                 <iframe 
-                    style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" 
                     id='rootFrame'>
                 </iframe>
             </div>
@@ -51,6 +53,16 @@
 
     <xui-design xid="main-tab-tab-item-1">
         <xui-tabs xid="tab-code" class="tab-code" xui-dark=true height="32px" xui-nb="2"></xui-tabs>
+    </xui-design>
+
+    <xui-design xid="main-tab-tab-item-2">
+        <div id="editorContent">
+            <vue-editor v-model="contentEditor"></vue-editor>
+        </div>
+          
+        <div id="resultContent">
+             <div v-html="contentEditor"></div>
+        </div>
     </xui-design>
 
     <xui-design xid="tab-code-tab-0"><div> Html </div></xui-design>
@@ -71,25 +83,28 @@
         </div>
     </xui-design>
 
-    <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true class="tab-action" height="35px" xui-nb="4">
+    <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true class="tab-action" height="35px" xui-nb="5">
     </xui-tabs>
 
     <xui-design xid="action-tab-tab-0"><v-icon>mdi-layers-triple</v-icon></xui-design>
     <xui-design xid="action-tab-tab-1"><v-icon>mdi-palette-swatch</v-icon></xui-design>
-    <xui-design xid="action-tab-tab-2"><v-icon>mdi-plus-box-multiple</v-icon></xui-design>
-    <xui-design xid="action-tab-tab-3"><v-icon>mdi-file-tree</v-icon></xui-design>
+    <xui-design xid="action-tab-tab-2"><v-icon>mdi-database-import</v-icon></xui-design>
+    <xui-design xid="action-tab-tab-3"><v-icon>mdi-plus-box-multiple</v-icon></xui-design>
+    <xui-design xid="action-tab-tab-4"><v-icon>mdi-file-tree</v-icon></xui-design>
 
     <xui-design xid="action-tab-tab-item-0"><div id="AppPropertiesSetting"></div></xui-design>
-    <xui-design xid="action-tab-tab-item-1"><div>Coming soon...</div></xui-design>
-    <xui-design xid="action-tab-tab-item-2"><div id="AppComponents"></div></xui-design>
-    <xui-design xid="action-tab-tab-item-3"><div>Coming soon...</div>.</xui-design>
+    <xui-design xid="action-tab-tab-item-1"><div>Style/class coming soon...</div></xui-design>
+    <xui-design xid="action-tab-tab-item-2"><div>Data binding coming soon...</div></xui-design>
+    <xui-design xid="action-tab-tab-item-3"><div id="AppComponents"></div></xui-design>
+    <xui-design xid="action-tab-tab-item-4"><div>TreeView coming soon...</div>.</xui-design>
 
     <xui-design xid="slot-action-header">
-        <xui-btn-small @click="$xui.fullScreen()"><v-icon>mdi-television-play</v-icon></xui-btn-small>
-        <xui-btn-small @click="$xui.modePreview()"><v-icon>mdi-monitor-cellphone</v-icon></xui-btn-small>
-        <xui-btn-small @click="$xui.refreshAction('final')"><v-icon>mdi-autorenew</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.fullScreen()"><v-icon>mdi-fullScreen</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.modePreview()"><v-icon>mdi-television-play</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.modePhone()"><v-icon>mdi-monitor-cellphone</v-icon></xui-btn-small>
+        <span style="width:20px"></span>
         <xui-btn-small @click="$xui.refreshAction('template')"><v-icon>mdi-refresh</v-icon></xui-btn-small>
-        <xui-btn-small @click="$xui.save()"><v-icon>mdi-content-save</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.saveProperties()"><v-icon>mdi-content-save</v-icon></xui-btn-small>
     </xui-design>
 
     <xui-design xid="slot-action-footer">
@@ -102,15 +117,21 @@
         <xui-btn-small><v-icon>mdi-settings</v-icon></xui-btn-small>
         <xui-btn-small><v-icon>mdi-note-multiple</v-icon></xui-btn-small>
         <xui-btn-small><v-icon>mdi-new-box</v-icon></xui-btn-small>
+
+        <span style="width:50px"></span>
+
+        <xui-btn-small @click="$xui.refreshAction('final')"><v-icon>mdi-autorenew</v-icon></xui-btn-small>
     </xui-design>
 
     <xui-design xid="xui-script-data">
         var json = { 
             selectedxui : "PWA Code Generator", 
             activeTab : 0,
-            activeAction : 0
+            activeAction : 0,
+            contentEditor: ''
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
+
     </xui-design>
 
     <xui-design xid="xui-init-vuetify">
@@ -126,8 +147,10 @@
         <script defer src="app/frameDesigner.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-yaml.min.js"></script>
+        <script defer src="https://unpkg.com/region2d@1.0.0/plain/region2d.min.js"></script> 
         <script defer src="libxui.dart.js"></script>
         <script defer src="app/frameDesignerWatch.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/vue2-editor@2.6.6/dist/vue2-editor.min.js"></script>
 
         <!-- <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script> -->
         <!-- <script>

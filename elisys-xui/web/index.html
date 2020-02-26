@@ -13,21 +13,22 @@
          <v-app style="background:white">
             <v-app-bar app color="#1d9da0" fixed :dark="dark" :height="heightHeader">
                <v-app-bar-nav-icon></v-app-bar-nav-icon>
-               <v-toolbar-title>{{selectedxui}}</v-toolbar-title>
+               <v-toolbar-title class="xui-path-component">{{selectedxui}}</v-toolbar-title>
                <v-spacer></v-spacer>
                <v-btn small class="xui-btn-action" @click="$xui.fullScreen()">
-                  <v-icon>mdi-television-play</v-icon>
+                  <v-icon>mdi-fullScreen</v-icon>
                </v-btn>
                <v-btn small class="xui-btn-action" @click="$xui.modePreview()">
+                  <v-icon>mdi-television-play</v-icon>
+               </v-btn>
+               <v-btn small class="xui-btn-action" @click="$xui.modePhone()">
                   <v-icon>mdi-monitor-cellphone</v-icon>
                </v-btn>
-               <v-btn small class="xui-btn-action" @click="$xui.refreshAction('final')">
-                  <v-icon>mdi-autorenew</v-icon>
-               </v-btn>
+               <span style="width:20px"></span>
                <v-btn small class="xui-btn-action" @click="$xui.refreshAction('template')">
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
-               <v-btn small class="xui-btn-action" @click="$xui.save()">
+               <v-btn small class="xui-btn-action" @click="$xui.saveProperties()">
                   <v-icon>mdi-content-save</v-icon>
                </v-btn>
             </v-app-bar>
@@ -47,7 +48,7 @@
                               <div class="main-container">
                                  <div class="main-item main-item-1"></div>
                                  <div class="main-item main-item-2">
-                                    <iframe style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" id="rootFrame"></iframe>
+                                    <iframe id="rootFrame"></iframe>
                                  </div>
                                  <div class="main-item main-item-3">
                                     <v-tabs v-model="activeAction" class="tab-action" dark height="35px">
@@ -61,7 +62,13 @@
                                           <v-icon>mdi-palette-swatch</v-icon>
                                        </v-tab>
                                        <v-tab-item eager>
-                                          <div>Coming soon...</div>
+                                          <div>Style/class coming soon...</div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-database-import</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div>Data binding coming soon...</div>
                                        </v-tab-item>
                                        <v-tab>
                                           <v-icon>mdi-plus-box-multiple</v-icon>
@@ -73,7 +80,7 @@
                                           <v-icon>mdi-file-tree</v-icon>
                                        </v-tab>
                                        <v-tab-item eager>
-                                          <div>Coming soon...</div>
+                                          <div>TreeView coming soon...</div>
 .                                       </v-tab-item>
                                     </v-tabs>
                                  </div>
@@ -123,6 +130,12 @@
                         <v-icon>mdi-api</v-icon>
                      </v-tab>
                      <v-tab-item eager>
+                        <div id="editorContent">
+                           <vue-editor v-model="contentEditor"></vue-editor>
+                        </div>
+                        <div id="resultContent">
+                           <div v-html="contentEditor"></div>
+                        </div>
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-database</v-icon>
@@ -167,6 +180,10 @@
                <v-btn small class="xui-btn-action">
                   <v-icon>mdi-new-box</v-icon>
                </v-btn>
+               <span style="width:50px"></span>
+               <v-btn small class="xui-btn-action" @click="$xui.refreshAction('final')">
+                  <v-icon>mdi-autorenew</v-icon>
+               </v-btn>
                <v-spacer></v-spacer>
                <span>&copy;&nbsp;Elisys 2020 v0.1.4</span>
             </v-footer>
@@ -175,30 +192,34 @@
       <div id="app"></div>
    </body>
    <script>
-		if (typeof $xui === 'undefined')
-			$xui={};
+	if (typeof $xui === 'undefined')
+		$xui={};
 
-		$xui.rootdata={ 
-			dark:true, 
-			heightHeader:32, 
-			heightFooter:32, 
-			ContentfillPage:true };
-
+	$xui.rootdata={ 
+		dark:true, 
+		heightHeader:32, 
+		heightFooter:32, 
+		ContentfillPage:true 
+	};
 	
         var json = { 
             selectedxui : "PWA Code Generator", 
             activeTab : 0,
-            activeAction : 0
+            activeAction : 0,
+            contentEditor: ''
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
+
     </script>
    <script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
    <script defer src="app/frameDesigner.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-yaml.min.js"></script>
+   <script defer src="https://unpkg.com/region2d@1.0.0/plain/region2d.min.js"></script>
    <script defer src="libxui.dart.js"></script>
    <script defer src="app/frameDesignerWatch.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/vue2-editor@2.6.6/dist/vue2-editor.min.js"></script>
    <script type="module">
 		import "./app/vue2frame.js";
 		$xui.loadApplicationJS();

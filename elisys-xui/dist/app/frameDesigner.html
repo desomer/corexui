@@ -4,16 +4,18 @@
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
 
+    <v-btn xid="xui-btn-small" small class="xui-btn-action"></v-btn>
+
     <xui-design xid="root">
         <xui-prop id="title" val="PWA Designer"></xui-prop>
         <xui-prop id="titleApp" val="{{selectedxui}}"></xui-prop>
         <xui-prop id="colorApp" val="#1d9da0"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2019 v0.1.0"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.1.4"></xui-prop>
     </xui-design>
 
     <xui-design xid="main">
-        <xui-tabs xid="main-tab" xui-nb="7" vertical dark class="main-tab"></xui-tabs>
+        <xui-tabs xid="main-tab" xui-nb="7" xui-vertical=true xui-dark=true v-model="activeTab" class="main-tab"></xui-tabs>
     </xui-design>
 
     <xui-design xid="main-tab-tab-0"><v-icon>mdi-square-edit-outline</v-icon></xui-design>
@@ -25,16 +27,15 @@
     <xui-design xid="main-tab-tab-6"><v-icon>mdi-border-inside</v-icon></xui-design>
    
     <xui-design xid="main-tab-tab-item-0">
-        <xui-tabs xid="tab-editor" class="tab-editor" dark height="32px" xui-nb="3"></xui-tabs>
+        <xui-tabs xid="tab-editor" class="tab-editor" xui-dark=true height="32px" xui-nb="3"></xui-tabs>
     </xui-design>
 
-    <xui-design xid="tab-editor-tab-0"><v-icon>mdi-monitor-screenshot</v-icon><span style='margin-left: 5px;'>frame1</span></xui-design>
+    <xui-design xid="tab-editor-tab-0"><v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon><span style='margin-left: 5px;'>frame1</span></xui-design>
     <xui-design xid="tab-editor-tab-item-0">
         <div class="main-container">
             <div class="main-item main-item-1"></div>
             <div class="main-item main-item-2">
                 <iframe 
-                    style="width:100%;height:100%;position:relative;border: 0px;padding: 0px;margin: 0px;" 
                     id='rootFrame'>
                 </iframe>
             </div>
@@ -48,6 +49,23 @@
     <xui-design xid="tab-editor-tab-item-1"><div>Coming soon...</div></xui-design>
 
     <xui-design xid="main-tab-tab-item-1">
+        <xui-tabs xid="tab-code" class="tab-code" xui-dark=true height="32px" xui-nb="2"></xui-tabs>
+    </xui-design>
+
+    <xui-design xid="main-tab-tab-item-2">
+        <div id="editorContent">
+            <vue-editor v-model="contentEditor"></vue-editor>
+        </div>
+          
+        <div id="resultContent">
+             <div v-html="contentEditor"></div>
+        </div>
+    </xui-design>
+
+ 
+
+    <xui-design xid="tab-code-tab-0"><div> Html </div></xui-design>
+    <xui-design xid="tab-code-tab-item-0">
         <div class="main-code">
             <pre>
                 <code id="xui-code-html" spellcheck="false"></code>
@@ -55,7 +73,16 @@
         </div>
     </xui-design>
 
-    <xui-tabs xid="design-action" v-model="activeAction" dark class="tab-action" height="35px" xui-nb="4">
+    <xui-design xid="tab-code-tab-1"><div> YAML </div></xui-design>
+    <xui-design xid="tab-code-tab-item-1">
+        <div class="main-code">
+            <pre>
+                <code id="xui-code-yaml" spellcheck="false"></code>
+            </pre>
+        </div>
+    </xui-design>
+
+    <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true class="tab-action" height="35px" xui-nb="4">
     </xui-tabs>
 
     <xui-design xid="action-tab-tab-0"><v-icon>mdi-layers-triple</v-icon></xui-design>
@@ -69,122 +96,54 @@
     <xui-design xid="action-tab-tab-item-3"><div>Coming soon...</div>.</xui-design>
 
     <xui-design xid="slot-action-header">
-        <v-btn small class="xui-btn-action" @click="$xui.fullScreen()"><v-icon>mdi-television-play</v-icon></v-btn>
-        <v-btn small class="xui-btn-action" ><v-icon>mdi-monitor-cellphone</v-icon></v-btn>
-        <v-btn small class="xui-btn-action" @click="$xui.refresh('final')"><v-icon>mdi-autorenew</v-icon></v-btn>
-        <v-btn small class="xui-btn-action" @click="$xui.refresh('template')"><v-icon>mdi-refresh</v-icon></v-btn>
-        <v-btn small class="xui-btn-action" @click="$xui.save()"><v-icon>mdi-content-save</v-icon></v-btn>
+        <xui-btn-small @click="$xui.fullScreen()"><v-icon>mdi-fullScreen</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.modePreview()"><v-icon>mdi-television-play</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.modePhone()"><v-icon>mdi-monitor-cellphone</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.refreshAction('final')"><v-icon>mdi-autorenew</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.refreshAction('template')"><v-icon>mdi-refresh</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.saveProperties()"><v-icon>mdi-content-save</v-icon></xui-btn-small>
     </xui-design>
 
     <xui-design xid="slot-action-footer">
-        <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()"><v-icon>mdi-delete</v-icon></v-btn>
-        <v-btn small class="xui-btn-action"><v-icon>mdi-content-cut</v-icon></v-btn>
-        <v-btn small class="xui-btn-action"><v-icon>mdi-content-paste</v-icon></v-btn>
+        <xui-btn-small @click="$xui.deleteCmp()"><v-icon>mdi-delete</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.deleteCmp()"><v-icon>mdi-content-cut</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.moveTo()"><v-icon>mdi-content-paste</v-icon></xui-btn-small>
 
         <span style="width:50px"></span>
 
-        <v-btn small class="xui-btn-action"><v-icon>mdi-settings</v-icon></v-btn>
-        <v-btn small class="xui-btn-action"><v-icon>mdi-note-multiple</v-icon></v-btn>
-        <v-btn small class="xui-btn-action"><v-icon>mdi-new-box</v-icon></v-btn>
+        <xui-btn-small><v-icon>mdi-settings</v-icon></xui-btn-small>
+        <xui-btn-small><v-icon>mdi-note-multiple</v-icon></xui-btn-small>
+        <xui-btn-small><v-icon>mdi-new-box</v-icon></xui-btn-small>
     </xui-design>
 
     <xui-design xid="xui-script-data">
-        $xui.rootdata=Object.assign($xui.rootdata, 
-                { 
-                    selectedxui : "PWA Code Generator", 
-                    activeAction : 0
-                }
-                );  ;
+        var json = { 
+            selectedxui : "PWA Code Generator", 
+            activeTab : 0,
+            activeAction : 0,
+            contentEditor: ''
+        };
+        $xui.rootdata= { ...$xui.rootdata, ...json};
+
+    </xui-design>
+
+    <xui-design xid="xui-init-vuetify">
+            $xui.initVuejs($xui.vuejs);
     </xui-design>
     
     <xui-design xid="inject-other-header">
         <link href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css" rel="stylesheet" />
-        <style>
-            .barcustom::-webkit-scrollbar {
-                width: 10px;
-            }
-            
-            .barcustom::-webkit-scrollbar-track {
-                box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-                border-radius: 10px;
-            }
-            
-            .barcustom::-webkit-scrollbar-thumb {
-                box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
-                border-radius: 10px;
-            }
-
-            .xui-style-prop {    
-                background: #f9f9f9;
-                height: 24px;
-                color: #696969 !important;
-                padding: 0px 5px;
-            }
-
-            html::-webkit-scrollbar {
-                 width: 0px;  /*pas de scrollbar */
-            }
-
-            .main-tab .v-tab {
-                min-width: 40px;
-                width: 40px;
-                height: 40px !important;
-            }
-
-            .tab-editor .v-tab {
-                min-width: auto;
-                width: auto;
-                height: 30px !important;
-            }
-
-            .tab-action .v-tab {
-                min-width: 40px;
-                width: 40px;
-            }
-
-            .main-container { 
-                height: calc(100vh - 64px - 32px);
-                width: 100%;
-                display: grid; 
-                grid-template-columns: 0px auto 250px;
-                grid-template-rows: 100%; 
-                }
-            .main-item-2 {
-                border: 1px solid #e0e0e0;
-            }
-
-            .main-code {
-                height: calc(100vh - 64px);
-                width: 100%;
-            }
-            pre, code {
-                font-family: monospace, monospace;
-            }
-            pre {
-                overflow: auto;
-            }
-            pre > code {
-                display: block;
-                padding: 1rem;
-                word-wrap: normal;
-                position: absolute;
-                right: 0px;
-                height: 100%;
-                width: 100%;
-                overflow: auto;
-                color: black !important;
-                white-space: unset !important;
-                font-weight: unset !important;
-            }
-
-            .xui-btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
-        </style>
+        <link href="app/frameDesigner.css" rel="stylesheet" />
     </xui-design>
 
     <xui-design xid="inject-after-body">
         <script defer src="app/frameDesigner.js"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.x/prism.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-yaml.min.js"></script>
+        <script defer src="https://unpkg.com/region2d@1.0.0/plain/region2d.min.js"></script> 
         <script defer src="libxui.dart.js"></script>
+        <script defer src="app/frameDesignerWatch.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/vue2-editor@2.6.6/dist/vue2-editor.min.js"></script>
 
         <!-- <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script> -->
         <!-- <script>

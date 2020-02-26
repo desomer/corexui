@@ -22,7 +22,7 @@ class NativeSlot extends XUIElementNative {
 
   @override
   Future doProcessPhase2(XUIEngine engine, XUIElementHTML html) async {
-    // recherche le nom du slot
+    // recherche le nom du slot et si celui ci et un slot full
     var slotName;
     bool isFull = false;
     html?.propertiesXUI?.entries?.forEach((f) {
@@ -41,19 +41,24 @@ class NativeSlot extends XUIElementNative {
       }
     }
 
-    bool isModeDesign = engine.xuiFile.context.mode != MODE_FINAL &&
-        engine.xuiFile.context.mode != MODE_PREVIEW;
+    var isModeDesign = engine.isModeDesign();
 
-    // creer un slot visible si pas d'enfant
+    // si mode design => creer un slot visible si pas d'enfant
     if (html.children == null && slotName != null && isModeDesign) {
       var newChild = XUIElementXUI()..tag = TAG_DIV_SLOT;
       newChild.children = [];
       newChild.children.add(XUIElementText()..content = slotName);
-      await XUIModel(this, MODE_ALL).doChild(newChild, html, engine);
+      await XUIModel(this, MODE_ALL).doChildPhase1(newChild, html, engine);
     }
 
-    int nb = html.getNbChild();
+    // affecte l'identifiant xid du slot sur le parent si le parent en a pas
+    var xidCal;
+    if (html.origin != null) {
+      xidCal = html.calculateProp(html.origin.xid);
+    }
 
+    int nbChild = html.getNbChildNoText();
+    int nbChildNoSlot = 0;
     html.children?.forEach((childHtml) {
       // affecte les attribut du slot sur les enfants
       var model = XUIElementXUI();
@@ -62,10 +67,17 @@ class NativeSlot extends XUIElementNative {
       // affecte le nom du slot sur les enfants si doit etre accessible (avoir un slot name)
       if (slotName != null && isModeDesign) {
         childHtml.attributes ??= HashMap<String, XUIProperty>();
-        var xidCal =
-            XUIModel(html.origin, null).calculateProp(html.origin.xid, html);
-        childHtml.attributes["data-" + ATTR_XID_SLOT] = XUIProperty(xidCal);
-        if (isFull && nb == 1) {
+
+        // affecte le xui-slot sur les enfant non slot
+        if (childHtml is! XUIElementHTMLText) {
+          if (childHtml.tag != TAG_NO_DOM) {
+            childHtml.attributes["data-" + ATTR_XID_SLOT] = XUIProperty(xidCal);
+            nbChildNoSlot++;
+          }
+        }
+
+        // affect la class full sur l'enfant si full et unique
+        if (isFull && nbChild == 1) {
           if (childHtml.attributes["class"] == null) {
             childHtml.attributes["class"] = XUIProperty("xui-class-slot-full");
           } else {
@@ -75,6 +87,20 @@ class NativeSlot extends XUIElementNative {
         }
       }
     });
+
+    if (isModeDesign && (nbChildNoSlot == 0 /*|| nbChildNoSlot > 1*/)) {
+      //recherche un parent affichable pour gerer la selection des slot (displaySelectorByXid)
+      var p = html.parent;
+      while (p != null) {
+        if (p.tag != null && !p.tag.startsWith("xui")) {
+          p.attributes ??= HashMap<String, XUIProperty>();
+          p.attributes["data-" + ATTR_XID_SLOT + "-" + xidCal] =
+              XUIProperty(true);
+          break;
+        }
+        p = p.parent;
+      }
+    }
 
     return Future.value();
   }

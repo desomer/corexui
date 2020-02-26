@@ -29,7 +29,7 @@ class XUIActionManager {
       DocInfo doc = engine.docInfo[xuiCmp.tag];
       if (doc != null && doc.variables.isNotEmpty) {
         for (var variable in doc.variables) {
-          // affecte les valeur par defaut  
+          // affecte les valeur par defaut
           if (variable.def != null) {
             xuiCmp.propertiesXUI ??= HashMap<String, XUIProperty>();
             xuiCmp.propertiesXUI[variable.id] = XUIProperty(variable.def);
@@ -87,6 +87,8 @@ class XUIActionManager {
       int idx = 0;
       int idxToDelete = -1;
 
+      var elemToChange;
+
       // recherche du child ayant le xid
       if (design.elemXUI.children != null) {
         for (var child in design.elemXUI.children) {
@@ -100,17 +102,16 @@ class XUIActionManager {
           }
           idx++;
         }
-      }
 
-      var elemToChange;
-      // retire le child
-      if (nbChildNoText == 1 && idxToDelete >= 0 && !hasText) {
-        elemToChange = design.elemXUI.children.removeAt(idxToDelete);
-        design.elemXUI.children = null;
-        print("remove all <$xid> on parent <$xidParent>");
-      } else if (nbChildNoText >= 0) {
-        elemToChange = design.elemXUI.children.removeAt(nbChildNoText);
-        print("remove only <$xid> on parent <$xidParent>");
+        // retire le child
+        if (nbChildNoText == 1 && idxToDelete >= 0 && !hasText) {
+          elemToChange = design.elemXUI.children.removeAt(idxToDelete);
+          design.elemXUI.children = null;
+          print("remove all <$xid> on parent <$xidParent>");
+        } else if (nbChildNoText >= 0) {
+          elemToChange = design.elemXUI.children.removeAt(nbChildNoText);
+          print("remove only <$xid> on parent <$xidParent>");
+        }
       }
 
       // supprime la parent si vide
@@ -122,7 +123,7 @@ class XUIActionManager {
       if (moveToXid == null) {
         print("delete design <$xid>");
         engine.xuiFile.designs.remove(xid);
-      } else {
+      } else if (elemToChange!=null) {
         moveToDesign(xid, moveToXid, mode, elemToChange);
       }
     }
@@ -139,18 +140,15 @@ class XUIActionManager {
     SlotInfo info = engine.getSlotInfo(moveToXid, moveToXid);
     XUIDesign designMove;
     if (info != null) {
-        designMove = _getXUIDesign(info, mode);
-    }
-    else
-    {
-      for (XUIDesign aDesign in engine.xuiFile.designs[moveToXid].list)
-      {
-        if (mode == null || aDesign.mode == mode) { 
-             designMove =  aDesign;
+      designMove = _getXUIDesign(info, mode);
+    } else {
+      for (XUIDesign aDesign in engine.xuiFile.designs[moveToXid].list) {
+        if (mode == null || aDesign.mode == mode) {
+          designMove = aDesign;
         }
       }
     }
-    
+
     if (designMove != null && elemToChange != null) {
       print("move <$xid> to <$moveToXid>");
       designMove.elemXUI.children ??= List<XUIElement>();

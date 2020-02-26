@@ -6,10 +6,7 @@ $xui.initVuejs = (vuejs) => {
     vuejs.$watch('activeTab', function(newValue, oldValue) {
         console.debug('The activeTab name was changed from ' + oldValue + ' to ' + newValue + '!');
         if (newValue==1)
-        {
-            $xui.refreshAction('final')
             $xui.loadCode( $xui.codeHtml);
-        }
 
     }, { deep: true });
 
