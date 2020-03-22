@@ -19,6 +19,7 @@ Factory =
          - genere les infos de design (info, doc, etc...)
 
     -   process phase 3 : construit le code HTML
+        - rechercher des tag de databinding
 
 Element =
     -   convertion de elemnentHTML en code HTML au travers du XUIHtmlBuffer
@@ -29,3 +30,8 @@ Element =
 Netlify
 Faunadb
     https://docs.fauna.com/fauna/current/tutorials/crud
+eval d'import
+    https://2ality.com/2019/10/eval-via-import.html
+
+css to json
+    https://codepen.io/Cdca12/pen/xJOEqd

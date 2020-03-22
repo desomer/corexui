@@ -1,6 +1,7 @@
 <xui-factory version="1.0">
     <xui-import xui-path="app/vue2frame.html"></xui-import>
     <xui-import xui-path="app/cmp2vuetify.html"></xui-import>
+    <xui-import xui-path="app/cmpDesignClassChooser.html"></xui-import>
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
 
@@ -93,10 +94,16 @@
     <xui-design xid="action-tab-tab-4"><v-icon>mdi-file-tree</v-icon></xui-design>
 
     <xui-design xid="action-tab-tab-item-0"><div id="AppPropertiesSetting"></div></xui-design>
-    <xui-design xid="action-tab-tab-item-1"><div>Style/class coming soon...</div></xui-design>
+    <xui-design xid="action-tab-tab-item-1">
+        <div class='xui-div-design'>
+            <cmp-list-class></cmp-list-class>   
+        </div>
+    </xui-design>
     <xui-design xid="action-tab-tab-item-2"><div>Data binding coming soon...</div></xui-design>
     <xui-design xid="action-tab-tab-item-3"><div id="AppComponents"></div></xui-design>
     <xui-design xid="action-tab-tab-item-4"><div>TreeView coming soon...</div>.</xui-design>
+
+    
 
     <xui-design xid="slot-action-header">
         <xui-btn-small @click="$xui.fullScreen()"><v-icon>mdi-fullScreen</v-icon></xui-btn-small>
@@ -131,7 +138,13 @@
             contentEditor: ''
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
+    </xui-design>
 
+    <xui-design xid="xui-script-data">
+        var json = {
+            listCatClass: []
+        };
+        $xui.rootdata= { ...$xui.rootdata, ...json};
     </xui-design>
 
     <xui-design xid="xui-init-vuetify">

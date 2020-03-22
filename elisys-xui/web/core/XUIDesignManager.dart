@@ -235,6 +235,10 @@ class XUIDesignManager {
             varCmp.id +
             "\",\"label\":\"" +
             varCmp.doc +
+             "\",\"cat\":\"" +
+             (varCmp.cat??"layout") +
+              "\",\"editor\":\"" +
+             varCmp.editor +
             "\", \"value\":" +
             value.toString() +
             ", \"value_orig\":" +

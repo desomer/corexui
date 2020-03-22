@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 import '../XUIEngine.dart' as cst;
 import '../XUIEngine.dart';
 import '../XUIFactory.dart';
@@ -91,7 +92,7 @@ class XUIElementHTML extends XUIElement {
     }
   }
 
-  dynamic processContent(String content, ParseInfoMode mode) {
+  dynamic processContent(XUIEngine engine, String content, ParseInfoMode mode) {
     ParseInfo parseInfo = ParseInfo(content, mode);
     try {
       XUIProperty.parse(parseInfo, (String tag) {
@@ -109,10 +110,17 @@ class XUIElementHTML extends XUIElement {
     return parseInfo.parsebuilder.toString();
   }
 
-  void processPhase3(XUIHtmlBuffer buffer) {
+  void processPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
+    var oldBuf;
+    if (this.propertiesXUI!=null && this.propertiesXUI.containsKey("convert-json"))
+    {
+      oldBuf = buffer;
+      buffer= XUIHtmlBuffer();
+    }
+
     if (tag == cst.TAG_NO_DOM) {
       // cas des slot
-      toChildrenPhase3(buffer);
+      toChildrenPhase3(engine, buffer);
       return;
     }
 
@@ -121,11 +129,11 @@ class XUIElementHTML extends XUIElement {
 
     this.attributes?.entries?.forEach((f) {
       var c = f.value.content;
-      var keyAttr = processContent(f.key, ParseInfoMode.KEY);
-
+      var keyAttr = processContent(engine, f.key, ParseInfoMode.KEY);
+      var valProp = c;
       if (keyAttr != "" && c != null) {
         if (c is String) {
-          var valProp = processContent(c, ParseInfoMode.ATTR);
+          valProp = processContent(engine, c, ParseInfoMode.ATTR);
           bool mustAdd = true;
           bool isBool = false;
           if (c != valProp) {
@@ -140,10 +148,12 @@ class XUIElementHTML extends XUIElement {
             }
             buffer.html.write(" ");
             if (keyAttr.toString().startsWith("-")) {
-              buffer.html.write(keyAttr.toString().substring(1));
-            } else {
-              buffer.html.write(keyAttr);
-            }
+              keyAttr = keyAttr.toString().substring(1);
+              // gestion des - devant des attr pour bypasser les correcteurs de syntaxe -style="[[xxx]]"  
+            } 
+
+            buffer.html.write(keyAttr);
+            
             if (!isBool) {
               /// pas d'ajout de valeur si boolean
               buffer.html.write("=");
@@ -151,19 +161,26 @@ class XUIElementHTML extends XUIElement {
                   ? (buffer.html.write(valProp))
                   : (buffer.html.write('"' + valProp + '"'));
             }
+
+            engine.dataBindingInfo.parseAttr(this, keyAttr, valProp.toString());
+
           }
         } else {
           // attribut boolean
           buffer.html.write(" ");
           buffer.html.write(keyAttr);
           buffer.html.write("=");
-          buffer.html.write(c);
+          buffer.html.write(valProp);
         }
       } else if (keyAttr != "") {
         // attribut sans valeur (ex  : <v-btn dark>)
         buffer.html.write(" ");
         buffer.html.write(keyAttr);
       }
+
+
+
+
     });
 
     buffer.html.write('>');
@@ -176,19 +193,25 @@ class XUIElementHTML extends XUIElement {
     if (hasChidren) buffer.html.write('\n');
 
     buffer.tab(1);
-    toChildrenPhase3(buffer);
+    toChildrenPhase3(engine, buffer);
     buffer.tab(-1);
 
     if (hasChidren) buffer.addTab();
     buffer.html.write('</' + this.tag + '>\n');
+
+    if (oldBuf!=null)
+    {
+        oldBuf.html.write( json.encode(   buffer.html.toString()  ));
+    }
+
   }
 
-  void toChildrenPhase3(XUIHtmlBuffer buffer) {
+  void toChildrenPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
     this.children?.forEach((c) {
       if (c is XUIElementHTMLText) {
-        c.content.trim().isNotEmpty ? c.processPhase3(buffer) : null;
+        c.content.trim().isNotEmpty ? c.processPhase3(engine, buffer) : null;
       } else {
-        (c as XUIElementHTML).processPhase3(buffer);
+        (c as XUIElementHTML).processPhase3(engine, buffer);
       }
     });
   }
@@ -198,8 +221,10 @@ class XUIElementHTMLText extends XUIElementHTML {
   String content;
 
   @override
-  void processPhase3(XUIHtmlBuffer buffer) {
-    buffer.html.write(processContent(content, ParseInfoMode.CONTENT));
+  void processPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
+    var cont = processContent(engine, content, ParseInfoMode.CONTENT);
+    engine.dataBindingInfo.parseContent(this, cont);
+    buffer.html.write(cont);
   }
 }
 

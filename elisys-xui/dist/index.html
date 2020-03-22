@@ -13,7 +13,7 @@
          <v-app style="background:white">
             <v-app-bar app color="#1d9da0" fixed :dark="dark" :height="heightHeader">
                <v-app-bar-nav-icon></v-app-bar-nav-icon>
-               <v-toolbar-title>{{selectedxui}}</v-toolbar-title>
+               <v-toolbar-title class="xui-path-component">{{selectedxui}}</v-toolbar-title>
                <v-spacer></v-spacer>
                <v-btn small class="xui-btn-action" @click="$xui.fullScreen()">
                   <v-icon>mdi-fullScreen</v-icon>
@@ -24,9 +24,7 @@
                <v-btn small class="xui-btn-action" @click="$xui.modePhone()">
                   <v-icon>mdi-monitor-cellphone</v-icon>
                </v-btn>
-               <v-btn small class="xui-btn-action" @click="$xui.refreshAction('final')">
-                  <v-icon>mdi-autorenew</v-icon>
-               </v-btn>
+               <span style="width:20px"></span>
                <v-btn small class="xui-btn-action" @click="$xui.refreshAction('template')">
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
@@ -64,7 +62,13 @@
                                           <v-icon>mdi-palette-swatch</v-icon>
                                        </v-tab>
                                        <v-tab-item eager>
-                                          <div>Coming soon...</div>
+                                          <div>Style/class coming soon...</div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-database-import</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div>Data binding coming soon...</div>
                                        </v-tab-item>
                                        <v-tab>
                                           <v-icon>mdi-plus-box-multiple</v-icon>
@@ -76,7 +80,7 @@
                                           <v-icon>mdi-file-tree</v-icon>
                                        </v-tab>
                                        <v-tab-item eager>
-                                          <div>Coming soon...</div>
+                                          <div>TreeView coming soon...</div>
 .                                       </v-tab-item>
                                     </v-tabs>
                                  </div>
@@ -175,6 +179,10 @@
                </v-btn>
                <v-btn small class="xui-btn-action">
                   <v-icon>mdi-new-box</v-icon>
+               </v-btn>
+               <span style="width:50px"></span>
+               <v-btn small class="xui-btn-action" @click="$xui.refreshAction('final')">
+                  <v-icon>mdi-autorenew</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
                <span>&copy;&nbsp;Elisys 2020 v0.1.4</span>

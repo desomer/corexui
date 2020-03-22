@@ -39,6 +39,9 @@ external set _getHtmlFrom(void Function(FileDesignInfo, String) f);
 @JS('removeDesign')
 external set _removeDesign(void Function(FileDesignInfo, String) f);
 
+@JS('deleteDesign')
+external set _deleteDesign(void Function(FileDesignInfo, String) f);
+
 @JS('moveDesign')
 external set _moveDesign(void Function(FileDesignInfo, String, String) f);
 
@@ -71,7 +74,7 @@ void setDesignProperties(
   await refresh(fileInfo);
 
   var xidProp = (listDesign[0] as ObjectDesign).xid;
-  context["\$xui"].callMethod("doPromise", [idPromise, xidProp]);
+  context["\$xui"].callMethod("doPromiseJS", [idPromise, xidProp]);
 
 }
 
@@ -123,6 +126,12 @@ void addDesign(FileDesignInfo fileInfo, String id, String template) async {
   var ret = Options(mode: fileInfo.mode, html: str);
 
   _reload(fileInfo, ret);
+}
+
+
+void deleteDesign(FileDesignInfo fileInfo, String id) async {
+    XUIDesignManager designMgr = getDesignManager(fileInfo);
+    await designMgr.removeDesign(id, null);
 }
 
 void removeDesign(FileDesignInfo fileInfo, String id) async {
@@ -184,7 +193,7 @@ void getHtmlFrom(FileDesignInfo fileInfo, String idPromise) async {
   var html = await getDesignManager(fileInfo)
       .getHtml(ctx, fileInfo.file, fileInfo.xid);
 
-  context["\$xui"].callMethod("doPromise", [idPromise, html]);
+  context["\$xui"].callMethod("doPromiseJS", [idPromise, html]);
 }
 
 void _reload(FileDesignInfo fileInfo, var options) {
@@ -216,6 +225,7 @@ void main() async {
   _setDesignProperties = allowInterop(setDesignProperties);
   _getComponents = allowInterop(getComponents);
   _getHtmlFrom = allowInterop(getHtmlFrom);
+  _deleteDesign = allowInterop(deleteDesign);
 
   FileDesignInfo fileInfo = FileDesignInfo();
   fileInfo.file = 'app/frame1.html';

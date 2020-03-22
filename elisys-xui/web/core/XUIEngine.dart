@@ -4,6 +4,7 @@ import 'package:yamlicious/yamlicious.dart';
 
 import 'XUIFactory.dart';
 import 'element/XUIElement.dart';
+import 'element/XUIParseJSDataBind.dart';
 import 'element/XUIProperty.dart';
 import 'native/register.dart';
 import 'parser/HTMLReader.dart';
@@ -14,6 +15,7 @@ const ATTR_SLOT_NAME = "slot-name";
 const ATTR_SLOT_FULL = "slot-full";
 const ATTR_XID_SLOT = "xid-slot";
 const ATTR_MODE = "mode";
+const ATTR_NO_DOM = "no-dom";
 
 const TAG_ESCAPE = "xui-escape-";
 const TAG_NO_DOM = "xui-no-dom";
@@ -340,6 +342,7 @@ class XUIEngine {
   XUIResource xuiFile;
   var mapInfo = HashMap<String, SlotInfo>();
   var docInfo = HashMap<String, DocInfo>();
+  var dataBindingInfo = XUIParseJSDataBinding();
 
   String lastDeleteXid;
 
@@ -427,7 +430,7 @@ class XUIEngine {
     await root.processPhase2(this, htmlRoot, null);
     // print("------------------- $xid --------------------");
 
-    return Future.sync(() => htmlRoot.processPhase3(writer));
+    return Future.sync(() => htmlRoot.processPhase3(this, writer));
   }
 }
 

@@ -53,6 +53,8 @@ html::-webkit-scrollbar {
     height: calc(100vh - 64px - 32px);
     width: 100%;
 }
+
+/***************************************************************/
 pre, code {
     font-family: monospace, monospace;
 }
@@ -71,6 +73,11 @@ pre > code {
     color: black !important;
     white-space: unset !important;
     font-weight: unset !important;
+}
+
+/*************************************************************/
+.xui-div-design {
+    overflow-y: scroll; height: calc(100% - 38px);
 }
 
 .xui-btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
@@ -106,6 +113,23 @@ pre > code {
 {
     font-size: 1rem;
 }
+
+.xui-list-class .v-list-item--dense { 
+    height: 25px;
+    min-height: 25px; 
+}
+
+.xui-list-class .v-list-group__header { 
+    height: 25px;
+    min-height: 25px; 
+    background: #f9f9f9;
+    border: 1px solid #e8e8e8;
+}
+
+.xui-list-class .v-list-item__icon { 
+    margin: 0px 6px 0px -10px !important;
+}
+
 /******************************************************************************/
 .xui-textarea-editor {
     overflow: hidden;

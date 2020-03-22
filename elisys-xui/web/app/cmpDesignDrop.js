@@ -60,13 +60,16 @@ window.addEventListener('message',function(e) {
     }
 });
 
-$xui.updateDirectPropInnerText = (value, variable, xid) => {
+$xui.updateDirectPropInnerText = (event, variable, xid, selectAll) => {
+    if (selectAll)
+        setTimeout( () => {document.execCommand('selectAll',false,null); } , 300);
+
     var message = {
         action:"updateDirectProp", 
         xid: xid, 
         xid_slot: xid, 
         variable: variable,
-        value : value.target.innerText	
+        value : event.target.innerText
     };
     window.parent.postMessage(message, "*");
 }

@@ -62,7 +62,9 @@
                                           <v-icon>mdi-palette-swatch</v-icon>
                                        </v-tab>
                                        <v-tab-item eager>
-                                          <div>Style/class coming soon...</div>
+                                          <div class="xui-div-design">
+                                             <cmp-list-class></cmp-list-class>
+                                          </div>
                                        </v-tab-item>
                                        <v-tab>
                                           <v-icon>mdi-database-import</v-icon>
@@ -209,7 +211,12 @@
             contentEditor: ''
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
-
+    
+        var json = {
+            listCatClass: [],
+            selectedClass: []
+        };
+        $xui.rootdata= { ...$xui.rootdata, ...json};
     </script>
    <script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>

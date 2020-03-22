@@ -235,6 +235,10 @@ class XUIModel implements Comparable<XUIModel> {
       elemXUI.propertiesXUI.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
 
+        if (prop.key.toLowerCase() == cst.ATTR_NO_DOM) {
+            elemHtml.tag=TAG_NO_DOM;   // si xui-no-dom alors retire la tag
+        }
+
         if (prop.key.toLowerCase() != cst.ATTR_XID) {
           // n'affecte pas le XID car gerer par attribut xid
           elemHtml.propertiesXUI[prop.key] = prop.value;
@@ -298,6 +302,10 @@ class XUIModel implements Comparable<XUIModel> {
   }
 
   String getDocumentationID(XUIElementHTML elemHtml) {
+    if (elemHtml.implementBy==null) {
+      return null;   // cas des xui-no-dom
+    }    
+
     var docId = elemHtml.implementBy.first.elemXUI.xid;
 
     for (XUIComponent comp in elemHtml.implementBy) {

@@ -92,6 +92,7 @@ pre > code {
     height: 24px;
     color: #696969 !important;
     padding: 0px 5px;
+    cursor : pointer;
 }
 
 .xui-frame-full-screen {
@@ -101,6 +102,10 @@ pre > code {
     z-index: 1000;
 }
 
+.xui-path-component
+{
+    font-size: 1rem;
+}
 /******************************************************************************/
 .xui-textarea-editor {
     overflow: hidden;

@@ -3,7 +3,7 @@
 if (typeof window.$xui === 'undefined')
     window.$xui = {};
 
-$xui.isModePreview = false; 
+$xui.isModePreview = false;
 $xui.modeDisplaySelection = false;
 
 var workerEnable = false;
@@ -17,52 +17,59 @@ if (workerEnable) {
     }
 }
 
-document.addEventListener("keydown", function (event) {
+class EventManager {
 
-    if (event.ctrlKey && event.keyCode == 81) {
-        event.stopPropagation();
-        event.preventDefault();
-        $xui.modePreview();
-    }
+    init() {
 
-});
+        document.addEventListener("keydown", function (event) {
 
-
-window.addEventListener('message', function (e) {
-    var data = e.data;
-    if (data.action == "select") {
-        $xui.displaySelector(data.position);
-        $xui.modeDisplaySelection = true;
-        setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, 100);
-    }
-    if (data.action == "drop") {
-        if ($xui.dragItem != null) {
-            // gestion drag de nouveau component
-            $xui.displayPropertiesJS(data.xid, data.xid_slot);
-            $xui.displayComponents(data.xid, data.xid_slot);
-            $xui.addCmp($xui.dragItem);
-        }
-        if ($xui.dragMoveItem != null) {
-            // gestion de drag entre slot
-            if ($xui.deleteCmp()) {
-                $xui.displayPropertiesJS(data.xid, data.xid_slot);
-
-                setTimeout(() => {   // todo gestion par promise
-                    $xui.moveTo();
-                }, 100);
+            if (event.ctrlKey && event.keyCode == 80) {    // ctrl + p
+                // mode preview
+                event.stopPropagation();
+                event.preventDefault();
+                $xui.modePreview();
             }
-        }
-    }
-    if (data.action == "ctrlQ") {
-        $xui.modePreview();
-    }
 
-    if (data.action == "updateDirectProp")
-    {
-        $xui.unDisplaySelector();
-        $xui.updateDirectProperty(data.value, data.variable, data.xid);
+        });
+
+        window.addEventListener('message', function (e) {
+            var data = e.data;
+            if (data.action == "select") {
+                $xui.displaySelector(data.position);
+                $xui.modeDisplaySelection = true;
+                setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, 100);
+            }
+            if (data.action == "drop") {
+                if ($xui.dragItem != null) {
+                    // gestion drag de nouveau component
+                    $xui.displayPropertiesJS(data.xid, data.xid_slot);
+                    $xui.displayComponents(data.xid, data.xid_slot);
+                    $xui.addCmp($xui.dragItem);
+                }
+                if ($xui.dragMoveItem != null) {
+                    // gestion de drag entre slot
+                    if ($xui.deleteCmp()) {
+                        $xui.displayPropertiesJS(data.xid, data.xid_slot);
+
+                        setTimeout(() => {   // todo gestion par promise
+                            $xui.moveTo();
+                        }, 100);
+                    }
+                }
+            }
+            if (data.action == "ctrlQ") {
+                $xui.modePreview();
+            }
+
+            if (data.action == "updateDirectProp") {
+                $xui.unDisplaySelector();
+                $xui.updateDirectProperty(data.value, data.variable, data.xid);
+            }
+        });
     }
-});
+}
+
+new EventManager().init();
 
 /******************************************************************************** */
 
@@ -135,6 +142,8 @@ $xui.addCmp = (cmp) => {
     console.debug("addCmp", cmp, $xui.propertiesComponent);
     var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
     $xui.addDesign(infoFile, $xui.propertiesComponent.xid, "<xui-design xid=" + $xui.propertiesComponent.xid + "><" + cmp.xid + " xid=\"" + $xui.getNewXid($xui.propertiesComponent, cmp) + "\"></" + cmp.xid + "></xui-design>");
+    // todo 
+      // gerer .then($xui.changePage())
 }
 
 $xui.getNewXid = (parent, cmp) => {
@@ -212,8 +221,7 @@ $xui.displaySelectorByXid = (xid, xid_slot, noSelect) => {
         }
     }
 
-    if (!noSelect)
-    {
+    if (!noSelect) {
         $xui.modeDisplaySelection = true;
         setTimeout(() => { $xui.displayPropertiesJS(xid, xid_slot); }, 100);
     }
@@ -244,17 +252,16 @@ $xui.unDisplaySelector = () => {
 $xui.displaySelector = (position) => {
 
     if ($xui.hasPropertiesChanged) {
-        $xui.saveProperties().then( () =>
-            {
-                console.debug("auto save ok");
-                if ($xui.modeDisplaySelection)
-                {
-                    console.debug("reselect ", $xui.propertiesDesign);
-                    setTimeout( () => {   // attente prise en compte par l'iFrame
-                        $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, true);
-                    }, 500);
-                }
+        // sauvegarde automatique
+        $xui.saveProperties().then(() => {
+            console.debug("auto save ok");
+            if ($xui.modeDisplaySelection) {
+                console.debug("reselect ", $xui.propertiesDesign);
+                setTimeout(() => {   // attente prise en compte par l'iFrame
+                    $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, true);
+                }, 500);
             }
+        }
         )
     }
 
@@ -305,7 +312,7 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
 
     $xui.getDesignProperties(infoFile, xid, xid_slot);
     // todo 
-            //gerer .then($xui.loadPropertiesJS())
+    //gerer .then($xui.loadPropertiesJS())
 
 }
 
@@ -315,13 +322,23 @@ $xui.loadPropertiesJS = (prop) => {
     console.debug("loadPropertiesJS", $xui.propertiesDesign);
     $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
     $xui.propertiesDesign.json = $xui.parseJson($xui.propertiesDesign.data);
+
+    console.debug("loadPropertiesJSon", $xui.propertiesDesign.json);
+
+    for (const aProperty of $xui.propertiesDesign.json) {
+        if (aProperty.cat=="class" && ( aProperty.xid==$xui.propertiesDesign.xid ||  aProperty.xid==$xui.propertiesDesign.xidSlot))
+        {
+            console.debug("load class", aProperty);
+        }
+    }
+
     $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
 
     if ($xui.vuejsDesign != null) {
         $xui.vuejsAppPropertiesSetting.$destroy();
     }
     $xui.vuejsAppPropertiesSetting = new Vue({
-        template: "<div class='barcustom' id='AppPropertiesSetting' style='overflow-y: scroll; height: calc(100% - 38px);'>" + $xui.propertiesDesign.template + "</div>",
+        template: "<div class='barcustom' id='AppPropertiesSetting' class='xui-div-design'>" + $xui.propertiesDesign.template + "</div>",
         el: '#AppPropertiesSetting',
         vuetify: new Vuetify(),
         data: $xui.rootDataProperties,
@@ -341,14 +358,15 @@ $xui.loadPropertiesJS = (prop) => {
         },
         mounted: function () {
             this.$nextTick(function () {
+                // gestion de la selection sur le mouseover
                 var listOver = document.querySelectorAll(".xui-over-prop-xid");
-                $xui.last=null;
+                $xui.last = null;
                 listOver.forEach((aDivOver) => {
                     aDivOver.style.border = "1px solid #bdbdbd";
                     aDivOver.addEventListener('mouseover', () => {
                         aDivOver.style.border = "1px solid #202020";
-                        if ($xui.last!=aDivOver.id)  {
-                            $xui.last=aDivOver.id;
+                        if ($xui.last != aDivOver.id) {
+                            $xui.last = aDivOver.id;
                             //console.debug("sel over", aDivOver.id);
                             $xui.displaySelectorByXid(aDivOver.id, aDivOver.id, true);
                         }
@@ -359,54 +377,31 @@ $xui.loadPropertiesJS = (prop) => {
                         if (!$xui.modeDisplaySelection)
                             $xui.unDisplaySelector();
                     });
-                  });
+                });
             })
-          }
+        }
     });
-}
-
-var dicoPromise = {};
-function getPromise(id) {
-
-    var _resolve, _reject;
-
-    var promise = new Promise((resolve, reject) => {
-        _reject = reject;
-        _resolve = resolve;
-    });
-
-    promise.resolve_ex = (value) => {
-       _resolve(value);
-    };
-
-    promise.reject_ex = (value) => {
-       _reject(value);
-    };
-
-    if (id!=null)
-        dicoPromise[id]=promise;
-    return promise;
 }
 
 $xui.saveProperties = () => {
     console.debug("saveProperties", $xui.propertiesDesign.json);
+
+    for (const aProperty of $xui.propertiesDesign.json) {
+        if (aProperty.cat=="class")
+        {
+            console.debug("save class", aProperty);
+        }
+    }
+
     $xui.hasPropertiesChanged = false;
     var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
     var prom = getPromise("designPromise");
     $xui.setDesignProperties(infoFile, "save", $xui.propertiesDesign.json, "designPromise");
-    prom.then(xidProp => { 
-        console.debug("saveProperties ok",  xidProp);
+    prom.then(xidProp => {
+        console.debug("saveProperties ok", xidProp);
         $xui.displayPropertiesJS(xidProp, xidProp);   // reaffecte le nouveau mapping
-     });
+    });
     return prom;
-}
-
-$xui.parseJson = (str) => {
-    try {
-        return JSON.parse(str);
-    } catch (error) {
-        console.debug("pb parse json", error, str);
-    }
 }
 
 $xui.displayComponents = (xid, xid_slot) => {
@@ -421,7 +416,7 @@ $xui.displayComponents = (xid, xid_slot) => {
         $xui.vuejsAppCmpSetting.$destroy();
     }
     $xui.vuejsAppCmpSetting = new Vue({
-        template: "<div class='barcustom' id='AppComponents' style='overflow-y: scroll; height: calc(100% - 38px);'>" + $xui.propertiesComponent.template + "</div>",
+        template: "<div class='barcustom' id='AppComponents' class='xui-div-design'>" + $xui.propertiesComponent.template + "</div>",
         el: '#AppComponents',
         vuetify: new Vuetify(),
         data: $xui.rootDataComponents,
@@ -431,13 +426,27 @@ $xui.displayComponents = (xid, xid_slot) => {
             }
         }
     });
+
+    // var infoFileCmp = { file: 'app/cmp2Vue.html', xid: "xui-cmp-vuejs2", mode: 'design' };
+    // $xui.getHtmlFrom(infoFileCmp, "getVueCmp");   // precharge
+    // $xui.addDesign(infoFileCmp, "xui-cmp-code", "<xui-design xid='xui-cmp-code' xui-id-cmp='ok'></xui-design>");
+    // var prom = getPromise("getVueCmp")
+    // $xui.getHtmlFrom(infoFileCmp, "getVueCmp");
+    // prom.then(html => {
+    //     console.debug("idCmp2Vue", html);
+    //     var infoFileCmp = { file: 'app/cmp2Vue.html', xid: "xui-cmp-vuejs2", mode: 'design' };
+    //     $xui.deleteDesign(infoFileCmp, "xui-cmp-code");
+    //     //$xui.getHtmlFrom(infoFileCmp, "getVueCmp");
+    // });
+
 }
+
 
 $xui.displayAction = (xid, xid_slot) => {
     var infoFile = { file: 'app/cmpDesignEditor.html', xid: 'bottom-editor', mode: 'final' };
     var prom = getPromise("displayActionPromise");
     $xui.getHtmlFrom(infoFile, "displayActionPromise");
-    prom.then(html => { 
+    prom.then(html => {
         $xui.rootDataAction = {};
         if ($xui.vuejsAppCmpAction != null) {
             $xui.vuejsAppCmpAction.$destroy();
@@ -453,7 +462,7 @@ $xui.displayAction = (xid, xid_slot) => {
                 }
             }
         });
-     });
+    });
 
 }
 
@@ -470,13 +479,45 @@ $xui.modePhone = () => {
 $xui.updateDirectProperty = (value, variable, xid) => {
     console.debug("updateDirectProperty", value, variable, xid, $xui.rootDataProperties);
     for (const aProp of $xui.rootDataProperties.data) {
-        if (aProp.xid==xid && aProp.variable==variable)
-        {
-            aProp.value=value;
+        if (aProp.xid == xid && aProp.variable == variable) {
+            aProp.value = value;
         }
     }
 }
 
-$xui.doPromise = (idPromise, ret) => {
+/********************************************************************************** */
+var dicoPromise = {};
+function getPromise(id) {
+
+    var _resolve, _reject;
+
+    var promise = new Promise((resolve, reject) => {
+        _reject = reject;
+        _resolve = resolve;
+    });
+
+    promise.resolve_ex = (value) => {
+        _resolve(value);
+    };
+
+    promise.reject_ex = (value) => {
+        _reject(value);
+    };
+
+    if (id != null)
+        dicoPromise[id] = promise;
+    return promise;
+}
+
+$xui.doPromiseJS = (idPromise, ret) => {
     dicoPromise[idPromise].resolve_ex(ret);
+}
+
+
+$xui.parseJson = (str) => {
+    try {
+        return JSON.parse(str);
+    } catch (error) {
+        console.debug("pb parse json", error, str);
+    }
 }

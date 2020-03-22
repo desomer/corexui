@@ -3,7 +3,8 @@
 if (typeof window.$xui === 'undefined')
     window.$xui = {};
 
-window.$xui.isModePreview = false;
+$xui.isModePreview = false; 
+$xui.modeDisplaySelection = false;
 
 var workerEnable = false;
 var monWorker = null;
@@ -94,7 +95,8 @@ $xui.changePageJS = (param) => {
 
     $xui.codeHtml = param.html;
     if ($xui.rootdata.activeTab == 1)
-        $xui.loadCode(param.html);
+        $xui.loadCode(param.html);   // affiche le code du mode (template, preview, final )
+
 };
 
 $xui.refreshAction = (mode) => {
@@ -209,7 +211,7 @@ $xui.displaySelectorByXid = (xid, xid_slot, noSelect) => {
             $xui.displaySelector(myRegion.getBounds());
         }
     }
-    
+
     if (!noSelect)
     {
         $xui.modeDisplaySelection = true;
@@ -242,7 +244,18 @@ $xui.unDisplaySelector = () => {
 $xui.displaySelector = (position) => {
 
     if ($xui.hasPropertiesChanged) {
-        $xui.saveProperties();
+        $xui.saveProperties().then( () =>
+            {
+                console.debug("auto save ok");
+                if ($xui.modeDisplaySelection)
+                {
+                    console.debug("reselect ", $xui.propertiesDesign);
+                    setTimeout( () => {   // attente prise en compte par l'iFrame
+                        $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, true);
+                    }, 500);
+                }
+            }
+        )
     }
 
     var node = document.getElementById("xui-display-selector");
@@ -261,8 +274,6 @@ $xui.displaySelector = (position) => {
         node.setAttribute("draggable", true);
 
         node.addEventListener("dragstart", function (event) { $xui.dragMoveStart(event); }, false);
-
-        // draggable=true dragstart="\$xui.dragStart(item, \$event)"
 
         document.body.appendChild(node);
     }
@@ -292,13 +303,16 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
     var info = $xui.getInfo(infoFile, xid, xid_slot);
     this.console.debug("select displayPropertiesJS ", info);
 
-    $xui.propertiesDesign = $xui.getDesignProperties(infoFile, xid, xid_slot);
+    $xui.getDesignProperties(infoFile, xid, xid_slot);
+    // todo 
+            //gerer .then($xui.loadPropertiesJS())
+
 }
 
 $xui.loadPropertiesJS = (prop) => {
     $xui.hasPropertiesChanged = false;
     $xui.propertiesDesign = prop;
-    //console.debug("displayProperties", $xui.propertiesDesign);
+    console.debug("loadPropertiesJS", $xui.propertiesDesign);
     $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
     $xui.propertiesDesign.json = $xui.parseJson($xui.propertiesDesign.data);
     $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
@@ -314,7 +328,7 @@ $xui.loadPropertiesJS = (prop) => {
         watch: {
             $data: {
                 handler: function (val, oldVal) {
-                    console.log("watch properties", val, this.$data)
+                    //console.log("watch properties", val, this.$data)
                     $xui.hasPropertiesChanged = true;
                 },
                 deep: true
@@ -381,9 +395,10 @@ $xui.saveProperties = () => {
     var prom = getPromise("designPromise");
     $xui.setDesignProperties(infoFile, "save", $xui.propertiesDesign.json, "designPromise");
     prom.then(xidProp => { 
-        console.debug("save ok",  xidProp);
-        $xui.displayPropertiesJS(xidProp, xidProp);
+        console.debug("saveProperties ok",  xidProp);
+        $xui.displayPropertiesJS(xidProp, xidProp);   // reaffecte le nouveau mapping
      });
+    return prom;
 }
 
 $xui.parseJson = (str) => {
@@ -452,10 +467,6 @@ $xui.modePhone = () => {
     document.querySelector("#rootFrame").classList.toggle("iframe-phone");
 }
 
-$xui.doPromise = (idPromise, ret) => {
-    dicoPromise[idPromise].resolve_ex(ret);
-}
-
 $xui.updateDirectProperty = (value, variable, xid) => {
     console.debug("updateDirectProperty", value, variable, xid, $xui.rootDataProperties);
     for (const aProp of $xui.rootDataProperties.data) {
@@ -464,4 +475,8 @@ $xui.updateDirectProperty = (value, variable, xid) => {
             aProp.value=value;
         }
     }
+}
+
+$xui.doPromise = (idPromise, ret) => {
+    dicoPromise[idPromise].resolve_ex(ret);
 }
