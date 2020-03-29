@@ -9,7 +9,7 @@ Vue.config.productionTip = false;
 /*********************************************************************************/
 $xui.createComponent = (idTemplate, dataBinding) => {
 	return {
-		template: document.querySelector("#"+idTemplate).innerHTML,
+		template: document.querySelector("#" + idTemplate).innerHTML,
 		data: () => { return $xui.rootdata; },
 		computed: {
 			$xui: () => $xui,  // pour les @click="$xui.doXXX()"
@@ -39,15 +39,52 @@ $xui.loadApplicationJS = () => {
 
 	/******************************************/
 
-    var dataBinding = Vuex.mapState( { titre: 'count'});
+	Vue.component("v-xui-reloader",
+		{
+			template: '<component v-bind:is="componentToReload"></component>',       // '<template>loading...</template>',
+			props: ['partid'],
+			data: () => { return { componentToReload: "", id: 1 }; },
+			methods: {
+				rload : function (e) {
+
+					var oldId = this.partid+"-"+this.id;
+					console.debug("reload "+oldId+" reponse **************", e);
+					delete Vue.options.components[oldId];
+
+					this.id++; //passe en composant suivant
+					var newId = this.partid+"-"+this.id;
+					Vue.component(newId, { template: '<template>'+ e.template+'</template>' });
+					this.componentToReload=newId;
+				},
+				reload: function () {
+					console.debug("reload **************", this.partid);
+
+					var message = {
+						action:"load reloader", 
+						xid: this.partid, 
+					};
+					window.parent.postMessage(message, "*");
+				}
+			},
+			mounted: function () {
+				this.reload();
+				$xui.listReloader[this.partid]=this;
+			},
+			computed: {
+				$xui: () => $xui
+			}
+		});
+
+	var dataBinding = Vuex.mapState({ titre: 'count' });
 	const RootComponent = $xui.createComponent("xui-rootTemplate", dataBinding);
 
+	$xui.listReloader={};
 	$xui.vuejs = new Vue({
 		el: '#app',
-		store : $xui.store,
-		data : $xui.rootdata,
+		store: $xui.store,
+		data: $xui.rootdata,
 		components: { RootComponent },
-		template: "<RootComponent></RootComponent>",
+		template: "<RootComponent ref='root'></RootComponent>",
 		vuetify: new Vuetify()
 	});
 }

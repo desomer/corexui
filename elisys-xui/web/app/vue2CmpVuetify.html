@@ -138,7 +138,7 @@
         <xui-prop id="name">Row</xui-prop>
         <xui-prop id="desc">Une ligne</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-        <xui-prop var="style" cat="style" editor="text">style</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
         <xui-prop var="nb" editor="int">nb col dans la ligne</xui-prop>
     </xui-doc>
 
@@ -151,13 +151,13 @@
     </xui-doc>
 
     <v-container class="xui-grid" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
-        <v-row no-gutters -style="[[style@-1]]">
+        <v-row class="[[class@-1]]" no-gutters -style="[[style@-1]]">
             <xui-row xid="[[parent-xid]]-row-[[idxr]]" xui-nb="2" xui-slot-name="row [[idxr]]"></xui-row>
         </v-row>
     </v-container>
 
     <xui-slot xid="xui-row" xui-for="idxc">
-        <v-col cols="[[cols@-1]]" -style="[[style@-1]]">
+        <v-col class="[[class@-1]]" cols="[[cols@-1]]" -style="[[style@-1]]">
             <xui-slot xid="[[parent-xid]]-col-[[idxc]]" xui-slot-name="row [[idxr]] col [[idxc]]"></xui-slot>
         </v-col>
     </xui-slot>
@@ -245,10 +245,10 @@
 
     <v-tabs xid="xui-tabs" vertical=[[vertical@0]] dark="[[dark@0]]" light="[[light@0]]" xui-for="idx" xui-slot-name="tab">
         <v-tab>
-            <xui-slot xid="[[parent-xid]]-tab-[[idx]]" xui-slot-name="tab [[idx]]"></xui-slot>
+            <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-[[idx]]" xui-slot-name="tab [[idx]]"></xui-slot>
         </v-tab>
-        <v-tab-item eager>    <!-- eager  desactive le lazyloading -->
-            <xui-slot xid="[[parent-xid]]-tab-item-[[idx]]" xui-slot-name="tab content [[idx]]"></xui-slot>
+        <v-tab-item :transition="false" :reverse-transition="false" eager>    <!-- eager  desactive le lazyloading -->
+            <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-item-[[idx]]" xui-slot-name="tab content [[idx]]"></xui-slot>
         </v-tab-item>
     </v-tabs>    
 
@@ -281,10 +281,15 @@
     <!--------------------------  XUI-SLOT   ----------------------------->
     <div xid="xui-div-slot" class="xui-class-slot" ></div>
 
+    <xui-design xid="inject-other-header" xui-mode="final;preview">
+        <style>
+            .xui-class-slot-full { height:100%; width:100%;}
+        </style>
+    </xui-design>
     <xui-design xid="inject-other-header" xui-mode="design;template">
         <style>
-            .xui-class-slot { border : 1px dashed lightgray; box-sizing: border-box; min-height: 20px; min-width: 20px; text-decoration: underline dotted;font-style: italic; user-select:none; }
             .xui-class-slot-full { height:100%; width:100%;}
+            .xui-class-slot { border : 1px dashed lightgray; box-sizing: border-box; min-height: 20px; min-width: 20px; text-decoration: underline dotted;font-style: italic; user-select:none; }
             .xui-class-slot:hover { border : 1px dashed blue; }
             .xui-class-dragover { border : 1px dashed blue !important;}
         </style>

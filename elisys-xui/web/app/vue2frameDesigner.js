@@ -35,52 +35,61 @@ document.addEventListener('dragend', function () {
 
 /***********************************************************************************/
 
-document.addEventListener('click', function(e) {    //dblclick
-    let targetAction=e.target.closest("[data-xid]");
+document.addEventListener('click', function (e) {    //dblclick
+    let targetAction = e.target.closest("[data-xid]");
 
     let elemRect = targetAction.getBoundingClientRect();
 
     var message = {
-        action:"select", 
-        xid: targetAction.dataset.xid, 
-        xid_slot: targetAction.dataset.xidSlot, 
-        position: elemRect	
+        action: "select",
+        xid: targetAction.dataset.xid,
+        xid_slot: targetAction.dataset.xidSlot,
+        position: elemRect
     };
     //console.debug("message", message);
     window.parent.postMessage(message, "*");
 });
 
-window.addEventListener('message',function(e) {
+window.addEventListener('message', function (e) {
     var data = e.data;
-    if (data.action=="changeTemplate")
-    {
-        var template = data.template;
-        this.document.body.innerHTML=template;
-        $xui.loadApplicationJS();
+    if (data.action == "changeTemplate") {
+        this.console.debug(data);
+        if (data.param.listReloader!=null) {
+            this.console.debug($xui.listReloader);
+            $xui.listReloader[data.param.listReloader[0]].reload();
+        }
+        else {
+            this.document.body.innerHTML = data.param.html;
+            $xui.loadApplicationJS();
+        }
+    }
+    if (data.action == "changeReloader") {
+        //console.debug("changeReloader", data, $xui);
+        $xui.listReloader[data.xid].rload(data);
     }
 });
 
 $xui.updateDirectPropInnerText = (event, variable, xid, selectAll) => {
     if (selectAll)
-        setTimeout( () => {document.execCommand('selectAll',false,null); } , 300);
+        setTimeout(() => { document.execCommand('selectAll', false, null); }, 300);
 
     var message = {
-        action:"updateDirectProp", 
-        xid: xid, 
-        xid_slot: xid, 
+        action: "updateDirectProp",
+        xid: xid,
+        xid_slot: xid,
         variable: variable,
-        value : event.target.innerText
+        value: event.target.innerText
     };
     window.parent.postMessage(message, "*");
 }
 
 $xui.updateDirectPropValue = (value, variable, xid) => {
     var message = {
-        action:"updateDirectProp", 
-        xid: xid, 
-        xid_slot: xid, 
+        action: "updateDirectProp",
+        xid: xid,
+        xid_slot: xid,
         variable: variable,
-        value : value.target.value	
+        value: value.target.value
     };
     window.parent.postMessage(message, "*");
 }

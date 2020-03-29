@@ -16,6 +16,7 @@ const ATTR_SLOT_FULL = "slot-full";
 const ATTR_XID_SLOT = "xid-slot";
 const ATTR_MODE = "mode";
 const ATTR_NO_DOM = "no-dom";
+const ATTR_RELOADER = "reloader";
 
 const TAG_ESCAPE = "xui-escape-";
 const TAG_NO_DOM = "xui-no-dom";
@@ -367,6 +368,27 @@ class XUIEngine {
     return info;
   }
 
+  getReloaderID(f) {
+    SlotInfo info = getSlotInfo(f, f);
+    if (info==null)
+    {
+      return null;
+    }
+    var html = info.elementHTML;
+    var reloaderId;
+    while (html != null) {
+      if (html.origin != null &&
+          html.origin.propertiesXUI != null &&
+          html.origin.propertiesXUI.containsKey(ATTR_RELOADER)) {
+        reloaderId = html.calculateProp(html.origin.xid);
+        html = null;
+      } else {
+        html = html.parent;
+      }
+    }
+    return reloaderId;
+  }
+
   List<DocInfo> getComponentsFor(String id, String idslot) {
     List<DocInfo> listDoc = [];
     docInfo.forEach((k, doc) {
@@ -430,7 +452,9 @@ class XUIEngine {
     await root.processPhase2(this, htmlRoot, null);
     // print("------------------- $xid --------------------");
 
-    return Future.sync(() => htmlRoot.processPhase3(this, writer));
+    if (writer != null) {
+      return Future.sync(() => htmlRoot.processPhase3(this, writer));
+    }
   }
 }
 

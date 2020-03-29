@@ -1,6 +1,6 @@
 <xui-factory version="1.0">
     <xui-import xui-path="app/vue2frame.html"></xui-import>
-    <xui-import xui-path="app/cmp2vuetify.html"></xui-import>
+    <xui-import xui-path="app/vue2CmpVuetify.html"></xui-import>
     <xui-import xui-path="app/cmpDesignClassChooser.html"></xui-import>
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
@@ -20,6 +20,13 @@
 
     <xui-design xid="main">
         <xui-tabs xid="main-tab" xui-nb="7" xui-vertical=true xui-dark=true v-model="activeTab" class="main-tab"></xui-tabs>
+        <v-dialog v-model="dialogClass"
+            v-on:click:outside="$xui.closeClassEditor()"
+            max-width="290">
+            <v-card>
+                <cmp-list-class></cmp-list-class>
+            </v-card>
+        </v-dialog>
     </xui-design>
 
     <xui-design xid="main-tab-tab-0"><v-icon>mdi-square-edit-outline</v-icon></xui-design>
@@ -95,8 +102,8 @@
 
     <xui-design xid="action-tab-tab-item-0"><div id="AppPropertiesSetting"></div></xui-design>
     <xui-design xid="action-tab-tab-item-1">
-        <div class='xui-div-design'>
-            <cmp-list-class></cmp-list-class>   
+        <div class='xui-div-design'>   
+            <component v-bind:is="componentTab"></component>
         </div>
     </xui-design>
     <xui-design xid="action-tab-tab-item-2"><div>Data binding coming soon...</div></xui-design>
@@ -142,7 +149,9 @@
 
     <xui-design xid="xui-script-data">
         var json = {
-            listCatClass: []
+            dialogClass:false,
+            listCatClass: [],
+            componentTab : ''
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
     </xui-design>

@@ -13,6 +13,7 @@ import './XUIJSInterface.dart';
 
 class XUIDesignManager {
   XUIEngine xuiEngine;
+  var listXidChanged = [];
   static final lock = Lock(); // gestion du lock car multiple iFrame
 
   static final _designManager = HashMap<String, XUIDesignManager>();
@@ -28,7 +29,16 @@ class XUIDesignManager {
   ///------------------------------------------------------------------------------------------
   Future<String> getHtml(XUIContext ctx, String uri, String xid) async {
     var bufferHtml = XUIHtmlBuffer();
+    await initEngine(uri, ctx);
 
+    if (xid == null) {
+      return null;
+    }
+    await xuiEngine.toHTMLString(bufferHtml, xid, ctx);
+    return Future.value(bufferHtml.html.toString());
+  }
+
+  Future initEngine(String uri, XUIContext ctx) async {
     await lock.synchronized(() async {
       if (xuiEngine == null) {
         xuiEngine = XUIEngine();
@@ -37,15 +47,17 @@ class XUIDesignManager {
         var reader = HTMLReader(uri, provider);
         await xuiEngine.initialize(reader, ctx);
       }
-
-      if (xid == null) {
-        return null;
-      }
-
-      await xuiEngine.toHTMLString(bufferHtml, xid, ctx);
     });
+  }
 
-    return Future.value(bufferHtml.html.toString());
+  void initHtml(XUIContext ctx, String uri, String xid) async {
+    await initEngine(uri, ctx);
+
+    if (xid == null) {
+      return;
+    }
+
+    await xuiEngine.toHTMLString(null, xid, ctx);
   }
 
   ///------------------------------------------------------------------------------------------
@@ -101,14 +113,13 @@ class XUIDesignManager {
                 "var ${aVariable.id} def ${aVariable.def} editor ${aVariable.editor} ");
 
             // affecte les valeur par defaut
-            if (aVariable.editor == "bool" && aVariable.def==null) {
-                if ( value == false && xuiDesign.elemXUI.propertiesXUI!=null)
-                {
-                    // vide la valeur 
-                    print("vide la variable bool");
-                    xuiDesign.elemXUI.propertiesXUI.remove(variable);
-                    return Future.value();
-                }
+            if (aVariable.editor == "bool" && aVariable.def == null) {
+              if (value == false && xuiDesign.elemXUI.propertiesXUI != null) {
+                // vide la valeur
+                print("vide la variable bool");
+                xuiDesign.elemXUI.propertiesXUI.remove(variable);
+                return Future.value();
+              }
             }
 
             // creer la propriete vide
@@ -130,7 +141,7 @@ class XUIDesignManager {
   JSDesignInfo getJSComponentInfo(String id, String idslot) {
     String cmp = """<v-list-item v-for="(item, i) in data" :key="i" >
         <v-list-item-icon draggable=true  @dragstart="\$xui.dragStart(item, \$event)">
-          <v-icon v-text="item.icon"></v-icon>
+          <v-icon dense v-text="item.icon"></v-icon>
         </v-list-item-icon>
         <v-list-item-content draggable=true @dragstart="\$xui.dragStart(item, \$event)">
           <v-list-item-title v-text="item.name"></v-list-item-title>
@@ -139,7 +150,7 @@ class XUIDesignManager {
 
     var ret = JSDesignInfo();
     ret.bufTemplate.write(
-        "<v-list dense><v-list-item-group v-model='item' color='primary'>");
+        "<v-list dense class='xui-list-cmp'><v-list-item-group v-model='item' color='primary'>");
     ret.bufTemplate.write(cmp);
     ret.bufTemplate.write("</v-list-item-group></v-list>");
 
@@ -181,7 +192,8 @@ class XUIDesignManager {
           "\$xui.displaySelectorByXid('${design.slotInfo.xid}', '${design.slotInfo.xid}')");
       cmp.addProperties("title", titleCmp);
       String header = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
-      ret.bufTemplate.write("<div class='xui-over-prop-xid' id='${design.slotInfo.xid}'>");
+      ret.bufTemplate
+          .write("<div class='xui-over-prop-xid' id='${design.slotInfo.xid}'>");
       ret.bufTemplate.write(header);
 
       for (DocVariables varCmp in design?.docInfo?.variables ?? const []) {
@@ -195,10 +207,14 @@ class XUIDesignManager {
           fi.xid = 'editor-int';
         } else if (varCmp.editor == "combo") {
           fi.xid = 'editor-combo';
+          // affecte les items a la combobox
           XUIComponent cmp =
               await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
           cmp.addProperties("items", "data[${istr}].items");
+
           extend = ", \"items\":" + varCmp.list;
+        } else if (varCmp.editor == "class") {
+          fi.xid = 'editor-class';
         } else {
           fi.xid = 'editor-text';
         }
@@ -207,6 +223,7 @@ class XUIDesignManager {
             await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
         cmp.addProperties("value", "data[${istr}].value");
         cmp.addProperties("label", "data[${istr}].label");
+        cmp.addProperties("id", design.slotInfo.xid);
         template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
 
         ret.bufTemplate.write(template);
@@ -218,7 +235,7 @@ class XUIDesignManager {
               (design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]?.content);
           if (valInCmp != null && varCmp.editor == "bool") {
             value = valInCmp;
-          } else if (valInCmp != null) value =  jsonEncode(valInCmp.toString());
+          } else if (valInCmp != null) value = jsonEncode(valInCmp.toString());
         }
 
         bool exist = value != null;
@@ -235,10 +252,10 @@ class XUIDesignManager {
             varCmp.id +
             "\",\"label\":\"" +
             varCmp.doc +
-             "\",\"cat\":\"" +
-             (varCmp.cat??"layout") +
-              "\",\"editor\":\"" +
-             varCmp.editor +
+            "\",\"cat\":\"" +
+            (varCmp.cat ?? "layout") +
+            "\",\"editor\":\"" +
+            varCmp.editor +
             "\", \"value\":" +
             value.toString() +
             ", \"value_orig\":" +
@@ -250,7 +267,7 @@ class XUIDesignManager {
         i++;
       }
 
-       ret.bufTemplate.write("</div>");
+      ret.bufTemplate.write("</div>");
     }
 
     designs.reversed.forEach((design) {

@@ -95,9 +95,9 @@ pre > code {
 }
 
 .xui-style-prop {    
-    background: #f9f9f9;
+    background: #565656;
     height: 24px;
-    color: #696969 !important;
+    color: white !important;
     padding: 0px 5px;
     cursor : pointer;
 }
@@ -112,6 +112,25 @@ pre > code {
 .xui-path-component
 {
     font-size: 1rem;
+}
+
+
+.xui-editor-action-btn
+{
+    min-width: 20px !important;
+    width: 20px;
+    margin: 7px 0px 0px 0px;
+}
+
+/******************************************************************************/
+.xui-list-cmp .v-list-item__icon {
+    height: 24px !important;
+    margin-top: 4px !important;
+    margin-bottom: 0px !important;
+}
+
+.xui-list-cmp .v-list-item {
+    min-height: 32px;
 }
 
 .xui-list-class .v-list-item--dense { 

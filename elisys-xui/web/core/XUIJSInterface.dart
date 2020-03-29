@@ -43,9 +43,13 @@ class VueParamJS {
 class Options {
   external String get mode;
   external String get html;
+  external String get yaml;
+  external List get listReloader;
   external set html(String html);
   external set mode(String mode);
-  external factory Options({String mode, dynamic html});
+  external set yaml(String yaml);
+  external set listReloader(List listReloader);
+  external factory Options({String mode, dynamic html, dynamic yaml});
 }
 
 @JS()
@@ -64,8 +68,10 @@ class FileDesignInfo {
   external String get file;
   external String get xid;
   external String get mode; 
+  external String get part;
 
   external set file(String file);
   external set xid(String xid);
   external set mode(String mode);
+  external set part(String part);
 }

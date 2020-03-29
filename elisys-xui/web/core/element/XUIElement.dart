@@ -112,6 +112,7 @@ class XUIElementHTML extends XUIElement {
 
   void processPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
     var oldBuf;
+
     if (this.propertiesXUI!=null && this.propertiesXUI.containsKey("convert-json"))
     {
       oldBuf = buffer;
@@ -120,7 +121,18 @@ class XUIElementHTML extends XUIElement {
 
     if (tag == cst.TAG_NO_DOM) {
       // cas des slot
-      toChildrenPhase3(engine, buffer);
+      bool isReloader = false;
+      bool isRoot = buffer.html.isEmpty;
+      if (!isRoot && engine.isModeDesign() && this.propertiesXUI!=null && this.propertiesXUI.containsKey(ATTR_RELOADER))
+      { 
+        isReloader=true;
+        var xid = processContent(engine, this.origin.xid, ParseInfoMode.ATTR);
+        buffer.html.write("<v-xui-reloader partid=\""+xid+"\"></v-xui-reloader>");
+      }
+
+      if (!isReloader) {
+        toChildrenPhase3(engine, buffer);
+      }
       return;
     }
 
@@ -129,7 +141,7 @@ class XUIElementHTML extends XUIElement {
 
     this.attributes?.entries?.forEach((f) {
       var c = f.value.content;
-      var keyAttr = processContent(engine, f.key, ParseInfoMode.KEY);
+      String keyAttr = processContent(engine, f.key, ParseInfoMode.KEY);
       var valProp = c;
       if (keyAttr != "" && c != null) {
         if (c is String) {
@@ -143,13 +155,14 @@ class XUIElementHTML extends XUIElement {
             }
           }
           if (mustAdd) {
-            if (valProp == "true" || valProp == "false") {
+            // cas du :value="false"
+            if ((valProp == "true" || valProp == "false") && !(keyAttr.startsWith(":")) ) {
               isBool = true;
             }
             buffer.html.write(" ");
             if (keyAttr.toString().startsWith("-")) {
               keyAttr = keyAttr.toString().substring(1);
-              // gestion des - devant des attr pour bypasser les correcteurs de syntaxe -style="[[xxx]]"  
+              // gestion des - devant des attr pour bypasser les correcteurs de syntaxe de vscode -style="[[xxx]]"  
             } 
 
             buffer.html.write(keyAttr);

@@ -8,6 +8,7 @@ import 'package:js/js.dart';
 
 import 'core/XUIDesignManager.dart';
 import 'core/XUIEngine.dart';
+import 'core/XUIFactory.dart';
 import 'core/XUIJSInterface.dart';
 
 import 'package:yamlicious/yamlicious.dart' show toYamlString;
@@ -15,23 +16,17 @@ import 'package:yamlicious/yamlicious.dart' show toYamlString;
 @JS()
 external void loadPageJS(obj);
 
-@JS()
-external void loadCodeYamlJS(obj);
+// @JS()
+// external void loadCodeYamlJS(obj);
 
 @JS()
 external void changePageJS(obj);
-
-@JS()
-external void displayPropertiesJS(xid, xid_slot);
-
-@JS()
-external void loadPropertiesJS(paramJS);
 
 @JS('refresh')
 external set _refresh(void Function(FileDesignInfo) f);
 
 @JS('addDesign')
-external set _addDesign(void Function(FileDesignInfo, String, String) f);
+external set _addDesign(void Function(FileDesignInfo, String, String, bool) f);
 
 @JS('getHtmlFrom')
 external set _getHtmlFrom(void Function(FileDesignInfo, String) f);
@@ -57,38 +52,44 @@ external set _getDesignProperties(
 
 @JS('setDesignProperties')
 external set _setDesignProperties(
-    dynamic Function(FileDesignInfo, String, dynamic, String) f);
+    dynamic Function(FileDesignInfo, String, dynamic) f);
 
 ///------------------------------------------------------------------
 
 void setDesignProperties(
-    FileDesignInfo fileInfo, String idAction, dynamic listDesg, String idPromise) async {
+    FileDesignInfo fileInfo, String idAction, dynamic listDesg) async {
+  XUIDesignManager designMgr = getDesignManager(fileInfo);
   List listDesign = listDesg;
+
   for (ObjectDesign item in listDesign) {
     if (item.value != item.value_orig) {
-      await getDesignManager(fileInfo)
-          .changeProperty(item.xid, item.variable, item.value);
+      designMgr.listXidChanged.add(item.xid);
+      await designMgr.changeProperty(item.xid, item.variable, item.value);
     }
   }
   fileInfo.mode = "template";
-  await refresh(fileInfo);
+
+  await _reload(fileInfo);
 
   var xidProp = (listDesign[0] as ObjectDesign).xid;
-  context["\$xui"].callMethod("doPromiseJS", [idPromise, xidProp]);
-
+  context["\$xui"].callMethod("doPromiseJS", ["setDesignProperties", xidProp]);
 }
 
 void getDesignProperties(
     FileDesignInfo fileInfo, String id, String idslot) async {
   var designInfo = await getDesignManager(fileInfo).getJSDesignInfo(id, idslot);
-  var vueParamJS = VueParamJS();
-  vueParamJS.xid = designInfo.xid;
-  vueParamJS.xidSlot = designInfo.xidSlot;
-  vueParamJS.isSlot = id.startsWith(SLOT_PREFIX);
-  vueParamJS.data = "[" + designInfo.bufData.toString() + "]";
-  vueParamJS.template = designInfo.bufTemplate.toString();
-  vueParamJS.path = designInfo.bufPath.toString();
-  loadPropertiesJS(vueParamJS);
+
+  var ret = {
+    "xid": designInfo.xid,
+    "xidSlot": designInfo.xidSlot,
+    "isSlot": id.startsWith(SLOT_PREFIX),
+    "data": "[" + designInfo.bufData.toString() + "]",
+    "template": designInfo.bufTemplate.toString(),
+    "path": designInfo.bufPath.toString()
+  };
+
+  context["\$xui"]
+      .callMethod("doPromiseJS", ["getDesignProperties", JsObject.jsify(ret)]);
 }
 
 dynamic getComponents(FileDesignInfo fileInfo, String id, String idslot) {
@@ -118,93 +119,119 @@ dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
   return InfoJS;
 }
 
-void addDesign(FileDesignInfo fileInfo, String id, String template) async {
-  await getDesignManager(fileInfo).addDesign(id, template);
-  var ctx = XUIContext(fileInfo.mode);
-  var str = await getDesignManager(fileInfo)
-      .getHtml(ctx, fileInfo.file, fileInfo.xid);
-  var ret = Options(mode: fileInfo.mode, html: str);
 
-  _reload(fileInfo, ret);
+void addDesign(
+    FileDesignInfo fileInfo, String id, String template, bool reload) async {
+  XUIDesignManager designMgr = getDesignManager(fileInfo);
+  await designMgr.addDesign(id, template);
+  designMgr.listXidChanged.add(id);
+
+  if (reload) {
+    // voir removeDesign  : evite de faire 2 reload
+    await _reload(fileInfo);
+  }
 }
-
 
 void deleteDesign(FileDesignInfo fileInfo, String id) async {
-    XUIDesignManager designMgr = getDesignManager(fileInfo);
-    await designMgr.removeDesign(id, null);
+  XUIDesignManager designMgr = getDesignManager(fileInfo);
+  await designMgr.removeDesign(id, null);
 }
 
-void removeDesign(FileDesignInfo fileInfo, String id) async {
+const XUI_TRASHCAN_SLOT = "xui-trashcan-slot";
 
+void removeDesign(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
   if (designMgr.xuiEngine.lastDeleteXid != null) {
-    // supprime la vielle trashcan 
+    // supprime la vielle trashcan
     designMgr.removeDesign(designMgr.xuiEngine.lastDeleteXid, null);
   }
 
   // ajoute un design a la trashcan
-  String moveToTrachcan = "xui-trashcan-slot";
+  String moveToTrachcan = XUI_TRASHCAN_SLOT;
   designMgr.xuiEngine.lastDeleteXid = id;
   String slot = "<xui-design xid=\"" + moveToTrachcan + "\"></xui-design>";
-  await addDesign(fileInfo, moveToTrachcan, slot);
+  await addDesign(fileInfo, moveToTrachcan, slot, false);
 
   // move id vers la trashcan
   designMgr.moveDesign(id, null, moveToTrachcan);
 
-  var ctx = XUIContext(fileInfo.mode);
-  var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
-  var ret = Options(mode: fileInfo.mode, html: str);
-  _reload(fileInfo, ret);
+  await _reload(fileInfo);
 }
 
 void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
-
   String slot = "<xui-design xid=\"" + idMoveTo + "\"></xui-design>";
-  await addDesign(fileInfo, idMoveTo, slot);
-  if (id==null) {
-    id=designMgr.xuiEngine.lastDeleteXid;
-    designMgr.xuiEngine.lastDeleteXid=null;
+  await addDesign(fileInfo, idMoveTo, slot, true);
+
+  // var ctx = XUIContext(fileInfo.mode);   // init car addDesign avec false
+  // await designMgr.getHtml(ctx, fileInfo.file, idMoveTo);
+
+  if (id == null) {
+    id = designMgr.xuiEngine.lastDeleteXid;
+    designMgr.xuiEngine.lastDeleteXid = null;
   }
 
   designMgr.moveDesign(id, null, idMoveTo);
-  var ctx = XUIContext(fileInfo.mode);
-  var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
-  var ret = Options(mode: fileInfo.mode, html: str);
+  designMgr.listXidChanged.add(idMoveTo);
 
-  _reload(fileInfo, ret);
+  await _reload(fileInfo);
 }
 
 Future refresh(FileDesignInfo fileInfo) async {
-  var ctx = XUIContext(fileInfo.mode);
-  var str = await getDesignManager(fileInfo)
-      .getHtml(ctx, fileInfo.file, fileInfo.xid);
-  var ret = Options(mode: fileInfo.mode, html: str);
-
-  _reload(fileInfo, ret);
-
+  await _reload(fileInfo);
   return Future.value();
 }
 
 void getHtmlFrom(FileDesignInfo fileInfo, String idPromise) async {
   var ctx = XUIContext(fileInfo.mode);
-  var html = await getDesignManager(fileInfo)
-      .getHtml(ctx, fileInfo.file, fileInfo.xid);
+  var designMgr = getDesignManager(fileInfo);
+  var html;
+
+  if (fileInfo.part == null) {
+    html = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
+  } else {
+    SlotInfo info =
+        designMgr.xuiEngine.getSlotInfo(fileInfo.part, fileInfo.part);
+    print("part = " + info.elementHTML.tag);
+    var bufferHtml = XUIHtmlBuffer();
+    info.elementHTML.processPhase3(designMgr.xuiEngine, bufferHtml);
+    html = bufferHtml.html.toString();
+  }
 
   context["\$xui"].callMethod("doPromiseJS", [idPromise, html]);
 }
 
-void _reload(FileDesignInfo fileInfo, var options) {
-  dynamic obj = getDesignManager(fileInfo).xuiEngine.xuiFile.getObject();
+void _reload(FileDesignInfo fileInfo) async {
+  var designMgr = getDesignManager(fileInfo);
 
-  // final jsond = json.encode(obj);
-  // print('json=' + jsond.toString());
+  dynamic obj = designMgr.xuiEngine.xuiFile.getObject();
+
+  List listReloader = [];
+  designMgr.listXidChanged.forEach((key) {
+    var reloaderId = designMgr.xuiEngine.getReloaderID(key);
+    print("****** changed " + key + " reloader " + (reloaderId ?? "?"));
+    if (reloaderId != null) {
+      listReloader.add(reloaderId);
+    }
+  });
+
+  designMgr.listXidChanged.clear();
+
+  var ctx = XUIContext(fileInfo.mode);
+  var options = Options(mode: fileInfo.mode);
+  if (listReloader.isEmpty) {
+    var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
+    options.html = str;
+  } else {
+    await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
+    options.listReloader = listReloader;
+  }
 
   final yamld = toYamlString(obj);
-  loadCodeYamlJS(yamld.toString());
-
+  //loadCodeYamlJS(yamld.toString());
+  options.yaml = yamld.toString();
   changePageJS(options);
 }
 
@@ -249,5 +276,4 @@ void main() async {
   //   print("-------------SEND  --------------");
   //   w.postMessage("ok");
   // });
-
 }

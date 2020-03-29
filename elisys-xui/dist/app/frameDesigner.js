@@ -31,7 +31,7 @@ document.addEventListener("keydown", function (event) {
 window.addEventListener('message', function (e) {
     var data = e.data;
     if (data.action == "select") {
-        $xui.displaySelector(data.position);
+        $xui.displaySelectorByPosition(data.position);
         $xui.modeDisplaySelection = true;
         setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, 100);
     }
