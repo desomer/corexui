@@ -6,6 +6,10 @@ import '../XUIEngine.dart';
 import '../XUIFactory.dart';
 import 'XUIProperty.dart';
 
+/// element racine des   XUIElementXUI, XUIElementText
+///   et des version HTML :   XUIElementHTML, XUIElementHTMLText
+///       ces derniere ont une methode processPhase3 de generation de l'HTML
+///
 abstract class XUIElement {
   // identifie l'implementation HTML ex: type panel (div, h1, span) input (label +
   // combo + action + desc + flag)
@@ -29,7 +33,7 @@ abstract class XUIElement {
 class XUIElementHTML extends XUIElement {
   XUIElementHTML parent;
 
-  XUIElementXUI origin;
+  XUIElementXUI originElemXUI;
   List<XUIComponent> implementBy;
   List<XUIDesign> designBy;
 
@@ -54,7 +58,8 @@ class XUIElementHTML extends XUIElement {
     return null;
   }
 
-  String calculateProp(String prop) {
+  ///calcule des propertiesXUI [[Prop]]
+  String calculatePropertyXUI(String prop) {
     if (prop != null) {
       ParseInfo parseInfo = ParseInfo(prop, ParseInfoMode.PROP);
       XUIProperty.parse(parseInfo, (String tag) {
@@ -69,9 +74,11 @@ class XUIElementHTML extends XUIElement {
 
   dynamic searchPropertyXUI(String tag, int deep) {
     if (tag == cst.ATTR_XID) {
-      return calculateProp(this.origin.xid);
+      // ne cherche pas sur les parent
+      return calculatePropertyXUI(this.originElemXUI.xid);
     }
 
+    /// gestion de la recherche sur des enfant (@-1) ou uniquement dans himself (@0)
     if (tag.contains("@")) {
       var atTag = tag.split("@");
       tag = atTag[0];
@@ -92,6 +99,7 @@ class XUIElementHTML extends XUIElement {
     }
   }
 
+  /// generation du contenu avec [[]] d'un balise <div>CONTENT<div>
   dynamic processContent(XUIEngine engine, String content, ParseInfoMode mode) {
     ParseInfo parseInfo = ParseInfo(content, mode);
     try {
@@ -110,24 +118,29 @@ class XUIElementHTML extends XUIElement {
     return parseInfo.parsebuilder.toString();
   }
 
+  /// gestion de la phase 3 : generation de l'HTML
   void processPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
     var oldBuf;
 
-    if (this.propertiesXUI!=null && this.propertiesXUI.containsKey("convert-json"))
-    {
+    if (this.propertiesXUI != null &&
+        this.propertiesXUI.containsKey(ATTR_CONVERT_JSON)) {
       oldBuf = buffer;
-      buffer= XUIHtmlBuffer();
+      buffer = XUIHtmlBuffer();
     }
 
     if (tag == cst.TAG_NO_DOM) {
       // cas des slot
       bool isReloader = false;
       bool isRoot = buffer.html.isEmpty;
-      if (!isRoot && engine.isModeDesign() && this.propertiesXUI!=null && this.propertiesXUI.containsKey(ATTR_RELOADER))
-      { 
-        isReloader=true;
-        var xid = processContent(engine, this.origin.xid, ParseInfoMode.ATTR);
-        buffer.html.write("<v-xui-reloader partid=\""+xid+"\"></v-xui-reloader>");
+      bool hasTagReloader = this.propertiesXUI != null &&
+          this.propertiesXUI.containsKey(ATTR_RELOADER);
+
+      if (!isRoot && engine.isModeDesign() && hasTagReloader) {
+        isReloader = true;
+        var xid = this.originElemXUI.xid;
+        var xidCal = processContent(engine, xid, ParseInfoMode.ATTR);
+        buffer.html.write(
+            "<v-xui-reloader partid=\"" + xidCal + "\"></v-xui-reloader>");
       }
 
       if (!isReloader) {
@@ -155,20 +168,22 @@ class XUIElementHTML extends XUIElement {
             }
           }
           if (mustAdd) {
-            // cas du :value="false"
-            if ((valProp == "true" || valProp == "false") && !(keyAttr.startsWith(":")) ) {
+            // cas du :value="false"   =>  reste en chaine "" pour vuejs sinon en boolean
+            if ((valProp == "true" || valProp == "false") &&
+                !(keyAttr.startsWith(":"))) {
               isBool = true;
             }
             buffer.html.write(" ");
+
+            // gestion des - devant des attr pour bypasser les correcteurs de syntaxe de vscode -style="[[xxx]]"
             if (keyAttr.toString().startsWith("-")) {
               keyAttr = keyAttr.toString().substring(1);
-              // gestion des - devant des attr pour bypasser les correcteurs de syntaxe de vscode -style="[[xxx]]"  
-            } 
+            }
 
             buffer.html.write(keyAttr);
-            
+
             if (!isBool) {
-              /// pas d'ajout de valeur si boolean
+              /// pas d'ajout de valeur si boolean   exemple : dark="true" donne dark
               buffer.html.write("=");
               isBool
                   ? (buffer.html.write(valProp))
@@ -176,7 +191,6 @@ class XUIElementHTML extends XUIElement {
             }
 
             engine.dataBindingInfo.parseAttr(this, keyAttr, valProp.toString());
-
           }
         } else {
           // attribut boolean
@@ -190,10 +204,6 @@ class XUIElementHTML extends XUIElement {
         buffer.html.write(" ");
         buffer.html.write(keyAttr);
       }
-
-
-
-
     });
 
     buffer.html.write('>');
@@ -212,11 +222,9 @@ class XUIElementHTML extends XUIElement {
     if (hasChidren) buffer.addTab();
     buffer.html.write('</' + this.tag + '>\n');
 
-    if (oldBuf!=null)
-    {
-        oldBuf.html.write( json.encode(   buffer.html.toString()  ));
+    if (oldBuf != null) {
+      oldBuf.html.write(json.encode(buffer.html.toString()));
     }
-
   }
 
   void toChildrenPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
@@ -258,14 +266,14 @@ abstract class XUIElementNative extends XUIElementXUI {
 }
 
 ///***************************************************************
-///
-///  uniquement un text
-class XUIElementText extends XUIElementXUI {
-  String content;
-}
-
 ///   provient d'un provider fichier XUI
 class XUIElementXUI extends XUIElement {
   String xid;
   String idRessource;
+}
+
+///
+///  uniquement un text
+class XUIElementText extends XUIElementXUI {
+  String content;
 }

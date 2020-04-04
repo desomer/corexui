@@ -53,7 +53,7 @@ $xui.loadApplicationJS = () => {
 
 					this.id++; //passe en composant suivant
 					var newId = this.partid+"-"+this.id;
-					Vue.component(newId, { template: '<template>'+ e.template+'</template>' });
+					Vue.component(newId, { template: '<div style="display:inherit">'+ e.template+'</div>' });
 					this.componentToReload=newId;
 				},
 				reload: function () {

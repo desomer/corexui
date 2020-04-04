@@ -68,45 +68,50 @@ $xui.initVuejs = (vuejs) => {
   }
   ];
 
+
+
+  $xui.rootdata.listCatClass.push(...listDesignClass);
+  //console.debug($xui.rootdata.listCatClass);
+
+
+
+
   // var list = "ma-2 pt-1 text-justify";
   // new DesignClassManager().initClassSelector(list, listDesignClass);
   // var txt = new DesignClassManager().getClassTextFromSeletor(list, listDesignClass);
   // console.debug(txt);
 
-  $xui.rootdata.listCatClass.push(...listDesignClass);
-  console.debug($xui.rootdata.listCatClass);
-
-  Vue.component("toto", { template: '<span>toto</span>' });
+  // Vue.component("toto", { template: '<span>toto</span>' });
   
-  Vue.component("v-xui-reloader2",
-    {
-      id : 1,
-      template: '<component v-bind:is="conponentReload"></component>',
-      data: () => { return { conponentReload: "" }; },
-      methods: {
-        reload: function () {
-          console.debug("reload**************");
+  // Vue.component("v-xui-reloader2",
+  //   {
+  //     id : 1,
+  //     template: '<component v-bind:is="conponentReload"></component>',
+  //     data: () => { return { conponentReload: "" }; },
+  //     methods: {
+  //       reload: function () {
+  //         console.debug("reload**************");
 
-          var infoFileCmp = { file: "app/frame1.html", xid: "root", mode: 'template',  part:'onglet-tab-item-0' };
-          var prom = getPromise("getVueCmp")
-          $xui.getHtmlFrom(infoFileCmp, "getVueCmp");
-          prom.then(template => {
-            console.debug(template);
-            Vue.component("toto", { template: template });
-            this.conponentReload="toto";
-          })
+  //         var infoFileCmp = { file: "app/frame1.html", xid: "root", mode: 'template',  part:'onglet-tab-item-0' };
+  //         var prom = getPromise("getVueCmp")
+  //         $xui.getHtmlFrom(infoFileCmp, "getVueCmp");
+  //         prom.then(template => {
+  //           console.debug(template);
+  //           Vue.component("toto", { template: template });
+  //           this.conponentReload="toto";
+  //         })
 
-        }
-      },
-      mounted: function () {
-        this.reload();
-      }
-    });
+  //       }
+  //     },
+  //     mounted: function () {
+  //       this.reload();
+  //     }
+  //   });
 
 
-  setTimeout(() => {
-    //$xui.rootdata.componentTab = "v-xui-reloader";
-  }, 3000);
+  // setTimeout(() => {
+  //   //$xui.rootdata.componentTab = "v-xui-reloader";
+  // }, 3000);
 
 
 
@@ -270,6 +275,7 @@ class ComponentManager {
 
 }
 
+// gestion des composants XUIvueJS (cmp-list-class)
 new ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
 
 

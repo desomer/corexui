@@ -79,7 +79,7 @@ class XUIModel implements Comparable<XUIModel> {
     await processPhase1Children(elemHtml, engine);
 
     // calcul le xid  (ex : __parentxid__ , __idx__)
-    var xidCal = elemHtml.calculateProp(elemXUI.xid);
+    var xidCal = elemHtml.calculatePropertyXUI(elemXUI.xid);
 
     // lance les design (pour affectation property utilise)
     await processPhase1Design(xidCal, engine, elemHtml);
@@ -147,7 +147,7 @@ class XUIModel implements Comparable<XUIModel> {
       if (xuifor != null) {
         varIdx = xuifor.content.toString();
 
-        nb = int.parse(elemHtml.calculateProp(
+        nb = int.parse(elemHtml.calculatePropertyXUI(
             elemHtml.propertiesXUI["nb"]?.content?.toString() ?? "1"));
       }
     }
@@ -161,7 +161,7 @@ class XUIModel implements Comparable<XUIModel> {
             item.propertiesXUI ??= HashMap<String, XUIProperty>();
             item.propertiesXUI[varIdx] = XUIProperty(i.toString());
             item.propertiesXUI[ATTR_PARENT_XID] =
-                XUIProperty(elemHtml.calculateProp(elemHtml.origin.xid));
+                XUIProperty(elemHtml.calculatePropertyXUI(elemHtml.originElemXUI.xid));
           }
           await doChildPhase1(item, elemHtml, engine);
         }
@@ -179,11 +179,11 @@ class XUIModel implements Comparable<XUIModel> {
         childHtml = XUIElementHTMLText();
         childHtml.content = childXUI.content;
         childHtml.parent = elemHtml;
-        childHtml.origin = childXUI;
+        childHtml.originElemXUI = childXUI;
       } else {
         childHtml = XUIElementHTML();
         childHtml.parent = elemHtml;
-        childHtml.origin = childXUI;
+        childHtml.originElemXUI = childXUI;
 
         var model = XUIChild(childXUI, MODE_ALL);
         await model.processPhase1(engine, childHtml);
@@ -288,10 +288,10 @@ class XUIModel implements Comparable<XUIModel> {
     //genere les infos de design (info, doc, etc...)
     if (slotInfo.xid != null && engine.isModeDesign()) {
       if (slotInfo.slotname != null) {
-        slotInfo.slotname = elemHtml.calculateProp(slotInfo.slotname);
+        slotInfo.slotname = elemHtml.calculatePropertyXUI(slotInfo.slotname);
         slotInfo.parentXid = parentXId;
         slotInfo.docId = getDocumentationID(elemHtml);
-        slotInfo.idRessource = elemHtml.origin.idRessource;
+        slotInfo.idRessource = elemHtml.originElemXUI.idRessource;
         slotInfo.elementHTML = elemHtml;
 
         engine.mapInfo[slotInfo.xid] = slotInfo;

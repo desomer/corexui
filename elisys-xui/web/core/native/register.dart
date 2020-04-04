@@ -15,7 +15,6 @@ class NativeSlot extends XUIElementNative {
       XUIEngine engine, XUIElementHTML html) async {
     var root = XUIElementXUI();
     root.tag = TAG_NO_DOM;
-
     Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));
     return f;
   }
@@ -48,21 +47,32 @@ class NativeSlot extends XUIElementNative {
       var newChild = XUIElementXUI()..tag = TAG_DIV_SLOT;
       newChild.children = [];
       newChild.children.add(XUIElementText()..content = slotName);
-      await XUIModel(this, MODE_ALL).doChildPhase1(newChild, html, engine);
+      if (html.originElemXUI.attributes!=null) {
+        // affecte les styles et les class du slot  (ex : flow et le display:inline flex)
+        newChild.attributes=HashMap<String, XUIProperty>();
+        if (html.originElemXUI.attributes["style"]!=null) {
+          newChild.attributes["style"] = html.originElemXUI.attributes["style"];
+        }
+        if (html.originElemXUI.attributes["class"]!=null) {
+          newChild.attributes["class"] = html.originElemXUI.attributes["class"];
+        }
+      }
+      await XUIModel(this, MODE_ALL).doChildPhase1(newChild, html, engine);  // affecte l'implementation du TAG_DIV_SLOT sur le newChild
     }
 
     // affecte l'identifiant xid du slot sur le parent si le parent en a pas
     var xidCal;
-    if (html.origin != null) {
-      xidCal = html.calculateProp(html.origin.xid);
+    if (html.originElemXUI != null) {
+      xidCal = html.calculatePropertyXUI(html.originElemXUI.xid);
     }
 
     int nbChild = html.getNbChildNoText();
     int nbChildNoSlot = 0;
     html.children?.forEach((childHtml) {
-      // affecte les attribut du slot sur les enfants
-      var model = XUIElementXUI();
-      XUIModel(model, MODE_ALL).processAttributes(childHtml);
+      // affecte les attribut du slot sur les enfants 
+
+     //var model = XUIElementXUI();
+     // XUIModel(model, MODE_ALL).processAttributes(childHtml);
 
       // affecte le nom du slot sur les enfants si doit etre accessible (avoir un slot name)
       if (isModeDesign && slotName != null) {
@@ -122,7 +132,7 @@ class NativeInjectFile extends XUIElementNative {
     root.tag = TAG_NO_DOM;
 
     var aText = XUIElementText();
-    var idResource = html.origin.propertiesXUI["path"].content;
+    var idResource = html.originElemXUI.propertiesXUI["path"].content;
 
     if (cacheText[idResource] == null) {
       cacheText[idResource] =

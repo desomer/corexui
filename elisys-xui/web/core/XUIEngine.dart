@@ -17,6 +17,7 @@ const ATTR_XID_SLOT = "xid-slot";
 const ATTR_MODE = "mode";
 const ATTR_NO_DOM = "no-dom";
 const ATTR_RELOADER = "reloader";
+const ATTR_CONVERT_JSON = "convert-json";
 
 const TAG_ESCAPE = "xui-escape-";
 const TAG_NO_DOM = "xui-no-dom";
@@ -377,10 +378,10 @@ class XUIEngine {
     var html = info.elementHTML;
     var reloaderId;
     while (html != null) {
-      if (html.origin != null &&
-          html.origin.propertiesXUI != null &&
-          html.origin.propertiesXUI.containsKey(ATTR_RELOADER)) {
-        reloaderId = html.calculateProp(html.origin.xid);
+      if (html.originElemXUI != null &&
+          html.originElemXUI.propertiesXUI != null &&
+          html.originElemXUI.propertiesXUI.containsKey(ATTR_RELOADER)) {
+        reloaderId = html.calculatePropertyXUI(html.originElemXUI.xid);
         html = null;
       } else {
         html = html.parent;
@@ -441,7 +442,7 @@ class XUIEngine {
     if (isModeDesign()) {
       htmlRoot.attributes ??= HashMap<String, XUIProperty>();
       htmlRoot.attributes["data-" + ATTR_XID] = XUIProperty(xid);
-      htmlRoot.origin = root.elemXUI;
+      htmlRoot.originElemXUI = root.elemXUI;
     }
 
     if (isModeDesign()) {
