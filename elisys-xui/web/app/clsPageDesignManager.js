@@ -2,6 +2,7 @@ export class PageDesignManager {
 
     codeHtml = null;
     codeYaml = null;
+    db = null;
 
     loadPage(html) {
         // console.debug("load", html);
@@ -36,12 +37,19 @@ export class PageDesignManager {
 
         this.codeHtml = param.html;
         this.codeYaml = param.yaml;
+
+        this.store();
+
         if ($xui.rootdata.activeTab == 1)  // si onglet 1 actif
         {
             this.loadCode();   // affiche le code du mode (template, preview, final )
             this.loadCodeYaml();
         }
 
+    }
+
+    store() {
+        localStorage.setItem('xui', this.codeYaml);
     }
 
     loadCode() {

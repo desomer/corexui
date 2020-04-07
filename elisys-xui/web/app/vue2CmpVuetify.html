@@ -113,6 +113,8 @@
         <xui-prop id="componentAs">container</xui-prop>
 
         <xui-prop var="nb" def="3" editor="int">nb de session</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
     <xui-doc xid="session:xui-session">
@@ -120,7 +122,7 @@
         <xui-prop id="desc">Une session item</xui-prop>
     </xui-doc>
 
-    <session xid="xui-session" xui-for="idxr" xui-slot-name="session">
+    <session class="[[class@0]]" -style="[[style@0]]" xid="xui-session" xui-for="idxr" xui-slot-name="session">
             <xui-slot xid="[[parent-xid]]-session-[[idxr]]" xui-slot-name="session [[idxr]]"></xui-slot>
     </session>
 
@@ -132,6 +134,8 @@
         <xui-prop id="componentAs">container</xui-prop>
 
         <xui-prop var="nb" def="3" editor="int">nb de lignes</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
     
     <xui-doc xid="xui-row">
@@ -150,7 +154,7 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-container class="xui-grid" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
+    <v-container class="xui-grid [[class@0]]" -style="[[style@0]]" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
         <v-row class="[[class@-1]]" no-gutters -style="[[style@-1]]">
             <xui-row xid="[[parent-xid]]-row-[[idxr]]" xui-nb="2" xui-slot-name="row [[idxr]]"></xui-row>
         </v-row>
@@ -242,6 +246,23 @@
         <xui-prop id="desc">Contenu de l'onglet</xui-prop>
         <xui-prop id="favorite">container</xui-prop>
     </xui-doc>
+
+
+    <xui-design xid="inject-other-header">
+        <style>
+
+            .v-tabs-items {
+                height: calc(100% - 48px) 
+            }
+            .v-tabs-items > .v-window__container {
+                height: 100% !important
+            }
+            .v-tabs-items > .v-window__container > .v-window-item {
+                height: 100% !important
+            }
+            
+        </style>
+    </xui-design>
 
     <v-tabs xid="xui-tabs" vertical=[[vertical@0]] dark="[[dark@0]]" light="[[light@0]]" xui-for="idx" xui-slot-name="tab">
         <v-tab>

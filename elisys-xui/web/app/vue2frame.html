@@ -104,7 +104,7 @@
 	</v-content>
 	
 	<v-footer xid="vue-footer-1"  xui-slot-name="footer bar" inset app :height="heightFooter" :dark="dark" color="[[colorApp]]" style="padding: 0px 10px;">
-	    <xui-slot xid="slot-action-footer" xui-slot-name="action footer"></xui-slot>
+	    <xui-slot xui-reloader=true xid="slot-action-footer" xui-slot-name="action footer"></xui-slot>
 	    <v-spacer></v-spacer>
 		<span>&amp;copy;&amp;nbsp;[[copyrightApp]]</span>
 	</v-footer>

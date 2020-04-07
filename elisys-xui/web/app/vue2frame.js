@@ -41,7 +41,7 @@ $xui.loadApplicationJS = () => {
 
 	Vue.component("v-xui-reloader",
 		{
-			template: '<component v-bind:is="componentToReload"></component>',       // '<template>loading...</template>',
+			template: '<component v-bind:is="componentToReload"></component>',
 			props: ['partid'],
 			data: () => { return { componentToReload: "", id: 1 }; },
 			methods: {
@@ -52,8 +52,8 @@ $xui.loadApplicationJS = () => {
 					delete Vue.options.components[oldId];
 
 					this.id++; //passe en composant suivant
-					var newId = this.partid+"-"+this.id;
-					Vue.component(newId, { template: '<div style="display:inherit">'+ e.template+'</div>' });
+					var newId = this.partid+"-"+this.id;  
+					Vue.component(newId, { template: '<div style="all:unset; box-sizing: inherit;">'+ e.template+'</div>' });
 					this.componentToReload=newId;
 				},
 				reload: function () {

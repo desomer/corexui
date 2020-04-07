@@ -2,7 +2,9 @@
 library xuiapp;
 
 import 'dart:async';
+import 'dart:html';
 import 'dart:js';
+import 'package:yaml/yaml.dart';
 
 import 'package:js/js.dart';
 
@@ -119,12 +121,12 @@ dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
   return InfoJS;
 }
 
-
 void addDesign(
     FileDesignInfo fileInfo, String id, String template, bool reload) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
   await designMgr.addDesign(id, template);
-  designMgr.listXidChanged.add(id);
+
+  if (id != XUI_TRASHCAN_SLOT) designMgr.listXidChanged.add(id);
 
   if (reload) {
     // voir removeDesign  : evite de faire 2 reload
@@ -142,6 +144,8 @@ const XUI_TRASHCAN_SLOT = "xui-trashcan-slot";
 void removeDesign(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
+  SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
+
   if (designMgr.xuiEngine.lastDeleteXid != null) {
     // supprime la vielle trashcan
     designMgr.removeDesign(designMgr.xuiEngine.lastDeleteXid, null);
@@ -155,6 +159,8 @@ void removeDesign(FileDesignInfo fileInfo, String id) async {
 
   // move id vers la trashcan
   designMgr.moveDesign(id, null, moveToTrachcan);
+
+  designMgr.listXidChanged.add(info.parentXid);
 
   await _reload(fileInfo);
 }
@@ -222,6 +228,7 @@ void _reload(FileDesignInfo fileInfo) async {
   var ctx = XUIContext(fileInfo.mode);
   var options = Options(mode: fileInfo.mode);
   if (listReloader.isEmpty) {
+    print("****** changed all");
     var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
     options.html = str;
   } else {
@@ -258,8 +265,24 @@ void main() async {
   fileInfo.file = 'app/frame1.html';
   fileInfo.xid = 'root';
 
+  var ctx = XUIContext(MODE_DESIGN);
+  var designManager = getDesignManager(fileInfo);
+
+  var db = window.localStorage['xui'];
+  if (db != null) {
+    await designManager.initEngine(fileInfo.file, ctx);
+
+    print("*********** window.localStorage ***********\n" + db);
+    var saveDb = loadYaml(db);
+
+    for (var aDesign in saveDb["design"]) {
+      print(aDesign);
+      designManager.xuiEngine.xuiFile.addObject(aDesign);
+    }
+  }
+
   String str = await getDesignManager(fileInfo)
-      .getHtml(XUIContext(MODE_DESIGN), fileInfo.file, fileInfo.xid);
+      .getHtml(ctx, fileInfo.file, fileInfo.xid);
 
   loadPageJS(str);
 

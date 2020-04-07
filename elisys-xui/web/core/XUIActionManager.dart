@@ -28,11 +28,19 @@ class XUIActionManager {
       XUIElementXUI xuiCmp = xuidesign.children.first;
       DocInfo doc = engine.docInfo[xuiCmp.tag];
       if (doc != null && doc.variables.isNotEmpty) {
+        // creation du design par defaut des info
+        var elemXuiChild = XUIElementXUI();
+        elemXuiChild.xid=xuiCmp.xid;
+        elemXuiChild.idRessource = engine.xuiFile.reader?.id;
+        DicoOrdered<XUIDesign> curDesign = DicoOrdered();
+        engine.xuiFile.designs[xuiCmp.xid] = curDesign;
+        curDesign.add(XUIDesign(elemXuiChild, MODE_ALL));
+
         for (var variable in doc.variables) {
           // affecte les valeur par defaut
           if (variable.def != null) {
-            xuiCmp.propertiesXUI ??= HashMap<String, XUIProperty>();
-            xuiCmp.propertiesXUI[variable.id] = XUIProperty(variable.def);
+            elemXuiChild.propertiesXUI ??= HashMap<String, XUIProperty>();
+            elemXuiChild.propertiesXUI[variable.id] = XUIProperty(variable.def);
           }
         }
       }
@@ -123,7 +131,7 @@ class XUIActionManager {
       if (moveToXid == null) {
         print("delete design <$xid>");
         engine.xuiFile.designs.remove(xid);
-      } else if (elemToChange!=null) {
+      } else if (elemToChange != null) {
         moveToDesign(xid, moveToXid, mode, elemToChange);
       }
     }

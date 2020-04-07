@@ -22,7 +22,16 @@ $xui.initVuejs = (vuejs) => {
   Vue.component(VueEditor)    //vue-editor
 
 
-  var listDesignClass = [{
+  var listDesignClass = [
+    {
+      title: "size",
+      icon: "mdi-format-text",
+      open: true,
+      listClass: [
+        { sel: false, type: 'check', text: 'fill height', value: 'fill-height' },
+      ]
+    },
+    {
     title: "Text",
     icon: "mdi-format-text",
     open: false,
