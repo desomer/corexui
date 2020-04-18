@@ -1,13 +1,11 @@
 <xui-factory version="1.0">
 
     <xui-design xid="xui-script-data">
-        <script xui-no-dom>
-            $xui.initComponentVuejs.push(() => {
-                new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
-                    "vue-xui-split");
-            }
-            );
-        </script>
+        $xui.initComponentVuejs.push(() => {
+        new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
+        "vue-xui-split");
+        }
+        );
     </xui-design>
 
     <!------------------------------------------------------------------------------>
@@ -19,9 +17,9 @@
         <xui-prop id="componentAs">container</xui-prop>
 
         <xui-prop var="column" editor="bool">column</xui-prop>
-        <xui-prop var="sizeA" def="1fr" editor="text">size A (px, fr, %)</xui-prop>
-        <xui-prop var="sizeB" def="1fr" editor="text">size B (px, fr, %)</xui-prop>
-
+        <xui-prop var="sizeA" editor="text">size A (px, fr, %)</xui-prop>
+        <xui-prop var="sizeB" editor="text">size B (px, fr, %)</xui-prop>
+        
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
@@ -34,18 +32,14 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-xui-split xid="xui-split-1" column="[[column@0]]" sizea="[[sizeA@0]]" sizeb="[[sizeB@0]]" class="[[class@0]]"
-        -style="[[style@0]]" xui-slot-name="split">
+    <v-xui-split xid="xui-split-1" column="[[column@0]]" sizea="[[sizeA]]" sizeb="[[sizeB]]" class="[[class@0]]" -style="[[style@0]]" xui-slot-name="split">
         <template v-slot:a>
-            <xui-slot xid="[[parent-xid]]-splitA" xui-slot-name="split A" class="[[class@1]]" -style="[[style@1]]"
-                xui-slot-full xui-reloader=true></xui-slot>
+            <xui-slot class="[[class@1]]" -style="[[style@1]]" xui-reloader=true xid="[[parent-xid]]-splitA" xui-slot-full xui-slot-name="split A"></xui-slot>
         </template>
         <template v-slot:b>
-            <xui-slot xid="[[parent-xid]]-splitB" xui-slot-name="split B" class="[[class@1]]" -style="[[style@1]]"
-                xui-slot-full xui-reloader=true></xui-slot>
+            <xui-slot class="[[class@1]]" -style="[[style@1]]" xui-reloader=true xid="[[parent-xid]]-splitB" xui-slot-full xui-slot-name="split B"></xui-slot>
         </template>
     </v-xui-split>
-
 
     <!------------------------------------------------------------------------------>
 
@@ -54,14 +48,14 @@
             template: <template-xui-split xui-convert-json></template-xui-split>,
             props: ["column", "sizea", "sizeb"],
             mounted: function () {
-                var sizeA = this.sizea == undefined ? "1fr" : this.sizea;
-                var sizeB = this.sizeb == undefined ? "1fr" : this.sizeb;
+                console.debug("############", this);
+                var sizeA = this.sizea==undefined?"1fr":this.sizea;
+                var sizeB = this.sizeb==undefined?"1fr":this.sizeb;
 
-                var split = this.$el;
-                var gutter = split.querySelector(':scope>.xui-split-gutter');
+                var gutter = this.$el.querySelector(':only-child > .xui-split-gutter');
 
-                if (this.column == undefined) {
-                    split.style.gridTemplateRows = sizeA + " 5px " + sizeB;
+                if (this.column==undefined) {
+                    this.$el.style.gridTemplateRows = sizeA+" 5px "+sizeB;
                     gutter.classList.add("xui-split-gutter-horizontal");
                     Split({
                         rowGutters: [{
@@ -70,8 +64,9 @@
                         }]
                     })
                 }
-                else {
-                    split.style.gridTemplateColumns = sizeA + " 5px " + sizeB;
+                else
+                {
+                    this.$el.style.gridTemplateColumns = sizeA+" 5px "+sizeB;
                     gutter.classList.add("xui-split-gutter-vertical");
                     Split({
                         columnGutters: [{
@@ -94,8 +89,9 @@
         </div>
     </div>
 
-    <xui-design xid="inject-style">
-        <style xui-no-dom>
+    <xui-design xid="inject-other-header">
+        <script async src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
+        <style>
             .xui-split {
                 display: grid;
                 height: 100%;
@@ -115,8 +111,6 @@
         </style>
     </xui-design>
 
-    <xui-design xid="inject-other-header">
-        <script async src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
-    </xui-design>
+
 
 </xui-factory>

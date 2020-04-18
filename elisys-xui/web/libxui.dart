@@ -61,6 +61,7 @@ external set _setDesignProperties(
 
 ///------------------------------------------------------------------
 
+/// change les properties
 void setDesignProperties(
     FileDesignInfo fileInfo, String idAction, dynamic listDesg) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
@@ -76,6 +77,7 @@ void setDesignProperties(
 
   await _reload(fileInfo);
 
+  // appel la promise
   var xidProp = (listDesign[0] as ObjectDesign).xid;
   context["\$xui"].callMethod("doPromiseJS", ["setDesignProperties", xidProp]);
 }
@@ -93,6 +95,7 @@ void getDesignProperties(
     "path": designInfo.bufPath.toString()
   };
 
+  // appel la promise
   context["\$xui"]
       .callMethod("doPromiseJS", ["getDesignProperties", JsObject.jsify(ret)]);
 }
@@ -132,14 +135,14 @@ void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
   if (!reload && init == true) {
     var ctx = XUIContext(fileInfo.mode);
     await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
-    return;
-  }
+    
+  } else {
+    if (id != XUI_TRASHCAN_SLOT) designMgr.listXidChanged.add(id);
 
-  if (id != XUI_TRASHCAN_SLOT) designMgr.listXidChanged.add(id);
-
-  if (reload) {
-    // voir removeDesign  : evite de faire 2 reload
-    await _reload(fileInfo);
+    if (reload) {
+      // voir removeDesign  : evite de faire 2 reload
+      await _reload(fileInfo);
+    }
   }
 }
 
@@ -155,31 +158,28 @@ void removeDesign(FileDesignInfo fileInfo, String id) async {
 
   String lastDeleteXid = getContentTrashcanID(designMgr);
 
-  //String lastDeleteXid = designMgr.xuiEngine.lastDeleteXid;
-
   if (lastDeleteXid != null) {
     // supprime la vielle trashcan
     designMgr.removeDesign(lastDeleteXid, null);
   }
 
   // ajoute un design a la trashcan
- 
-  //designMgr.xuiEngine.lastDeleteXid = id;
   String slot = "<xui-design xid=\"" + XUI_TRASHCAN_SLOT + "\"></xui-design>";
-  await addDesign(fileInfo, XUI_TRASHCAN_SLOT, slot, false, false);
+  await addDesign(fileInfo, XUI_TRASHCAN_SLOT, slot, false, true);
 
   // move id vers la trashcan
   designMgr.moveDesign(id, null, XUI_TRASHCAN_SLOT);
 
+  // lance le reload
   designMgr.listXidChanged.add(info.parentXid);
-
   await _reload(fileInfo);
 }
 
 String getContentTrashcanID(XUIDesignManager designMgr) {
-  SlotInfo infoTrash = designMgr.xuiEngine.getSlotInfo(XUI_TRASHCAN_SLOT, XUI_TRASHCAN_SLOT);
-  XUIElementHTML contentTrash =   infoTrash?.elementHTML?.children?.first;
-  var lastDeleteXid= contentTrash?.originElemXUI?.xid;
+  SlotInfo infoTrash =
+      designMgr.xuiEngine.getSlotInfo(XUI_TRASHCAN_SLOT, XUI_TRASHCAN_SLOT);
+  XUIElementHTML contentTrash = infoTrash?.elementHTML?.children?.first;
+  var lastDeleteXid = contentTrash?.originElemXUI?.xid;
   return lastDeleteXid;
 }
 
@@ -192,8 +192,6 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
 
   if (id == null) {
     id = getContentTrashcanID(designMgr);
-   // id = designMgr.xuiEngine.lastDeleteXid;
-   // designMgr.xuiEngine.lastDeleteXid = null;
   }
 
   designMgr.moveDesign(id, null, idMoveTo);
@@ -204,6 +202,7 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
 
 Future refresh(FileDesignInfo fileInfo) async {
   if (fileInfo.action == "reload") {
+    print("reload all from storage");
     XUIDesignManager.removeDesignManager(fileInfo);
     var ctx = XUIContext(MODE_TEMPLATE);
     var designManager = getDesignManager(fileInfo);
@@ -262,7 +261,6 @@ void _reload(FileDesignInfo fileInfo) async {
   }
 
   final yamld = toYamlString(obj);
-  //loadCodeYamlJS(yamld.toString());
   options.yaml = yamld.toString();
   options.action = fileInfo.action;
   changePageJS(options);
@@ -273,9 +271,6 @@ XUIDesignManager getDesignManager(FileDesignInfo fileInfo) {
 }
 
 void main() async {
-  print("-------------- start xui ----------------");
-  // context['console'].callMethod('log', ["------------ start xui 2"]);
-
   _refresh = allowInterop(refresh);
   _addDesign = allowInterop(addDesign);
   _removeDesign = allowInterop(removeDesign);
@@ -287,19 +282,7 @@ void main() async {
   _getHtmlFrom = allowInterop(getHtmlFrom);
   _deleteDesign = allowInterop(deleteDesign);
 
-  FileDesignInfo fileInfo = FileDesignInfo();
-  fileInfo.file = 'app/frame1.html';
-  fileInfo.xid = 'root';
-
-  var ctx = XUIContext(MODE_DESIGN);
-  var designManager = getDesignManager(fileInfo);
-
-  await initStoreVersion(designManager, fileInfo, ctx);
-
-  String str = await getDesignManager(fileInfo)
-      .getHtml(ctx, fileInfo.file, fileInfo.xid);
-
-  loadPageJS(str);
+  await initPage();
 
   // var w = Worker('libxuiworker.js');   //libxuiworker.dart.js
 
@@ -314,6 +297,23 @@ void main() async {
   //   print("-------------SEND  --------------");
   //   w.postMessage("ok");
   // });
+}
+
+Future initPage() async {
+  print("-------------- start initPage xui ----------------");
+
+  FileDesignInfo fileInfo = FileDesignInfo();
+  fileInfo.file = 'app/frame1.html';
+  fileInfo.xid = 'root';
+
+  var ctx = XUIContext(MODE_DESIGN);
+  var designManager = getDesignManager(fileInfo);
+
+  await initStoreVersion(designManager, fileInfo, ctx);
+
+  String str = await designManager.getHtml(ctx, fileInfo.file, fileInfo.xid);
+
+  loadPageJS(str);
 }
 
 Future initStoreVersion(XUIDesignManager designManager, FileDesignInfo fileInfo,

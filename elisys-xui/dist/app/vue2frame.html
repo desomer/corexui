@@ -94,7 +94,7 @@
 		<v-app-bar-nav-icon></v-app-bar-nav-icon>
 		<v-toolbar-title xid="xui-toolbar-title">[[titleApp]]</v-toolbar-title>
 		<v-spacer></v-spacer>
-		<xui-slot xid="slot-action-header" xui-slot-name="action header"></xui-slot>
+		<xui-slot xui-reloader=true xid="slot-action-header" xui-slot-name="action header"></xui-slot>
 	</v-app-bar>
 	
 	<v-content xid="vue-content-1">
@@ -104,7 +104,7 @@
 	</v-content>
 	
 	<v-footer xid="vue-footer-1"  xui-slot-name="footer bar" inset app :height="heightFooter" :dark="dark" color="[[colorApp]]" style="padding: 0px 10px;">
-	    <xui-slot xid="slot-action-footer" xui-slot-name="action footer"></xui-slot>
+	    <xui-slot xui-reloader=true xid="slot-action-footer" xui-slot-name="action footer"></xui-slot>
 	    <v-spacer></v-spacer>
 		<span>&amp;copy;&amp;nbsp;[[copyrightApp]]</span>
 	</v-footer>
@@ -122,10 +122,13 @@
 
 	<!----------------------------  TRASHCAN ---------------------------------->
 	<div xid="xui-trashcan" xui-mode="template;design" 
-		style="display:none; z-index: 100; background-color: white;position: absolute;border: 1px solid #0b00ff;top: 10vh;left: 10vw;height: 80vh;width: 80vw;">
-		<xui-slot xid="xui-trashcan-slot"></xui-slot>
+		style="	display:none; z-index: 100; 
+				background-color: white;position: absolute;
+				border: 1px solid #0b00ff;
+				top: 10vh;left: 10vw;height: 80vh;width: 80vw;">
+		<xui-slot xid="xui-trashcan-slot" xui-slot-name="trashcan Slot"></xui-slot>
 	</div>
-	<xui-slot xid="xui-trashcan" xui-mode="final"></xui-slot>
+	<xui-slot xid="xui-trashcan" xui-mode="final;preview"></xui-slot>
 	<!------------------------------------------------------------------------->
 
 	<script xid="xui-script-data" >
@@ -138,6 +141,8 @@
 		heightFooter:32, 
 		ContentfillPage:true 
 	};
+
+	$xui.initComponentVuejs = [];  // liste des function à appeler  
 	</script>
 
 	<!--------------------------------------------------------------------------------------->
@@ -151,7 +156,7 @@
 
 	<script xid="xui-init-designer" xui-mode="preview">
 		document.addEventListener("keydown", function (event) {
-			if (event.ctrlKey && event.keyCode == 81) {
+			if (event.ctrlKey && event.keyCode == 81) {    // ctrl + Q
 				event.stopPropagation();
 				event.preventDefault();
 				var message = {
@@ -163,7 +168,7 @@
 	</script>
 
 	<script xid="xui-init-designer" xui-mode="design">
-		<xui-inject xui-path="app/cmpDesignDrop.js"></xui-inject>
+		<xui-inject xui-path="app/vue2frameDesigner.js"></xui-inject>
 	</script>
 
 </xui-factory>

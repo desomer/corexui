@@ -53,6 +53,8 @@ html::-webkit-scrollbar {
     height: calc(100vh - 64px - 32px);
     width: 100%;
 }
+
+/***************************************************************/
 pre, code {
     font-family: monospace, monospace;
 }
@@ -73,6 +75,11 @@ pre > code {
     font-weight: unset !important;
 }
 
+/*************************************************************/
+.xui-div-design {
+    overflow-y: scroll; height: calc(100% + 48px - 35px);
+}
+
 .xui-btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
 
 .xui-style-selector { 
@@ -88,9 +95,9 @@ pre > code {
 }
 
 .xui-style-prop {    
-    background: #f9f9f9;
+    background: #565656;
     height: 24px;
-    color: #696969 !important;
+    color: white !important;
     padding: 0px 5px;
     cursor : pointer;
 }
@@ -106,6 +113,42 @@ pre > code {
 {
     font-size: 1rem;
 }
+
+
+.xui-editor-action-btn
+{
+    min-width: 20px !important;
+    width: 20px;
+    margin: 7px 0px 0px 0px;
+}
+
+/******************************************************************************/
+.xui-list-cmp .v-list-item__icon {
+    height: 24px !important;
+    margin-top: 4px !important;
+    margin-bottom: 0px !important;
+}
+
+.xui-list-cmp .v-list-item {
+    min-height: 32px;
+}
+
+.xui-list-class .v-list-item--dense { 
+    height: 25px;
+    min-height: 25px; 
+}
+
+.xui-list-class .v-list-group__header { 
+    height: 25px;
+    min-height: 25px; 
+    background: #f9f9f9;
+    border: 1px solid #e8e8e8;
+}
+
+.xui-list-class .v-list-item__icon { 
+    margin: 0px 6px 0px -10px !important;
+}
+
 /******************************************************************************/
 .xui-textarea-editor {
     overflow: hidden;

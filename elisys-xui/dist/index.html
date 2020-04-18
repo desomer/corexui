@@ -7,6 +7,35 @@
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css"></link>
       <link rel="stylesheet" href="app/frameDesigner.css"></link>
+      <style>
+            .xui-grid { padding:0px 0px; margin: 0px 0px; max-width:unset; }
+        </style>
+      <style>
+            .xui-form { max-width:unset; }
+            .xui-form-gutter>.col, .xui-form-gutter>[class*=col-] {
+                padding: 5px 6px;
+            }
+            .xui-form .v-text-field input {
+                line-height: 14px;
+                font-size: 0.9rem;
+            }
+        </style>
+      <style>
+
+            .v-tabs-items {
+                height: calc(100% - 48px) 
+            }
+            .v-tabs-items > .v-window__container {
+                height: 100% !important
+            }
+            .v-tabs-items > .v-window__container > .v-window-item {
+                height: 100% !important
+            }
+            
+        </style>
+      <style>
+            .xui-class-slot-full { height:100%; width:100%;}
+        </style>
    </head>
    <body style="height:100vh">
       <template id="xui-rootTemplate">
@@ -25,7 +54,7 @@
                   <v-icon>mdi-monitor-cellphone</v-icon>
                </v-btn>
                <span style="width:20px"></span>
-               <v-btn small class="xui-btn-action" @click="$xui.refreshAction('template')">
+               <v-btn small class="xui-btn-action" @click="$xui.refreshAction('template:reload')">
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
                <v-btn small class="xui-btn-action" @click="$xui.saveProperties()">
@@ -38,13 +67,13 @@
                      <v-tab>
                         <v-icon>mdi-square-edit-outline</v-icon>
                      </v-tab>
-                     <v-tab-item eager>
+                     <v-tab-item eager :transition="false" :reverse-transition="false">
                         <v-tabs class="tab-editor" dark height="32px">
                            <v-tab>
                               <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
                               <span style="margin-left: 5px;">frame1</span>
                            </v-tab>
-                           <v-tab-item eager>
+                           <v-tab-item eager :transition="false" :reverse-transition="false">
                               <div class="main-container">
                                  <div class="main-item main-item-1"></div>
                                  <div class="main-item main-item-2">
@@ -55,31 +84,33 @@
                                        <v-tab>
                                           <v-icon>mdi-layers-triple</v-icon>
                                        </v-tab>
-                                       <v-tab-item eager>
+                                       <v-tab-item eager :transition="false" :reverse-transition="false">
                                           <div id="AppPropertiesSetting"></div>
                                        </v-tab-item>
                                        <v-tab>
                                           <v-icon>mdi-palette-swatch</v-icon>
                                        </v-tab>
-                                       <v-tab-item eager>
-                                          <div>Style/class coming soon...</div>
+                                       <v-tab-item eager :transition="false" :reverse-transition="false">
+                                          <div class="xui-div-design">
+                                             <component v-bind:is="componentTab"></component>
+                                          </div>
                                        </v-tab-item>
                                        <v-tab>
                                           <v-icon>mdi-database-import</v-icon>
                                        </v-tab>
-                                       <v-tab-item eager>
+                                       <v-tab-item eager :transition="false" :reverse-transition="false">
                                           <div>Data binding coming soon...</div>
                                        </v-tab-item>
                                        <v-tab>
                                           <v-icon>mdi-plus-box-multiple</v-icon>
                                        </v-tab>
-                                       <v-tab-item eager>
+                                       <v-tab-item eager :transition="false" :reverse-transition="false">
                                           <div id="AppComponents"></div>
                                        </v-tab-item>
                                        <v-tab>
                                           <v-icon>mdi-file-tree</v-icon>
                                        </v-tab>
-                                       <v-tab-item eager>
+                                       <v-tab-item eager :transition="false" :reverse-transition="false">
                                           <div>TreeView coming soon...</div>
 .                                       </v-tab-item>
                                     </v-tabs>
@@ -90,24 +121,24 @@
                               <v-icon>mdi-palette</v-icon>
                               <span>style1</span>
                            </v-tab>
-                           <v-tab-item eager>
+                           <v-tab-item eager :transition="false" :reverse-transition="false">
                               <div>Coming soon...</div>
                            </v-tab-item>
                            <v-tab>
                            </v-tab>
-                           <v-tab-item eager>
+                           <v-tab-item eager :transition="false" :reverse-transition="false">
                            </v-tab-item>
                         </v-tabs>
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-code-tags</v-icon>
                      </v-tab>
-                     <v-tab-item eager>
+                     <v-tab-item eager :transition="false" :reverse-transition="false">
                         <v-tabs class="tab-code" dark height="32px">
                            <v-tab>
                               <div> Html </div>
                            </v-tab>
-                           <v-tab-item eager>
+                           <v-tab-item eager :transition="false" :reverse-transition="false">
                               <div class="main-code">
                                  <pre>
                                     <code spellcheck id="xui-code-html"></code>
@@ -117,7 +148,7 @@
                            <v-tab>
                               <div> YAML </div>
                            </v-tab>
-                           <v-tab-item eager>
+                           <v-tab-item eager :transition="false" :reverse-transition="false">
                               <div class="main-code">
                                  <pre>
                                     <code spellcheck id="xui-code-yaml"></code>
@@ -129,7 +160,7 @@
                      <v-tab>
                         <v-icon>mdi-api</v-icon>
                      </v-tab>
-                     <v-tab-item eager>
+                     <v-tab-item eager :transition="false" :reverse-transition="false">
                         <div id="editorContent">
                            <vue-editor v-model="contentEditor"></vue-editor>
                         </div>
@@ -140,24 +171,38 @@
                      <v-tab>
                         <v-icon>mdi-database</v-icon>
                      </v-tab>
-                     <v-tab-item eager>
+                     <v-tab-item eager :transition="false" :reverse-transition="false">
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-apps</v-icon>
                      </v-tab>
-                     <v-tab-item eager>
+                     <v-tab-item eager :transition="false" :reverse-transition="false">
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-image-filter</v-icon>
                      </v-tab>
-                     <v-tab-item eager>
+                     <v-tab-item eager :transition="false" :reverse-transition="false">
                      </v-tab-item>
                      <v-tab>
                         <v-icon>mdi-border-inside</v-icon>
                      </v-tab>
-                     <v-tab-item eager>
+                     <v-tab-item eager :transition="false" :reverse-transition="false">
                      </v-tab-item>
                   </v-tabs>
+                  <v-dialog v-model="dialogClass" v-on:click:outside="$xui.closeClassEditor()" max-width="290">
+                     <v-card>
+                        <div style="height:60px; background-image: linear-gradient(20deg, #484848, black);" class="white--text elevation-6">
+                           <v-card-title>List class</v-card-title>
+                        </div>
+                        <div style="max-height:65vh; overflow-y: scroll;">
+                           <cmp-list-class></cmp-list-class>
+                        </div>
+                        <v-card-actions class="elevation-6">
+                           <v-btn text @click="dialogClass=false;">Cancel</v-btn>
+                           <v-btn text @click="$xui.closeClassEditor();dialogClass=false;">Save</v-btn>
+                        </v-card-actions>
+                     </v-card>
+                  </v-dialog>
                </v-container>
             </v-content>
             <v-footer app color="#1d9da0" :dark="dark" style="padding: 0px 10px;" :height="heightFooter" inset>
@@ -167,8 +212,15 @@
                <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-content-cut</v-icon>
                </v-btn>
-               <v-btn small class="xui-btn-action" @click="$xui.moveTo()">
+               <v-btn small class="xui-btn-action" @click="$xui.pasteTo()">
                   <v-icon>mdi-content-paste</v-icon>
+               </v-btn>
+               <span style="width:20px"></span>
+               <v-btn small class="xui-btn-action" @click="$xui.undo()">
+                  <v-icon>mdi-undo</v-icon>
+               </v-btn>
+               <v-btn small class="xui-btn-action" @click="$xui.redo()">
+                  <v-icon>mdi-redo</v-icon>
                </v-btn>
                <span style="width:50px"></span>
                <v-btn small class="xui-btn-action">
@@ -185,7 +237,7 @@
                   <v-icon>mdi-autorenew</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2020 v0.1.4</span>
+               <span>&copy;&nbsp;Elisys 2020 v0.1.5 14/04/20</span>
             </v-footer>
          </v-app>
       </template>
@@ -201,15 +253,29 @@
 		heightFooter:32, 
 		ContentfillPage:true 
 	};
+
+	$xui.initComponentVuejs = [];  // liste des function à appeler  
 	
         var json = { 
+            isDesignFrame : true,
             selectedxui : "PWA Code Generator", 
             activeTab : 0,
             activeAction : 0,
             contentEditor: ''
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
-
+    
+        var json = {
+            dialogClass:false,
+            listCatClass: [],
+            componentTab : ''
+        };
+        $xui.rootdata= { ...$xui.rootdata, ...json};
+    
+        $xui.initComponentVuejs.push(() => {
+            new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
+        }
+        );
     </script>
    <script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>

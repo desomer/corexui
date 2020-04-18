@@ -71,12 +71,12 @@
 	<xui-design xid="header-vuetify">
 		<title>[[title]]</title>
 		<viewport-no-zoom></viewport-no-zoom>
-	
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"/>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"/>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"/>
-				
+		
 		<xui-slot xid="inject-other-header"></xui-slot>
+		<style xid="inject-style"></style>		
 	</xui-design>
 	
 	<meta xid="viewport-no-zoom" name="viewport" 
@@ -142,7 +142,7 @@
 		ContentfillPage:true 
 	};
 
-	$xui.initComponentVuejs = [];  // liste des function à appeler  
+	$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler  
 	</script>
 
 	<!--------------------------------------------------------------------------------------->
