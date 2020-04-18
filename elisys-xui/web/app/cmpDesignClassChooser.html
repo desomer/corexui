@@ -1,8 +1,15 @@
 <xui-factory version="1.0">
 
+    <xui-design xid="xui-script-data">
+        $xui.initComponentVuejs.push(() => {
+            new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
+        }
+        );
+    </xui-design>
+
     <script xid="xui-list-class" xui-no-dom >
         export default {
-            template: <vue-template xui-convert-json></vue-template>,
+            template: <vue-xui-list-class xui-convert-json></vue-xui-list-class>,
             watch: {
                 selectedClass: (newValue, oldValue) => {
                     console.debug('The selectedClass name was changed from <' + oldValue + '> to <' + newValue + '>');
@@ -11,7 +18,7 @@
         }
     </script>
 
-    <v-list xid="vue-template" expand dense class="xui-list-class">
+    <v-list xid="vue-xui-list-class" expand dense class="xui-list-class">
         <v-list-group no-action v-for="(itemCat, j) in listCatClass" :prepend-icon="itemCat.icon"
             :value="itemCat.open">
             <template v-slot:activator>
@@ -27,7 +34,7 @@
                         <v-select dense v-model="item.vl" hide-details style="width: 60px;
                                 position: absolute;
                                 top: 0px;
-                                left: 70px;" :items="item.list"></v-select>
+                                left: 85px;" :items="item.list"></v-select>
 
                         <v-checkbox dense color="blue accent-4" v-model="item.sel">
                         </v-checkbox>

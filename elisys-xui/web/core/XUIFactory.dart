@@ -114,9 +114,14 @@ class XUIModel implements Comparable<XUIModel> {
   Future processPhase1Design(
       String xid, XUIEngine engine, XUIElementHTML elemHtml) async {
     if (xid != null && this is! XUIDesign) {
-      var dico = engine.xuiFile.searchDesign(xid);
+      // if (xid=="xui-script-data") {
+      //           xid="xui-script-data";
+      // }
 
-      if (dico != null) {
+      List<DicoOrdered<XUIDesign>> listDico = [];
+      engine.xuiFile.searchDesign(listDico, xid);
+
+      for (var dico in listDico) {
         for (var item in dico.sort(engine.xuiFile.context)) {
           await item.processPhase1(engine, elemHtml);
         }
@@ -124,25 +129,13 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  // String calculateProp(String prop, XUIElementHTML elemHtml) {
-  //   if (prop != null) {
-  //     ParseInfo parseInfo = ParseInfo(prop, ParseInfoMode.PROP);
-  //     XUIProperty.parse(parseInfo, (String tag) {
-  //       var ret = elemHtml.searchPropertyXUI(tag, -1);
-  //       return ret != null ? ret : "[" + tag + "]";
-  //     });
-  //     prop = parseInfo.parsebuilder.toString();
-  //   }
-
-  //   return prop;
-  // }
 
   Future processPhase1Children(
       XUIElementHTML elemHtml, XUIEngine engine) async {
     /**************** FOR  *****************/
     int nb = 1;
     String varIdx;
-    if (elemXUI?.propertiesXUI != null) {
+    if (elemHtml?.propertiesXUI != null) {
       XUIProperty xuifor = elemHtml.propertiesXUI["for"];
       if (xuifor != null) {
         varIdx = xuifor.content.toString();
@@ -160,9 +153,10 @@ class XUIModel implements Comparable<XUIModel> {
             // affecte les proprties de la boucle FOR
             item.propertiesXUI ??= HashMap<String, XUIProperty>();
             item.propertiesXUI[varIdx] = XUIProperty(i.toString());
-            item.propertiesXUI[ATTR_PARENT_XID] =
-                XUIProperty(elemHtml.calculatePropertyXUI(elemHtml.originElemXUI.xid));
+            // item.propertiesXUI[ATTR_PARENT_XID] = XUIProperty(
+            //     elemHtml.calculatePropertyXUI(elemHtml.originElemXUI.xid));
           }
+
           await doChildPhase1(item, elemHtml, engine);
         }
       }
@@ -236,7 +230,7 @@ class XUIModel implements Comparable<XUIModel> {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
 
         if (prop.key.toLowerCase() == cst.ATTR_NO_DOM) {
-            elemHtml.tag=TAG_NO_DOM;   // si xui-no-dom alors retire la tag
+          elemHtml.tag = TAG_NO_DOM; // si xui-no-dom alors retire la tag
         }
 
         if (prop.key.toLowerCase() != cst.ATTR_XID) {
@@ -302,9 +296,9 @@ class XUIModel implements Comparable<XUIModel> {
   }
 
   String getDocumentationID(XUIElementHTML elemHtml) {
-    if (elemHtml.implementBy==null) {
-      return null;   // cas des xui-no-dom
-    }    
+    if (elemHtml.implementBy == null) {
+      return null; // cas des xui-no-dom
+    }
 
     var docId = elemHtml.implementBy.first.elemXUI.xid;
 

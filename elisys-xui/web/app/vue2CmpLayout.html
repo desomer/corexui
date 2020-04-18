@@ -1,0 +1,116 @@
+<xui-factory version="1.0">
+
+    <xui-design xid="xui-script-data">
+        $xui.initComponentVuejs.push(() => {
+        new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
+        "vue-xui-split");
+        }
+        );
+    </xui-design>
+
+    <!------------------------------------------------------------------------------>
+
+    <xui-doc xid="xui-split-1">
+        <xui-prop id="name">Split</xui-prop>
+        <xui-prop id="icon">mdi-format-title</xui-prop>
+        <xui-prop id="desc">Un split</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="column" editor="bool">column</xui-prop>
+        <xui-prop var="sizeA" editor="text">size A (px, fr, %)</xui-prop>
+        <xui-prop var="sizeB" editor="text">size B (px, fr, %)</xui-prop>
+        
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="template:xui-split-1">
+        <xui-prop id="name">Split Cell</xui-prop>
+        <xui-prop id="desc">Contenu du split</xui-prop>
+        <xui-prop id="favorite">container</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <v-xui-split xid="xui-split-1" column="[[column@0]]" sizea="[[sizeA]]" sizeb="[[sizeB]]" class="[[class@0]]" -style="[[style@0]]" xui-slot-name="split">
+        <template v-slot:a>
+            <xui-slot class="[[class@1]]" -style="[[style@1]]" xui-reloader=true xid="[[parent-xid]]-splitA" xui-slot-full xui-slot-name="split A"></xui-slot>
+        </template>
+        <template v-slot:b>
+            <xui-slot class="[[class@1]]" -style="[[style@1]]" xui-reloader=true xid="[[parent-xid]]-splitB" xui-slot-full xui-slot-name="split B"></xui-slot>
+        </template>
+    </v-xui-split>
+
+    <!------------------------------------------------------------------------------>
+
+    <script xid="vue-xui-split" xui-no-dom>
+        export default {
+            template: <template-xui-split xui-convert-json></template-xui-split>,
+            props: ["column", "sizea", "sizeb"],
+            mounted: function () {
+                console.debug("############", this);
+                var sizeA = this.sizea==undefined?"1fr":this.sizea;
+                var sizeB = this.sizeb==undefined?"1fr":this.sizeb;
+
+                var gutter = this.$el.querySelector(':only-child > .xui-split-gutter');
+
+                if (this.column==undefined) {
+                    this.$el.style.gridTemplateRows = sizeA+" 5px "+sizeB;
+                    gutter.classList.add("xui-split-gutter-horizontal");
+                    Split({
+                        rowGutters: [{
+                            track: 1,
+                            element: gutter
+                        }]
+                    })
+                }
+                else
+                {
+                    this.$el.style.gridTemplateColumns = sizeA+" 5px "+sizeB;
+                    gutter.classList.add("xui-split-gutter-vertical");
+                    Split({
+                        columnGutters: [{
+                            track: 1,
+                            element: gutter
+                        }]
+                    })
+                }
+            }
+        }
+    </script>
+
+    <div xid="template-xui-split" class="xui-split">
+        <div>
+            <slot name="a"></slot>
+        </div>
+        <div class="xui-split-gutter"></div>
+        <div>
+            <slot name="b"></slot>
+        </div>
+    </div>
+
+    <xui-design xid="inject-other-header">
+        <script async src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
+        <style>
+            .xui-split {
+                display: grid;
+                height: 100%;
+            }
+
+            .xui-split-gutter {
+                background-color: #c7c7c7
+            }
+
+            .xui-split-gutter-horizontal {
+                cursor: row-resize;
+            }
+
+            .xui-split-gutter-vertical {
+                cursor: col-resize;
+            }
+        </style>
+    </xui-design>
+
+
+
+</xui-factory>

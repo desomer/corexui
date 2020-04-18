@@ -1,3 +1,9 @@
+// $xui.initComponentVuejs.push( () => {
+//     // gestion des composants XUIvueJS (cmp-list-class)
+//     new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
+//   }
+// )
+
 $xui.initVuejs = (vuejs) => {
 
   vuejs.$watch('activeAction', function (newValue, oldValue) {
@@ -24,11 +30,12 @@ $xui.initVuejs = (vuejs) => {
 
   var listDesignClass = [
     {
-      title: "size",
-      icon: "mdi-format-text",
-      open: true,
+      title: "style",
+      icon: "mdi-image-size-select-large",
+      open: false,
       listClass: [
         { sel: false, type: 'check', text: 'fill height', value: 'fill-height' },
+        { sel: false, text: 'elevation', value: 'elevation', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12','13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'] },
       ]
     },
     {
@@ -80,11 +87,10 @@ $xui.initVuejs = (vuejs) => {
 
 
   $xui.rootdata.listCatClass.push(...listDesignClass);
+  
+  
   //console.debug($xui.rootdata.listCatClass);
-
-
-
-
+  
   // var list = "ma-2 pt-1 text-justify";
   // new DesignClassManager().initClassSelector(list, listDesignClass);
   // var txt = new DesignClassManager().getClassTextFromSeletor(list, listDesignClass);
@@ -223,72 +229,66 @@ class DesignClassManager {
 }
 
 /***************************************************************************************/
-class ComponentManager {
+// class ComponentManager {
 
-  registerVueComponent(idCmp, file, xid) {
+//   registerVueComponent(idCmp, file, xid) {
 
-    Vue.component(idCmp, function (resolve, reject) {
+//     Vue.component(idCmp, function (resolve, reject) {
 
-      this.waitForGlobal("getHtmlFrom", function () {
+//       this.waitForGlobal("getHtmlFrom", function () {
 
-        var infoFileCmp = { file: file, xid: xid, mode: 'final' };
-        var prom = getPromise("getVueCmp")
-        $xui.getHtmlFrom(infoFileCmp, "getVueCmp");
-        prom.then(jsCmp => {
+//         var infoFileCmp = { file: file, xid: xid, mode: 'final' };
+//         var prom = getPromise("getVueCmp")
+//         $xui.getHtmlFrom(infoFileCmp, "getVueCmp");
+//         prom.then(jsCmp => {
 
-          const dataUri = ComponentManager.esm`${jsCmp}`;
-          import(dataUri)
-            .then((namespaceObject) => {
+//           const dataUri = ComponentManager.esm`${jsCmp}`;
+//           import(dataUri)
+//             .then((namespaceObject) => {
 
-              console.debug("addVueComponent", namespaceObject.default);
+//               console.debug("addVueComponent", namespaceObject.default);
 
-              var cmp = {
-                data: function () {
-                  return $xui.rootdata;
-                },
-                computed: {
-                  $xui: function () {
-                    return window.$xui;
-                  }
-                }
-                , ...namespaceObject.default
-              };
+//               var cmp = {
+//                 data: function () {
+//                   return $xui.rootdata;
+//                 },
+//                 computed: {
+//                   $xui: function () {
+//                     return window.$xui;
+//                   }
+//                 }
+//                 , ...namespaceObject.default
+//               };
 
-              resolve(cmp);
-            });
+//               resolve(cmp);
+//             });
 
-        });
-      }.bind(this));
+//         });
+//       }.bind(this));
 
-    }.bind(this))
+//     }.bind(this))
 
-  }
+//   }
 
-  /*******************************************************************/
+//   /*******************************************************************/
 
-  static esm(templateStrings, ...substitutions) {
-    let js = templateStrings.raw[0];
-    for (let i = 0; i < substitutions.length; i++) {
-      js += substitutions[i] + templateStrings.raw[i + 1];
-    }
-    return 'data:text/javascript;base64,' + btoa(js);
-  }
+//   static esm(templateStrings, ...substitutions) {
+//     let js = templateStrings.raw[0];
+//     for (let i = 0; i < substitutions.length; i++) {
+//       js += substitutions[i] + templateStrings.raw[i + 1];
+//     }
+//     return 'data:text/javascript;base64,' + btoa(js);
+//   }
 
-  waitForGlobal(key, callback) {
-    if ($xui[key] != null) {
-      callback();
-    } else {
-      setTimeout(function () { this.waitForGlobal(key, callback); }.bind(this), 100);
-    }
-  };
+//   waitForGlobal(key, callback) {
+//     if ($xui[key] != null) {
+//       callback();
+//     } else {
+//       setTimeout(function () { this.waitForGlobal(key, callback); }.bind(this), 100);
+//     }
+//   };
 
-}
-
-// gestion des composants XUIvueJS (cmp-list-class)
-new ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
-
-
-
+// }
 
 
 

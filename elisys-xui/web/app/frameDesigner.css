@@ -77,7 +77,7 @@ pre > code {
 
 /*************************************************************/
 .xui-div-design {
-    overflow-y: scroll; height: calc(100% - 38px);
+    overflow-y: scroll; height: calc(100% + 48px - 35px);
 }
 
 .xui-btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}

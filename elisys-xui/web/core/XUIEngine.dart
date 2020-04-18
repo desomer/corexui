@@ -19,7 +19,10 @@ const ATTR_NO_DOM = "no-dom";
 const ATTR_RELOADER = "reloader";
 const ATTR_CONVERT_JSON = "convert-json";
 
-const TAG_ESCAPE = "xui-escape-";
+const ATTR_STYLE_SLOT = "style-slot";
+
+const TAG_ESCAPE =
+    "xui-escape-"; // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
 const TAG_NO_DOM = "xui-no-dom";
 
 const TAG_DOC = "xui-doc";
@@ -29,10 +32,12 @@ const TAG_IMPORT = "xui-import";
 const TAG_DIV_SLOT = "xui-div-slot";
 const TAG_PROP = "xui-prop";
 
+const XUI_TRASHCAN_SLOT = "xui-trashcan-slot";
+
 const MODE_ALL = "";
 const MODE_FINAL = "final";
-const MODE_TEMPLATE = "template";
 const MODE_DESIGN = "design";
+const MODE_TEMPLATE = "template";
 const MODE_PREVIEW = "preview";
 
 const SLOT_PREFIX = "_slot-";
@@ -109,7 +114,7 @@ class XUIResource extends XMLElemReader {
     }
     var xuiDesign = curDesign.sort(context)?.first;
 
-    print(xuiDesign);
+    // print(xuiDesign);
 
     var props = aDesign["props"];
     if (props != null) {
@@ -130,8 +135,7 @@ class XUIResource extends XMLElemReader {
     var parent = xuiDesign.elemXUI;
 
     if (children != null &&
-        (parent.children == null ||
-        parent.children.isEmpty)) {
+        (parent.children == null || parent.children.isEmpty)) {
       // ajout des enfants
       for (var aChild in children) {
         var childElemXui = XUIElementXUI();
@@ -214,15 +218,18 @@ class XUIResource extends XMLElemReader {
     return cmp;
   }
 
-  DicoOrdered<XUIDesign> searchDesign(String tag) {
+  List<DicoOrdered<XUIDesign>> searchDesign(List listCmp, String tag) {
     var cmp = designs[tag];
-    if (cmp == null) {
-      for (var subFile in listImport) {
-        cmp = subFile.searchDesign(tag);
-        if (cmp != null) break;
-      }
+    if (cmp != null) {
+      listCmp.add(cmp);
     }
-    return cmp;
+    // if (cmp == null) {
+    for (var subFile in listImport) {
+      subFile.searchDesign(listCmp, tag);
+      //if (cmp != null) break;
+    }
+    // }
+    return listCmp;
   }
 
   void generateDocumentation(XUIEngine engine) {
@@ -344,6 +351,7 @@ class XUIResource extends XMLElemReader {
         elemXui.tag = null; // pas de tag a affecter si cest le tag design
         if (elemXui.xid != null) {
           isChild = false;
+          //  if (elemXui.xid == "xui-script-data") isChild = false;
           designs[elemXui.xid] ??= DicoOrdered();
           designs[elemXui.xid].add(XUIDesign(elemXui, mode));
         }
@@ -371,14 +379,19 @@ class XUIResource extends XMLElemReader {
 
   void processAttributs(XMLElem element, XUIElementXUI elemXui) {
     element.attributs.entries.forEach((f) {
-      if (f.key.toString().startsWith("xui-")) {
+      String keyAttr = f.key.toString();
+      if (keyAttr.startsWith("-")) {
+        keyAttr = keyAttr.substring(1);
+      }
+
+      if (keyAttr.startsWith("xui-")) {
         // les xui- sont des properties
         elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
-        elemXui.propertiesXUI[f.key.toString().substring(4)] =
+        elemXui.propertiesXUI[keyAttr.substring(4)] =
             XUIProperty(f.value);
       } else {
         elemXui.attributes ??= HashMap<String, XUIProperty>();
-        elemXui.attributes[f.key] = XUIProperty(f.value == "" ? null : f.value);
+        elemXui.attributes[keyAttr] = XUIProperty(f.value == "" ? null : f.value);
       }
     });
   }
@@ -392,7 +405,7 @@ class XUIEngine {
   var docInfo = HashMap<String, DocInfo>();
   var dataBindingInfo = XUIParseJSDataBinding();
 
-  String lastDeleteXid;
+  //String lastDeleteXid;
 
   Future initialize(HTMLReader reader, XUIContext ctx) async {
     xuiFile = XUIResource(reader, ctx);

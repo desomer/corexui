@@ -76,6 +76,16 @@ class XUIElementHTML extends XUIElement {
     if (tag == cst.ATTR_XID) {
       // ne cherche pas sur les parent
       return calculatePropertyXUI(this.originElemXUI.xid);
+    } else if (tag == cst.ATTR_PARENT_XID) {
+      XUIElementHTML p = this.parent;
+      while (p != null) {
+        if (p.originElemXUI != null && p.originElemXUI.xid != null) {
+          break;
+        }
+        p = p.parent;
+      }
+
+      return p.calculatePropertyXUI(p.originElemXUI.xid);
     }
 
     /// gestion de la recherche sur des enfant (@-1) ou uniquement dans himself (@0)
@@ -175,10 +185,10 @@ class XUIElementHTML extends XUIElement {
             }
             buffer.html.write(" ");
 
-            // gestion des - devant des attr pour bypasser les correcteurs de syntaxe de vscode -style="[[xxx]]"
-            if (keyAttr.toString().startsWith("-")) {
-              keyAttr = keyAttr.toString().substring(1);
-            }
+            // // gestion des - devant des attr pour bypasser les correcteurs de syntaxe de vscode -style="[[xxx]]"
+            // if (keyAttr.toString().startsWith("-")) {
+            //   keyAttr = keyAttr.toString().substring(1);
+            // }
 
             buffer.html.write(keyAttr);
 

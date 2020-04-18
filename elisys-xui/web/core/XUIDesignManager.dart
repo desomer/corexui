@@ -26,6 +26,12 @@ class XUIDesignManager {
     return _designManager[fileInfo.file];
   }
 
+   static void removeDesignManager(FileDesignInfo fileInfo) {
+    if (_designManager[fileInfo.file] != null) {
+      _designManager[fileInfo.file] = null;
+    }
+  }
+
   ///------------------------------------------------------------------------------------------
   Future<String> getHtml(XUIContext ctx, String uri, String xid) async {
     var bufferHtml = XUIHtmlBuffer();

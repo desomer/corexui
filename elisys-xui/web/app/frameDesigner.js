@@ -45,10 +45,22 @@ $xui.changePageJS = (param) => {
     $xui.pageDesignManager.changePageJS(param);
 };
 
+$xui.undo = () => {
+    $xui.pageDesignManager.undo();
+};
+
+$xui.redo = () => {
+    $xui.pageDesignManager.redo();
+};
+
 /******************************************************************************** */
 // gestion des button refresh de la page
 $xui.refreshAction = (mode) => {
     var infoFile = { file: 'app/frame1.html', xid: 'root', mode: mode };
+    if (mode=="template:reload") {
+        infoFile.mode="template";
+        infoFile.action="reload";
+    }
     $xui.refresh(infoFile);    // lance le dart
 };
 
@@ -75,7 +87,7 @@ $xui.addCmp = (cmp) => {
     const newXid = $xui.getNewXid($xui.propertiesComponent, cmp);
     const currentXid = $xui.propertiesComponent.xid;
     const template = "<xui-design xid=\"" + currentXid + "\"><" + cmp.xid + " xid=\"" + newXid + "\"></" + cmp.xid + "></xui-design>";
-    $xui.addDesign(infoFile, $xui.propertiesComponent.xid, template, true);
+    $xui.addDesign(infoFile, $xui.propertiesComponent.xid, template, true, false);
     // todo 
     // gerer .then($xui.changePage())
 }
@@ -105,9 +117,9 @@ $xui.deleteCmp = () => {
 
 }
 
-$xui.moveTo = () => {
+$xui.pasteTo = () => {
     $xui.unDisplaySelector();
-    console.debug("moveToCmp", $xui.propertiesDesign);
+    console.debug("pasteTo", $xui.propertiesDesign);
     var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
     var info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xui.moveDesign(infoFile, null, info.xid);
@@ -237,6 +249,8 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
             }
         });
     });
+
+    return prom;
 
 }
 

@@ -15,6 +15,8 @@ import 'core/XUIJSInterface.dart';
 
 import 'package:yamlicious/yamlicious.dart' show toYamlString;
 
+import 'core/element/XUIElement.dart';
+
 @JS()
 external void loadPageJS(obj);
 
@@ -28,7 +30,8 @@ external void changePageJS(obj);
 external set _refresh(void Function(FileDesignInfo) f);
 
 @JS('addDesign')
-external set _addDesign(void Function(FileDesignInfo, String, String, bool) f);
+external set _addDesign(
+    void Function(FileDesignInfo, String, String, bool, bool) f);
 
 @JS('getHtmlFrom')
 external set _getHtmlFrom(void Function(FileDesignInfo, String) f);
@@ -121,10 +124,16 @@ dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
   return InfoJS;
 }
 
-void addDesign(
-    FileDesignInfo fileInfo, String id, String template, bool reload) async {
+void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
+    bool init) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
   await designMgr.addDesign(id, template);
+
+  if (!reload && init == true) {
+    var ctx = XUIContext(fileInfo.mode);
+    await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
+    return;
+  }
 
   if (id != XUI_TRASHCAN_SLOT) designMgr.listXidChanged.add(id);
 
@@ -139,44 +148,52 @@ void deleteDesign(FileDesignInfo fileInfo, String id) async {
   await designMgr.removeDesign(id, null);
 }
 
-const XUI_TRASHCAN_SLOT = "xui-trashcan-slot";
-
 void removeDesign(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
   SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
 
-  if (designMgr.xuiEngine.lastDeleteXid != null) {
+  String lastDeleteXid = getContentTrashcanID(designMgr);
+
+  //String lastDeleteXid = designMgr.xuiEngine.lastDeleteXid;
+
+  if (lastDeleteXid != null) {
     // supprime la vielle trashcan
-    designMgr.removeDesign(designMgr.xuiEngine.lastDeleteXid, null);
+    designMgr.removeDesign(lastDeleteXid, null);
   }
 
   // ajoute un design a la trashcan
-  String moveToTrachcan = XUI_TRASHCAN_SLOT;
-  designMgr.xuiEngine.lastDeleteXid = id;
-  String slot = "<xui-design xid=\"" + moveToTrachcan + "\"></xui-design>";
-  await addDesign(fileInfo, moveToTrachcan, slot, false);
+ 
+  //designMgr.xuiEngine.lastDeleteXid = id;
+  String slot = "<xui-design xid=\"" + XUI_TRASHCAN_SLOT + "\"></xui-design>";
+  await addDesign(fileInfo, XUI_TRASHCAN_SLOT, slot, false, false);
 
   // move id vers la trashcan
-  designMgr.moveDesign(id, null, moveToTrachcan);
+  designMgr.moveDesign(id, null, XUI_TRASHCAN_SLOT);
 
   designMgr.listXidChanged.add(info.parentXid);
 
   await _reload(fileInfo);
 }
 
+String getContentTrashcanID(XUIDesignManager designMgr) {
+  SlotInfo infoTrash = designMgr.xuiEngine.getSlotInfo(XUI_TRASHCAN_SLOT, XUI_TRASHCAN_SLOT);
+  XUIElementHTML contentTrash =   infoTrash?.elementHTML?.children?.first;
+  var lastDeleteXid= contentTrash?.originElemXUI?.xid;
+  return lastDeleteXid;
+}
+
 void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
+  // ajoute le design qui doit recevoir le composant
   String slot = "<xui-design xid=\"" + idMoveTo + "\"></xui-design>";
-  await addDesign(fileInfo, idMoveTo, slot, true);
-
-  // var ctx = XUIContext(fileInfo.mode);   // init car addDesign avec false
-  // await designMgr.getHtml(ctx, fileInfo.file, idMoveTo);
+  await addDesign(fileInfo, idMoveTo, slot, false, true);
 
   if (id == null) {
-    id = designMgr.xuiEngine.lastDeleteXid;
-    designMgr.xuiEngine.lastDeleteXid = null;
+    id = getContentTrashcanID(designMgr);
+   // id = designMgr.xuiEngine.lastDeleteXid;
+   // designMgr.xuiEngine.lastDeleteXid = null;
   }
 
   designMgr.moveDesign(id, null, idMoveTo);
@@ -186,6 +203,14 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
 }
 
 Future refresh(FileDesignInfo fileInfo) async {
+  if (fileInfo.action == "reload") {
+    XUIDesignManager.removeDesignManager(fileInfo);
+    var ctx = XUIContext(MODE_TEMPLATE);
+    var designManager = getDesignManager(fileInfo);
+
+    await initStoreVersion(designManager, fileInfo, ctx);
+  }
+
   await _reload(fileInfo);
   return Future.value();
 }
@@ -239,6 +264,7 @@ void _reload(FileDesignInfo fileInfo) async {
   final yamld = toYamlString(obj);
   //loadCodeYamlJS(yamld.toString());
   options.yaml = yamld.toString();
+  options.action = fileInfo.action;
   changePageJS(options);
 }
 
@@ -268,18 +294,7 @@ void main() async {
   var ctx = XUIContext(MODE_DESIGN);
   var designManager = getDesignManager(fileInfo);
 
-  var db = window.localStorage['xui'];
-  if (db != null) {
-    await designManager.initEngine(fileInfo.file, ctx);
-
-    print("*********** window.localStorage ***********\n" + db);
-    var saveDb = loadYaml(db);
-
-    for (var aDesign in saveDb["design"]) {
-      print(aDesign);
-      designManager.xuiEngine.xuiFile.addObject(aDesign);
-    }
-  }
+  await initStoreVersion(designManager, fileInfo, ctx);
 
   String str = await getDesignManager(fileInfo)
       .getHtml(ctx, fileInfo.file, fileInfo.xid);
@@ -299,4 +314,24 @@ void main() async {
   //   print("-------------SEND  --------------");
   //   w.postMessage("ok");
   // });
+}
+
+Future initStoreVersion(XUIDesignManager designManager, FileDesignInfo fileInfo,
+    XUIContext ctx) async {
+  var name = "frame1";
+
+  var ver = window.localStorage['xui_version_' + name];
+  if (ver != null) {
+    int v = int.parse(ver) - 1;
+    var db = window.localStorage['xui_yaml_' + name + '_' + v.toString()];
+
+    await designManager.initEngine(fileInfo.file, ctx);
+
+    print("*********** window.localStorage ***********\n" + db);
+    var saveDb = loadYaml(db);
+
+    for (var aDesign in saveDb["design"]) {
+      designManager.xuiEngine.xuiFile.addObject(aDesign);
+    }
+  }
 }

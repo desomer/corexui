@@ -1,5 +1,6 @@
 <xui-factory version="1.0">
     <xui-import xui-path="app/vue2frame.html"></xui-import>
+    <xui-import xui-path="app/vue2CmpLayout.html"></xui-import>
     <xui-import xui-path="app/vue2CmpVuetify.html"></xui-import>
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
@@ -10,14 +11,6 @@
         <xui-prop id="colorApp" val="blue lighten-2"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
         <xui-prop id="copyrightApp" val="{{titre}}"></xui-prop>
-    </xui-design>
-
-    <xui-design xid="main">
-        <xui-tabs xid="onglet"></xui-tabs>
-    </xui-design>
-
-    <xui-design xid="onglet">
-        <xui-prop id="nb" val="3"></xui-prop>
-    </xui-design>    
+    </xui-design>  
 
 </xui-factory>

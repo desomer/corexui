@@ -38,7 +38,8 @@ export class PageDesignManager {
         this.codeHtml = param.html;
         this.codeYaml = param.yaml;
 
-        this.store();
+        if (param.action!="reload")
+            this.store();
 
         if ($xui.rootdata.activeTab == 1)  // si onglet 1 actif
         {
@@ -49,7 +50,26 @@ export class PageDesignManager {
     }
 
     store() {
-        localStorage.setItem('xui', this.codeYaml);
+        var name = "frame1"
+        var version = localStorage.getItem('xui_version_' + name);
+        if (version == null)
+            version = "0";
+
+        var ver = parseInt(version);
+
+        localStorage.setItem('xui_yaml_' + name + '_' + ver, this.codeYaml);
+        ver++;
+        localStorage.setItem('xui_version_' + name, "" + ver);
+        localStorage.setItem('xui_version_max_' + name, "" + ver);
+
+        // gestion du max
+        // var versionMax = localStorage.getItem('xui_version_max_' + name);
+        // if (versionMax == null)
+        //     versionMax = "" + ver;
+
+        // if (parseInt(versionMax) <= ver)
+        //     localStorage.setItem('xui_version_max_' + name, "" + ver);
+
     }
 
     loadCode() {
@@ -66,5 +86,34 @@ export class PageDesignManager {
             const code = Prism.highlight(this.codeYaml, Prism.languages.yaml, 'yaml');
             codeElem.innerHTML = code;
         }
+    }
+
+    undo() {
+        var name = "frame1"
+        var version = localStorage.getItem('xui_version_' + name);
+        if (version == null)
+            version = "0";
+
+        var ver = parseInt(version);
+        if (ver>1)
+            ver--;
+
+        localStorage.setItem('xui_version_' + name, "" + ver);
+        $xui.refreshAction("template:reload");
+    }
+
+    redo() {
+        var name = "frame1"
+        var versionMax = localStorage.getItem('xui_version_max_' + name);
+        var version = localStorage.getItem('xui_version_' + name);
+
+
+        var ver = parseInt(version);
+        var verMax = parseInt(versionMax);
+        if (ver<verMax)
+            ver++;
+
+        localStorage.setItem('xui_version_' + name, "" + ver);
+        $xui.refreshAction("template:reload");
     }
 }

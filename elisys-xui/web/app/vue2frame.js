@@ -1,4 +1,5 @@
 import Vuex from "https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.esm.browser.min.js";
+import * as vue2CmpMgr from "./vue2CmpMgr.js";
 
 
 // https://codesandbox.io/s/vue-template-o4j2g
@@ -6,8 +7,11 @@ import Vuex from "https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.esm.browser.
 Vue.config.devtools = true;
 Vue.config.productionTip = false;
 
+//console.debug(vue2CmpMgr);
+window.vue2CmpMgr=vue2CmpMgr;
+
 /*********************************************************************************/
-$xui.createComponent = (idTemplate, dataBinding) => {
+$xui.createComponentFromBody = (idTemplate, dataBinding) => {
 	return {
 		template: document.querySelector("#" + idTemplate).innerHTML,
 		data: () => { return $xui.rootdata; },
@@ -17,10 +21,21 @@ $xui.createComponent = (idTemplate, dataBinding) => {
 		}
 	}
 }
+
+
 /*********************************************************************************/
 $xui.loadApplicationJS = () => {
-	if ($xui.vuejs != null)
+	if ($xui.vuejs != null) {
 		$xui.vuejs.$destroy();
+	}
+	else
+	{
+		var listFct = $xui.initComponentVuejs;
+		for (const f of listFct) {
+			f();
+		}
+	}
+
 
 	/******************************************/
 	$xui.store = new Vuex.Store({
@@ -76,7 +91,7 @@ $xui.loadApplicationJS = () => {
 		});
 
 	var dataBinding = Vuex.mapState({ titre: 'count' });
-	const RootComponent = $xui.createComponent("xui-rootTemplate", dataBinding);
+	const RootComponent = $xui.createComponentFromBody("xui-rootTemplate", dataBinding);
 
 	$xui.listReloader={};
 	$xui.vuejs = new Vue({

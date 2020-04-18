@@ -117,8 +117,8 @@ class XUIActionManager {
           design.elemXUI.children = null;
           print("remove all <$xid> on parent <$xidParent>");
         } else if (nbChildNoText >= 0) {
+          print("*****  remove only <$xid> on parent <$xidParent>");
           elemToChange = design.elemXUI.children.removeAt(nbChildNoText);
-          print("remove only <$xid> on parent <$xidParent>");
         }
       }
 
@@ -149,7 +149,9 @@ class XUIActionManager {
     XUIDesign designMove;
     if (info != null) {
       designMove = _getXUIDesign(info, mode);
-    } else {
+    } 
+    
+    if (designMove==null) {
       for (XUIDesign aDesign in engine.xuiFile.designs[moveToXid].list) {
         if (mode == null || aDesign.mode == mode) {
           designMove = aDesign;

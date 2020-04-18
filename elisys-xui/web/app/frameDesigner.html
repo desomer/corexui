@@ -12,21 +12,37 @@
         <xui-prop id="titleApp" val="{{selectedxui}}"></xui-prop>
         <xui-prop id="colorApp" val="#1d9da0"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2020 v0.1.4"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.1.5 14/04/20"></xui-prop>
     </xui-design>
 
     <xui-design xid="xui-toolbar-title" class="xui-path-component">
     </xui-design>
 
+    <v-dialog xid="xui-class-editor" v-model="dialogClass"
+        v-on:click:outside="$xui.closeClassEditor()"
+        max-width="290">
+        <v-card>
+            <div
+                class="white--text elevation-6"
+                style="height:60px; background-image: linear-gradient(20deg, #484848, black);"
+            >
+                <v-card-title>List class</v-card-title>
+            </div>
+            <div style="max-height:65vh; overflow-y: scroll;">
+                <cmp-list-class></cmp-list-class>
+            </div>
+            <v-card-actions class="elevation-6">
+                <v-btn text @click="dialogClass=false;">Cancel</v-btn>
+                <v-btn text @click="$xui.closeClassEditor();dialogClass=false;">Save</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <!---------------------------------------------------------------------------> 
     <xui-design xid="main">
         <xui-tabs xid="main-tab" xui-nb="7" xui-vertical=true xui-dark=true v-model="activeTab" class="main-tab"></xui-tabs>
-        <v-dialog v-model="dialogClass"
-            v-on:click:outside="$xui.closeClassEditor()"
-            max-width="290">
-            <v-card>
-                <cmp-list-class></cmp-list-class>
-            </v-card>
-        </v-dialog>
+       
+        <xui-class-editor></xui-class-editor>
     </xui-design>
 
     <xui-design xid="main-tab-tab-0"><v-icon>mdi-square-edit-outline</v-icon></xui-design>
@@ -37,11 +53,16 @@
     <xui-design xid="main-tab-tab-5"><v-icon>mdi-image-filter</v-icon></xui-design>
     <xui-design xid="main-tab-tab-6"><v-icon>mdi-border-inside</v-icon></xui-design>
    
+    <!---------------------------------------------------------------------------> 
     <xui-design xid="main-tab-tab-item-0">
         <xui-tabs xid="tab-editor" class="tab-editor" xui-dark=true height="32px" xui-nb="3"></xui-tabs>
     </xui-design>
 
-    <xui-design xid="tab-editor-tab-0"><v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon><span style='margin-left: 5px;'>frame1</span></xui-design>
+    <xui-design xid="tab-editor-tab-0">
+        <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
+        <span style='margin-left: 5px;'>frame1</span>
+    </xui-design>
+    
     <xui-design xid="tab-editor-tab-item-0">
         <div class="main-container">
             <div class="main-item main-item-1"></div>
@@ -56,23 +77,19 @@
         </div>
     </xui-design>
 
+    <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true class="tab-action" height="35px" xui-nb="5">
+    </xui-tabs>
+
+    <!---------------------------------------------------------------------------> 
     <xui-design xid="tab-editor-tab-1"><v-icon>mdi-palette</v-icon><span>style1</span></xui-design>
     <xui-design xid="tab-editor-tab-item-1"><div>Coming soon...</div></xui-design>
+    <!---------------------------------------------------------------------------> 
 
     <xui-design xid="main-tab-tab-item-1">
         <xui-tabs xid="tab-code" class="tab-code" xui-dark=true height="32px" xui-nb="2"></xui-tabs>
     </xui-design>
 
-    <xui-design xid="main-tab-tab-item-2">
-        <div id="editorContent">
-            <vue-editor v-model="contentEditor"></vue-editor>
-        </div>
-          
-        <div id="resultContent">
-             <div v-html="contentEditor"></div>
-        </div>
-    </xui-design>
-
+    <!---------------------------------------------------------------------------> 
     <xui-design xid="tab-code-tab-0"><div> Html </div></xui-design>
     <xui-design xid="tab-code-tab-item-0">
         <div class="main-code">
@@ -91,9 +108,19 @@
         </div>
     </xui-design>
 
-    <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true class="tab-action" height="35px" xui-nb="5">
-    </xui-tabs>
+    <!---------------------------------------------------------------------------> 
 
+    <xui-design xid="main-tab-tab-item-2">
+        <div id="editorContent">
+            <vue-editor v-model="contentEditor"></vue-editor>
+        </div>
+          
+        <div id="resultContent">
+             <div v-html="contentEditor"></div>
+        </div>
+    </xui-design>
+
+    <!---------------------------------------------------------------------------> 
     <xui-design xid="action-tab-tab-0"><v-icon>mdi-layers-triple</v-icon></xui-design>
     <xui-design xid="action-tab-tab-1"><v-icon>mdi-palette-swatch</v-icon></xui-design>
     <xui-design xid="action-tab-tab-2"><v-icon>mdi-database-import</v-icon></xui-design>
@@ -110,21 +137,26 @@
     <xui-design xid="action-tab-tab-item-3"><div id="AppComponents"></div></xui-design>
     <xui-design xid="action-tab-tab-item-4"><div>TreeView coming soon...</div>.</xui-design>
 
-    
-
+    <!---------------------------------------------------------------------------> 
     <xui-design xid="slot-action-header">
         <xui-btn-small @click="$xui.fullScreen()"><v-icon>mdi-fullScreen</v-icon></xui-btn-small>
         <xui-btn-small @click="$xui.modePreview()"><v-icon>mdi-television-play</v-icon></xui-btn-small>
         <xui-btn-small @click="$xui.modePhone()"><v-icon>mdi-monitor-cellphone</v-icon></xui-btn-small>
         <span style="width:20px"></span>
-        <xui-btn-small @click="$xui.refreshAction('template')"><v-icon>mdi-refresh</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.refreshAction('template:reload')"><v-icon>mdi-refresh</v-icon></xui-btn-small>
         <xui-btn-small @click="$xui.saveProperties()"><v-icon>mdi-content-save</v-icon></xui-btn-small>
     </xui-design>
 
+    <!---------------------------------------------------------------------------> 
     <xui-design xid="slot-action-footer">
         <xui-btn-small @click="$xui.deleteCmp()"><v-icon>mdi-delete</v-icon></xui-btn-small>
         <xui-btn-small @click="$xui.deleteCmp()"><v-icon>mdi-content-cut</v-icon></xui-btn-small>
-        <xui-btn-small @click="$xui.moveTo()"><v-icon>mdi-content-paste</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.pasteTo()"><v-icon>mdi-content-paste</v-icon></xui-btn-small>
+
+        <span style="width:20px"></span>
+
+        <xui-btn-small @click="$xui.undo()"><v-icon>mdi-undo</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.redo()"><v-icon>mdi-redo</v-icon></xui-btn-small>
 
         <span style="width:50px"></span>
 
@@ -137,8 +169,10 @@
         <xui-btn-small @click="$xui.refreshAction('final')"><v-icon>mdi-autorenew</v-icon></xui-btn-small>
     </xui-design>
 
+    <!---------------------------------------------------------------------------> 
     <xui-design xid="xui-script-data">
         var json = { 
+            isDesignFrame : true,
             selectedxui : "PWA Code Generator", 
             activeTab : 0,
             activeAction : 0,
@@ -150,8 +184,7 @@
     <xui-design xid="xui-script-data">
         var json = {
             dialogClass:false,
-            listCatClass: [],
-            componentTab : ''
+            listCatClass: []
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
     </xui-design>

@@ -19,8 +19,8 @@ export class EventManager {
 
         document.addEventListener("keydown", function (event) {
 
-            if (event.ctrlKey && event.keyCode == 80) {    // ctrl + p
-                // mode preview
+            if (event.ctrlKey && event.keyCode == 80) {    // ctrl + Q
+                // mode preview  : gestion de la fermeture par ctrl Q
                 event.stopPropagation();
                 event.preventDefault();
                 $xui.modePreview();
@@ -34,23 +34,28 @@ export class EventManager {
             if (data.action == "select") {
                 $xui.displaySelectorByPosition(data.position);
                 $xui.modeDisplaySelection = true;
+                // 250 = delay d'animation des v-tabs
                 setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, 250);
             }
             if (data.action == "drop") {
                 if ($xui.dragItem != null) {
-                    // gestion drag de nouveau component
+                    // gestion drag de nouveau component sur l'Iframe
                     $xui.displayPropertiesJS(data.xid, data.xid_slot);
                     $xui.displayComponents(data.xid, data.xid_slot);
                     $xui.addCmp($xui.dragItem);
                 }
                 if ($xui.dragMoveItem != null) {
                     // gestion de drag entre slot
-                    if ($xui.deleteCmp()) {
-                        $xui.displayPropertiesJS(data.xid, data.xid_slot);
+                    if ($xui.deleteCmp()) {   // suppression de source
+                        // selection de la target
+                        var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
+                        prom.then(() => {  
+                            $xui.pasteTo();
+                        })
 
-                        setTimeout(() => {   // todo gestion par promise
-                            $xui.moveTo();
-                        }, 200);  // attend la fin du displayPropertiesJS
+                        // setTimeout(() => {   // todo gestion par promise
+                        //     $xui.pasteTo();
+                        // }, 200);  // attend la fin du displayPropertiesJS
                     }
                 }
             }
@@ -70,6 +75,20 @@ export class EventManager {
                 prom.then(template => {
                   document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeReloader", "xid": data.xid , "template": template }, "*");
                 })
+
+            }
+
+            if (data.action == "getCmpForFile")
+            {
+                //this.console.debug("***********getCmpForFile***********", data);
+                var act = "returnCmpForFile_"+data.infoFileCmp.file+"_"+data.infoFileCmp.xid;
+
+                var prom = getPromise(act)
+                $xui.getHtmlFrom(data.infoFileCmp, act);
+                prom.then(jsCmp => {
+                    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": act, jsCmp: jsCmp }, "*");
+                });
+
 
             }
         });

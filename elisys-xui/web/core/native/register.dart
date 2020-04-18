@@ -24,6 +24,7 @@ class NativeSlot extends XUIElementNative {
     // recherche le nom du slot et si celui ci et un slot full
     var slotName;
     bool isFull = false;
+
     html?.propertiesXUI?.entries?.forEach((f) {
       if (f.key.toLowerCase() == ATTR_SLOT_NAME) {
         slotName = f.value.content.toString();
@@ -41,41 +42,43 @@ class NativeSlot extends XUIElementNative {
     }
 
     var isModeDesign = engine.isModeDesign();
-
-    // si mode design => creer un slot visible si pas d'enfant
-    if (isModeDesign && html.children == null && slotName != null) {
-      var newChild = XUIElementXUI()..tag = TAG_DIV_SLOT;
-      newChild.children = [];
-      newChild.children.add(XUIElementText()..content = slotName);
-      if (html.originElemXUI.attributes!=null) {
-        // affecte les styles et les class du slot  (ex : flow et le display:inline flex)
-        newChild.attributes=HashMap<String, XUIProperty>();
-        if (html.originElemXUI.attributes["style"]!=null) {
-          newChild.attributes["style"] = html.originElemXUI.attributes["style"];
-        }
-        if (html.originElemXUI.attributes["class"]!=null) {
-          newChild.attributes["class"] = html.originElemXUI.attributes["class"];
-        }
-      }
-      await XUIModel(this, MODE_ALL).doChildPhase1(newChild, html, engine);  // affecte l'implementation du TAG_DIV_SLOT sur le newChild
-    }
-
-    // affecte l'identifiant xid du slot sur le parent si le parent en a pas
     var xidCal;
-    if (html.originElemXUI != null) {
+    if (isModeDesign && html.originElemXUI != null) {
       xidCal = html.calculatePropertyXUI(html.originElemXUI.xid);
     }
 
+    var isSlotButNotTrashcan = slotName != null && xidCal != XUI_TRASHCAN_SLOT;
+
+    // si mode design => creer un slot visible si pas d'enfant sauf XUI_TRASHCAN_SLOT
+    if (isModeDesign && html.children == null && isSlotButNotTrashcan) {
+      var newChild = XUIElementXUI()..tag = TAG_DIV_SLOT;
+      newChild.children = [];
+      newChild.children.add(XUIElementText()..content = slotName);
+      if (html.originElemXUI.attributes != null) {
+        // affecte les styles et les class du slot  (ex : flow et le display:inline flex)
+        newChild.attributes = HashMap<String, XUIProperty>();
+        if (html.originElemXUI.attributes[ATTR_STYLE_SLOT] != null) {
+          newChild.attributes["style"] =
+              html.originElemXUI.attributes[ATTR_STYLE_SLOT];
+        }
+
+        addAttributClassStyle("class", html, newChild);
+        addAttributClassStyle("style", html, newChild);
+      }
+      // affecte l'implementation du TAG_DIV_SLOT sur le newChild
+      await XUIModel(this, MODE_ALL).doChildPhase1(newChild, html, engine);
+    }
+
+    // affecte l'identifiant xid du slot sur le parent si le parent en a pas
     int nbChild = html.getNbChildNoText();
     int nbChildNoSlot = 0;
     html.children?.forEach((childHtml) {
-      // affecte les attribut du slot sur les enfants 
-
-     //var model = XUIElementXUI();
-     // XUIModel(model, MODE_ALL).processAttributes(childHtml);
+      // affecte les attribut du slot sur les enfants
+      //var model = XUIElementXUI();
+      // XUIModel(model, MODE_ALL).processAttributes(childHtml);
 
       // affecte le nom du slot sur les enfants si doit etre accessible (avoir un slot name)
-      if (isModeDesign && slotName != null) {
+      if (isModeDesign && isSlotButNotTrashcan) {
         childHtml.attributes ??= HashMap<String, XUIProperty>();
 
         // affecte le xui-slot sur les enfant non slot
@@ -86,19 +89,26 @@ class NativeSlot extends XUIElementNative {
           }
         }
       }
-      // affect la class full sur l'enfant si full et unique
-      if (isFull && nbChild == 1) {
-        childHtml.attributes ??= HashMap<String, XUIProperty>();
-        if (childHtml.attributes["class"] == null) {
-          childHtml.attributes["class"] = XUIProperty("xui-class-slot-full");
-        } else {
-          childHtml.attributes["class"] = XUIProperty(
-              childHtml.attributes["class"].content + " xui-class-slot-full");
+
+      // affecte la class full sur l'enfant si full et unique
+      if (nbChild == 1) {
+
+        addAttributClassStyle("class", html, childHtml);
+        addAttributClassStyle("style", html, childHtml);
+
+        if (isFull) {
+          childHtml.attributes ??= HashMap<String, XUIProperty>();
+          if (childHtml.attributes["class"] == null) {
+            childHtml.attributes["class"] = XUIProperty("xui-class-slot-full");
+          } else {
+            childHtml.attributes["class"] = XUIProperty(
+                childHtml.attributes["class"].content + " xui-class-slot-full");
+          }
         }
       }
     });
 
-    if (isModeDesign && (nbChildNoSlot == 0 /*|| nbChildNoSlot > 1*/)) {
+    if (isModeDesign && (nbChildNoSlot == 0)) {
       //recherche un parent affichable pour gerer la selection des slot (displaySelectorByXid)
       var p = html.parent;
       while (p != null) {
@@ -113,6 +123,24 @@ class NativeSlot extends XUIElementNative {
     }
 
     return Future.value();
+  }
+
+  void addAttributClassStyle(String attr, XUIElementHTML html, XUIElement newChild) {
+    if (html?.originElemXUI?.attributes!=null && html.originElemXUI.attributes[attr] != null) {
+      newChild.attributes ??= HashMap<String, XUIProperty>();
+
+      if (newChild.attributes[attr] == null) {
+        newChild.attributes[attr] =
+            XUIProperty(html.originElemXUI.attributes[attr].content);
+      } else {
+        newChild.attributes[attr] = XUIProperty(
+            newChild.attributes[attr].content +
+                " " +
+                html.originElemXUI.attributes[attr].content);
+      }
+      
+    }
+    
   }
 }
 

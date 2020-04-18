@@ -35,8 +35,14 @@ document.addEventListener('dragend', function () {
 
 /***********************************************************************************/
 
+document.addEventListener('mousedown', e => {
+    targetActionStart = e.target.closest("[data-xid]");
+  });
+
 document.addEventListener('click', function (e) {    //dblclick
     let targetAction = e.target.closest("[data-xid]");
+    if (targetActionStart!=targetAction)
+        return ;  // ne fait rien sur le drag (ex : Split)
 
     let elemRect = targetAction.getBoundingClientRect();
 
@@ -46,7 +52,7 @@ document.addEventListener('click', function (e) {    //dblclick
         xid_slot: targetAction.dataset.xidSlot,
         position: elemRect
     };
-    //console.debug("message", message);
+    //console.debug("***********message", message, targetAction, targetActionStart);
     window.parent.postMessage(message, "*");
 });
 
