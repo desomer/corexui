@@ -19,14 +19,14 @@ class XUIDesignManager {
   static final _designManager = HashMap<String, XUIDesignManager>();
   static XUIDesignManager getDesignManager(FileDesignInfo fileInfo) {
     if (_designManager[fileInfo.file] == null) {
-      print("create file ${fileInfo.file}");
+      //print("create file ${fileInfo.file}");
       _designManager[fileInfo.file] = XUIDesignManager();
     }
 
     return _designManager[fileInfo.file];
   }
 
-   static void removeDesignManager(FileDesignInfo fileInfo) {
+  static void removeDesignManager(FileDesignInfo fileInfo) {
     if (_designManager[fileInfo.file] != null) {
       _designManager[fileInfo.file] = null;
     }
@@ -45,18 +45,16 @@ class XUIDesignManager {
   }
 
   Future initEngine(String uri, XUIContext ctx) async {
-    await lock.synchronized(() async {
-      if (xuiEngine == null) {
+    if (xuiEngine == null) {
+      await lock.synchronized(() async {
         xuiEngine = XUIEngine();
         var provider = ProviderAjax();
-        print("initialize file ${uri}");
+        print("initialize file : read ${uri}");
         var reader = HTMLReader(uri, provider);
         await xuiEngine.initialize(reader, ctx);
-      }
-    });
+      });
+    }
   }
-
-
 
   void initHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
@@ -71,15 +69,15 @@ class XUIDesignManager {
   ///------------------------------------------------------------------------------------------
   Future<XUIComponent> getXUIComponent(
       XUIContext ctx, String uri, String idCmp) async {
-    await lock.synchronized(() async {
-      if (xuiEngine == null) {
+    if (xuiEngine == null) {
+      await lock.synchronized(() async {
         xuiEngine = XUIEngine();
         var provider = ProviderAjax();
-        print("initialize file ${uri}");
+        print("initialize file for getXUIComponent : read ${uri}");
         var reader = HTMLReader(uri, provider);
         await xuiEngine.initialize(reader, ctx);
-      }
-    });
+      });
+    }
 
     XUIComponent cmp = xuiEngine.xuiFile.components[idCmp].sort(ctx).first;
     return cmp;
@@ -102,7 +100,7 @@ class XUIDesignManager {
 
   ///------------------------------------------------------------------------------------------
   Future changeProperty(String xid, String variable, dynamic value) async {
-    print("${xid} a changer l'attribut ${variable} par ${value}");
+    print("${xid} a changer l'attribut <${variable}> par <${value}>");
     var listDesign = xuiEngine.xuiFile.designs[xid];
     if (listDesign == null) {
       await addDesign(xid, "<xui-design></xui-design>");
@@ -111,7 +109,7 @@ class XUIDesignManager {
 
     var xuiDesign = listDesign.sort(xuiEngine.xuiFile.context).first;
 
-    var designs = xuiEngine.getDesignInfo(xid, xid);
+    List<DesignInfo> designs = xuiEngine.getDesignInfo(xid, xid);
     for (var design in designs) {
       DocInfo doc = design.docInfo;
       if (doc != null && doc.variables.isNotEmpty) {
@@ -124,7 +122,20 @@ class XUIDesignManager {
             if (aVariable.editor == "bool" && aVariable.def == null) {
               if (value == false && xuiDesign.elemXUI.propertiesXUI != null) {
                 // vide la valeur
-                print("vide la variable bool");
+                print("retire la variable bool a false");
+                xuiDesign.elemXUI.propertiesXUI.remove(variable);
+                return Future.value();
+              }
+            }
+
+            // teste si champs vider par la croix
+            if (value == null && xuiDesign.elemXUI.propertiesXUI != null) {
+              if ((aVariable.editor == "text" || aVariable.editor == "int") &&
+                  aVariable.def != null) {
+                value = aVariable.def; // affecte la valeur par defaut
+              } else {
+                // vide la valeur
+                print("retire la variable value à null");
                 xuiDesign.elemXUI.propertiesXUI.remove(variable);
                 return Future.value();
               }
@@ -191,90 +202,22 @@ class XUIDesignManager {
     var ctx = XUIContext(fi.mode);
 
     int i = 0;
+    // boucle sur l'ensemble des couches de widget
     for (var design in designs) {
-      var titleCmp = design?.docInfo?.name ?? design.slotInfo.docId;
-      fi.xid = 'editor-header';
-      XUIComponent cmp =
-          await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
-      cmp.addProperties("selectAction",
-          "\$xui.displaySelectorByXid('${design.slotInfo.xid}', '${design.slotInfo.xid}')");
-      cmp.addProperties("title", titleCmp);
-      String header = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
-      ret.bufTemplate
-          .write("<div class='xui-over-prop-xid' id='${design.slotInfo.xid}'>");
-      ret.bufTemplate.write(header);
-
+      //------------------------------------------------------------------
+      // gestion de l'entete
+      await getJSDesignHeader(fi, design, ctx, ret);
+      //------------------------------------------------------------------
+      // gestion des variable du composant du widget
       for (DocVariables varCmp in design?.docInfo?.variables ?? const []) {
-        var istr = i.toString();
-        String template;
-        String extend = "";
-
-        if (varCmp.editor == "bool") {
-          fi.xid = 'editor-bool';
-        } else if (varCmp.editor == "int") {
-          fi.xid = 'editor-int';
-        } else if (varCmp.editor == "combo") {
-          fi.xid = 'editor-combo';
-          // affecte les items a la combobox
-          XUIComponent cmp =
-              await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
-          cmp.addProperties("items", "data[${istr}].items");
-
-          extend = ", \"items\":" + varCmp.list;
-        } else if (varCmp.editor == "class") {
-          fi.xid = 'editor-class';
-        } else {
-          fi.xid = 'editor-text';
-        }
-
-        XUIComponent cmp =
-            await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
-        cmp.addProperties("value", "data[${istr}].value");
-        cmp.addProperties("label", "data[${istr}].label");
-        cmp.addProperties("id", design.slotInfo.xid);
-        template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
-
+        String template =
+            await getJSDesignVariableTemplate(varCmp, fi, ctx, i, design);
         ret.bufTemplate.write(template);
-        if (i > 0) ret.bufData.write(",");
-
-        var value;
-        if (design.slotInfo.elementHTML?.propertiesXUI != null) {
-          var valInCmp =
-              (design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]?.content);
-          if (valInCmp != null && varCmp.editor == "bool") {
-            value = valInCmp;
-          } else if (valInCmp != null) value = jsonEncode(valInCmp.toString());
-        }
-
-        bool exist = value != null;
-        if (value == null && varCmp.editor == "bool") {
-          value = (varCmp.def ?? "false");
-        }
-        if (value == null) {
-          value = "\"" + (varCmp.def ?? "") + "\"";
-        }
-
-        ret.bufData.write("{\"xid\":\"" +
-            design.slotInfo.xid +
-            "\",\"variable\":\"" +
-            varCmp.id +
-            "\",\"label\":\"" +
-            varCmp.doc +
-            "\",\"cat\":\"" +
-            (varCmp.cat ?? "layout") +
-            "\",\"editor\":\"" +
-            varCmp.editor +
-            "\", \"value\":" +
-            value.toString() +
-            ", \"value_orig\":" +
-            value.toString() +
-            ", \"exist\":" +
-            exist.toString() +
-            extend +
-            "}");
+        //------------------------------------------------------------------
+        getJSDesignVariableData(varCmp, design, ret, i);
         i++;
       }
-
+      // fin de template
       ret.bufTemplate.write("</div>");
     }
 
@@ -284,6 +227,126 @@ class XUIDesignManager {
     });
 
     return ret;
+  }
+
+  void getJSDesignVariableData(
+      DocVariables varCmp, DesignInfo design, JSDesignInfo ret, int i) {
+    String extend = "";
+    if (varCmp.editor == "combo") {
+      extend = ", \"items\":" + varCmp.list;
+    }
+
+    // gestion des valeurs
+    var value;
+    if (design.slotInfo.elementHTML?.propertiesXUI != null) {
+      var valInCmp =
+          (design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]?.content);
+      if (valInCmp != null && varCmp.editor == "bool") {
+        value = valInCmp;
+      } else if (valInCmp != null) value = jsonEncode(valInCmp.toString());
+    }
+
+    bool exist = value != null;
+    if (value == null && varCmp.editor == "bool") {
+      value = (varCmp.def ?? "false");
+    }
+    if (value == null) {
+      value = "\"" + (varCmp.def ?? "") + "\"";
+    }
+
+    //------------------------------------------------------------------
+    if (i > 0) {
+      ret.bufData.write(",");
+    }
+
+    ret.bufData.write("{\"xid\":\"" +
+        design.slotInfo.xid +
+        "\",\"variable\":\"" +
+        varCmp.id +
+        "\",\"label\":\"" +
+        varCmp.doc +
+        "\",\"cat\":\"" +
+        (varCmp.cat ?? "layout") +
+        "\",\"editor\":\"" +
+        varCmp.editor +
+        "\", \"value\":" +
+        value.toString() +
+        ", \"value_orig\":" +
+        value.toString() +
+        ", \"exist\":" +
+        exist.toString() +
+        extend +
+        "}");
+  }
+
+  static var cacheTemplateEditor = HashMap<String, String>();
+
+  Future<String> getJSDesignVariableTemplate(DocVariables varCmp,
+      FileDesignInfo fi, XUIContext ctx, int i, DesignInfo design) async {
+
+    var keyCache = varCmp.editor;
+    var template = cacheTemplateEditor[keyCache];
+
+    if (template == null) {
+      if (varCmp.editor == "bool") {
+        fi.xid = 'editor-bool';
+      } else if (varCmp.editor == "int") {
+        fi.xid = 'editor-int';
+      } else if (varCmp.editor == "combo") {
+        fi.xid = 'editor-combo';
+        // affecte les items a la combobox grace au addProperties
+        XUIComponent cmp =
+            await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
+        cmp.addProperties("items", "data[##idx##].items");
+      } else if (varCmp.editor == "class") {
+        fi.xid = 'editor-class';
+      } else {
+        fi.xid = 'editor-text';
+      }
+
+      XUIComponent cmp =
+          await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
+      cmp.addProperties("value", "data[##idx##].value");
+      cmp.addProperties("label", "data[##idx##].label");
+      cmp.addProperties("id", "data[##idx##].xid");
+      // recupere le code html
+      template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
+
+      // insertion dans le cache
+      print("****<" + keyCache + ">=>" + template);
+      cacheTemplateEditor[keyCache] = template;
+    }
+    template = template.replaceAll("##idx##",   i.toString());
+   // template = template.replaceAll("##id##",   design.slotInfo.xid);
+
+    return template;
+  }
+
+  Future getJSDesignHeader(FileDesignInfo fi, DesignInfo design, XUIContext ctx,
+      JSDesignInfo ret) async {
+    var keyCache = 'editor-header';
+    var template = cacheTemplateEditor[keyCache];
+    // titre du widget
+    var titleCmp = design?.docInfo?.name ?? design.slotInfo.docId;
+    if (template == null) {
+      fi.xid = 'editor-header';
+
+      XUIComponent cmp =
+          await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
+      cmp.addProperties(
+          "selectAction", "\$xui.displaySelectorByXid('##xid##', '##xid##')");
+      cmp.addProperties("title", "##title##");
+      template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
+      print("****<" + keyCache + ">=>" + template);
+      cacheTemplateEditor[keyCache] = template;
+    }
+
+    template = template.replaceAll("##xid##", design.slotInfo.xid);
+    template = template.replaceAll("##title##", titleCmp);
+
+    ret.bufTemplate
+        .write("<div class='xui-over-prop-xid' id='${design.slotInfo.xid}'>");
+    ret.bufTemplate.write(template);
   }
 }
 

@@ -9,7 +9,7 @@
     <!------------------------------------------------------------------------------------->
 
     <xui-slot xid="editor-header">
-        <v-subheader @click='[[selectAction]]' class='elevation-2 xui-style-prop'>[[title]]<v-spacer></v-spacer>
+        <v-subheader @click='[[selectAction@1]]' class='elevation-2 xui-style-prop'>[[title@2]]<v-spacer></v-spacer>
             <v-icon dark >mdi-dots-horizontal</v-icon>
         </v-subheader>
         <v-divider></v-divider>
@@ -22,10 +22,10 @@
 
     <div xid="editor-class" style="display: inline-flex;">
         <v-text-field  dense class='mx-1 mt-3' hide-details clearable
-            :label='[[label]]' 
-            v-model='[[value]]'>
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
         </v-text-field>
-        <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openClassEditor('[[id]]')"><v-icon dense>mdi-dots-horizontal</v-icon></v-btn>
+        <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openClassEditor([[id@1]])"><v-icon dense>mdi-dots-horizontal</v-icon></v-btn>
     </div>
 
     <v-text-field xid="editor-int" class='ma-1' hide-details clearable type='number' min='0' max='99' 

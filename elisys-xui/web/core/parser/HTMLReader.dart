@@ -53,10 +53,8 @@ class HTMLReader {
 
   ///------------------------------------------------------------------
   Future _parseElem(Node elem, dynamic parent, XMLElemReader elemReader) async {
-    //   print("---------------");
     var xmlelem = XMLElem();
 
-   
     if (elem is Element) {
       xmlelem.tag = elem.localName;
     } else if (elem is Text) {
@@ -69,7 +67,7 @@ class HTMLReader {
     }
     else 
     {
-      print(elem);
+      print("******* erreur");
     }
 
     xmlelem.attributs = elem.attributes;

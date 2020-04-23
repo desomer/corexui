@@ -36,8 +36,8 @@ external set _addDesign(
 @JS('getHtmlFrom')
 external set _getHtmlFrom(void Function(FileDesignInfo, String) f);
 
-@JS('removeDesign')
-external set _removeDesign(void Function(FileDesignInfo, String) f);
+@JS('cutDesign')
+external set _cutDesign(void Function(FileDesignInfo, String) f);
 
 @JS('deleteDesign')
 external set _deleteDesign(void Function(FileDesignInfo, String) f);
@@ -148,10 +148,14 @@ void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
 
 void deleteDesign(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
+  SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
   await designMgr.removeDesign(id, null);
+    // lance le reload
+  designMgr.listXidChanged.add(info.parentXid);
+  await _reload(fileInfo);
 }
 
-void removeDesign(FileDesignInfo fileInfo, String id) async {
+void cutDesign(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
   SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
@@ -224,7 +228,7 @@ void getHtmlFrom(FileDesignInfo fileInfo, String idPromise) async {
   } else {
     SlotInfo info =
         designMgr.xuiEngine.getSlotInfo(fileInfo.part, fileInfo.part);
-    print("part = " + info.elementHTML.tag);
+    //print("part = " + info.elementHTML.tag);
     var bufferHtml = XUIHtmlBuffer();
     info.elementHTML.processPhase3(designMgr.xuiEngine, bufferHtml);
     html = bufferHtml.html.toString();
@@ -241,7 +245,7 @@ void _reload(FileDesignInfo fileInfo) async {
   List listReloader = [];
   designMgr.listXidChanged.forEach((key) {
     var reloaderId = designMgr.xuiEngine.getReloaderID(key);
-    print("****** changed " + key + " reloader " + (reloaderId ?? "?"));
+    print("****** changed " + key + " => reloader " + (reloaderId ?? "?"));
     if (reloaderId != null) {
       listReloader.add(reloaderId);
     }
@@ -252,7 +256,7 @@ void _reload(FileDesignInfo fileInfo) async {
   var ctx = XUIContext(fileInfo.mode);
   var options = Options(mode: fileInfo.mode);
   if (listReloader.isEmpty) {
-    print("****** changed all");
+    print("****** changed all " + ctx.mode);
     var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
     options.html = str;
   } else {
@@ -273,7 +277,7 @@ XUIDesignManager getDesignManager(FileDesignInfo fileInfo) {
 void main() async {
   _refresh = allowInterop(refresh);
   _addDesign = allowInterop(addDesign);
-  _removeDesign = allowInterop(removeDesign);
+  _cutDesign = allowInterop(cutDesign);
   _moveDesign = allowInterop(moveDesign);
   _getInfo = allowInterop(getInfo);
   _getDesignProperties = allowInterop(getDesignProperties);
@@ -327,7 +331,8 @@ Future initStoreVersion(XUIDesignManager designManager, FileDesignInfo fileInfo,
 
     await designManager.initEngine(fileInfo.file, ctx);
 
-    print("*********** window.localStorage ***********\n" + db);
+    print("*********** window.localStorage ***********");
+    //print(db);
     var saveDb = loadYaml(db);
 
     for (var aDesign in saveDb["design"]) {

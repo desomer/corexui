@@ -62,8 +62,8 @@ class NativeSlot extends XUIElementNative {
               html.originElemXUI.attributes[ATTR_STYLE_SLOT];
         }
 
-        addAttributClassStyle("class", html, newChild);
-        addAttributClassStyle("style", html, newChild);
+        addAttributClassStyle("class", html, newChild," ");
+        addAttributClassStyle("style", html, newChild,";");
       }
       // affecte l'implementation du TAG_DIV_SLOT sur le newChild
       await XUIModel(this, MODE_ALL).doChildPhase1(newChild, html, engine);
@@ -92,9 +92,8 @@ class NativeSlot extends XUIElementNative {
 
       // affecte la class full sur l'enfant si full et unique
       if (nbChild == 1) {
-
-        addAttributClassStyle("class", html, childHtml);
-        addAttributClassStyle("style", html, childHtml);
+        addAttributClassStyle("class", html, childHtml," ");
+        addAttributClassStyle("style", html, childHtml,";");
 
         if (isFull) {
           childHtml.attributes ??= HashMap<String, XUIProperty>();
@@ -102,7 +101,8 @@ class NativeSlot extends XUIElementNative {
             childHtml.attributes["class"] = XUIProperty("xui-class-slot-full");
           } else {
             childHtml.attributes["class"] = XUIProperty(
-                childHtml.attributes["class"].content + " xui-class-slot-full");
+                (childHtml.attributes["class"].content + " xui-class-slot-full")
+                    .trim());
           }
         }
       }
@@ -125,22 +125,23 @@ class NativeSlot extends XUIElementNative {
     return Future.value();
   }
 
-  void addAttributClassStyle(String attr, XUIElementHTML html, XUIElement newChild) {
-    if (html?.originElemXUI?.attributes!=null && html.originElemXUI.attributes[attr] != null) {
+  void addAttributClassStyle(
+      String attr, XUIElementHTML html, XUIElement newChild, String sep) {
+    if (html?.originElemXUI?.attributes != null &&
+        html.originElemXUI.attributes[attr] != null) {
       newChild.attributes ??= HashMap<String, XUIProperty>();
 
+      String val;
       if (newChild.attributes[attr] == null) {
-        newChild.attributes[attr] =
-            XUIProperty(html.originElemXUI.attributes[attr].content);
+        val = html.originElemXUI.attributes[attr].content;
+        newChild.attributes[attr] = XUIProperty(val);
       } else {
-        newChild.attributes[attr] = XUIProperty(
-            newChild.attributes[attr].content +
-                " " +
-                html.originElemXUI.attributes[attr].content);
+        val = newChild.attributes[attr].content +
+            sep +
+            html.originElemXUI.attributes[attr].content;
+        newChild.attributes[attr].content=val;
       }
-      
     }
-    
   }
 }
 

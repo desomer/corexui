@@ -17,6 +17,7 @@ const ATTR_XID_SLOT = "xid-slot";
 const ATTR_MODE = "mode";
 const ATTR_NO_DOM = "no-dom";
 const ATTR_RELOADER = "reloader";
+const ATTR_MODE_DISPLAY = "modedisplay";
 const ATTR_CONVERT_JSON = "convert-json";
 
 const ATTR_STYLE_SLOT = "style-slot";
@@ -24,6 +25,7 @@ const ATTR_STYLE_SLOT = "style-slot";
 const TAG_ESCAPE =
     "xui-escape-"; // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
 const TAG_NO_DOM = "xui-no-dom";
+const TAG_RELOADER = "xui-reloader";
 
 const TAG_DOC = "xui-doc";
 const TAG_DESIGN = "xui-design";
@@ -413,10 +415,11 @@ class XUIEngine {
     await xuiFile.parse();
     xuiFile.generateDocumentation(this);
 
-    dynamic obj = xuiFile.getObject();
+    //dynamic obj = xuiFile.getObject();
 
-    final yamld = toYamlString(obj);
-    print("initialize ${reader.id} ok\n" + yamld.toString());
+    //final yamld = toYamlString(obj);
+    //print("initialize ${reader.id} ok");
+    //print(yamld.toString());
 
     return Future.value();
   }
@@ -470,8 +473,11 @@ class XUIEngine {
     var next = slotInfo.parentXid;
     while (next != null) {
       slotInfo = getSlotInfo(next, next);
-      doc = docInfo[slotInfo.docId];
-      listDesignInfo.add(DesignInfo(slotInfo, doc));
+      if (slotInfo.elementHTML.tag!=TAG_RELOADER)
+      {
+        doc = docInfo[slotInfo.docId];
+        listDesignInfo.add(DesignInfo(slotInfo, doc));
+      }
       next = slotInfo.parentXid;
     }
     return listDesignInfo;
@@ -509,7 +515,6 @@ class XUIEngine {
 
     await root.processPhase1(this, htmlRoot);
     await root.processPhase2(this, htmlRoot, null);
-    // print("------------------- $xid --------------------");
 
     if (writer != null) {
       return Future.sync(() => htmlRoot.processPhase3(this, writer));

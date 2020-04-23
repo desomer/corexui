@@ -215,7 +215,8 @@ class XUIModel implements Comparable<XUIModel> {
     if (style == null) {
       elemHtml.attributes[f.key] = XUIProperty(v);
     } else {
-      elemHtml.attributes[f.key].content += sep + v;
+      String val = elemHtml.attributes[f.key].content + sep + v;
+      elemHtml.attributes[f.key].content = val ;
     }
   }
 

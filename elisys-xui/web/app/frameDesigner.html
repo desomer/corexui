@@ -33,7 +33,7 @@
             </div>
             <v-card-actions class="elevation-6">
                 <v-btn text @click="dialogClass=false;">Cancel</v-btn>
-                <v-btn text @click="$xui.closeClassEditor();dialogClass=false;">Save</v-btn>
+                <v-btn text @click="$xui.closeClassEditor(); dialogClass=false;">Save</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -128,7 +128,7 @@
     <xui-design xid="action-tab-tab-4"><v-icon>mdi-file-tree</v-icon></xui-design>
 
     <xui-design xid="action-tab-tab-item-0"><div id="AppPropertiesSetting"></div></xui-design>
-    <xui-design xid="action-tab-tab-item-1"><div>Data binding coming soon...</div></xui-design>
+    <xui-design xid="action-tab-tab-item-1"><div>Extended Style coming soon...</div></xui-design>
     <xui-design xid="action-tab-tab-item-2"><div>Data binding coming soon...</div></xui-design>
     <xui-design xid="action-tab-tab-item-3"><div id="AppComponents"></div></xui-design>
     <xui-design xid="action-tab-tab-item-4"><div>TreeView coming soon...</div>.</xui-design>
@@ -146,8 +146,8 @@
     <!---------------------------------------------------------------------------> 
     <xui-design xid="slot-action-footer">
         <xui-btn-small @click="$xui.deleteCmp()"><v-icon>mdi-delete</v-icon></xui-btn-small>
-        <xui-btn-small @click="$xui.deleteCmp()"><v-icon>mdi-content-cut</v-icon></xui-btn-small>
-        <xui-btn-small @click="$xui.pasteTo()"><v-icon>mdi-content-paste</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.cutCmp()"><v-icon>mdi-content-cut</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.pasteTo()" :disabled="pasteDisabled"><v-icon>mdi-content-paste</v-icon></xui-btn-small>
 
         <span style="width:20px"></span>
 
@@ -170,6 +170,7 @@
         var json = { 
             isDesignFrame : true,
             selectedxui : "PWA Code Generator", 
+            pasteDisabled : true,
             activeTab : 0,
             activeAction : 0,
             contentEditor: ''

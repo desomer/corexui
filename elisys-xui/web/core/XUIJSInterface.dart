@@ -1,4 +1,4 @@
-@JS("xui")
+@JS("\$xui")
 library xuiapp;
 
 import 'package:js/js.dart';

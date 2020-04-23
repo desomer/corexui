@@ -64,12 +64,21 @@ class XUIElementHTML extends XUIElement {
       ParseInfo parseInfo = ParseInfo(prop, ParseInfoMode.PROP);
       XUIProperty.parse(parseInfo, (String tag) {
         var ret = searchPropertyXUI(tag, -1);
-        return ret != null ? ret : "[" + tag + "]";
+        return ret != null ? ret : doPropPlaceHolder(tag);
       });
       prop = parseInfo.parsebuilder.toString();
     }
 
     return prop;
+  }
+
+  String doPropPlaceHolder(String tag) {
+    // gestion du placeholder
+    int idx = tag.indexOf("@");
+    if (idx > 0) {
+      tag = tag.substring(0, idx);
+    }
+    return "[" + tag + "]";
   }
 
   dynamic searchPropertyXUI(String tag, int deep) {
@@ -88,17 +97,22 @@ class XUIElementHTML extends XUIElement {
       return p.calculatePropertyXUI(p.originElemXUI.xid);
     }
 
-    /// gestion de la recherche sur des enfant (@-1) ou uniquement dans himself (@0)
+    /// gestion de la recherche sur des enfant (@-1) ou les parents (@0+)
     if (tag.contains("@")) {
       var atTag = tag.split("@");
       tag = atTag[0];
-      var atHtml = atTag[1];
-      if (atHtml == "-1") {
+      var atScope = atTag[1];
+      if (atScope == "-1") {
         return firstChildNoText().searchPropertyXUI(tag, 0);
       }
-      if (atHtml == "0") {
-        return searchPropertyXUI(tag, 0);
+      if (atScope == "0+") {
+        return searchPropertyXUI(tag, -2);
       }
+      int scope = int.tryParse(atScope) ?? 0;
+      return searchPropertyXUI(tag, scope);
+    } else if (deep == -1) {
+      // par defaut uniquement dans himself (@0)
+      deep = 0;
     }
 
     XUIProperty prop = propertiesXUI == null ? null : propertiesXUI[tag];
@@ -115,9 +129,10 @@ class XUIElementHTML extends XUIElement {
     try {
       XUIProperty.parse(parseInfo, (String tag) {
         var ret = searchPropertyXUI(tag, -1);
+
         return ret != null
             ? ret
-            : ((mode == ParseInfoMode.CONTENT ? ("[" + tag + "]") : ""));
+            : ((mode == ParseInfoMode.CONTENT ? (doPropPlaceHolder(tag)) : ""));
       });
     } catch (e, s) {
       print("pb parse $e $s");
@@ -138,25 +153,39 @@ class XUIElementHTML extends XUIElement {
       buffer = XUIHtmlBuffer();
     }
 
-    if (tag == cst.TAG_NO_DOM) {
-      // cas des slot
+    if (tag == cst.TAG_NO_DOM || tag==TAG_RELOADER) {
+      // cas des slot ou des reloader
       bool isReloader = false;
       bool isRoot = buffer.html.isEmpty;
-      bool hasTagReloader = this.propertiesXUI != null &&
-          this.propertiesXUI.containsKey(ATTR_RELOADER);
+      bool hasTagReloader = (tag==TAG_RELOADER) || ( this.propertiesXUI != null &&
+          this.propertiesXUI.containsKey(ATTR_RELOADER));
 
       if (!isRoot && engine.isModeDesign() && hasTagReloader) {
         isReloader = true;
         var xid = this.originElemXUI.xid;
         var xidCal = processContent(engine, xid, ParseInfoMode.ATTR);
+         var modeDisplay = "unset";
+        if (this.propertiesXUI[ATTR_MODE_DISPLAY]!=null)
+        {
+            modeDisplay=this.propertiesXUI[ATTR_MODE_DISPLAY]?.content.toString();
+        }
         buffer.html.write(
-            "<v-xui-reloader partid=\"" + xidCal + "\"></v-xui-reloader>");
+            "<v-xui-reloader modedisplay=\"" + modeDisplay + "\" partid=\"" + xidCal + "\"></v-xui-reloader>");
       }
 
       if (!isReloader) {
         toChildrenPhase3(engine, buffer);
       }
       return;
+    }
+
+    if (this.propertiesXUI != null && this.propertiesXUI.containsKey("if"))
+    {
+        var valIf = processContent(engine, this.propertiesXUI["if"].content, ParseInfoMode.ATTR);
+        if (valIf != "true")
+        {
+            return;
+        }
     }
 
     buffer.addTab();
@@ -166,12 +195,26 @@ class XUIElementHTML extends XUIElement {
       var c = f.value.content;
       String keyAttr = processContent(engine, f.key, ParseInfoMode.KEY);
       var valProp = c;
+
       if (keyAttr != "" && c != null) {
         if (c is String) {
           valProp = processContent(engine, c, ParseInfoMode.ATTR);
           bool mustAdd = true;
           bool isBool = false;
+
           if (c != valProp) {
+            //supprime les balise class et style faussement non vide
+            if (keyAttr == "class") {
+              valProp = valProp.toString().trim();
+            }
+            if (keyAttr == "style") {
+              valProp = valProp.toString().trim();
+              if (valProp==";" || valProp==";;")
+              {
+                 valProp="";
+              }
+            }
+
             // transformation par recherche de tag
             if (valProp == "" || valProp == "false") {
               mustAdd = false; // pas d'ajout si vide ou false

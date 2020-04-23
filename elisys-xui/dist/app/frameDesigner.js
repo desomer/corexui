@@ -143,7 +143,7 @@ $xui.saveProperties = () => {
 }
 
 $xui.openClassEditor = (id) => {
-    console.debug(id);
+    console.debug("openClassEditor", id);
     $xui.editorOpenId = id;
 
     $xui.modeDisplaySelection = false;
