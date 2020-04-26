@@ -134,8 +134,10 @@ void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
 
   if (!reload && init == true) {
     var ctx = XUIContext(fileInfo.mode);
+    // SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
+    // print("initHtml addDesign " +fileInfo.xid + " >> " + info.parentXid );
+    // fileInfo.xid=info.parentXid;
     await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
-    
   } else {
     if (id != XUI_TRASHCAN_SLOT) designMgr.listXidChanged.add(id);
 
@@ -150,7 +152,7 @@ void deleteDesign(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
   SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
   await designMgr.removeDesign(id, null);
-    // lance le reload
+  // lance le reload
   designMgr.listXidChanged.add(info.parentXid);
   await _reload(fileInfo);
 }
@@ -260,6 +262,7 @@ void _reload(FileDesignInfo fileInfo) async {
     var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
     options.html = str;
   } else {
+    //print("initHtml _reload " +fileInfo.xid );
     await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
     options.listReloader = listReloader;
   }
@@ -327,16 +330,18 @@ Future initStoreVersion(XUIDesignManager designManager, FileDesignInfo fileInfo,
   var ver = window.localStorage['xui_version_' + name];
   if (ver != null) {
     int v = int.parse(ver) - 1;
-    var db = window.localStorage['xui_yaml_' + name + '_' + v.toString()];
-
     await designManager.initEngine(fileInfo.file, ctx);
 
-    print("*********** window.localStorage ***********");
-    //print(db);
-    var saveDb = loadYaml(db);
+    if (v >= 0) {
+      var db = window.localStorage['xui_yaml_' + name + '_' + v.toString()];
 
-    for (var aDesign in saveDb["design"]) {
-      designManager.xuiEngine.xuiFile.addObject(aDesign);
+      print("*********** window.localStorage ***********");
+      //print(db);
+      var saveDb = loadYaml(db);
+
+      for (var aDesign in saveDb["design"]) {
+        designManager.xuiEngine.xuiFile.addObject(aDesign);
+      }
     }
   }
 }

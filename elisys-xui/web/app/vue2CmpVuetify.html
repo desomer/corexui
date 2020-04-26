@@ -39,7 +39,7 @@
     <!--------------------------  XUI-TEXTFIELD-1   ---------------------------->
     <xui-doc xid="xui-textfield-1">
         <xui-prop id="name">Text Field</xui-prop>
-        <xui-prop id="icon">mdi-textbox</xui-prop>
+        <xui-prop id="icon">mdi-form-textbox</xui-prop>
         <xui-prop id="desc">Un champs de saisie</xui-prop>
         <xui-prop id="componentAs">input</xui-prop>
         <xui-prop var="label" def="label" editor="text">label</xui-prop>
@@ -85,7 +85,7 @@
         <xui-prop var="btn-type" def="icon" editor="combo"
         list='["depressed","outlined","rounded","text","tile","icon","fab"]'>type depressed/outlined/...</xui-prop>
 
-        <xui-prop var="icon" def="plus" editor="text">icon</xui-prop>
+        <xui-prop var="icon" def="mdi-plus" editor="icon">icon (mdi-xxx)</xui-prop>
         <xui-prop var="color" cat="style" editor="text">color</xui-prop>
         <xui-prop var="dark" cat="style" def="false" editor="bool">on dark</xui-prop>
         <xui-prop var="light" cat="style" def="false" editor="bool">on light</xui-prop>
@@ -112,7 +112,7 @@
     </xui-doc>
 
     <v-btn xid="xui-btn-icon-1" class="[[class]]" -style="[[style]]" [[btn-type]] disabled="[[disabled]]" [[size]] [[position]] [[leftright]] [[topbottom]] xui-slot-name="Btn" color="[[color]]" dark="[[dark]]" light="[[light]]">
-        [[textleft@1]]<v-icon [[positionicon@1]]>mdi-[[icon@2]]</v-icon>[[textright@1]]
+        [[textleft@1]]<v-icon [[positionicon@1]]>[[icon@2]]</v-icon>[[textright@1]]
     </v-btn>
     <!--------------------------  XUI-ICON-1   ---------------------------->
     <xui-doc xid="xui-icon-1">
@@ -121,8 +121,7 @@
         <xui-prop id="desc">Un Icon</xui-prop>
         <xui-prop id="componentAs">action</xui-prop>
 
-        <xui-prop var="icon" editor="combo" def="web"
-            list='["content-save","undo","delete","plus-circle","minus-circle-outline"]'>icon</xui-prop>
+        <xui-prop var="icon" editor="icon" def="mdi-web">icon (mdi-xxx)</xui-prop>
         <xui-prop var="color" cat="style" editor="text">icon color</xui-prop>
         <xui-prop var="size" editor="combo"
             list='["dense","large","small","x-small","x-large"]'>size</xui-prop>
@@ -134,8 +133,7 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-icon xid="xui-icon-1" xui-slot-name="Icon" [[size]] class="[[class]]" -style="[[style]]" size="[[sizeCustom]]" color="[[color]]" dark="[[dark]]" light="[[light]]">mdi-[[icon@1]]
-    </v-icon>
+    <v-icon xid="xui-icon-1" xui-slot-name="Icon" [[size]] class="[[class]]" -style="[[style]]" size="[[sizeCustom]]" color="[[color]]" dark="[[dark]]" light="[[light]]">[[icon@1]]</v-icon>
 
 
     <!--------------------------  XUI-FLOW   ------------------------------->

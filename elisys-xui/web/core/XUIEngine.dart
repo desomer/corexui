@@ -490,6 +490,7 @@ class XUIEngine {
 
   toHTMLString(XUIHtmlBuffer writer, String xid, XUIContext ctx) async {
     xuiFile.context = ctx;
+    print("toHTMLString on " + writer.toString() +" xid component="+xid);
     var listCmp = xuiFile.searchComponent(xid);
     if (listCmp == null) {
       dynamic obj = xuiFile.getObject();

@@ -12,7 +12,10 @@
         <xui-prop id="titleApp" val="{{selectedxui}}"></xui-prop>
         <xui-prop id="colorApp" val="#1d9da0"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2020 v0.1.5 14/04/20"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.1.6 24/04/20"></xui-prop>
+        <xui-prop id="withLeftNavigation" val="true"></xui-prop>
+        <xui-prop id="withFooter" val="true"></xui-prop>
+        <xui-prop id="navTemporary" val="true"></xui-prop>
     </xui-design>
 
     <xui-design xid="xui-toolbar-title" class="xui-path-component">
@@ -50,7 +53,7 @@
     <xui-design xid="main-tab-tab-2"><v-icon>mdi-api</v-icon></xui-design>
     <xui-design xid="main-tab-tab-3"><v-icon>mdi-database</v-icon></xui-design>
     <xui-design xid="main-tab-tab-4"><v-icon>mdi-apps</v-icon></xui-design>
-    <xui-design xid="main-tab-tab-5"><v-icon>mdi-image-filter</v-icon></xui-design>
+    <xui-design xid="main-tab-tab-5"><v-icon>mdi-image-multiple-outline</v-icon></xui-design>
     <xui-design xid="main-tab-tab-6"><v-icon>mdi-border-inside</v-icon></xui-design>
    
     <!---------------------------------------------------------------------------> 
@@ -151,12 +154,12 @@
 
         <span style="width:20px"></span>
 
-        <xui-btn-small @click="$xui.undo()"><v-icon>mdi-undo</v-icon></xui-btn-small>
-        <xui-btn-small @click="$xui.redo()"><v-icon>mdi-redo</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.undo()" :disabled="undoDisabled"><v-icon>mdi-undo</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.redo()" :disabled="redoDisabled"><v-icon>mdi-redo</v-icon></xui-btn-small>
 
         <span style="width:50px"></span>
 
-        <xui-btn-small><v-icon>mdi-settings</v-icon></xui-btn-small>
+        <xui-btn-small><v-icon>mdi-cog</v-icon></xui-btn-small>
         <xui-btn-small><v-icon>mdi-note-multiple</v-icon></xui-btn-small>
         <xui-btn-small><v-icon>mdi-new-box</v-icon></xui-btn-small>
 
@@ -171,6 +174,8 @@
             isDesignFrame : true,
             selectedxui : "PWA Code Generator", 
             pasteDisabled : true,
+            undoDisabled  : true,
+            redoDisabled  : true,
             activeTab : 0,
             activeAction : 0,
             contentEditor: ''

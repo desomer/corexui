@@ -53,6 +53,17 @@ $xui.redo = () => {
     $xui.pageDesignManager.redo();
 };
 
+
+var listIcon = null;
+$xui.openTabUrl = (url) => {
+    if (url == "listIcon") {
+        if (listIcon == null || listIcon.closed)
+            listIcon = window.open('https://cdn.materialdesignicons.com/5.1.45/', '_blank');
+        listIcon.focus()
+    }
+
+};
+
 /******************************************************************************** */
 // gestion des button refresh de la page
 $xui.refreshAction = (mode) => {
@@ -211,10 +222,10 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
         $xui.propertiesDesign.json = $xui.parseJson($xui.propertiesDesign.data);
 
-        console.debug("displayPropertiesJS", $xui.propertiesDesign, $xui.propertiesDesign.template);
+        console.debug("displayPropertiesJS", $xui.propertiesDesign);
 
         $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
-        var template="<div id='AppPropertiesSetting' class='barcustom xui-div-design'>" + $xui.propertiesDesign.template + "</div>";
+        var template = "<div id='AppPropertiesSetting' class='barcustom xui-div-design'>" + $xui.propertiesDesign.template + "</div>";
         var tmpCompiled = compileTemplate(template);
 
         if ($xui.vuejsDesign != null) {
@@ -319,7 +330,7 @@ $xui.displayAction = (xid, xid_slot) => {
                     }
                 }
             });
-            lastHtmlAction=html;
+            lastHtmlAction = html;
         });
     }
 

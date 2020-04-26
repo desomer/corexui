@@ -8,7 +8,7 @@ Vue.config.devtools = true;
 Vue.config.productionTip = false;
 
 //console.debug(vue2CmpMgr);
-window.vue2CmpMgr=vue2CmpMgr;
+window.vue2CmpMgr = vue2CmpMgr;
 
 /*********************************************************************************/
 $xui.createComponentFromBody = (idTemplate, dataBinding) => {
@@ -28,14 +28,13 @@ $xui.loadApplicationJS = () => {
 	if ($xui.vuejs != null) {
 		$xui.vuejs.$destroy();
 	}
-	else
-	{
-		var listFct = $xui.initComponentVuejs;
-		for (const f of listFct) {
-			f();
+	else {
+		// creation des composants xui/vuejs
+		var listFunctCreateCmp = $xui.initComponentVuejs;
+		for (const functCreateCmp of listFunctCreateCmp) {
+			functCreateCmp();
 		}
 	}
-
 
 	/******************************************/
 	$xui.store = new Vuex.Store({
@@ -48,58 +47,80 @@ $xui.loadApplicationJS = () => {
 			}
 		}
 	})
-	/******************************************/
+
 	$xui.store.commit('increment');
 	$xui.store.commit('increment');
 
-	/******************************************/
-
+	/******************************************************************************/
+	$xui.listReloader = {};
 	Vue.component("v-xui-reloader",
 		{
 			template: '<component v-bind:is="componentToReload"></component>',
-			props: ['partid'],
+			props: ['partid','modedisplay'],
 			data: () => { return { componentToReload: "", id: 1 }; },
 			methods: {
-				rload : function (e) {
+				rload: function (e) {
 
-					var oldId = this.partid+"-"+this.id;
-					console.debug("reload "+oldId+" reponse **************", e);
+					var oldId = this.partid + "-" + this.id;
+					//console.debug("reload " + oldId + " reponse **************", e);
 					delete Vue.options.components[oldId];
 
 					this.id++; //passe en composant suivant
-					var newId = this.partid+"-"+this.id;  
-					Vue.component(newId, { template: '<div style="all:unset; box-sizing: inherit;">'+ e.template+'</div>' });
-					this.componentToReload=newId;
+					var newId = this.partid + "-" + this.id;        //all:unset; box-sizing: inherit;
+					Vue.component(newId, 
+						{ template: '<div style="display:'+this.modedisplay+'">' + e.template + '</div>' });
+					this.componentToReload = newId;
 				},
 				reload: function () {
-					console.debug("reload **************", this.partid);
+					//console.debug("reload **************", this.partid);
 
 					var message = {
-						action:"load reloader", 
-						xid: this.partid, 
+						action: "load reloader",
+						xid: this.partid,
 					};
 					window.parent.postMessage(message, "*");
 				}
 			},
 			mounted: function () {
 				this.reload();
-				$xui.listReloader[this.partid]=this;
+				$xui.listReloader[this.partid] = this;
 			},
 			computed: {
 				$xui: () => $xui
 			}
 		});
 
+	/******************************************************************************/
+
 	var dataBinding = Vuex.mapState({ titre: 'count' });
 	const RootComponent = $xui.createComponentFromBody("xui-rootTemplate", dataBinding);
 
-	$xui.listReloader={};
+	const configVuetify = {
+		theme: {
+			dark: false,
+			themes: {
+				light: {
+					primary: '#000000',
+					secondary: '#424242',
+					accent: '#82B1FF',
+					error: '#FF5252',
+					info: '#2196F3',
+					success: '#4CAF50',
+					warning: '#FFC107'
+				},
+				dark: {
+					//primary: '#0caf50',
+				},
+			},
+		},
+	};
+
 	$xui.vuejs = new Vue({
 		el: '#app',
 		store: $xui.store,
 		data: $xui.rootdata,
 		components: { RootComponent },
 		template: "<RootComponent ref='root'></RootComponent>",
-		vuetify: new Vuetify()
+		vuetify: new Vuetify(configVuetify)
 	});
 }

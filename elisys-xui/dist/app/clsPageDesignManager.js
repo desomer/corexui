@@ -13,6 +13,21 @@ export class PageDesignManager {
             $xui.displayComponents("", "");
             $xui.displayPropertiesJS("root", "root")
         }, 100);
+
+        var name = "frame1"
+        var version = localStorage.getItem('xui_version_' + name);
+        if (version != null)
+        {
+            $xui.rootdata.undoDisabled=false;
+            var versionMax = localStorage.getItem('xui_version_max_' + name);
+            if (versionMax != null)
+            {
+                if (parseInt(versionMax) > parseInt(version))
+                {
+                    $xui.rootdata.redoDisabled=false;
+                }
+            }
+        }
     }
 
     changePageJS(param) {
@@ -62,6 +77,9 @@ export class PageDesignManager {
         localStorage.setItem('xui_version_' + name, "" + ver);
         localStorage.setItem('xui_version_max_' + name, "" + ver);
 
+        $xui.rootdata.redoDisabled=true;
+        $xui.rootdata.undoDisabled=false;
+
         // gestion du max
         // var versionMax = localStorage.getItem('xui_version_max_' + name);
         // if (versionMax == null)
@@ -95,11 +113,12 @@ export class PageDesignManager {
             version = "0";
 
         var ver = parseInt(version);
-        if (ver>1)
+        if (ver>0)
             ver--;
 
         localStorage.setItem('xui_version_' + name, "" + ver);
         $xui.refreshAction("template:reload");
+        $xui.rootdata.redoDisabled=false;
     }
 
     redo() {
@@ -107,11 +126,15 @@ export class PageDesignManager {
         var versionMax = localStorage.getItem('xui_version_max_' + name);
         var version = localStorage.getItem('xui_version_' + name);
 
-
         var ver = parseInt(version);
         var verMax = parseInt(versionMax);
         if (ver<verMax)
+        {
             ver++;
+        }
+        if (ver==verMax) {
+            $xui.rootdata.redoDisabled=true;
+        }
 
         localStorage.setItem('xui_version_' + name, "" + ver);
         $xui.refreshAction("template:reload");

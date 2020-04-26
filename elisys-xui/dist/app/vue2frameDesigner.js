@@ -35,11 +35,15 @@ document.addEventListener('dragend', function () {
 
 /***********************************************************************************/
 
-document.addEventListener('mousedown', e => {
+document.addEventListener('pointerdown', e => {
     targetActionStart = e.target.closest("[data-xid]");
   });
 
-document.addEventListener('click', function (e) {    //dblclick
+document.addEventListener('pointerup', function (e) {    //dblclick
+    //console.debug("pointerup", e);
+    if (e.button!=0)
+        return; 
+
     let targetAction = e.target.closest("[data-xid]");
     if (targetActionStart!=targetAction)
         return ;  // ne fait rien sur le drag (ex : Split)
@@ -56,24 +60,44 @@ document.addEventListener('click', function (e) {    //dblclick
     window.parent.postMessage(message, "*");
 });
 
+document.addEventListener('scroll', function( event ) {
+    var message = {
+        action: "unselect",
+    };
+    window.parent.postMessage(message, "*");
+} );
+
+window.addEventListener('resize', function( event ) {
+    var message = {
+        action: "unselect",
+    };
+    window.parent.postMessage(message, "*");
+} );
+
+//******************************************************************************* */
+
 window.addEventListener('message', function (e) {
     var data = e.data;
     if (data.action == "changeTemplate") {
-        this.console.debug(data);
         if (data.param.listReloader!=null) {
-            this.console.debug($xui.listReloader);
+            this.console.info("changeTemplate event reloader", data.param);
             $xui.listReloader[data.param.listReloader[0]].reload();
         }
         else {
+            this.console.info("changeTemplate event all", data.param);
             this.document.body.innerHTML = data.param.html;
             $xui.loadApplicationJS();
         }
     }
     if (data.action == "changeReloader") {
-        //console.debug("changeReloader", data, $xui);
+        //console.debug("load reloader", data.xid, data);
+        if ($xui.listReloader[data.xid]==null)
+            console.error("change Reloader on error", data, $xui.listReloader);
         $xui.listReloader[data.xid].rload(data);
     }
 });
+
+//******************************************************************************* */
 
 $xui.updateDirectPropInnerText = (event, variable, xid, selectAll) => {
     if (selectAll)

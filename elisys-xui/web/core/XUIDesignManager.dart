@@ -300,6 +300,8 @@ class XUIDesignManager {
         cmp.addProperties("items", "data[##idx##].items");
       } else if (varCmp.editor == "class") {
         fi.xid = 'editor-class';
+      } else if (varCmp.editor == "icon") {
+        fi.xid = 'editor-icon';
       } else {
         fi.xid = 'editor-text';
       }

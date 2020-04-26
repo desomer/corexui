@@ -1,11 +1,11 @@
 
-$xui.initVuejs = (vuejs) => {
+$xui.initVuejs = (instanceVue) => {
 
-  vuejs.$watch('activeAction', function (newValue, oldValue) {
+  instanceVue.$watch('activeAction', function (newValue, oldValue) {
     console.debug('The activeAction name was changed from ' + oldValue + ' to ' + newValue + '!');
   }, { deep: true });
 
-  vuejs.$watch('activeTab', function (newValue, oldValue) {
+  instanceVue.$watch('activeTab', function (newValue, oldValue) {
     console.debug('The activeTab name was changed from ' + oldValue + ' to ' + newValue + '!');
     if (newValue == 1) {
       // onglet code
@@ -14,9 +14,10 @@ $xui.initVuejs = (vuejs) => {
 
   }, { deep: true });
 
-  vuejs.$watch('selectedClass', function (newValue, oldValue) {
+  instanceVue.$watch('selectedClass', function (newValue, oldValue) {
     console.debug('The selectedClass name was changed from ' + oldValue + ' to ' + newValue + '!');
   }, { deep: true });
+
 
   if (false) {
     Vue.use(Vue2Editor);

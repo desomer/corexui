@@ -2,46 +2,69 @@
    <head>
       <title>PWA Designer</title>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"></meta>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"></link>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css"></link>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css"></link>
       <link rel="stylesheet" href="app/frameDesigner.css"></link>
       <style>
-            .xui-grid { padding:0px 0px; margin: 0px 0px; max-width:unset; }
-        </style>
-      <style>
-            .xui-form { max-width:unset; }
-            .xui-form-gutter>.col, .xui-form-gutter>[class*=col-] {
+
+            .xui-session {
+                display: block;
+            }
+        
+            .xui-grid {
+                padding: 0px 0px;
+                margin: 0px 0px;
+                max-width: unset;
+            }
+        
+            .xui-form {
+                max-width: unset;
+            }
+
+            .xui-form-gutter>.col,
+            .xui-form-gutter>[class*=col-] {
                 padding: 5px 6px;
             }
+
             .xui-form .v-text-field input {
                 line-height: 14px;
                 font-size: 0.9rem;
             }
-        </style>
-      <style>
-
+        
             .v-tabs-items {
-                height: calc(100% - 48px) 
+                height: calc(100% - 48px);
+                background-color: unset !important;
             }
-            .v-tabs-items > .v-window__container {
+
+            .v-tabs-items>.v-window__container {
                 height: 100% !important
             }
-            .v-tabs-items > .v-window__container > .v-window-item {
-                height: 100% !important
+
+            .v-tabs-items>.v-window__container>.v-window-item {
+                height: 100%
             }
-            
-        </style>
-      <style>
-            .xui-class-slot-full { height:100%; width:100%;}
-        </style>
+
+            .v-application .primary--text {
+                color:red !important;
+                caret-color: #1976d2 !important;
+            }
+
+        
+            .xui-class-slot-full {
+                height: 100%;
+                width: 100%;
+            }
+              </style>
    </head>
    <body style="height:100vh">
       <template id="xui-rootTemplate">
          <v-app style="background:white">
-            <v-app-bar app color="#1d9da0" fixed :dark="dark" :height="heightHeader">
-               <v-app-bar-nav-icon></v-app-bar-nav-icon>
+            <v-navigation-drawer v-model="navdrawer" :clipped="true" app :temporary="true" overflow>
+            </v-navigation-drawer>
+            <v-app-bar app color="#1d9da0" :clipped-left="true" :dark="dark" :height="heightHeader">
+               <v-app-bar-nav-icon @click.stop="navdrawer = !navdrawer"></v-app-bar-nav-icon>
                <v-toolbar-title class="xui-path-component">{{selectedxui}}</v-toolbar-title>
                <v-spacer></v-spacer>
                <v-btn small class="xui-btn-action" @click="$xui.fullScreen()">
@@ -80,7 +103,7 @@
                                     <iframe id="rootFrame"></iframe>
                                  </div>
                                  <div class="main-item main-item-3">
-                                    <v-tabs v-model="activeAction" class="tab-action" dark height="35px">
+                                    <v-tabs v-model="activeAction" height="35px" class="tab-action" dark>
                                        <v-tab>
                                           <v-icon>mdi-layers-triple</v-icon>
                                        </v-tab>
@@ -91,9 +114,7 @@
                                           <v-icon>mdi-palette-swatch</v-icon>
                                        </v-tab>
                                        <v-tab-item eager :transition="false" :reverse-transition="false">
-                                          <div class="xui-div-design">
-                                             <component v-bind:is="componentTab"></component>
-                                          </div>
+                                          <div>Extended Style coming soon...</div>
                                        </v-tab-item>
                                        <v-tab>
                                           <v-icon>mdi-database-import</v-icon>
@@ -179,7 +200,7 @@
                      <v-tab-item eager :transition="false" :reverse-transition="false">
                      </v-tab-item>
                      <v-tab>
-                        <v-icon>mdi-image-filter</v-icon>
+                        <v-icon>mdi-image-multiple-outline</v-icon>
                      </v-tab>
                      <v-tab-item eager :transition="false" :reverse-transition="false">
                      </v-tab-item>
@@ -199,32 +220,32 @@
                         </div>
                         <v-card-actions class="elevation-6">
                            <v-btn text @click="dialogClass=false;">Cancel</v-btn>
-                           <v-btn text @click="$xui.closeClassEditor();dialogClass=false;">Save</v-btn>
+                           <v-btn text @click="$xui.closeClassEditor(); dialogClass=false;">Save</v-btn>
                         </v-card-actions>
                      </v-card>
                   </v-dialog>
                </v-container>
             </v-content>
-            <v-footer app color="#1d9da0" :dark="dark" style="padding: 0px 10px;" :height="heightFooter" inset>
+            <v-footer :inset="false" app color="#1d9da0" :dark="dark" style="padding: 0px 10px;" :height="heightFooter">
                <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
-               <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
+               <v-btn small class="xui-btn-action" @click="$xui.cutCmp()">
                   <v-icon>mdi-content-cut</v-icon>
                </v-btn>
-               <v-btn small class="xui-btn-action" @click="$xui.pasteTo()">
+               <v-btn small :disabled="pasteDisabled" class="xui-btn-action" @click="$xui.pasteTo()">
                   <v-icon>mdi-content-paste</v-icon>
                </v-btn>
                <span style="width:20px"></span>
-               <v-btn small class="xui-btn-action" @click="$xui.undo()">
+               <v-btn small :disabled="undoDisabled" class="xui-btn-action" @click="$xui.undo()">
                   <v-icon>mdi-undo</v-icon>
                </v-btn>
-               <v-btn small class="xui-btn-action" @click="$xui.redo()">
+               <v-btn small :disabled="redoDisabled" class="xui-btn-action" @click="$xui.redo()">
                   <v-icon>mdi-redo</v-icon>
                </v-btn>
                <span style="width:50px"></span>
                <v-btn small class="xui-btn-action">
-                  <v-icon>mdi-settings</v-icon>
+                  <v-icon>mdi-cog</v-icon>
                </v-btn>
                <v-btn small class="xui-btn-action">
                   <v-icon>mdi-note-multiple</v-icon>
@@ -237,46 +258,107 @@
                   <v-icon>mdi-autorenew</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2020 v0.1.5 14/04/20</span>
+               <span>&copy;&nbsp;Elisys 2020 v0.1.6 24/04/20</span>
             </v-footer>
          </v-app>
       </template>
       <div id="app"></div>
    </body>
    <script>
-	if (typeof $xui === 'undefined')
-		$xui={};
 
-	$xui.rootdata={ 
-		dark:true, 
-		heightHeader:32, 
-		heightFooter:32, 
-		ContentfillPage:true 
-	};
+		if (typeof $xui === 'undefined')
+			$xui = {};
 
-	$xui.initComponentVuejs = [];  // liste des function à appeler  
+		$xui.rootdata = {
+			dark: true,
+			heightHeader: 32,
+			heightFooter: 32,
+			ContentfillPage: true,
+			navdrawer: false
+		};
+
+		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler  
 	
         var json = { 
             isDesignFrame : true,
             selectedxui : "PWA Code Generator", 
+            pasteDisabled : true,
+            undoDisabled  : true,
+            redoDisabled  : true,
             activeTab : 0,
             activeAction : 0,
             contentEditor: ''
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
     
-        var json = {
-            dialogClass:false,
-            listCatClass: [],
-            componentTab : ''
-        };
-        $xui.rootdata= { ...$xui.rootdata, ...json};
-    
-        $xui.initComponentVuejs.push(() => {
-            new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
-        }
-        );
-    </script>
+            
+            var listDesignClass = [
+                {
+                    title: "style",
+                    icon: "mdi-image-size-select-large",
+                    open: true,
+                    listClass: [
+                        { sel: false, type: 'check', text: 'fill height', value: 'fill-height' },
+                        { sel: false, text: 'elevation', value: 'elevation', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'] },
+                    ]
+                },
+                {
+                    title: "Margin",
+                    icon: "mdi-image-filter-none",
+                    open: false,
+                    listClass: [
+                        { sel: false, text: 'all', value: 'ma', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'x', value: 'mx', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'y', value: 'my', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'top', value: 'mt', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'bottom', value: 'mb', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'left', value: 'ml', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'right', value: 'mr', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                    ],
+                },
+                {
+                    title: "Padding",
+                    icon: "mdi-checkbox-intermediate",
+                    open: false,
+                    listClass: [
+                        { sel: false, text: 'all', value: 'pa', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'x', value: 'px', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'y', value: 'py', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'top', value: 'pt', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'bottom', value: 'pb', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'left', value: 'pl', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'right', value: 'pr', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                    ],
+                },
+                {
+                    title: "Text",
+                    icon: "mdi-format-text",
+                    open: false,
+                    listClass: [
+                        { sel: false, type: 'check', text: 'text left', value: 'text-left' },
+                        { sel: false, type: 'check', text: 'text center', value: 'text-center' },
+                        { sel: false, type: 'check', text: 'text right', value: 'text-right' },
+                        { sel: false, type: 'check', text: 'text justify', value: 'text-justify' },
+                        { sel: false, type: 'divider' },
+                        { sel: false, type: 'check', text: 'text no wrap', value: 'text-no-wrap' },
+                        { sel: false, type: 'check', text: 'text lowercase', value: 'text-lowercase' },
+                        { sel: false, type: 'check', text: 'text uppercase', value: 'text-uppercase' },
+                        { sel: false, type: 'check', text: 'text capitalize', value: 'text-capitalize' }
+                    ],
+                },
+            ];
+
+            var json = {
+                dialogClass: false,
+                listCatClass: listDesignClass
+            };
+            $xui.rootdata = { ...$xui.rootdata, ...json };
+
+            $xui.initComponentVuejs.push(() => {
+                new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
+            }
+            );
+           </script>
    <script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
    <script defer src="app/frameDesigner.js"></script>

@@ -6,12 +6,22 @@
 		<xui-prop var="colorApp" editor="string" link="https://materialdesignicons.com/">couleur primaire</xui-prop>
 		<xui-prop var="colorBg" editor="string" link="https://materialdesignicons.com/">couleur fond de page</xui-prop>
 		<xui-prop var="copyrightApp" editor="string">copyright de l'appli</xui-prop>
+		
 		<xui-prop var="withLeftNavigation" editor="bool">Navigation Drawer</xui-prop>
+		<xui-prop var="navTemporary" editor="bool">Nav Always Temporary on Desktop</xui-prop>
+		<xui-prop var="navPermanent" editor="bool">Nav Permanent</xui-prop>
+
 		<xui-prop var="withFooter" editor="bool">Footer</xui-prop>
 		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
-		
+				
 		<xui-prop id="name">Page</xui-prop>
 		<xui-prop id="desc">La page</xui-prop>
+	</xui-doc>
+
+
+	<xui-doc xid="v-navigation-drawer:vue-nav-drawer-1">
+		<xui-prop id="name">Nav drawer</xui-prop>
+		<xui-prop id="desc">navigation drawer</xui-prop>
 	</xui-doc>
 
 	<xui-doc xid="v-container:vue-content-1">
@@ -131,7 +141,8 @@
 		<xui-slot xui-reloader=true xid="slot-action-header" xui-slot-name="action header"></xui-slot>
 	</v-app-bar>
 
-	<v-navigation-drawer v-model="navdrawer" xid="vue-nav-drawer-1" xui-slot-name="nav drawer" xui-if=[[withLeftNavigation@0+]] :clipped="true" :temporary="false" :permanent="false" app overflow>
+	<v-navigation-drawer v-model="navdrawer" xid="vue-nav-drawer-1" xui-slot-name="nav drawer" xui-if=[[withLeftNavigation@0+]] 
+		:clipped="true" :temporary="[[navTemporary@0+]]" :permanent="[[navPermanent@0+]]" app overflow>
 		<xui-slot xui-slot-full xui-reloader=true xid="slot-navigation-drawer" xui-slot-name="navigation"></xui-slot>
 	</v-navigation-drawer>
 
@@ -183,7 +194,7 @@
 			heightHeader: 32,
 			heightFooter: 32,
 			ContentfillPage: true,
-			navdrawer: null
+			navdrawer: false
 		};
 
 		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler  

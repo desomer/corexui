@@ -37,6 +37,9 @@ export class EventManager {
                 // 250 = delay d'animation des v-tabs
                 setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, 250);
             }
+            if (data.action == "unselect") {
+                $xui.unDisplaySelector();
+            }
             if (data.action == "drop") {
                 if ($xui.dragItem != null) {
                     // gestion drag de nouveau component sur l'Iframe
@@ -46,7 +49,7 @@ export class EventManager {
                 }
                 if ($xui.dragMoveItem != null) {
                     // gestion de drag entre slot
-                    if ($xui.deleteCmp()) {   // suppression de source
+                    if ($xui.cutCmp()) {   // suppression de source
                         // selection de la target
                         var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
                         prom.then(() => {  

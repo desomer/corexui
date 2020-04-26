@@ -2,7 +2,7 @@
    <head>
       <title>PWA Designer</title>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"></meta>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"></link>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css"></link>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css"></link>
@@ -61,8 +61,10 @@
    <body style="height:100vh">
       <template id="xui-rootTemplate">
          <v-app style="background:white">
-            <v-app-bar app color="#1d9da0" fixed :dark="dark" :height="heightHeader">
-               <v-app-bar-nav-icon></v-app-bar-nav-icon>
+            <v-navigation-drawer v-model="navdrawer" :clipped="true" app :temporary="true" overflow>
+            </v-navigation-drawer>
+            <v-app-bar app color="#1d9da0" :clipped-left="true" :dark="dark" :height="heightHeader">
+               <v-app-bar-nav-icon @click.stop="navdrawer = !navdrawer"></v-app-bar-nav-icon>
                <v-toolbar-title class="xui-path-component">{{selectedxui}}</v-toolbar-title>
                <v-spacer></v-spacer>
                <v-btn small class="xui-btn-action" @click="$xui.fullScreen()">
@@ -198,7 +200,7 @@
                      <v-tab-item eager :transition="false" :reverse-transition="false">
                      </v-tab-item>
                      <v-tab>
-                        <v-icon>mdi-image-filter</v-icon>
+                        <v-icon>mdi-image-multiple-outline</v-icon>
                      </v-tab>
                      <v-tab-item eager :transition="false" :reverse-transition="false">
                      </v-tab-item>
@@ -224,7 +226,7 @@
                   </v-dialog>
                </v-container>
             </v-content>
-            <v-footer app color="#1d9da0" :dark="dark" style="padding: 0px 10px;" :height="heightFooter" inset>
+            <v-footer :inset="false" app color="#1d9da0" :dark="dark" style="padding: 0px 10px;" :height="heightFooter">
                <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
@@ -235,15 +237,15 @@
                   <v-icon>mdi-content-paste</v-icon>
                </v-btn>
                <span style="width:20px"></span>
-               <v-btn small class="xui-btn-action" @click="$xui.undo()">
+               <v-btn small :disabled="undoDisabled" class="xui-btn-action" @click="$xui.undo()">
                   <v-icon>mdi-undo</v-icon>
                </v-btn>
-               <v-btn small class="xui-btn-action" @click="$xui.redo()">
+               <v-btn small :disabled="redoDisabled" class="xui-btn-action" @click="$xui.redo()">
                   <v-icon>mdi-redo</v-icon>
                </v-btn>
                <span style="width:50px"></span>
                <v-btn small class="xui-btn-action">
-                  <v-icon>mdi-settings</v-icon>
+                  <v-icon>mdi-cog</v-icon>
                </v-btn>
                <v-btn small class="xui-btn-action">
                   <v-icon>mdi-note-multiple</v-icon>
@@ -256,7 +258,7 @@
                   <v-icon>mdi-autorenew</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2020 v0.1.5 14/04/20</span>
+               <span>&copy;&nbsp;Elisys 2020 v0.1.6 24/04/20</span>
             </v-footer>
          </v-app>
       </template>
@@ -271,7 +273,8 @@
 			dark: true,
 			heightHeader: 32,
 			heightFooter: 32,
-			ContentfillPage: true
+			ContentfillPage: true,
+			navdrawer: false
 		};
 
 		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler  
@@ -280,6 +283,8 @@
             isDesignFrame : true,
             selectedxui : "PWA Code Generator", 
             pasteDisabled : true,
+            undoDisabled  : true,
+            redoDisabled  : true,
             activeTab : 0,
             activeAction : 0,
             contentEditor: ''
