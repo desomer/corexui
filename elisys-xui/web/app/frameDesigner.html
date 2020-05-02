@@ -1,5 +1,7 @@
 <xui-factory version="1.0">
     <xui-import xui-path="app/vue2frame.html"></xui-import>
+    <xui-import xui-path="app/vue2CmpLayoutVuetify.html"></xui-import>
+    <xui-import xui-path="app/vue2CmpLayout.html"></xui-import>
     <xui-import xui-path="app/vue2CmpVuetify.html"></xui-import>
     <xui-import xui-path="app/cmpDesignClassChooser.html"></xui-import>
 
@@ -9,16 +11,23 @@
 
     <xui-design xid="root">
         <xui-prop id="title" val="PWA Designer"></xui-prop>
-        <xui-prop id="titleApp" val="{{selectedxui}}"></xui-prop>
-        <xui-prop id="colorApp" val="#1d9da0"></xui-prop>
+
+        <xui-prop id="colorApp" val="#ff5900"></xui-prop>  <!--#1d9da0 vert-->
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2020 v0.1.6 24/04/20"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.1.7 01/05/20"></xui-prop>
+
+        <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
         <xui-prop id="withFooter" val="true"></xui-prop>
         <xui-prop id="navTemporary" val="true"></xui-prop>
     </xui-design>
 
-    <xui-design xid="xui-toolbar-title" class="xui-path-component">
+    <xui-design xid="vue-toolbar-1" >
+        <xui-prop id="HeaderHeight" val="32px"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="slot-toolbar-title" >
+        <span class="xui-path-component">{{selectedxui}}</span>
     </xui-design>
 
     <v-dialog xid="xui-class-editor" v-model="dialogClass"
@@ -161,7 +170,7 @@
 
         <xui-btn-small><v-icon>mdi-cog</v-icon></xui-btn-small>
         <xui-btn-small><v-icon>mdi-note-multiple</v-icon></xui-btn-small>
-        <xui-btn-small><v-icon>mdi-new-box</v-icon></xui-btn-small>
+        <xui-btn-small @click="$xui.clearAll"><v-icon>mdi-new-box</v-icon></xui-btn-small>
 
         <span style="width:50px"></span>
 

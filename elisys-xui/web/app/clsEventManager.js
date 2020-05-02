@@ -32,6 +32,7 @@ export class EventManager {
         window.addEventListener('message', function (e) {
             var data = e.data;
             if (data.action == "select") {
+                this.console.debug(data);
                 $xui.displaySelectorByPosition(data.position);
                 $xui.modeDisplaySelection = true;
                 // 250 = delay d'animation des v-tabs

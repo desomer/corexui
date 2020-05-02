@@ -344,7 +344,7 @@ class XUIDesignManager {
     }
 
     template = template.replaceAll("##xid##", design.slotInfo.xid);
-    template = template.replaceAll("##title##", titleCmp);
+    template = template.replaceAll("##title##", titleCmp??("xid = "+design.slotInfo.xid));
 
     ret.bufTemplate
         .write("<div class='xui-over-prop-xid' id='${design.slotInfo.xid}'>");

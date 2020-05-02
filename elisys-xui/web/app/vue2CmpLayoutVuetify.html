@@ -1,0 +1,318 @@
+<xui-factory version="1.0">
+
+    <!--------------------------  XUI-FLOW   ------------------------------->
+    <xui-doc xid="xui-flow">
+        <xui-prop id="name">Flow</xui-prop>
+        <xui-prop id="icon">mdi-transfer-right</xui-prop>
+        <xui-prop id="desc">Flows</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop var="nb" def="2" editor="int">nb slot</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="xui-no-dom:xui-flow">
+        <xui-prop id="name">Flow item</xui-prop>
+        <xui-prop id="desc">Une colonne</xui-prop>
+    </xui-doc>
+
+    <xui-slot xid="xui-flow" xui-for="idxf" xui-slot-name="Flow">
+        <xui-slot style-slot="display:inline-flex" xid="[[parent-xid]]-col-[[idxf@2]]" xui-slot-name="Flow [[idxf@2]]">
+        </xui-slot>
+    </xui-slot>
+
+    <!--------------------------  XUI-SESSION   ------------------------------->
+    <xui-doc xid="xui-session">
+        <xui-prop id="name">Sessions</xui-prop>
+        <xui-prop id="icon">mdi-view-day</xui-prop>
+        <xui-prop id="desc">Une session</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="nb" def="3" editor="int">nb de session</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="session:xui-session">
+        <xui-prop id="name">Session item</xui-prop>
+        <xui-prop id="desc">Une session item</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <div xid="xui-session" class="[[class]]" -style="[[style]]" xui-for="idxr" xui-slot-name="sessions">
+        <div xui-reloader=true xid="[[parent-xid]]-session-[[idxr@0+]]" xui-slot-name="reloader">
+            <session class="xui-session [[class@-1]]" -style="[[style@-1]]">
+                <xui-slot xui-slot-full xid="[[parent-xid]]-item" xui-slot-name="session [[idxr@0+]]"></xui-slot>
+            </session>
+        </div>
+    </div>
+
+    <xui-design xid="inject-style">
+        <style xui-no-dom>
+            .xui-session {
+                display: block;
+            }
+        </style>
+    </xui-design>
+
+    <!--------------------------  XUI-LIST   ------------------------------->
+    <xui-doc xid="xui-list">
+        <xui-prop id="name">List</xui-prop>
+        <xui-prop id="icon">mdi-format-list-text</xui-prop>
+        <xui-prop id="desc">Une Liste</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var="nb" def="3" editor="int">nb de slots</xui-prop>
+        <xui-prop var="twoline" def="false" editor="bool">two line</xui-prop>
+        <xui-prop var="subheader" def="false" editor="bool">with subheader</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <v-list xid="xui-list" xui-for="idxr" xui-slot-name="List" two-line="[[twoline@0+]]" subheader="[[subheader@0+]]">
+        <xui-slot xid="[[parent-xid]]-list-[[idxr@2]]" xui-slot-name="List row [[idxr@2]]"></xui-slot>
+    </v-list>
+
+
+    <!--------------------------  XUI-GRID   ------------------------------->
+    <xui-doc xid="xui-grid">
+        <xui-prop id="name">Grid</xui-prop>
+        <xui-prop id="icon">mdi-apps</xui-prop>
+        <xui-prop id="desc">Une grille</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="nb" def="3" editor="int">nb de lignes</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="xui-row">
+        <xui-prop id="name">Grid Row</xui-prop>
+        <xui-prop id="desc">Une ligne</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var="nb" editor="int">nb col dans la ligne</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="v-col:xui-row">
+        <xui-prop id="name">Grid Cell</xui-prop>
+        <xui-prop id="desc">Une cellule</xui-prop>
+        <xui-prop var="cols" editor="text">Larg. de col (1-12/auto)</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <v-container class="xui-grid [[class]]" -style="[[style]]" xid="xui-grid" xui-for="idxr" xui-slot-name="grid">
+        <v-row class="[[class@-1]]" no-gutters -style="[[style@-1]]">
+            <xui-row xid="[[parent-xid]]-row-[[idxr@2]]" xui-nb="2" xui-slot-name="row [[idxr@2]]"></xui-row>
+        </v-row>
+    </v-container>
+
+    <xui-slot xid="xui-row" xui-for="idxc">
+        <v-col class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]">
+            <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" xui-slot-name="row [[idxr@5]] col [[idxc@3]]"></xui-slot>
+        </v-col>
+    </xui-slot>
+
+    <xui-design xid="inject-style">
+        <style xui-no-dom>
+            .xui-grid {
+                padding: 0px 0px;
+                margin: 0px 0px;
+                max-width: unset;
+            }
+        </style>
+    </xui-design>
+
+    <!--------------------------  XUI-FORM   ------------------------------->
+    <xui-doc class="xui-form" xid="xui-form-1">
+        <xui-prop id="name">Form</xui-prop>
+        <xui-prop id="icon">mdi-format-columns</xui-prop>
+        <xui-prop id="desc">Un formulaire</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="nb" def="3" editor="int">nb de lignes</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="xui-form-row-1">
+        <xui-prop id="name">Form Row</xui-prop>
+        <xui-prop id="desc">Une ligne</xui-prop>
+        <xui-prop var="nb" editor="int">nb col dans la ligne</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="v-col:xui-form-row-1">
+        <xui-prop id="name">Form Cell</xui-prop>
+        <xui-prop id="desc">Une cellule</xui-prop>
+        <xui-prop var="cols" editor="text">Larg. de col (1-12/auto)</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <v-container xid="xui-form-1" xui-for="idxr" xui-slot-name="form" class="xui-form [[class]]" -style="[[style]]">
+        <v-row class="xui-form-gutter [[class@-1]]" -style="[[style@-1]]">
+            <xui-form-row-1 xid="[[parent-xid]]-row-[[idxr@2]]" xui-nb="1" xui-slot-name="row [[idxr@2]]">
+            </xui-form-row-1>
+        </v-row>
+    </v-container>
+
+    <xui-slot xid="xui-form-row-1" xui-for="idxc">
+        <v-col class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]">
+            <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" xui-slot-name="row [[idxr@5]] col [[idxc@3]]"></xui-slot>
+        </v-col>
+    </xui-slot>
+
+    <xui-design xid="inject-style">
+        <style xui-no-dom>
+            .xui-form {
+                max-width: unset;
+            }
+
+            .xui-form-gutter>.col,
+            .xui-form-gutter>[class*=col-] {
+                padding: 5px 6px;
+            }
+
+            .xui-form .v-text-field input {
+                line-height: 14px;
+                font-size: 0.9rem;
+            }
+        </style>
+    </xui-design>
+
+    <!-------------------------- XUI-TABS -------------------------------->
+    <xui-doc xid="xui-tabs">
+        <xui-prop id="name">Tabs</xui-prop>
+        <xui-prop id="icon">mdi-tab</xui-prop>
+        <xui-prop id="desc">Des onglets</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="nb" def="3" editor="int">Nb d'onglet</xui-prop>
+        <xui-prop var="vertical" editor="bool">onglet vertical</xui-prop>
+        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="v-tab:xui-tabs">
+        <xui-prop id="favorite">text;icon;composer</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+        <xui-prop id="include"></xui-prop>
+
+        <xui-prop id="name">Tab</xui-prop>
+        <xui-prop id="desc">Titre de l'onglet</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="v-tab-item:xui-tabs">
+        <xui-prop id="name">Tab item</xui-prop>
+        <xui-prop id="desc">Contenu de l'onglet</xui-prop>
+        <xui-prop id="favorite">container</xui-prop>
+    </xui-doc>
+
+    <v-tabs class="[[class]]" -style="[[style]]" xid="xui-tabs" vertical=[[vertical]] dark="[[dark]]" light="[[light]]"
+        xui-for="idx" xui-slot-name="tab">
+        <v-tab>
+            <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-[[idx@0+]]" xui-slot-name="tab [[idx@0+]]"></xui-slot>
+        </v-tab>
+        <v-tab-item :transition="false" :reverse-transition="false" eager>
+            <!-- eager  desactive le lazyloading -->
+            <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-item-[[idx@0+]]" xui-slot-name="tab content [[idx@0+]]">
+            </xui-slot>
+        </v-tab-item>
+    </v-tabs>
+
+    <xui-design xid="inject-style">
+        <style xui-no-dom>
+            .v-tabs-items {
+                height: calc(100% - 48px);
+                background-color: unset !important;
+            }
+
+            .v-tabs-items>.v-window__container {
+                height: 100% !important
+            }
+
+            .v-tabs-items>.v-window__container>.v-window-item {
+                height: 100%
+            }
+
+            .v-application .primary--text {
+                color: red !important;
+                caret-color: #1976d2 !important;
+            }
+        </style>
+    </xui-design>
+
+    <!-------------------------------- V-CARD ---------------------------->
+    <xui-doc xid="xui-card-1">
+        <xui-prop id="name">Card</xui-prop>
+        <xui-prop id="icon">mdi-smart-card</xui-prop>
+        <xui-prop id="desc">Une Card</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="height" def="80px" editor="text">hauteur header</xui-prop>
+    </xui-doc>
+
+    <v-card xid="xui-card-1" xui-for="idxc" class="mx-auto" xui-slot-name="Card">
+        <v-img src="https://cdn.vuetifyjs.com/images/cards/store.jpg" class="white--text align-end"
+            height="[[height@1]]">
+            <v-card-title>
+                <xui-slot xid="[[parent-xid]]-card-title" xui-slot-name="Card Title"></xui-slot>
+            </v-card-title>
+        </v-img>
+
+        <v-card-text>
+            <xui-slot xid="[[parent-xid]]-card-main" xui-slot-name="Card Content"></xui-slot>
+        </v-card-text>
+
+        <v-card-actions>
+            <xui-slot xid="[[parent-xid]]-card-actions" xui-slot-name="Card Actions"></xui-slot>
+        </v-card-actions>
+
+    </v-card>
+
+    <!--------------------------  XUI-SLOT   ----------------------------->
+    <div xid="xui-div-slot" class="xui-class-slot"></div>
+
+    <xui-design xid="inject-style" xui-mode="final;preview">
+        <style xui-no-dom>
+            .xui-class-slot-full {
+                height: 100%;
+                width: 100%;
+            }
+        </style>
+    </xui-design>
+
+    <xui-design xid="inject-style" xui-mode="design;template">
+        <style xui-no-dom>
+            .xui-class-slot-full {
+                height: 100%;
+                width: 100%;
+            }
+
+            .xui-class-slot {
+                border: 1px dashed lightgray;
+                box-sizing: border-box;
+                min-height: 20px;
+                min-width: 20px;
+                text-decoration: underline dotted;
+                font-style: italic;
+                user-select: none;
+            }
+
+            .xui-class-slot:hover {
+                border: 1px dashed blue;
+            }
+
+            .xui-class-dragover {
+                border: 1px dashed blue !important;
+            }
+        </style>
+    </xui-design>
+
+</xui-factory>

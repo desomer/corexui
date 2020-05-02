@@ -70,13 +70,17 @@ $xui.refreshAction = (mode) => {
     var infoFile = { file: 'app/frame1.html', xid: 'root', mode: mode };
     if (mode == "template:reload") {
         infoFile.mode = "template";
-        infoFile.action = "reload";
+        infoFile.action = "reload";  // pas de store
+    }
+    if (mode == "template:clearAll") {
+        infoFile.mode = "design";
+        infoFile.action = "clear";   // pas de store
     }
     $xui.refresh(infoFile);    // lance le dart
 };
 
 $xui.fullScreen = () => {
-    window.$xui.unDisplaySelector();
+    $xui.unDisplaySelector();
     window.document.documentElement.requestFullscreen();
 }
 
@@ -88,6 +92,11 @@ $xui.modePreview = () => {
 
 $xui.modePhone = () => {
     document.querySelector("#rootFrame").classList.toggle("iframe-phone");
+}
+
+$xui.clearAll = () => {
+    $xui.pageDesignManager.clearAll();
+    $xui.refreshAction("template:clearAll");
 }
 
 /************************************************************************** */
@@ -279,7 +288,6 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
     });
 
     return prom;
-
 }
 
 

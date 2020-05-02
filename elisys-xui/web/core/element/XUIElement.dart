@@ -164,7 +164,7 @@ class XUIElementHTML extends XUIElement {
         isReloader = true;
         var xid = this.originElemXUI.xid;
         var xidCal = processContent(engine, xid, ParseInfoMode.ATTR);
-         var modeDisplay = "unset";
+         var modeDisplay = "contents";
         if (this.propertiesXUI[ATTR_MODE_DISPLAY]!=null)
         {
             modeDisplay=this.propertiesXUI[ATTR_MODE_DISPLAY]?.content.toString();

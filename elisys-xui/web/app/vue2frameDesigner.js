@@ -37,49 +37,58 @@ document.addEventListener('dragend', function () {
 
 document.addEventListener('pointerdown', e => {
     targetActionStart = e.target.closest("[data-xid]");
-  });
+});
 
 document.addEventListener('pointerup', function (e) {    //dblclick
     //console.debug("pointerup", e);
-    if (e.button!=0)
-        return; 
+    if (e.button != 0)
+        return;
 
     let targetAction = e.target.closest("[data-xid]");
-    if (targetActionStart!=targetAction)
-        return ;  // ne fait rien sur le drag (ex : Split)
+    if (targetActionStart != targetAction)
+        return;  // ne fait rien sur le drag (ex : Split)
 
     let elemRect = targetAction.getBoundingClientRect();
+    let s = getComputedStyle(targetAction);
+    let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
 
     var message = {
         action: "select",
         xid: targetAction.dataset.xid,
         xid_slot: targetAction.dataset.xidSlot,
-        position: elemRect
+        position: {
+            hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
+            height: elemRect.height,
+            width: elemRect.width,
+            left: elemRect.left,
+            top: elemRect.top,
+            ...margin
+        },
     };
     //console.debug("***********message", message, targetAction, targetActionStart);
     window.parent.postMessage(message, "*");
 });
 
-document.addEventListener('scroll', function( event ) {
+document.addEventListener('scroll', function (event) {
     var message = {
         action: "unselect",
     };
     window.parent.postMessage(message, "*");
-} );
+});
 
-window.addEventListener('resize', function( event ) {
+window.addEventListener('resize', function (event) {
     var message = {
         action: "unselect",
     };
     window.parent.postMessage(message, "*");
-} );
+});
 
 //******************************************************************************* */
 
 window.addEventListener('message', function (e) {
     var data = e.data;
     if (data.action == "changeTemplate") {
-        if (data.param.listReloader!=null) {
+        if (data.param.listReloader != null) {
             this.console.info("changeTemplate event reloader", data.param);
             $xui.listReloader[data.param.listReloader[0]].reload();
         }
@@ -91,7 +100,7 @@ window.addEventListener('message', function (e) {
     }
     if (data.action == "changeReloader") {
         //console.debug("load reloader", data.xid, data);
-        if ($xui.listReloader[data.xid]==null)
+        if ($xui.listReloader[data.xid] == null)
             console.error("change Reloader on error", data, $xui.listReloader);
         $xui.listReloader[data.xid].rload(data);
     }
@@ -122,4 +131,28 @@ $xui.updateDirectPropValue = (value, variable, xid) => {
         value: value.target.value
     };
     window.parent.postMessage(message, "*");
+}
+
+
+window.getInfoForSelector = (selector, parent) => {
+    var targetAction = document.querySelector(selector)
+    if (targetAction == null) return null;
+    if (parent)
+        targetAction=targetAction.parentNode;
+        
+    let elemRect = targetAction.getBoundingClientRect();
+    let s = getComputedStyle(targetAction);
+
+    let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
+
+    var ret = {
+        hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
+        height: elemRect.height,
+        width: elemRect.width,
+        left: elemRect.left,
+        top: elemRect.top,
+        ...margin
+    };
+
+    return ret;
 }

@@ -216,6 +216,14 @@ Future refresh(FileDesignInfo fileInfo) async {
     await initStoreVersion(designManager, fileInfo, ctx);
   }
 
+  if (fileInfo.action == "clear") {
+    print("clear all from storage");
+    XUIDesignManager.removeDesignManager(fileInfo);
+    var ctx = XUIContext(MODE_TEMPLATE);
+    var designManager = getDesignManager(fileInfo);
+    await designManager.initEngine(fileInfo.file, ctx);
+  }
+
   await _reload(fileInfo);
   return Future.value();
 }

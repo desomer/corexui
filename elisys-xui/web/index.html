@@ -7,8 +7,36 @@
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css"></link>
       <link rel="stylesheet" href="app/frameDesigner.css"></link>
+      <script defer src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
       <style>
 
+
+            .v-navigation-drawer__content {
+                color: rgba(0, 0, 0, 0); 
+                transition: color .5s ease;
+            }
+
+            .v-navigation-drawer__content:hover {
+                color: rgba(0, 0, 0, 0.2); 
+            }
+
+            .v-navigation-drawer__content::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            .v-navigation-drawer__content::-webkit-scrollbar-track {
+                box-shadow: inset 0 0 6px 0px  rgba(0, 0, 0, 0.1);
+            }
+            .v-navigation-drawer__content:hover::-webkit-scrollbar-track {
+               box-shadow: inset 0 0 6px 0px  rgba(0, 0, 0, 0.3);
+            }
+
+            .v-navigation-drawer__content::-webkit-scrollbar-thumb {
+                box-shadow: inset 0 0 15px 0px;
+                border-radius: 5px;
+            }
+
+        
             .xui-session {
                 display: block;
             }
@@ -47,25 +75,43 @@
             }
 
             .v-application .primary--text {
-                color:red !important;
+                color: red !important;
                 caret-color: #1976d2 !important;
             }
-
         
             .xui-class-slot-full {
                 height: 100%;
                 width: 100%;
+            }
+        
+            .xui-split {
+                display: grid;
+                height: 100%;
+            }
+
+            .xui-split-gutter {
+                background-color: #c7c7c7
+            }
+
+            .xui-split-gutter-horizontal {
+                cursor: row-resize;
+            }
+
+            .xui-split-gutter-vertical {
+                cursor: col-resize;
             }
               </style>
    </head>
    <body style="height:100vh">
       <template id="xui-rootTemplate">
          <v-app style="background:white">
-            <v-navigation-drawer v-model="navdrawer" :clipped="true" app :temporary="true" overflow>
+            <v-navigation-drawer v-model="navdrawer" :clipped="true" app temporary>
             </v-navigation-drawer>
-            <v-app-bar app color="#1d9da0" :clipped-left="true" :dark="dark" :height="heightHeader">
+            <v-app-bar app height="32px" color="#ff5900" :clipped-left="true" :dark="dark">
                <v-app-bar-nav-icon @click.stop="navdrawer = !navdrawer"></v-app-bar-nav-icon>
-               <v-toolbar-title class="xui-path-component">{{selectedxui}}</v-toolbar-title>
+               <v-toolbar-title>
+                  <span class="xui-path-component">{{selectedxui}}</span>
+               </v-toolbar-title>
                <v-spacer></v-spacer>
                <v-btn small class="xui-btn-action" @click="$xui.fullScreen()">
                   <v-icon>mdi-fullScreen</v-icon>
@@ -226,7 +272,7 @@
                   </v-dialog>
                </v-container>
             </v-content>
-            <v-footer :inset="false" app color="#1d9da0" :dark="dark" style="padding: 0px 10px;" :height="heightFooter">
+            <v-footer :inset="false" app color="#ff5900" :dark="dark" style="padding: 0px 10px;" :height="heightFooter">
                <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
@@ -250,7 +296,7 @@
                <v-btn small class="xui-btn-action">
                   <v-icon>mdi-note-multiple</v-icon>
                </v-btn>
-               <v-btn small class="xui-btn-action">
+               <v-btn small class="xui-btn-action" @click="$xui.clearAll">
                   <v-icon>mdi-new-box</v-icon>
                </v-btn>
                <span style="width:50px"></span>
@@ -258,7 +304,7 @@
                   <v-icon>mdi-autorenew</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2020 v0.1.6 24/04/20</span>
+               <span>&copy;&nbsp;Elisys 2020 v0.1.7 01/05/20</span>
             </v-footer>
          </v-app>
       </template>
@@ -271,7 +317,7 @@
 
 		$xui.rootdata = {
 			dark: true,
-			heightHeader: 32,
+			//heightHeader: 32,
 			heightFooter: 32,
 			ContentfillPage: true,
 			navdrawer: false
@@ -291,6 +337,12 @@
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
     
+            $xui.initComponentVuejs.push(() => {
+                new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
+                    "vue-xui-split");
+            }
+            );
+        
             
             var listDesignClass = [
                 {

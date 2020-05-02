@@ -96,6 +96,13 @@ pre > code {
     background: rgba(204, 205, 255, 0.10);
 }
 
+.xui-style-selector-margin
+{ 
+    position: absolute; 
+    z-index: 999;
+    border: 1px dashed rgb(255, 115, 0); 
+}
+
 .xui-style-prop {    
     background: #565656;
     height: 24px;

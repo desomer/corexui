@@ -53,7 +53,7 @@ export class PageDesignManager {
         this.codeHtml = param.html;
         this.codeYaml = param.yaml;
 
-        if (param.action!="reload")
+        if (param.action!="reload" && param.action!="clear")
             this.store();
 
         if ($xui.rootdata.activeTab == 1)  // si onglet 1 actif
@@ -138,5 +138,10 @@ export class PageDesignManager {
 
         localStorage.setItem('xui_version_' + name, "" + ver);
         $xui.refreshAction("template:reload");
+    }
+
+    clearAll()
+    {
+        localStorage.clear();
     }
 }
