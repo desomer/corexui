@@ -28,6 +28,22 @@
         <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openClassEditor([[id@1]])"><v-icon dense>mdi-dots-horizontal</v-icon></v-btn>
     </div>
 
+    <div xid="editor-icon" style="display: inline-flex;">
+        <v-text-field  dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+        <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openTabUrl('listIcon')"><v-icon dense>mdi-application-import</v-icon></v-btn>
+    </div>
+
+    <div xid="editor-image" style="display: inline-flex;">
+        <v-text-field  dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+        <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openTabUrl('siteImage')"><v-icon dense>mdi-application-import</v-icon></v-btn>
+    </div>
+
     <v-text-field xid="editor-int" class='ma-1' hide-details clearable type='number' min='0' max='99' 
         :label='[[label]]' 
         v-model='[[value]]'>

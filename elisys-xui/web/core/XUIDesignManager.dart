@@ -283,31 +283,30 @@ class XUIDesignManager {
 
   Future<String> getJSDesignVariableTemplate(DocVariables varCmp,
       FileDesignInfo fi, XUIContext ctx, int i, DesignInfo design) async {
-
     var keyCache = varCmp.editor;
     var template = cacheTemplateEditor[keyCache];
 
     if (template == null) {
-      if (varCmp.editor == "bool") {
-        fi.xid = 'editor-bool';
-      } else if (varCmp.editor == "int") {
-        fi.xid = 'editor-int';
-      } else if (varCmp.editor == "combo") {
+      if (varCmp.editor == "combo") {
         fi.xid = 'editor-combo';
         // affecte les items a la combobox grace au addProperties
         XUIComponent cmp =
             await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
         cmp.addProperties("items", "data[##idx##].items");
-      } else if (varCmp.editor == "class") {
-        fi.xid = 'editor-class';
-      } else if (varCmp.editor == "icon") {
-        fi.xid = 'editor-icon';
-      } else {
+      } else if (varCmp.editor == "style") {
         fi.xid = 'editor-text';
+      } else {
+        fi.xid = 'editor-' + varCmp.editor;
       }
 
-      XUIComponent cmp =
-          await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
+      XUIComponent cmp;
+      try {
+        cmp = await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
+      } catch (e, s) {
+        print("pb cmp ${fi.xid} $e $s");
+        rethrow;
+      }
+
       cmp.addProperties("value", "data[##idx##].value");
       cmp.addProperties("label", "data[##idx##].label");
       cmp.addProperties("id", "data[##idx##].xid");
@@ -318,8 +317,8 @@ class XUIDesignManager {
       print("****<" + keyCache + ">=>" + template);
       cacheTemplateEditor[keyCache] = template;
     }
-    template = template.replaceAll("##idx##",   i.toString());
-   // template = template.replaceAll("##id##",   design.slotInfo.xid);
+    template = template.replaceAll("##idx##", i.toString());
+    // template = template.replaceAll("##id##",   design.slotInfo.xid);
 
     return template;
   }
@@ -344,7 +343,8 @@ class XUIDesignManager {
     }
 
     template = template.replaceAll("##xid##", design.slotInfo.xid);
-    template = template.replaceAll("##title##", titleCmp??("xid = "+design.slotInfo.xid));
+    template = template.replaceAll(
+        "##title##", titleCmp ?? ("xid = " + design.slotInfo.xid));
 
     ret.bufTemplate
         .write("<div class='xui-over-prop-xid' id='${design.slotInfo.xid}'>");

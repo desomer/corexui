@@ -1,78 +1,110 @@
 <xui-factory version="1.0">
 
 	<xui-doc xid="page">
-		<xui-prop var="title" editor="string">titre</xui-prop>
+		<xui-prop var="title" editor="text">titre</xui-prop>
 
-		<xui-prop var="colorApp" editor="string" link="https://materialdesignicons.com/">couleur primaire</xui-prop>
-		<xui-prop var="colorBg" editor="string" link="https://materialdesignicons.com/">couleur fond de page</xui-prop>
-		<xui-prop var="copyrightApp" editor="string">copyright de l'appli</xui-prop>
+		<xui-prop var="colorApp" editor="text" link="https://materialdesignicons.com/">color nav global</xui-prop>
+		<xui-prop var="darkApp" editor="bool">dark navigation</xui-prop>
+		<xui-prop var="copyrightApp" editor="text">copyright de l'appli</xui-prop>
 		
 		<xui-prop var="withSysBar" editor="bool">System bar</xui-prop>
 		<xui-prop var="withAppBar" def="true" editor="bool">App bar</xui-prop>
-
-		<xui-prop var="withLeftNavigation" editor="bool">Navigation Drawer</xui-prop>
-		<xui-prop var="navPermanent" editor="bool">Nav permanent</xui-prop>
-		<xui-prop var="navTemporary" editor="bool">Force temporary nav on Desktop</xui-prop>
-
 		<xui-prop var="withFooter" editor="bool">Footer bar</xui-prop>
 		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
+
+		<xui-prop var="withLeftNavigation" editor="bool">Left Navigation Drawer</xui-prop>
+		<xui-prop var="navPermanent" editor="bool">Nav permanent</xui-prop>
+		<xui-prop var="navTemporary" editor="bool">Force temporary nav on Desktop</xui-prop>
+		<xui-prop var="clipped-left" editor="bool">App bar clipped left</xui-prop>
+		<xui-prop var="inset-left" editor="bool">Footer bar inset (if Nav Drawer)</xui-prop>
 				
 		<xui-prop id="name">Page</xui-prop>
 		<xui-prop id="desc">La page</xui-prop>
 	</xui-doc>
+
 	<!---------------------------------------------------------------------------------------->
 
-	<xui-doc xid="v-navigation-drawer:vue-nav-drawer-1">
-		<xui-prop id="name">Nav drawer</xui-prop>
-		<xui-prop id="desc">navigation drawer</xui-prop>
+	<xui-doc xid="vue-content-1"">
+		<xui-prop id="name">Content</xui-prop>
+		<xui-prop id="desc">Contenu de la page</xui-prop>
+		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">couleur fond de page</xui-prop>
 	</xui-doc>
 
-	<!---------------------------------------------------------------------------------------->
-
-	<xui-doc xid="v-container:vue-content-1">
+	<xui-doc xid="v-container:vue-content-1">  
 		<xui-prop id="favorite">container</xui-prop>
 		<xui-prop id="exclude"></xui-prop>
 		<xui-prop id="include"></xui-prop>
 
-		<xui-prop id="name">Content</xui-prop>
-		<xui-prop id="desc">Contenu de la page</xui-prop>
+		<xui-prop id="name">Content slot</xui-prop>
+		<xui-prop id="desc">Contenu slot</xui-prop>
 	</xui-doc>
 	
 	<!---------------------------------------------------------------------------------------->
-	<xui-doc xid="vue-toolbar-1">
+
+	<xui-doc xid="vue-systembar-1">
+		<xui-prop id="name">System bar</xui-prop>
+		<xui-prop id="desc">System bar</xui-prop>
+
+		<xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+	</xui-doc>
+
+	<xui-doc xid="v-system-bar:vue-systembar-1">
+		<xui-prop id="name">System bar slot</xui-prop>
+		<xui-prop id="desc">System bar slot</xui-prop>
+	</xui-doc>
+
+	<!------------------------------------- elevate-on-scroll--------------------------------------------------->
+	<xui-doc xid="vue-apptoolbar-1">
 		<xui-prop id="name">Header</xui-prop>
 		<xui-prop id="desc">Entete</xui-prop>
 
-		<xui-prop var="HeaderHeight" editor="height">height (px, vh)</xui-prop>
-
 		<xui-prop var="HeaderDense" def="false" editor="bool">dense</xui-prop>
 		<xui-prop var="HeaderProminent" def="false" editor="bool">prominent</xui-prop>
-		<xui-prop var="shrink-on-scroll" def="false" editor="bool">shrink on scroll</xui-prop>
+		<xui-prop var="HeaderExtended" def="false" editor="bool">extended</xui-prop>
 
+		<xui-prop var="HeaderFlat" def="false" editor="bool">flat</xui-prop>
+		
+		<xui-prop var="src" editor="image">url background image</xui-prop>
+		<xui-prop var="fade-img-on-scroll" editor="bool">fade background img on scroll</xui-prop>
+
+
+		<xui-prop var="shrink-on-scroll" def="false" editor="bool">shrink on scroll (prominent)</xui-prop>
 		<xui-prop var="HeaderCollapseonscroll" def="false" editor="bool">collapse on scroll</xui-prop>
 		<xui-prop var="HeaderHideonscroll" def="false" editor="bool">hide on scroll</xui-prop>
 		
-		<xui-prop var="HeaderExtended" def="false" editor="bool">Extended</xui-prop>
 		<xui-prop var="Headerscrolloffscreen" def="false" editor="bool">scroll off screen (if Extended)</xui-prop>
+
+		<xui-prop var="scroll-threshold" editor="int">scroll threshold (px)</xui-prop>
+		<xui-prop var="HeaderHeight" editor="int">Custom height (px)</xui-prop>
+
+		<xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
 	</xui-doc>
 
-	<xui-doc xid="v-toolbar-title:vue-toolbar-1">
-		<xui-prop id="name">Toolbar title</xui-prop>
+	<xui-doc xid="v-toolbar-title:vue-apptoolbar-1">
+		<xui-prop id="name">Toolbar title slot</xui-prop>
 		<xui-prop id="desc">Toolbar title</xui-prop>
 	</xui-doc>
 
-	<xui-doc xid="v-toolbar-items:vue-toolbar-1">
-		<xui-prop id="name">Toolbar items</xui-prop>
+	<xui-doc xid="v-toolbar-items:vue-apptoolbar-1">
+		<xui-prop id="name">Toolbar items slot</xui-prop>
 		<xui-prop id="desc">Entete Toolbar items</xui-prop>
 	</xui-doc>
 	
-	<xui-doc xid="v-app-bar:vue-toolbar-1">
+	<xui-doc xid="v-app-bar:vue-apptoolbar-1">
 		<xui-prop id="favorite">action</xui-prop>
 		<xui-prop id="exclude"></xui-prop>
 		<xui-prop id="include"></xui-prop>
 
-		<xui-prop id="name">Toolbar action</xui-prop>
+		<xui-prop id="name">Toolbar action slot</xui-prop>
 		<xui-prop id="desc">Toolbar de l'entete</xui-prop>
+	</xui-doc>
+	<!---------------------------------------------------------------------------------------->
+
+	<xui-doc xid="v-navigation-drawer:vue-nav-drawer-1">
+		<xui-prop id="name">Nav drawer slot</xui-prop>
+		<xui-prop id="desc">navigation drawer slot</xui-prop>
 	</xui-doc>
 
 	<!---------------------------------------------------------------------------------------->
@@ -86,8 +118,8 @@
 		<xui-prop id="exclude"></xui-prop>
 		<xui-prop id="include"></xui-prop>
 
-		<xui-prop id="name">Toolbar</xui-prop>
-		<xui-prop id="desc">Toolbar du pied de page</xui-prop>
+		<xui-prop id="name">footer action slot</xui-prop>
+		<xui-prop id="desc">footer action du pied de page</xui-prop>
 	</xui-doc>
 <!---------------------------------------------------------------------------------------->
 
@@ -101,26 +133,27 @@
 		<xui-prop id="desc">Bottom Navigation Action</xui-prop>
 	</xui-doc>
 	
-
+	<!---------------------------------------------------------------------------------------->
+	<!-------------------------------     PAGE      ------------------------------------------>
 	<!---------------------------------------------------------------------------------------->
 	<!--  gestion page autonome -->
 	<html xid="frame-vuetify-1" xui-mode="final;design;preview" style="height:100vh;" xui-slot-name="page"
 		xui-doc-id="page">
 
-		<head xid="header-vuetify"></head>
+		<head xid="header-vuetify" xui-no-design></head>
 
-		<body xid="body-vuetify" style="height:100vh"></body>
+		<body xid="body-vuetify" xui-no-design style="height:100vh"></body>
 		<xui-script-data></xui-script-data>
 		<script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
-		<xui-slot xid="inject-after-body"></xui-slot>
+		<xui-slot xid="inject-after-body" xui-no-design></xui-slot>
 		<xui-init-vuetify></xui-init-vuetify>
 		<xui-init-designer></xui-init-designer>
 	</html>
 
 	<!--  gestion du designer -->
 	<xui-slot xid="frame-vuetify-1" xui-mode="template" xui-slot-name="page" xui-doc-id="page">
-		<body xid="body-vuetify" style="height:100vh"></body>
+		<body xid="body-vuetify" xui-no-design style="height:100vh"></body>
 	</xui-slot>
 
 	<!--------------------------------------------------------------------------------------->
@@ -133,10 +166,112 @@
 			href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" />
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" />
 
-		<xui-slot xid="inject-other-header"></xui-slot>
-		<style xid="inject-style"></style>
+		<xui-slot xid="inject-other-header" xui-no-design></xui-slot>
+		<style xid="inject-style" xui-no-design></style>
 	</xui-design>
 
+
+	<meta xid="viewport-no-zoom" name="viewport"
+		content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+	</meta>
+
+	<xui-design xid="maincontent">
+		<xui-slot xid="inject-design-ui" xui-no-design></xui-slot>
+		<vue-systembar-1 xid="systembar"></vue-systembar-1>
+		<vue-nav-drawer-1 xid="navdrawerleft"></vue-nav-drawer-1>
+		<vue-apptoolbar-1 xid="toolbar"></vue-apptoolbar-1>
+		<vue-content-1 xid="contentpage"></vue-content-1>
+		<vue-footer-1 xid="footer"></vue-footer-1>
+		<vue-bottom-nav-1 xid="bottom-nav"></vue-bottom-nav-1>
+	</xui-design>
+
+	<v-system-bar xid="vue-systembar-1" xui-if=[[withSysBar@0+]]
+		class="[[class]]" -style="[[style]]"
+		app
+		dark="[[darkApp@0+]]"> 
+		<xui-slot xui-reloader=true xid="slot-content-systembar" xui-slot-full xui-slot-name="system bar content"></xui-slot>
+	</v-system-bar>
+
+	<v-app-bar xid="vue-apptoolbar-1" xui-if=[[withAppBar@0+]] 
+		app 
+		clipped-left="[[clipped-left@0+]]" 
+		src="[[src]]"
+		fade-img-on-scroll="[[fade-img-on-scroll]]"
+		dark="[[darkApp@0+]]" 
+		flat="[[HeaderFlat]]"
+		height="[[HeaderHeight]]"
+		dense="[[HeaderDense]]"
+		prominent="[[HeaderProminent]]"
+		shrink-on-scroll="[[shrink-on-scroll]]"
+		collapse-on-scroll="[[HeaderCollapseonscroll]]"
+		hide-on-scroll="[[HeaderHideonscroll]]"
+		scroll-threshold="[[scroll-threshold]]"
+		color="[[colorApp@0+]]"
+		class="[[class]]" -style="[[style]]"
+		>
+		<v-app-bar-nav-icon xui-if=[[withLeftNavigation@0+]] @click.stop="navdrawer = !navdrawer"></v-app-bar-nav-icon>
+		<v-toolbar-title>
+			<xui-slot xui-reloader=true xid="slot-toolbar-title" xui-slot-name="toolbar title"></xui-slot>
+		</v-toolbar-title>
+		<v-spacer></v-spacer>
+		<!--v-toolbar-items-->
+			<xui-slot xui-reloader=true xid="slot-action-header" xui-slot-name="toolbar items"></xui-slot>
+		<!--/v-toolbar-items-->
+
+		<template xui-if=[[HeaderExtended@0+]] v-slot:extension>
+			<xui-slot xui-reloader=true xid="slot-extend-header" xui-slot-name="extended"></xui-slot>
+		</template>
+	</v-app-bar>
+
+	<v-navigation-drawer v-model="navdrawer" xid="vue-nav-drawer-1" xui-if=[[withLeftNavigation@0+]] 
+		clipped="[[clipped-left@0+]]" temporary="[[navTemporary@0+]]" permanent="[[navPermanent@0+]]" app>
+		<xui-slot xui-slot-full xui-reloader=true xid="slot-navigation-drawer" xui-slot-name="navigation"></xui-slot>
+	</v-navigation-drawer>
+
+	<v-content xid="vue-content-1" -style="background:[[colorBg]]">
+		<v-container fluid :fill-height="ContentfillPage" class="pa-0" style="align-items:start">
+			<xui-slot xui-reloader=true xui-slot-full xid="main" xui-slot-name="page content"></xui-slot>
+		</v-container>
+	</v-content>
+
+	<v-footer xid="vue-footer-1" xui-if=[[withFooter@0+]] 
+		app 
+		inset="[[inset-left@0+]]"
+		:height="heightFooter" 
+		dark="[[darkApp@0+]]"
+		color="[[colorApp@0+]]" style="padding: 0px 10px;">
+		<xui-slot xui-reloader=true xid="slot-action-footer" xui-slot-name="action footer"></xui-slot>
+		<v-spacer></v-spacer>
+		<span>&amp;copy;&amp;nbsp;[[copyrightApp@0+]]</span>
+	</v-footer>
+
+	<v-bottom-navigation xid="vue-bottom-nav-1" xui-if=[[withBottomNavigation@0+]] 
+		app background-color="[[colorApp@0+]]" 
+		dark="[[darkApp@0+]]">
+		<xui-slot xui-reloader=true xid="slot-bottom-navigation" xui-slot-name="action bottom navigation"></xui-slot>
+	</v-bottom-navigation>
+
+	<xui-design xid="body-vuetify">
+		<template id="xui-rootTemplate">
+			<v-app xid="maincontent" xui-no-design>
+			</v-app>
+			<xui-trashcan></xui-trashcan>
+			<xui-slot xid="xui-temporary-slot" xui-no-design></xui-slot>
+		</template>
+
+		<div id="app"></div>
+
+	</xui-design>
+
+	<!----------------------------  TRASHCAN ---------------------------------->
+	<div xid="xui-trashcan" xui-mode="template;design" style="display:none; z-index: 100; 
+				background-color: white;position: absolute;
+				border: 1px solid #0b00ff;
+				top: 10vh;left: 10vw;height: 80vh;width: 80vw;">
+		<xui-slot xid="xui-trashcan-slot"></xui-slot>
+	</div>
+	<xui-slot xid="xui-trashcan" xui-mode="final;preview"></xui-slot>
+	<!------------------------------------------------------------------------->
 
 	<xui-design xui-mode="template;design" xid="inject-style">
 		<style xui-no-dom>
@@ -208,96 +343,13 @@
         </style>
     </xui-design>
 
-
-	<meta xid="viewport-no-zoom" name="viewport"
-		content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-	</meta>
-
-	<xui-design xid="maincontent">
-		<xui-slot xid="inject-design-ui"></xui-slot>
-		<vue-systembar-1></vue-systembar-1>
-		<vue-nav-drawer-1></vue-nav-drawer-1>
-		<vue-toolbar-1 xid="toolbar"></vue-toolbar-1>
-		<vue-content-1></vue-content-1>
-		<vue-footer-1 xid="footer"></vue-footer-1>
-		<vue-bottom-nav-1 xid="bottom-nav"></vue-bottom-nav-1>
-	</xui-design>
-
-	<v-system-bar xid="vue-systembar-1" xui-if=[[withSysBar@0+]] app :dark="dark"> 
-		<xui-slot xui-reloader=true xid="slot-content-systembar" xui-slot-name="content system bar"></xui-slot>
-	</v-system-bar>
-
-	<v-app-bar xid="vue-toolbar-1" xui-slot-name="header bar" xui-if=[[withAppBar@0+]] 
-		app 
-		:clipped-left="true" 
-		:dark="dark" 
-		height="[[HeaderHeight@0]]"
-		dense="[[HeaderDense@0]]"
-		prominent="[[HeaderProminent@0]]"
-		shrink-on-scroll="[[shrink-on-scroll@0]]"
-		collapse-on-scroll="[[HeaderCollapseonscroll@0]]"
-		hide-on-scroll="[[HeaderHideonscroll@0]]"
-		color="[[colorApp@0+]]">
-		<v-app-bar-nav-icon xui-if=[[withLeftNavigation@0+]] @click.stop="navdrawer = !navdrawer"></v-app-bar-nav-icon>
-		<v-toolbar-title>
-			<xui-slot xui-reloader=true xid="slot-toolbar-title" xui-slot-name="toolbar title"></xui-slot>
-		</v-toolbar-title>
-		<v-spacer></v-spacer>
-		<!--v-toolbar-items-->
-			<xui-slot xui-reloader=true xid="slot-action-header" xui-slot-name="toolbar items"></xui-slot>
-		<!--/v-toolbar-items-->
-	</v-app-bar>
-
-	<v-navigation-drawer v-model="navdrawer" xid="vue-nav-drawer-1" xui-slot-name="nav drawer" xui-if=[[withLeftNavigation@0+]] 
-		:clipped="true" temporary="[[navTemporary@0+]]" permanent="[[navPermanent@0+]]" app>
-		<xui-slot xui-slot-full xui-reloader=true xid="slot-navigation-drawer" xui-slot-name="navigation"></xui-slot>
-	</v-navigation-drawer>
-
-	<v-content xid="vue-content-1">
-		<v-container fluid :fill-height="ContentfillPage" class="pa-0" style="align-items:start">
-			<xui-slot xui-reloader=true xui-slot-full xid="main" xui-slot-name="page content"></xui-slot>
-		</v-container>
-	</v-content>
-
-	<v-footer xid="vue-footer-1" xui-slot-name="footer bar" :inset="false" xui-if=[[withFooter@0+]] app :height="heightFooter" :dark="dark"
-		color="[[colorApp@0+]]" style="padding: 0px 10px;">
-		<xui-slot xui-reloader=true xid="slot-action-footer" xui-slot-name="action footer"></xui-slot>
-		<v-spacer></v-spacer>
-		<span>&amp;copy;&amp;nbsp;[[copyrightApp@0+]]</span>
-	</v-footer>
-
-	<v-bottom-navigation xid="vue-bottom-nav-1" xui-slot-name="bottom nav bar" xui-if=[[withBottomNavigation@0+]] app background-color="[[colorApp@0+]]" :dark="dark">
-		<xui-slot xui-reloader=true xid="slot-bottom-navigation" xui-slot-name="action bottom navigation"></xui-slot>
-	</v-bottom-navigation>
-
-
-	<xui-design xid="body-vuetify">
-		<template id="xui-rootTemplate">
-			<v-app xid="maincontent" -style="background:[[colorBg@0+]]">
-			</v-app>
-			<xui-trashcan></xui-trashcan>
-		</template>
-
-		<div id="app"></div>
-
-	</xui-design>
-
-	<!----------------------------  TRASHCAN ---------------------------------->
-	<div xid="xui-trashcan" xui-mode="template;design" style="	display:none; z-index: 100; 
-				background-color: white;position: absolute;
-				border: 1px solid #0b00ff;
-				top: 10vh;left: 10vw;height: 80vh;width: 80vw;">
-		<xui-slot xid="xui-trashcan-slot" xui-slot-name="trashcan Slot"></xui-slot>
-	</div>
-	<xui-slot xid="xui-trashcan" xui-mode="final;preview"></xui-slot>
 	<!------------------------------------------------------------------------->
-
 	<script xid="xui-script-data">
 		if (typeof $xui === 'undefined')
 			$xui = {};
 
 		$xui.rootdata = {
-			dark: true,
+			//dark: true,
 			//heightHeader: 32,
 			heightFooter: 32,
 			ContentfillPage: true,

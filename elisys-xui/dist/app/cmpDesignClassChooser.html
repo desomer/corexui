@@ -5,9 +5,10 @@
             
             var listDesignClass = [
                 {
-                    title: "style",
+                    title: "style & elevation",
                     icon: "mdi-image-size-select-large",
                     open: true,
+                    nb : "0",
                     listClass: [
                         { sel: false, type: 'check', text: 'fill height', value: 'fill-height' },
                         { sel: false, text: 'elevation', value: 'elevation', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'] },
@@ -17,6 +18,7 @@
                     title: "Margin",
                     icon: "mdi-image-filter-none",
                     open: false,
+                    nb : "0",
                     listClass: [
                         { sel: false, text: 'all', value: 'ma', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
                         { sel: false, text: 'x', value: 'mx', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
@@ -31,6 +33,7 @@
                     title: "Padding",
                     icon: "mdi-checkbox-intermediate",
                     open: false,
+                    nb : "0",
                     listClass: [
                         { sel: false, text: 'all', value: 'pa', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
                         { sel: false, text: 'x', value: 'px', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
@@ -42,16 +45,27 @@
                     ],
                 },
                 {
-                    title: "Text",
+                    title: "Text style",
                     icon: "mdi-format-text",
                     open: false,
+                    nb : "0",
                     listClass: [
-                        { sel: false, type: 'check', text: 'text left', value: 'text-left' },
-                        { sel: false, type: 'check', text: 'text center', value: 'text-center' },
-                        { sel: false, type: 'check', text: 'text right', value: 'text-right' },
-                        { sel: false, type: 'check', text: 'text justify', value: 'text-justify' },
+                        { sel: false, text: 'size', value: '', type: 'list', vl: '1', list: 
+                            ['display-4', 'display-3', 'display-2', 'display-1','headline', 'title', 
+                            'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'caption', 'overline'] },
+                        { sel: false, text: 'Style', value: '', type: 'list', vl: '1', list: 
+                            ['font-regular','font-italic'] },
+                        { sel: false, text: 'weight', value: '', type: 'list', vl: '1', list: 
+                            ['font-weight-light','font-weight-thin','font-weight-regular','font-weight-medium','font-weight-bold','font-weight-black'] },
+                        { sel: false, text: 'opacity', value: 'text-', type: 'list', vl: '1', list: 
+                            ['primary','secondary','disabled'], },
+
+                        { sel: false, type: 'divider' },
+                        { sel: false, text: 'alignment', value: '', type: 'list', vl: '1', list: 
+                            ['text-left','text-center','text-right','text-justify'], },
                         { sel: false, type: 'divider' },
                         { sel: false, type: 'check', text: 'text no wrap', value: 'text-no-wrap' },
+                        { sel: false, type: 'check', text: 'text truncate (...)', value: 'text-truncate' },
                         { sel: false, type: 'check', text: 'text lowercase', value: 'text-lowercase' },
                         { sel: false, type: 'check', text: 'text uppercase', value: 'text-uppercase' },
                         { sel: false, type: 'check', text: 'text capitalize', value: 'text-capitalize' }
@@ -83,41 +97,44 @@
         }
     </script>
 
-    <v-list xid="vue-xui-list-class" expand dense class="xui-list-class">
-        <v-list-group no-action v-for="(itemCat, j) in listCatClass" :prepend-icon="itemCat.icon" :value="itemCat.open">
-            <template v-slot:activator>
-                <v-list-item-title>{{itemCat.title}}</v-list-item-title>
-            </template>
-
-            <v-list-item-group>
+    <v-tabs xid="vue-xui-list-class">
+        <v-tab  v-for="(itemCat, j) in listCatClass" :key="j">
+            <v-badge overlap color="red"  :content="itemCat.nb" :value="itemCat.open">
+                <span>{{itemCat.title}}</span>
+                <v-icon class="ml-2">{{itemCat.icon}}</v-icon>
+            </v-badge>
+        </v-tab>
+        <v-tab-item  v-for="(itemCat, j) in listCatClass" :key="j">
+            <v-list dense class="xui-list-class">
                 <template v-for="(item, i) in itemCat.listClass">
                     <v-divider v-if="item.type=='divider'" :key="`divider-${i}`"></v-divider>
                     <!------------------------------------------------------------------->
-                    <v-list-item style="height: 35px;" v-else-if="item.type=='list'" :key="`cl-cbo-${i}`">
+                    <v-list-item dense v-else-if="item.type=='list'" :key="`cl-cbo-${i}`">
+                        <v-list-item-action>
+                            <v-checkbox dense color="blue accent-4" v-model="item.sel">
+                            </v-checkbox>
+                        </v-list-item-action>
                         <v-list-item-title v-text="item.text"></v-list-item-title>
-                        <v-select dense v-model="item.vl" hide-details style="width: 80px;
+                        <v-select dense v-model="item.vl" hide-details style="width: 200px;
                                 position: absolute;
-                                top: 0px;
-                                left: 85px;" :items="item.list"></v-select>
+                                top: -5px;
+                                left: 185px;" :items="item.list"></v-select>
 
-                        <v-checkbox dense color="blue accent-4" v-model="item.sel">
-                        </v-checkbox>
                     </v-list-item>
                     <!------------------------------------------------------------------->
                     <v-list-item dense v-else :key="`cl-${i}`">
-                        <v-list-item-content>
-                            <v-list-item-title v-text="item.text"></v-list-item-title>
-                        </v-list-item-content>
-
                         <v-list-item-action>
                             <v-checkbox dense color="blue accent-4" v-model="item.sel"></v-checkbox>
                             </v-checkbox>
                         </v-list-item-action>
+                        <v-list-item-content>
+                            <v-list-item-title v-text="item.text"></v-list-item-title>
+                        </v-list-item-content>
                     </v-list-item>
 
                 </template>
-            </v-list-item-group>
-        </v-list-group>
-    </v-list>
+            </v-list>
+        </v-tab-item>
+    </v-tabs>
 
 </xui-factory>

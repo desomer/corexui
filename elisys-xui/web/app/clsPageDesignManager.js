@@ -36,7 +36,7 @@ export class PageDesignManager {
         $xui.unDisplaySelector();
 
         if (param.mode == "template") {
-            // change uniquement template de la page aprés le demarrage en mode design
+            // change uniquement template de la page aprés le demarrage en mode design et les reloader
             document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "param": param }, "*");
         }
         else if (param.mode == "preview") {
@@ -54,7 +54,7 @@ export class PageDesignManager {
         this.codeYaml = param.yaml;
 
         if (param.action!="reload" && param.action!="clear")
-            this.store();
+            this.store(); // save un nouvelle version
 
         if ($xui.rootdata.activeTab == 1)  // si onglet 1 actif
         {

@@ -142,16 +142,24 @@
         <xui-prop id="desc">Une image</xui-prop>
         <xui-prop id="componentAs">background</xui-prop>
 
-        <xui-prop var="url" editor="text" def="https://cdn.vuetifyjs.com/images/cards/store.jpg">image url</xui-prop>
+        <xui-prop var="url" editor="image">image url</xui-prop>
         <xui-prop var="contain" editor="bool">contain</xui-prop>
         <xui-prop var="aspect-ratio" editor="text">aspect ratio (16/9)</xui-prop>
+        <xui-prop var="withSlot" def="false" editor="bool">with Slot</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-img xid="xui-image-1" xui-slot-name="image" :aspect-ratio="[[aspect-ratio]]" contain=[[contain]] class="[[class]]" -style="[[style]]" src="[[url]]">
 
+    <xui-doc xid="v-img:xui-image-1">
+        <xui-prop id="name">Image Slot</xui-prop>
+        <xui-prop id="desc">Image Slot</xui-prop>
+    </xui-doc>
+
+
+    <v-img xid="xui-image-1" xui-slot-name="image" :aspect-ratio="[[aspect-ratio]]" contain=[[contain]] class="[[class]]" -style="[[style]]" src="[[url]]">
+        <xui-slot xui-if=[[withSlot@1]] xui-slot-full xid="[[parent-xid]]-image-content" xui-slot-name="Image Content"></xui-slot>
     </v-img>
 
 

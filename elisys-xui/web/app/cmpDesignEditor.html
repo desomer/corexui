@@ -2,7 +2,7 @@
 
     <div xid="bottom-editor" style="display:flex">
         <v-icon style="font-size:18px"  @click="$xui.deleteCmp()">mdi-delete</v-icon>
-        <v-icon style="font-size:18px">mdi-plus-box</v-icon>
+        <v-icon style="font-size:18px"  @click="$xui.addAction()">mdi-plus-box</v-icon>
         <v-icon style="font-size:18px">mdi-pencil</v-icon>
     </div>
 
@@ -34,6 +34,14 @@
             v-model='[[value@1]]'>
         </v-text-field>
         <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openTabUrl('listIcon')"><v-icon dense>mdi-application-import</v-icon></v-btn>
+    </div>
+
+    <div xid="editor-image" style="display: inline-flex;">
+        <v-text-field  dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+        <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openTabUrl('siteImage')"><v-icon dense>mdi-application-import</v-icon></v-btn>
     </div>
 
     <v-text-field xid="editor-int" class='ma-1' hide-details clearable type='number' min='0' max='99' 

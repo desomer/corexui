@@ -1,5 +1,5 @@
 import Vuex from "https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.esm.browser.min.js";
-import * as vue2CmpMgr from "./vue2CmpMgr.js";
+import * as vue2CmpMgr from "./vue2MgrCmp.js";
 
 
 // https://codesandbox.io/s/vue-template-o4j2g

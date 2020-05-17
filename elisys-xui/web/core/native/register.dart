@@ -54,6 +54,10 @@ class NativeSlot extends XUIElementNative {
       var newChild = XUIElementXUI()..tag = TAG_DIV_SLOT;
       newChild.children = [];
       newChild.children.add(XUIElementText()..content = slotName);
+
+      newChild.attributes = HashMap<String, XUIProperty>();
+      newChild.attributes["class"] = XUIProperty("text-truncate");  // trunc le texte si trop long
+      
       if (html.originElemXUI.attributes != null) {
         // affecte les styles et les class du slot  (ex : flow et le display:inline flex)
         newChild.attributes = HashMap<String, XUIProperty>();
@@ -73,15 +77,12 @@ class NativeSlot extends XUIElementNative {
     int nbChild = html.getNbChildNoText();
     int nbChildNoSlot = 0;
     html.children?.forEach((childHtml) {
-      // affecte les attribut du slot sur les enfants
-      //var model = XUIElementXUI();
-      // XUIModel(model, MODE_ALL).processAttributes(childHtml);
 
-      // affecte le nom du slot sur les enfants si doit etre accessible (avoir un slot name)
+      // affecte le nom du slot sur les enfants si doit etre accessible (avoir un slot xid)
       if (isModeDesign && isSlotButNotTrashcan) {
         childHtml.attributes ??= HashMap<String, XUIProperty>();
 
-        // affecte le xui-slot sur les enfant non slot
+        // affecte le xid-slot sur les enfant non slot
         if (childHtml is! XUIElementHTMLText) {
           if (childHtml.tag != TAG_NO_DOM) {
             childHtml.attributes["data-" + ATTR_XID_SLOT] = XUIProperty(xidCal);

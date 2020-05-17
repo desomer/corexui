@@ -6,6 +6,7 @@
 if (typeof window.$xui === 'undefined')
     window.$xui = {};
 
+/****************************************************************************************/
 
 import("./clsPageDesignManager.js").then((module) => {
     $xui.pageDesignManager = new module.PageDesignManager();
@@ -20,21 +21,10 @@ import("./clsSelectorManager.js").then((module) => {
 });
 
 /****************************************************************************************/
-
 $xui.isModePreview = false;
 $xui.modeDisplaySelection = false;
 $xui.editorOpenId = null;
 
-var workerEnable = false;
-var monWorker = null;
-
-if (workerEnable) {
-    monWorker = new Worker('./libxuiworker.js');
-
-    monWorker.onmessage = function (e) {
-        console.log('Message depuis le worker', e);
-    }
-}
 
 /******************************************************************************** */
 $xui.loadPageJS = (html) => {
@@ -43,31 +33,14 @@ $xui.loadPageJS = (html) => {
 
 $xui.changePageJS = (param) => {
     $xui.pageDesignManager.changePageJS(param);
+    $xui.doPromiseJS("changePage");
 };
 
-$xui.undo = () => {
-    $xui.pageDesignManager.undo();
-};
-
-$xui.redo = () => {
-    $xui.pageDesignManager.redo();
-};
-
-
-var listIcon = null;
-$xui.openTabUrl = (url) => {
-    if (url == "listIcon") {
-        if (listIcon == null || listIcon.closed)
-            listIcon = window.open('https://cdn.materialdesignicons.com/5.1.45/', '_blank');
-        listIcon.focus()
-    }
-
-};
 
 /******************************************************************************** */
 // gestion des button refresh de la page
 $xui.refreshAction = (mode) => {
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: mode };
+    var infoFile = getInfoFile(mode);
     if (mode == "template:reload") {
         infoFile.mode = "template";
         infoFile.action = "reload";  // pas de store
@@ -76,7 +49,7 @@ $xui.refreshAction = (mode) => {
         infoFile.mode = "design";
         infoFile.action = "clear";   // pas de store
     }
-    $xui.refresh(infoFile);    // lance le dart
+    $xui.refreshXUI(infoFile);
 };
 
 $xui.fullScreen = () => {
@@ -94,88 +67,234 @@ $xui.modePhone = () => {
     document.querySelector("#rootFrame").classList.toggle("iframe-phone");
 }
 
+/***************************************************************************************************************/
+let lastActionDate = Date.now();
+let lastAction = null;
+$xui.setCurrentAction = (actionName) => {
+    $xui.rootdata.saveLayout = true;
+
+    lastActionDate = Date.now();
+    lastAction = actionName;
+    console.debug("START ------- " + actionName + " ---------")
+    var displayMode = "root"
+    var undisplaySelector = true;
+    var reselect = $xui.modeDisplaySelection;
+
+    /**************************/
+    if (actionName == "addCmp")
+        displayMode = "none";
+
+    if (actionName == "saveProperties" || actionName == "addAction")
+        displayMode = "current";
+
+    if (actionName == "addSlot")
+        displayMode = "current";
+    /**************************/
+
+    if (undisplaySelector)
+        $xui.unDisplaySelector();
+
+    var prom = getPromise("changePageFinish");
+    prom.then(() => {
+        $xui.rootdata.saveLayout = false;
+        if (displayMode == "current") {
+            if (reselect)
+                $xui.modeDisplaySelection = true;
+
+            console.debug("changePageFinish ok", $xui.modeDisplaySelection);
+            if ($xui.modeDisplaySelection) {
+                setTimeout(() => {   // attente prise en compte chargement des images
+                    console.debug("reselect after change ", $xui.propertiesDesign);
+                    $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, true);
+                }, 10);
+            }
+        }
+    });
+
+    var prom = getPromise("changePage");
+    prom.then(() => {
+        if (displayMode == "root") {
+            $xui.displayPropertiesJS("root", "root");   // reaffecte le nouveau mapping sur la page
+        }
+        else if (displayMode == "current") {
+            $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);   // reaffecte le nouveau mapping
+        }
+        console.debug("END ------ " + actionName + " ------")
+    }
+    );
+
+    return true;
+}
+
+/***************************************************************************************************************/
 $xui.clearAll = () => {
+    $xui.setCurrentAction("clearAll");
     $xui.pageDesignManager.clearAll();
     $xui.refreshAction("template:clearAll");
 }
 
-/************************************************************************** */
 $xui.addCmp = (cmp) => {
-    window.$xui.unDisplaySelector();
+    $xui.setCurrentAction("addCmp");
     console.debug("addCmp", cmp, $xui.propertiesComponent);
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
-    const newXid = $xui.getNewXid($xui.propertiesComponent, cmp);
+    let infoFile = getInfoFile("template");
+    const newXid = $xui.getNewXid($xui.propertiesComponent.xid, cmp.xid);
     const currentXid = $xui.propertiesComponent.xid;
     const template = "<xui-design xid=\"" + currentXid + "\"><" + cmp.xid + " xid=\"" + newXid + "\"></" + cmp.xid + "></xui-design>";
     $xui.addDesign(infoFile, $xui.propertiesComponent.xid, template, true, false);
-    // todo 
-    // gerer .then($xui.changePage())
-}
-
-$xui.getNewXid = (parent, cmp) => {
-    var d = new Date().getTime();
-    d += (parseInt(Math.random() * 100)).toString();
-
-    var idxUUID = parent.xid.indexOf("_");
-    var pxid = idxUUID == -1 ? parent.xid : (parent.xid.substring(0, idxUUID));
-    var ret = pxid + "-" + cmp.xid.replace("xui-", "") + "_" + d;
-    return ret;
 }
 
 $xui.deleteCmp = () => {
-    $xui.unDisplaySelector();
     console.debug("deleteCmp", $xui.propertiesDesign);
     if ($xui.propertiesDesign.isSlot) {
         console.debug("deleteCmp slot impossible");
         return false;
     }
     else {
-        var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
-        $xui.deleteDesign(infoFile, $xui.propertiesDesign.xid);
+        $xui.setCurrentAction("deleteCmp");
+        $xui.deleteDesign(getInfoFile("template"), $xui.propertiesDesign.xid);
         return true;
     }
 }
 
-$xui.cutCmp = () => {
-    $xui.unDisplaySelector();
-    console.debug("cutCmp", $xui.propertiesDesign);
+$xui.cutCmp = (forMove) => {
+
     if ($xui.propertiesDesign.isSlot) {
         console.debug("deleteCmp slot impossible");
         return false;
     }
     else {
-        var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
-        $xui.cutDesign(infoFile, $xui.propertiesDesign.xid);
+        if (!forMove)
+            $xui.setCurrentAction("cutCmp");
+
+        $xui.cutDesign(getInfoFile("template"), $xui.propertiesDesign.xid);
         $xui.rootdata.pasteDisabled = false;
         return true;
     }
 }
 
-$xui.pasteTo = () => {
-    $xui.unDisplaySelector();
-    console.debug("pasteTo", $xui.propertiesDesign);
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
+$xui.pasteTo = (forMove) => {
+    if (forMove) {
+        $xui.setCurrentAction("movePasteTo");
+    }
+    else
+        $xui.setCurrentAction("pasteTo");
+
+    let infoFile = getInfoFile("template");
     var info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xui.moveDesign(infoFile, null, info.xid);
     $xui.rootdata.pasteDisabled = true;
 }
 
-//********************************************************************************************/
+$xui.moveTo = (data) => {
+    if ($xui.cutCmp(true)) {   // suppression de source
+        // selection de la target
+        var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
+        prom.then(() => {
+            $xui.pasteTo(true);
+        })
+    }
+}
+
+$xui.addAction = () => {
+
+    let infoFile = getInfoFile("template");
+    let info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    let infoParent = $xui.getInfo(infoFile, info.parentXid, info.parentXid);
+    console.debug("infoParent", info, infoParent);
+
+    $xui.rootdata.activeAction = 3;
+
+    if ($xui.propertiesDesign.isSlot) {
+
+        if (info.docId == "xui-no-dom:xui-flow"
+            || info.docId == "v-col:xui-row-grid"
+            || info.docId == "v-col:xui-row-1"
+            || info.docId == "v-col:xui-form-row-1"
+            || info.docId == "v-tab:xui-tabs"
+        ) {
+            addSlotByVariable(infoFile, info);
+            return true
+        }
+        else {
+            console.debug("addAction sur slot impossible");
+            return false;
+        }
+    }
+    else {
+        if (infoParent.docId == "xui-no-dom:xui-flow") {
+            addSlotByVariable(infoFile, infoParent);
+            return true
+        }
+        else {
+            // surround
+            $xui.setCurrentAction("addAction");
+            let cmp = { xid: 'xui-flow' };
+            const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
+            const currentXid = info.parentXid;
+            const template = "<xui-design xid=\"" + currentXid + "\"><" + cmp.xid + " xid=\"" + newXid + "\"></" + cmp.xid + "></xui-design>";
+            $xui.surroundDesign(infoFile, $xui.propertiesDesign.xid, template, newXid);
+            return true;
+        }
+    }
+}
+
+function addSlotByVariable(infoFile, infoParent) {
+    $xui.setCurrentAction("addSlot");
+    infoFlow = $xui.getInfo(infoFile, infoParent.parentXid, infoParent.parentXid);
+    for (const aProp of $xui.rootDataProperties.data) {
+        if (aProp.xid == infoFlow.xid && aProp.variable == "nb") {
+            aProp.value = "" + (parseInt(aProp.value) + 1);
+        }
+    }
+    // save properties
+    $xui.hasPropertiesChanged = false;
+    $xui.setDesignProperties(getInfoFile("template"), $xui.propertiesDesign.json);
+}
+
+$xui.undo = () => {
+    $xui.setCurrentAction("undo");
+    $xui.pageDesignManager.undo();
+};
+
+$xui.redo = () => {
+    $xui.setCurrentAction("redo");
+    $xui.pageDesignManager.redo();
+};
 
 $xui.saveProperties = () => {
+    $xui.setCurrentAction("saveProperties");
     console.debug("saveProperties", $xui.propertiesDesign.json);
 
     $xui.hasPropertiesChanged = false;
-
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
-    var prom = getPromise("setDesignProperties");
-    $xui.setDesignProperties(infoFile, "save", $xui.propertiesDesign.json);
-    prom.then(xidProp => {
-        console.debug("saveProperties ok", xidProp);
-        $xui.displayPropertiesJS(xidProp, xidProp);   // reaffecte le nouveau mapping
-    });
-    return prom;
+    $xui.setDesignProperties(getInfoFile("template"), $xui.propertiesDesign.json);
 }
+
+/***************************************************************************************************************/
+$xui.getNewXid = (xidParent, nameCmp) => {
+    var d = new Date().getTime();
+    d += (parseInt(Math.random() * 100)).toString();
+
+    var idxUUID = xidParent.indexOf("_");
+    var pxid = idxUUID == -1 ? xidParent : (xidParent.substring(0, idxUUID));
+    var ret = pxid + "-" + nameCmp.replace("xui-", "") + "_" + d;
+    return ret;
+}
+
+/***************************************************************************************************************/
+var listIcon = null;
+var listImage = null;
+$xui.openTabUrl = (url) => {
+    if (url == "listIcon") {
+        if (listIcon == null || listIcon.closed)
+            listIcon = window.open('https://cdn.materialdesignicons.com/5.1.45/', '_blank');
+        listIcon.focus()
+    }
+    if (url == "siteImage") {
+        if (listImage == null || listImage.closed)
+            listImage = window.open('https://unsplash.com/', '_blank');
+        listImage.focus()
+    }
+};
 
 $xui.openClassEditor = (id) => {
     $xui.editorOpenId = id;
@@ -191,7 +310,6 @@ $xui.openClassEditor = (id) => {
             new DesignClassManager().initClassSelector(aProperty.value, $xui.rootdata.listCatClass);
         }
     }
-
 }
 
 $xui.closeClassEditor = () => {
@@ -204,29 +322,27 @@ $xui.closeClassEditor = () => {
             $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
         }
     }
-
 }
 
-
-/******************************************************************************** */
-
+/***************************************************************************************************************/
 $xui.displayPropertiesJS = (xid, xid_slot) => {
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
+    let infoFile = getInfoFile("template");
 
-    var param = { infoFile: infoFile, xid: xid, xid_slot: xid_slot };
+    let posScroll = -1;
+    if ($xui.propertiesDesign != null && xid == $xui.propertiesDesign.xid) {
+        posScroll = document.getElementById("AppPropertiesSetting").scrollTop;
+    }
 
-    // gestion en thread
-    if (monWorker != null)
-        monWorker.postMessage([param]);
-
-    // var info = $xui.getInfo(infoFile, xid, xid_slot);
-
-    var prom = getPromise("getDesignProperties");
-
+    let prom = getPromise("getDesignProperties");
     $xui.getDesignProperties(infoFile, xid, xid_slot);
-
     prom.then(prop => {
         $xui.hasPropertiesChanged = false;
+
+        if (prop.path == "") {
+            console.debug("displayPropertiesJS **** INCONNU ****", $xui.propertiesDesign);
+            return;
+        }
+
         $xui.propertiesDesign = prop;
         $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
         $xui.propertiesDesign.json = $xui.parseJson($xui.propertiesDesign.data);
@@ -262,21 +378,23 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
             },
             mounted: function () {
                 this.$nextTick(function () {
+                    if (posScroll >= 0) {
+                        document.getElementById("AppPropertiesSetting").scrollTop = posScroll;
+                    }
                     // gestion de la selection sur le mouseover
                     var listOver = document.querySelectorAll(".xui-over-prop-xid");
-                    $xui.last = null;
+                    $xui.lastPropOver = null;
+
                     listOver.forEach((aDivOver) => {
-                        aDivOver.style.border = "1px solid #bdbdbd";
                         aDivOver.addEventListener('mouseover', () => {
-                            aDivOver.style.border = "1px solid #202020";
-                            if ($xui.last != aDivOver.id) {
-                                $xui.last = aDivOver.id;
-                                //console.debug("sel over", aDivOver.id);
+                            if ($xui.lastPropOver != aDivOver.id) {
+                                $xui.lastPropOver = aDivOver.id;
                                 $xui.displaySelectorByXid(aDivOver.id, aDivOver.id, true);
                             }
                         });
                         aDivOver.addEventListener('mouseleave', () => {
-                            aDivOver.style.border = "1px solid #bdbdbd";
+                            $xui.lastPropOver = null;
+                            // lance aussi la sauvegarde
                             $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xid, true);
                             if (!$xui.modeDisplaySelection)
                                 $xui.unDisplaySelector();
@@ -290,16 +408,23 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
     return prom;
 }
 
-
+/***************************************************************************************************************/
 $xui.displayComponents = (xid, xid_slot) => {
 
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
+    let infoFile = getInfoFile("template");
 
     $xui.propertiesComponent = $xui.getComponents(infoFile, xid, xid_slot);
     //console.debug("displayComponents", $xui.propertiesComponent);
+
+    /************************************************************ */
+    if ($xui.vuejsAppCmpSetting != null) {
+        return; // pas de raffraichissement dynamique en fonction du composant
+    }
+    /************************************************************ */
+
     $xui.propertiesComponent.json = $xui.parseJson($xui.propertiesComponent.data);
     $xui.rootDataComponents = { data: $xui.propertiesComponent.json, item: null };
-    if ($xui.vuejsDesign != null) {
+    if ($xui.vuejsAppCmpSetting != null) {
         $xui.vuejsAppCmpSetting.$destroy();
     }
     $xui.vuejsAppCmpSetting = new Vue({
@@ -316,9 +441,10 @@ $xui.displayComponents = (xid, xid_slot) => {
 
 }
 
-var lastHtmlAction = null;
+/***************************************************************************************************************/
+var cacheHtmlAction = null;
 $xui.displayAction = (xid, xid_slot) => {
-    if (lastHtmlAction == null) {
+    if (cacheHtmlAction == null) {
         var infoFile = { file: 'app/cmpDesignEditor.html', xid: 'bottom-editor', mode: 'final' };
         var prom = getPromise("displayActionPromise");
         $xui.getHtmlFrom(infoFile, "displayActionPromise");
@@ -338,12 +464,14 @@ $xui.displayAction = (xid, xid_slot) => {
                     }
                 }
             });
-            lastHtmlAction = html;
+            cacheHtmlAction = html;
         });
     }
 
 }
 
+/***************************************************************************************************************/
+/***************************************************************************************************************/
 $xui.updateDirectProperty = (value, variable, xid) => {
     console.debug("updateDirectProperty", value, variable, xid, $xui.rootDataProperties);
     for (const aProp of $xui.rootDataProperties.data) {
@@ -353,8 +481,12 @@ $xui.updateDirectProperty = (value, variable, xid) => {
     }
 }
 
-/********************************************************************************** */
+/***************************************************************************************************************/
 var dicoPromise = {};
+
+function getInfoFile(mode) {
+    return { file: 'app/frame1.html', xid: 'root', mode: mode };
+}
 
 function compileTemplate(template) {
     return Vue.compile(template);
@@ -383,7 +515,10 @@ function getPromise(id) {
 }
 
 $xui.doPromiseJS = (idPromise, ret) => {
-    dicoPromise[idPromise].resolve_ex(ret);
+    if (dicoPromise[idPromise] != null) {
+        dicoPromise[idPromise].resolve_ex(ret);
+        dicoPromise[idPromise] = null;
+    }
 }
 
 

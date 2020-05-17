@@ -22,8 +22,12 @@ import("./clsSelectorManager.js").then((module) => {
 /****************************************************************************************/
 
 $xui.isModePreview = false;
-$xui.modeDisplaySelection = false;
+$xui.modeDisplaySelection = false;    //affichage de la selection en cours
 $xui.editorOpenId = null;
+
+
+
+
 
 var workerEnable = false;
 var monWorker = null;
@@ -53,19 +57,40 @@ $xui.redo = () => {
     $xui.pageDesignManager.redo();
 };
 
+
+var listIcon = null;
+var listImage = null;
+$xui.openTabUrl = (url) => {
+    if (url == "listIcon") {
+        if (listIcon == null || listIcon.closed)
+            listIcon = window.open('https://cdn.materialdesignicons.com/5.1.45/', '_blank');
+        listIcon.focus()
+    }
+    if (url == "siteImage") {
+        if (listImage == null || listImage.closed)
+            listImage = window.open('https://unsplash.com/', '_blank');
+        listImage.focus()
+    }
+
+};
+
 /******************************************************************************** */
 // gestion des button refresh de la page
 $xui.refreshAction = (mode) => {
     var infoFile = { file: 'app/frame1.html', xid: 'root', mode: mode };
     if (mode == "template:reload") {
         infoFile.mode = "template";
-        infoFile.action = "reload";
+        infoFile.action = "reload";  // pas de store
+    }
+    if (mode == "template:clearAll") {
+        infoFile.mode = "design";
+        infoFile.action = "clear";   // pas de store
     }
     $xui.refresh(infoFile);    // lance le dart
 };
 
 $xui.fullScreen = () => {
-    window.$xui.unDisplaySelector();
+    $xui.unDisplaySelector();
     window.document.documentElement.requestFullscreen();
 }
 
@@ -77,6 +102,11 @@ $xui.modePreview = () => {
 
 $xui.modePhone = () => {
     document.querySelector("#rootFrame").classList.toggle("iframe-phone");
+}
+
+$xui.clearAll = () => {
+    $xui.pageDesignManager.clearAll();
+    $xui.refreshAction("template:clearAll");
 }
 
 /************************************************************************** */
@@ -214,7 +244,7 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         console.debug("displayPropertiesJS", $xui.propertiesDesign);
 
         $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
-        var template="<div id='AppPropertiesSetting' class='barcustom xui-div-design'>" + $xui.propertiesDesign.template + "</div>";
+        var template = "<div id='AppPropertiesSetting' class='barcustom xui-div-design'>" + $xui.propertiesDesign.template + "</div>";
         var tmpCompiled = compileTemplate(template);
 
         if ($xui.vuejsDesign != null) {
@@ -242,7 +272,9 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
             },
             mounted: function () {
                 this.$nextTick(function () {
+                    /*******************************************************/
                     // gestion de la selection sur le mouseover
+                    /*******************************************************/
                     var listOver = document.querySelectorAll(".xui-over-prop-xid");
                     $xui.last = null;
                     listOver.forEach((aDivOver) => {
@@ -262,13 +294,13 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
                                 $xui.unDisplaySelector();
                         });
                     });
+                    /*******************************************************/
                 })
             }
         });
     });
 
     return prom;
-
 }
 
 
@@ -319,7 +351,7 @@ $xui.displayAction = (xid, xid_slot) => {
                     }
                 }
             });
-            lastHtmlAction=html;
+            lastHtmlAction = html;
         });
     }
 

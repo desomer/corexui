@@ -56,7 +56,7 @@ class DesignClassManager {
         }
         else if (classDesc.type == "list" && classDesc.sel) {
           classDesc.sel = true;
-          text = text + classDesc.value + "-" + classDesc.vl + " "
+          text = text + classDesc.value + (classDesc.value!=""?"-":"") + classDesc.vl + " "
         }
       }
     }
@@ -65,18 +65,22 @@ class DesignClassManager {
 
   initClassSelector(list, listDesignClass) {
 
+    // par de defaut à false
     for (const catDesc of listDesignClass) {
+      catDesc.open = false;
+      catDesc.nbint = 0;
       for (const classDesc of catDesc.listClass) {
         if (classDesc.type == "check") {
           classDesc.sel = false;
         }
         else if (classDesc.type == "list") {
           classDesc.sel = false;
-          classDesc.vl = "1";
+          classDesc.vl = classDesc.list[0];
         }
       }
     }
 
+    // ensuite affecte
     var listTag = list.split(" ");
     listTag.forEach(tag => {
       a: for (const catDesc of listDesignClass) {
@@ -84,6 +88,7 @@ class DesignClassManager {
           if (classDesc.type == "check" && classDesc.value == tag) {
             classDesc.sel = true;
             catDesc.open = true;
+            catDesc.nbint++;
             break a;
           }
           else if (classDesc.type == "list" && tag.startsWith(classDesc.value + "-")) {
@@ -91,11 +96,24 @@ class DesignClassManager {
             var descTag = tag.split("-");
             classDesc.vl = descTag[1];
             catDesc.open = true;
+            catDesc.nbint++;
+            break a;
+          }
+          else if (classDesc.type == "list" && classDesc.value=="" && classDesc.list.indexOf(tag)>=0) {
+            classDesc.sel = true;
+            classDesc.vl = tag;
+            catDesc.open = true;
+            catDesc.nbint++;
             break a;
           }
         }
       }
     });
+
+    for (const catDesc of listDesignClass) {
+      catDesc.nb = ""+catDesc.nbint;
+    }
+
   }
 }
 

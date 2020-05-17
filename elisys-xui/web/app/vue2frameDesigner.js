@@ -90,7 +90,10 @@ window.addEventListener('message', function (e) {
     if (data.action == "changeTemplate") {
         if (data.param.listReloader != null) {
             this.console.info("changeTemplate event reloader", data.param);
-            $xui.listReloader[data.param.listReloader[0]].reload();
+            if ($xui.listReloader[data.param.listReloader[0]] != null)
+                $xui.listReloader[data.param.listReloader[0]].reload();
+            else
+                this.console.error("+-+-+-+-+-+-+-+-+ pb reloader inconnu", data.param.listReloader, $xui.listReloader);
         }
         else {
             this.console.info("changeTemplate event all", data.param);
@@ -101,7 +104,7 @@ window.addEventListener('message', function (e) {
     if (data.action == "changeReloader") {
         //console.debug("load reloader", data.xid, data);
         if ($xui.listReloader[data.xid] == null)
-            console.error("change Reloader on error", data, $xui.listReloader);
+            console.error("changeReloader on error", data, $xui.listReloader);
         $xui.listReloader[data.xid].rload(data);
     }
 });
@@ -133,13 +136,12 @@ $xui.updateDirectPropValue = (value, variable, xid) => {
     window.parent.postMessage(message, "*");
 }
 
-
 window.getInfoForSelector = (selector, parent) => {
     var targetAction = document.querySelector(selector)
     if (targetAction == null) return null;
     if (parent)
-        targetAction=targetAction.parentNode;
-        
+        targetAction = targetAction.parentNode;
+
     let elemRect = targetAction.getBoundingClientRect();
     let s = getComputedStyle(targetAction);
 

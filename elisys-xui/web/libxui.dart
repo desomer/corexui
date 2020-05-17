@@ -26,7 +26,7 @@ external void loadPageJS(obj);
 @JS()
 external void changePageJS(obj);
 
-@JS('refresh')
+@JS('refreshXUI')
 external set _refresh(void Function(FileDesignInfo) f);
 
 @JS('addDesign')
@@ -41,6 +41,9 @@ external set _cutDesign(void Function(FileDesignInfo, String) f);
 
 @JS('deleteDesign')
 external set _deleteDesign(void Function(FileDesignInfo, String) f);
+
+@JS('surroundDesign')
+external set _surroundDesign(void Function(FileDesignInfo, String, String, String) f);
 
 @JS('moveDesign')
 external set _moveDesign(void Function(FileDesignInfo, String, String) f);
@@ -57,13 +60,14 @@ external set _getDesignProperties(
 
 @JS('setDesignProperties')
 external set _setDesignProperties(
-    dynamic Function(FileDesignInfo, String, dynamic) f);
+    dynamic Function(FileDesignInfo, dynamic) f);
 
 ///------------------------------------------------------------------
 
 /// change les properties
 void setDesignProperties(
-    FileDesignInfo fileInfo, String idAction, dynamic listDesg) async {
+    FileDesignInfo fileInfo, dynamic listDesg) async {
+
   XUIDesignManager designMgr = getDesignManager(fileInfo);
   List listDesign = listDesg;
 
@@ -106,9 +110,11 @@ dynamic getComponents(FileDesignInfo fileInfo, String id, String idslot) {
   vueParamJS.xid = designInfo.xid;
   vueParamJS.xidSlot = designInfo.xidSlot;
   vueParamJS.isSlot = id.startsWith(SLOT_PREFIX);
+
   vueParamJS.data = "[" + designInfo.bufData.toString() + "]";
   vueParamJS.template = designInfo.bufTemplate.toString();
   vueParamJS.path = designInfo.bufPath.toString();
+  
   return vueParamJS;
 }
 
@@ -139,8 +145,8 @@ void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
     // fileInfo.xid=info.parentXid;
     await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
   } else {
-    if (id != XUI_TRASHCAN_SLOT) designMgr.listXidChanged.add(id);
 
+    if (id != XUI_TRASHCAN_SLOT) designMgr.listXidChanged.add(id);
     if (reload) {
       // voir removeDesign  : evite de faire 2 reload
       await _reload(fileInfo);
@@ -181,9 +187,35 @@ void cutDesign(FileDesignInfo fileInfo, String id) async {
   await _reload(fileInfo);
 }
 
+void surroundDesign(FileDesignInfo fileInfo, String id, String template, String xidSurround) async {
+  XUIDesignManager designMgr = getDesignManager(fileInfo);
+
+  SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id); 
+ // ajoute un design au tempory
+  String slot = "<xui-design xid=\"" + XUI_TEMPORARY_SLOT + "\"></xui-design>";
+  await addDesign(fileInfo, XUI_TEMPORARY_SLOT, slot, false, true);
+
+  // move id vers la tempory
+  designMgr.moveDesign(id, null, XUI_TEMPORARY_SLOT);
+
+  await addDesign(fileInfo, info.parentXid, template, false, true);
+
+  String targetXid =  xidSurround + "-col-0";
+  String slotTarget = "<xui-design xid=\"" + targetXid + "\"></xui-design>";
+  await addDesign(fileInfo, targetXid, slotTarget, false, true);
+
+  designMgr.moveDesign(id, null, targetXid);
+
+ // lance le reload
+  designMgr.listXidChanged.add(info.parentXid);
+  await _reload(fileInfo);
+
+}
+
 String getContentTrashcanID(XUIDesignManager designMgr) {
   SlotInfo infoTrash =
       designMgr.xuiEngine.getSlotInfo(XUI_TRASHCAN_SLOT, XUI_TRASHCAN_SLOT);
+
   XUIElementHTML contentTrash = infoTrash?.elementHTML?.children?.first;
   var lastDeleteXid = contentTrash?.originElemXUI?.xid;
   return lastDeleteXid;
@@ -255,7 +287,7 @@ void _reload(FileDesignInfo fileInfo) async {
   List listReloader = [];
   designMgr.listXidChanged.forEach((key) {
     var reloaderId = designMgr.xuiEngine.getReloaderID(key);
-    print("****** changed " + key + " => reloader " + (reloaderId ?? "?"));
+    print("****** reloader : changed xid  " + key + " => reloader id " + (reloaderId ?? "?"));
     if (reloaderId != null) {
       listReloader.add(reloaderId);
     }
@@ -266,7 +298,7 @@ void _reload(FileDesignInfo fileInfo) async {
   var ctx = XUIContext(fileInfo.mode);
   var options = Options(mode: fileInfo.mode);
   if (listReloader.isEmpty) {
-    print("****** changed all " + ctx.mode);
+    print("****** reloader : all " + ctx.mode);
     var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
     options.html = str;
   } else {
@@ -289,6 +321,7 @@ void main() async {
   _refresh = allowInterop(refresh);
   _addDesign = allowInterop(addDesign);
   _cutDesign = allowInterop(cutDesign);
+  _surroundDesign = allowInterop(surroundDesign);
   _moveDesign = allowInterop(moveDesign);
   _getInfo = allowInterop(getInfo);
   _getDesignProperties = allowInterop(getDesignProperties);

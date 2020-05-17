@@ -21,17 +21,11 @@ https://stackoverflow.com/questions/10189582/regex-to-match-valid-values-for-htm
 
 
 
-bug a corriger
------------------
+/****************************************************************/
+xid : sur racice = ID de composant
 
-xui-reloader=true   ET  class="[[class@-1]]" -style="[[style@-1]]" 
-le reloader devrait rafraichir le parent  V-TAB-ITEM car @-1
+      sur tag = ID de surcharge par xui-design
 
-    => workaround utiliser un XUI-RELOADER parent (voix XUI-SESSION)
 
-ex
-       <v-tab-item class="[[class@-1]]" -style="[[style@-1]]" :transition="false" :reverse-transition="false" eager>
-            <!-- eager  desactive le lazyloading -->
-            <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-item-[[idx@0+]]" xui-slot-name="tab content [[idx@0+]]">
-            </xui-slot>
-        </v-tab-item>
+
+

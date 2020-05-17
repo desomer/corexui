@@ -11,9 +11,14 @@ import 'parser/HTMLReader.dart';
 
 const ATTR_XID = "xid";
 const ATTR_PARENT_XID = "parent-xid";
+
 const ATTR_SLOT_NAME = "slot-name";
 const ATTR_SLOT_FULL = "slot-full";
 const ATTR_XID_SLOT = "xid-slot";
+
+const ATTR_NO_DESIGN = "no-design";
+const ATTR_DOC_ID = "doc-id";
+
 const ATTR_MODE = "mode";
 const ATTR_NO_DOM = "no-dom";
 const ATTR_RELOADER = "reloader";
@@ -25,7 +30,7 @@ const ATTR_STYLE_SLOT = "style-slot";
 const TAG_ESCAPE =
     "xui-escape-"; // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
 const TAG_NO_DOM = "xui-no-dom";
-const TAG_RELOADER = "xui-reloader";
+const TAG_RELOADER = "xui-reloader";  
 
 const TAG_DOC = "xui-doc";
 const TAG_DESIGN = "xui-design";
@@ -35,6 +40,7 @@ const TAG_DIV_SLOT = "xui-div-slot";
 const TAG_PROP = "xui-prop";
 
 const XUI_TRASHCAN_SLOT = "xui-trashcan-slot";
+const XUI_TEMPORARY_SLOT = "xui-temporary-slot";
 
 const MODE_ALL = "";
 const MODE_FINAL = "final";
@@ -389,11 +395,11 @@ class XUIResource extends XMLElemReader {
       if (keyAttr.startsWith("xui-")) {
         // les xui- sont des properties
         elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
-        elemXui.propertiesXUI[keyAttr.substring(4)] =
-            XUIProperty(f.value);
+        elemXui.propertiesXUI[keyAttr.substring(4)] = XUIProperty(f.value);
       } else {
         elemXui.attributes ??= HashMap<String, XUIProperty>();
-        elemXui.attributes[keyAttr] = XUIProperty(f.value == "" ? null : f.value);
+        elemXui.attributes[keyAttr] =
+            XUIProperty(f.value == "" ? null : f.value);
       }
     });
   }
@@ -473,8 +479,7 @@ class XUIEngine {
     var next = slotInfo.parentXid;
     while (next != null) {
       slotInfo = getSlotInfo(next, next);
-      if (slotInfo.elementHTML.tag!=TAG_RELOADER)
-      {
+      if (slotInfo.elementHTML.tag != TAG_RELOADER) {
         doc = docInfo[slotInfo.docId];
         listDesignInfo.add(DesignInfo(slotInfo, doc));
       }
@@ -490,7 +495,12 @@ class XUIEngine {
 
   toHTMLString(XUIHtmlBuffer writer, String xid, XUIContext ctx) async {
     xuiFile.context = ctx;
-    print("toHTMLString on " + writer.toString() +" xid component="+xid);
+    if (writer == null) {
+      print("toHTMLString for init xid=" + xid);
+    } else {
+      print("toHTMLString on " + writer.toString() + " xid=" + xid);
+    }
+
     var listCmp = xuiFile.searchComponent(xid);
     if (listCmp == null) {
       dynamic obj = xuiFile.getObject();
@@ -530,6 +540,7 @@ class SlotInfo {
   String slotname;
   String docId;
   String idRessource;
+  String implement;
   XUIElementHTML elementHTML;
 }
 

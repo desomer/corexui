@@ -96,6 +96,13 @@ pre > code {
     background: rgba(204, 205, 255, 0.10);
 }
 
+.xui-style-selector-margin
+{ 
+    position: absolute; 
+    z-index: 999;
+    border: 1px dashed rgb(255, 115, 0); 
+}
+
 .xui-style-prop {    
     background: #565656;
     height: 24px;
@@ -134,9 +141,9 @@ pre > code {
 .xui-list-cmp .v-list-item {
     min-height: 32px;
 }
-
+/*****************************************/
 .xui-list-class .v-list-item--dense { 
-    height: 25px;
+    height: 30px;
     min-height: 25px; 
 }
 
