@@ -9,7 +9,7 @@ $xui.initVuejs = (instanceVue) => {
     console.debug('The activeTab name was changed from ' + oldValue + ' to ' + newValue + '!');
     if (newValue == 1) {
       // onglet code
-      $xui.refreshAction('final')   // affiche le code et le yaml
+      $xui.refreshAction('final')   // affiche le code et le xui
     }
 
   }, { deep: true });
@@ -93,8 +93,8 @@ class DesignClassManager {
           }
           else if (classDesc.type == "list" && tag.startsWith(classDesc.value + "-")) {
             classDesc.sel = true;
-            var descTag = tag.split("-");
-            classDesc.vl = descTag[1];
+            var lenTag = classDesc.value.length;
+            classDesc.vl =  tag.substring(lenTag+1);
             catDesc.open = true;
             catDesc.nbint++;
             break a;

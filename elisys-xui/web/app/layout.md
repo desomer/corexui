@@ -21,6 +21,18 @@ https://stackoverflow.com/questions/10189582/regex-to-match-valid-values-for-htm
 
 
 
+
+//*********************************** DOC FLEX BOX  **********************************************/ 
+https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+
+
+
+1/********** OBSERVER & ERROR   **************/
+
+https://ericbidelman.tumblr.com/post/149032341876/observing-your-web-app
+https://stackoverflow.com/questions/9156176/what-is-the-difference-between-throw-new-error-and-throw-someobject
+
+
 /****************************************************************/
 xid : sur racice = ID de composant
 
@@ -29,3 +41,13 @@ xid : sur racice = ID de composant
 
 
 
+mdi-magnify = loupe
+mdi-cog = engrenage
+mdi-apps = appli
+mid-refresh = raffraichir
+mdi-chevron-right
+
+
+/********************** CMS **************************/
+
+https://app.takeshape.io/projects

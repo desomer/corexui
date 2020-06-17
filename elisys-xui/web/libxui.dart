@@ -2,9 +2,10 @@
 library xuiapp;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:html';
 import 'dart:js';
-import 'package:yaml/yaml.dart';
+import 'dart:math';
 
 import 'package:js/js.dart';
 
@@ -13,15 +14,11 @@ import 'core/XUIEngine.dart';
 import 'core/XUIFactory.dart';
 import 'core/XUIJSInterface.dart';
 
-import 'package:yamlicious/yamlicious.dart' show toYamlString;
-
 import 'core/element/XUIElement.dart';
+import 'core/parser/HTMLWriter.dart';
 
 @JS()
 external void loadPageJS(obj);
-
-// @JS()
-// external void loadCodeYamlJS(obj);
 
 @JS()
 external void changePageJS(obj);
@@ -43,7 +40,8 @@ external set _cutDesign(void Function(FileDesignInfo, String) f);
 external set _deleteDesign(void Function(FileDesignInfo, String) f);
 
 @JS('surroundDesign')
-external set _surroundDesign(void Function(FileDesignInfo, String, String, String) f);
+external set _surroundDesign(
+    void Function(FileDesignInfo, String, String, String) f);
 
 @JS('moveDesign')
 external set _moveDesign(void Function(FileDesignInfo, String, String) f);
@@ -59,15 +57,15 @@ external set _getDesignProperties(
     void Function(FileDesignInfo, String, String) f);
 
 @JS('setDesignProperties')
-external set _setDesignProperties(
-    dynamic Function(FileDesignInfo, dynamic) f);
+external set _setDesignProperties(dynamic Function(FileDesignInfo, dynamic) f);
+
+@JS('initPage')
+external set _initPage(dynamic Function(FileDesignInfo) f);
 
 ///------------------------------------------------------------------
 
 /// change les properties
-void setDesignProperties(
-    FileDesignInfo fileInfo, dynamic listDesg) async {
-
+void setDesignProperties(FileDesignInfo fileInfo, dynamic listDesg) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
   List listDesign = listDesg;
 
@@ -114,7 +112,7 @@ dynamic getComponents(FileDesignInfo fileInfo, String id, String idslot) {
   vueParamJS.data = "[" + designInfo.bufData.toString() + "]";
   vueParamJS.template = designInfo.bufTemplate.toString();
   vueParamJS.path = designInfo.bufPath.toString();
-  
+
   return vueParamJS;
 }
 
@@ -145,13 +143,22 @@ void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
     // fileInfo.xid=info.parentXid;
     await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
   } else {
-
     if (id != XUI_TRASHCAN_SLOT) designMgr.listXidChanged.add(id);
     if (reload) {
       // voir removeDesign  : evite de faire 2 reload
       await _reload(fileInfo);
     }
   }
+}
+
+///****************************************************************** */
+String getContentTrashcanID(XUIDesignManager designMgr) {
+  SlotInfo infoTrash =
+      designMgr.xuiEngine.getSlotInfo(XUI_TRASHCAN_SLOT, XUI_TRASHCAN_SLOT);
+
+  XUIElementHTML contentTrash = infoTrash?.elementHTML?.children?.first;
+  var lastDeleteXid = contentTrash?.originElemXUI?.xid;
+  return lastDeleteXid;
 }
 
 void deleteDesign(FileDesignInfo fileInfo, String id) async {
@@ -187,11 +194,12 @@ void cutDesign(FileDesignInfo fileInfo, String id) async {
   await _reload(fileInfo);
 }
 
-void surroundDesign(FileDesignInfo fileInfo, String id, String template, String xidSurround) async {
+void surroundDesign(FileDesignInfo fileInfo, String id, String template,
+    String xidSurround) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
-  SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id); 
- // ajoute un design au tempory
+  SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
+  // ajoute un design au tempory
   String slot = "<xui-design xid=\"" + XUI_TEMPORARY_SLOT + "\"></xui-design>";
   await addDesign(fileInfo, XUI_TEMPORARY_SLOT, slot, false, true);
 
@@ -200,42 +208,50 @@ void surroundDesign(FileDesignInfo fileInfo, String id, String template, String 
 
   await addDesign(fileInfo, info.parentXid, template, false, true);
 
-  String targetXid =  xidSurround + "-col-0";
+  String targetXid = xidSurround + "-col-0";
   String slotTarget = "<xui-design xid=\"" + targetXid + "\"></xui-design>";
   await addDesign(fileInfo, targetXid, slotTarget, false, true);
 
   designMgr.moveDesign(id, null, targetXid);
 
- // lance le reload
+  // lance le reload
   designMgr.listXidChanged.add(info.parentXid);
   await _reload(fileInfo);
-
-}
-
-String getContentTrashcanID(XUIDesignManager designMgr) {
-  SlotInfo infoTrash =
-      designMgr.xuiEngine.getSlotInfo(XUI_TRASHCAN_SLOT, XUI_TRASHCAN_SLOT);
-
-  XUIElementHTML contentTrash = infoTrash?.elementHTML?.children?.first;
-  var lastDeleteXid = contentTrash?.originElemXUI?.xid;
-  return lastDeleteXid;
 }
 
 void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
-  // ajoute le design qui doit recevoir le composant
-  String slot = "<xui-design xid=\"" + idMoveTo + "\"></xui-design>";
-  await addDesign(fileInfo, idMoveTo, slot, false, true);
-
   if (id == null) {
+    // gestion du paste
     id = getContentTrashcanID(designMgr);
+
+    String idClone = getNewXid(idMoveTo, "clone");
+
+    designMgr.cloneDesign(id, idMoveTo, null, idClone);
+    designMgr.listXidChanged.add(idMoveTo);
+
+    await _reload(fileInfo);
+  } else {
+    // ajoute le design qui doit recevoir le composant
+    String slot = "<xui-design xid=\"" + idMoveTo + "\"></xui-design>";
+    await addDesign(fileInfo, idMoveTo, slot, false, true);
+    designMgr.moveDesign(id, null, idMoveTo);
+    designMgr.listXidChanged.add(id);
+    designMgr.listXidChanged.add(idMoveTo);
+
+    await _reload(fileInfo);
   }
+}
 
-  designMgr.moveDesign(id, null, idMoveTo);
-  designMgr.listXidChanged.add(idMoveTo);
+String getNewXid(String xidParent, String nameCmp) {
+  var d = DateTime.now().millisecondsSinceEpoch.toString();
+  d += Random().nextInt(100).toString();
 
-  await _reload(fileInfo);
+  var idxUUID = xidParent.indexOf("_");
+  var pxid = idxUUID == -1 ? xidParent : (xidParent.substring(0, idxUUID));
+  var ret = pxid + "-" + nameCmp.replaceFirst("xui-", "") + "_" + d;
+  return ret;
 }
 
 Future refresh(FileDesignInfo fileInfo) async {
@@ -282,12 +298,13 @@ void getHtmlFrom(FileDesignInfo fileInfo, String idPromise) async {
 void _reload(FileDesignInfo fileInfo) async {
   var designMgr = getDesignManager(fileInfo);
 
-  dynamic obj = designMgr.xuiEngine.xuiFile.getObject();
-
   List listReloader = [];
   designMgr.listXidChanged.forEach((key) {
     var reloaderId = designMgr.xuiEngine.getReloaderID(key);
-    print("****** reloader : changed xid  " + key + " => reloader id " + (reloaderId ?? "?"));
+    print("****** reloader : changed xid  " +
+        key +
+        " => reloader id " +
+        (reloaderId ?? "?"));
     if (reloaderId != null) {
       listReloader.add(reloaderId);
     }
@@ -307,8 +324,11 @@ void _reload(FileDesignInfo fileInfo) async {
     options.listReloader = listReloader;
   }
 
-  final yamld = toYamlString(obj);
-  options.yaml = yamld.toString();
+  String dataXui = JsonEncoder.withIndent('   ')
+      .convert(designMgr.xuiEngine.xuiFile.getObject());
+  //final yamld = toYamlString(designMgr.xuiEngine.xuiFile.getObject());
+  options.xuidata = dataXui; //yamld.toString();
+  options.xuifile = HTMLWriter().toHTMLString(designMgr.xuiEngine.xuiFile);
   options.action = fileInfo.action;
   changePageJS(options);
 }
@@ -329,8 +349,13 @@ void main() async {
   _getComponents = allowInterop(getComponents);
   _getHtmlFrom = allowInterop(getHtmlFrom);
   _deleteDesign = allowInterop(deleteDesign);
+  _initPage = allowInterop(initPage);
 
-  await initPage();
+  // FileDesignInfo fileInfo = FileDesignInfo();
+  // fileInfo.file = 'app/frame1.html';
+  // fileInfo.xid = 'root';
+
+  //initPage(fileInfo);
 
   // var w = Worker('libxuiworker.js');   //libxuiworker.dart.js
 
@@ -347,12 +372,8 @@ void main() async {
   // });
 }
 
-Future initPage() async {
+Future initPage(FileDesignInfo fileInfo) async {
   print("-------------- start initPage xui ----------------");
-
-  FileDesignInfo fileInfo = FileDesignInfo();
-  fileInfo.file = 'app/frame1.html';
-  fileInfo.xid = 'root';
 
   var ctx = XUIContext(MODE_DESIGN);
   var designManager = getDesignManager(fileInfo);
@@ -374,11 +395,11 @@ Future initStoreVersion(XUIDesignManager designManager, FileDesignInfo fileInfo,
     await designManager.initEngine(fileInfo.file, ctx);
 
     if (v >= 0) {
-      var db = window.localStorage['xui_yaml_' + name + '_' + v.toString()];
+      var db = window.localStorage['xui_data_' + name + '_' + v.toString()];
 
       print("*********** window.localStorage ***********");
       //print(db);
-      var saveDb = loadYaml(db);
+      var saveDb = json.decode(db); //loadYaml(db);
 
       for (var aDesign in saveDb["design"]) {
         designManager.xuiEngine.xuiFile.addObject(aDesign);

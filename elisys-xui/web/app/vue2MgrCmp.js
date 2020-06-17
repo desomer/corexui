@@ -2,7 +2,7 @@ export class ComponentManager {
 
     registerVueComponent(idCmp, file, xid) {
 
-        console.debug("init component vuejs " + idCmp);
+        console.debug("init component xui vuejs " + idCmp);
 
         Vue.component(idCmp, function (resolve, reject) {
 

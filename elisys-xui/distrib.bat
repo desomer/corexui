@@ -5,3 +5,4 @@ copy web\* dist\
 copy web\app\* dist\app\
 
 del dist\*.dart
+del dist\app\*.md

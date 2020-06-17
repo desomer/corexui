@@ -4,6 +4,7 @@ import 'XUIEngine.dart';
 import 'XUIFactory.dart';
 import 'element/XUIElement.dart';
 import 'element/XUIProperty.dart';
+import 'parser/HTMLReader.dart';
 
 class XUIActionManager {
   XUIEngine engine;
@@ -15,8 +16,9 @@ class XUIActionManager {
   Future<XUIElementXUI> addDesign(String xid, String html) async {
     XUIResource res = XUIResource(null, engine.xuiFile.context);
 
-    XUIElementXUI xuidesign =
-        await engine.xuiFile.reader.parseString(html, res);
+    XUIElementXUI xuidesign = await HTMLReader(
+            engine.xuiFile.reader.id, engine.xuiFile.reader.provider)
+        .parseString(html, res);
 
     if (xid != null) {
       xuidesign.xid = xid;
@@ -30,7 +32,7 @@ class XUIActionManager {
       if (doc != null && doc.variables.isNotEmpty) {
         // creation du design par defaut des info
         var elemXuiChild = XUIElementXUI();
-        elemXuiChild.xid=xuiCmp.xid;
+        elemXuiChild.xid = xuiCmp.xid;
         elemXuiChild.idRessource = engine.xuiFile.reader?.id;
         DicoOrdered<XUIDesign> curDesign = DicoOrdered();
         engine.xuiFile.designs[xuiCmp.xid] = curDesign;
@@ -69,6 +71,27 @@ class XUIActionManager {
           return design;
         }
       }
+    }
+    return null;
+  }
+
+  /// clone
+  UndoAction cloneDesign(String xid, String idMove, String mode, String newId) {
+    print(xid + " <=> " + newId);
+    SlotInfo info = engine.getSlotInfo(xid, xid);
+    if (info != null) {
+      var tag = info.implement;
+      XUIElementXUI xuidesign = XUIElementXUI();
+      xuidesign.xid = idMove;
+      xuidesign.idRessource = engine.xuiFile.reader.id;
+      XUIElementXUI child = XUIElementXUI();
+      child.idRessource = engine.xuiFile.reader.id;
+      child.xid = newId;
+      child.tag = tag;
+      xuidesign.children ??= [];
+      xuidesign.children.add(child);
+      engine.xuiFile.designs[idMove] ??= DicoOrdered();
+      engine.xuiFile.designs[idMove].add(XUIDesign(xuidesign, MODE_ALL));
     }
     return null;
   }
@@ -149,9 +172,9 @@ class XUIActionManager {
     XUIDesign designMove;
     if (info != null) {
       designMove = _getXUIDesign(info, mode);
-    } 
-    
-    if (designMove==null) {
+    }
+
+    if (designMove == null) {
       for (XUIDesign aDesign in engine.xuiFile.designs[moveToXid].list) {
         if (mode == null || aDesign.mode == mode) {
           designMove = aDesign;

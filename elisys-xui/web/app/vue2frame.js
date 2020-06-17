@@ -22,7 +22,6 @@ $xui.createComponentFromBody = (idTemplate, dataBinding) => {
 	}
 }
 
-
 /*********************************************************************************/
 $xui.loadApplicationJS = () => {
 	if ($xui.vuejs != null) {
@@ -74,7 +73,7 @@ $xui.loadApplicationJS = () => {
 					this.componentToReload = newId;
 					this.$nextTick(function () {
 						$xui.nbRefeshReloader--;
-						console.debug("nbRefeshReloader ", $xui.nbRefeshReloader);
+						//console.debug("nbRefeshReloader ", $xui.nbRefeshReloader);
 						if ($xui.nbRefeshReloader == 0) {
 							var message = {
 								action: "reloader finish",
@@ -133,6 +132,11 @@ $xui.loadApplicationJS = () => {
 		data: $xui.rootdata,
 		components: { RootComponent },
 		template: "<RootComponent ref='root'></RootComponent>",
-		vuetify: new Vuetify(configVuetify)
+		vuetify: new Vuetify(configVuetify),
+		errorCaptured: function(err, component, details) {
+			console.error(err, component, details);
+			alert("xui reporting " + err + " details " +details);
+			throw err;
+		}
 	});
 }

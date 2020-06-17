@@ -5,10 +5,9 @@
 
 		<xui-prop var="colorApp" editor="text" link="https://materialdesignicons.com/">color nav global</xui-prop>
 		<xui-prop var="darkApp" editor="bool">dark navigation</xui-prop>
-		<xui-prop var="copyrightApp" editor="text">copyright de l'appli</xui-prop>
 		
 		<xui-prop var="withSysBar" editor="bool">System bar</xui-prop>
-		<xui-prop var="withAppBar" def="true" editor="bool">App bar</xui-prop>
+		<xui-prop var="withAppBar" editor="bool">App bar</xui-prop>
 		<xui-prop var="withFooter" editor="bool">Footer bar</xui-prop>
 		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
 
@@ -30,7 +29,7 @@
 		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">couleur fond de page</xui-prop>
 	</xui-doc>
 
-	<xui-doc xid="v-container:vue-content-1">  
+	<xui-doc xid="v-main:vue-content-1">  
 		<xui-prop id="favorite">container</xui-prop>
 		<xui-prop id="exclude"></xui-prop>
 		<xui-prop id="include"></xui-prop>
@@ -137,22 +136,23 @@
 	<!-------------------------------     PAGE      ------------------------------------------>
 	<!---------------------------------------------------------------------------------------->
 	<!--  gestion page autonome -->
-	<html xid="frame-vuetify-1" xui-mode="final;design;preview" style="height:100vh;" xui-slot-name="page"
+	<html xid="frame-vuetify-1" xui-mode="final;design;preview" 
+		style="height:100vh;"
 		xui-doc-id="page">
 
 		<head xid="header-vuetify" xui-no-design></head>
 
 		<body xid="body-vuetify" xui-no-design style="height:100vh"></body>
+
 		<xui-script-data></xui-script-data>
-		<script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
-		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+		<style id="xui-style" xid="inject-style" xui-no-design></style>
 		<xui-slot xid="inject-after-body" xui-no-design></xui-slot>
 		<xui-init-vuetify></xui-init-vuetify>
 		<xui-init-designer></xui-init-designer>
 	</html>
 
-	<!--  gestion du designer -->
-	<xui-slot xid="frame-vuetify-1" xui-mode="template" xui-slot-name="page" xui-doc-id="page">
+	<!--  gestion du mode changement de template du mode designer -->
+	<xui-slot xid="frame-vuetify-1" xui-mode="template" xui-doc-id="page">
 		<body xid="body-vuetify" xui-no-design style="height:100vh"></body>
 	</xui-slot>
 
@@ -164,16 +164,27 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" />
 		<link rel="stylesheet"
 			href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" />
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" />
-
+		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" />
+		<script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
+		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
 		<xui-slot xid="inject-other-header" xui-no-design></xui-slot>
-		<style xid="inject-style" xui-no-design></style>
 	</xui-design>
 
 
 	<meta xid="viewport-no-zoom" name="viewport"
 		content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 	</meta>
+
+	<xui-design xid="body-vuetify">
+		<template id="xui-rootTemplate">
+			<v-app xid="maincontent" xui-no-design>
+			</v-app>
+			<xui-trashcan></xui-trashcan>
+			<xui-slot xid="xui-temporary-slot" xui-no-design></xui-slot>
+		</template>
+
+		<div id="app"></div>
+	</xui-design>
 
 	<xui-design xid="maincontent">
 		<xui-slot xid="inject-design-ui" xui-no-design></xui-slot>
@@ -225,14 +236,12 @@
 
 	<v-navigation-drawer v-model="navdrawer" xid="vue-nav-drawer-1" xui-if=[[withLeftNavigation@0+]] 
 		clipped="[[clipped-left@0+]]" temporary="[[navTemporary@0+]]" permanent="[[navPermanent@0+]]" app>
-		<xui-slot xui-slot-full xui-reloader=true xid="slot-navigation-drawer" xui-slot-name="navigation"></xui-slot>
+		<xui-slot style-slot="height:100%" xui-reloader=true xid="slot-navigation-drawer" xui-slot-name="navigation"></xui-slot>
 	</v-navigation-drawer>
 
-	<v-content xid="vue-content-1" -style="background:[[colorBg]]">
-		<v-container fluid :fill-height="ContentfillPage" class="pa-0" style="align-items:start">
-			<xui-slot xui-reloader=true xui-slot-full xid="main" xui-slot-name="page content"></xui-slot>
-		</v-container>
-	</v-content>
+	<v-main xid="vue-content-1" class="fill-height" -style="background:[[colorBg]]">
+		<xui-slot xui-reloader=true style-slot="height:100%;width:100%" xid="main" xui-slot-name="page content"></xui-slot>
+	</v-main>
 
 	<v-footer xid="vue-footer-1" xui-if=[[withFooter@0+]] 
 		app 
@@ -240,9 +249,7 @@
 		:height="heightFooter" 
 		dark="[[darkApp@0+]]"
 		color="[[colorApp@0+]]" style="padding: 0px 10px;">
-		<xui-slot xui-reloader=true xid="slot-action-footer" xui-slot-name="action footer"></xui-slot>
-		<v-spacer></v-spacer>
-		<span>&amp;copy;&amp;nbsp;[[copyrightApp@0+]]</span>
+		<xui-slot xui-reloader=true xid="slot-footer" style-slot="width:100%" xui-slot-name="footer"></xui-slot>
 	</v-footer>
 
 	<v-bottom-navigation xid="vue-bottom-nav-1" xui-if=[[withBottomNavigation@0+]] 
@@ -250,18 +257,6 @@
 		dark="[[darkApp@0+]]">
 		<xui-slot xui-reloader=true xid="slot-bottom-navigation" xui-slot-name="action bottom navigation"></xui-slot>
 	</v-bottom-navigation>
-
-	<xui-design xid="body-vuetify">
-		<template id="xui-rootTemplate">
-			<v-app xid="maincontent" xui-no-design>
-			</v-app>
-			<xui-trashcan></xui-trashcan>
-			<xui-slot xid="xui-temporary-slot" xui-no-design></xui-slot>
-		</template>
-
-		<div id="app"></div>
-
-	</xui-design>
 
 	<!----------------------------  TRASHCAN ---------------------------------->
 	<div xid="xui-trashcan" xui-mode="template;design" style="display:none; z-index: 100; 
@@ -294,7 +289,6 @@
 
 	<xui-design xui-mode="template;design" xid="inject-style">
         <style xui-no-dom>
-
             html::-webkit-scrollbar {
                 width: 10px;
             }
@@ -314,15 +308,7 @@
 	
 	<xui-design xid="inject-style">
         <style xui-no-dom>
-
-            .v-navigation-drawer__content {
-                color: rgba(0, 0, 0, 0); 
-                transition: color .5s ease;
-            }
-
-            .v-navigation-drawer__content:hover {
-                color: rgba(0, 0, 0, 0.2); 
-            }
+			.v-main__wrap {display: contents;height: 100%;}
 
             .v-navigation-drawer__content::-webkit-scrollbar {
                 width: 10px;
@@ -349,10 +335,7 @@
 			$xui = {};
 
 		$xui.rootdata = {
-			//dark: true,
-			//heightHeader: 32,
 			heightFooter: 32,
-			ContentfillPage: true,
 			navdrawer: false
 		};
 
@@ -368,18 +351,46 @@
 	<!--------------------------- PAS IMPLEMENTATION EN MODE FINAL ------------>
 	<xui-slot xid="xui-init-designer" xui-mode="final"></xui-slot>
 
-	<script xid="xui-init-designer" xui-mode="preview">
+	<script xid="xui-init-designer" xui-mode="design">
 		document.addEventListener("keydown", function (event) {
-			if (event.ctrlKey && event.keyCode == 81) {    // ctrl + Q
-				event.stopPropagation();
-				event.preventDefault();
-				var message = {
-					action: "ctrlQ",
-				};
-				window.parent.postMessage(message, "*");
+			listShortCut = [
+				{ctrl:true, keyCode:80, action:"ctrlP"},  // preview
+				{ctrl:true, keyCode:67, action:"ctrlC"},
+				{ctrl:true, keyCode:88, action:"ctrlX"},
+				{ctrl:true, keyCode:86, action:"ctrlV"},
+				{ctrl:true, keyCode:90, action:"ctrlZ"},
+				{ctrl:true, keyCode:89, action:"ctrlY"},
+				{ctrl:false, keyCode:8, action:"DEL"},
+				{ctrl:false, keyCode:46, action:"DEL"},
+			];
+
+			//console.debug( event.keyCode );
+
+			for (const shortKey of listShortCut) {
+				if (event.ctrlKey==shortKey.ctrl && event.keyCode == shortKey.keyCode) {   
+					event.preventDefault();
+					var message = {
+						action: shortKey.action,
+					};
+					window.parent.postMessage(message, "*");
+				}	
 			}
+
 		});
 	</script>
+
+<script xid="xui-init-designer" xui-mode="preview">
+	document.addEventListener("keydown", function (event) {
+		if (event.ctrlKey && event.keyCode == 81) {    // ctrl + Q
+			event.stopPropagation();
+			event.preventDefault();
+			var message = {
+				action: "ctrlP",  //ferme la preview
+			};
+			window.parent.postMessage(message, "*");
+		}
+	});
+</script>
 
 	<script xid="xui-init-designer" xui-mode="design">
 		<xui-inject xui-path="app/vue2frameDesigner.js"></xui-inject>

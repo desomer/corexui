@@ -59,21 +59,28 @@ class XUIElementHTML extends XUIElement {
   }
 
   ///calcule des propertiesXUI [[Prop]]
-  String calculatePropertyXUI(String prop) {
+  String calculatePropertyXUI(String prop, ParseInfo parseInfoOptional) {
     if (prop != null) {
-      ParseInfo parseInfo = ParseInfo(prop, ParseInfoMode.PROP);
-      XUIProperty.parse(parseInfo, (String tag) {
-        var ret = searchPropertyXUI(tag, -1);
+      ParseInfo parseInf;
+      if (parseInfoOptional != null) {
+        parseInf =
+            ParseInfo(prop, parseInfoOptional.context, ParseInfoMode.PROP);
+      } else {
+        parseInf = ParseInfo(prop, null, ParseInfoMode.PROP);
+      }
+
+      XUIProperty.parse(parseInf, (String tag) {
+        var ret = searchPropertyXUI(tag, -1, parseInf);
         return ret != null ? ret : doPropPlaceHolder(tag);
       });
-      prop = parseInfo.parsebuilder.toString();
+      prop = parseInf.parsebuilder.toString();
     }
 
     return prop;
   }
 
   String doPropPlaceHolder(String tag) {
-    // gestion du placeholder
+    // gestion du placeholder pour les CONTENT (ex : XUI-TITLE)
     int idx = tag.indexOf("@");
     if (idx > 0) {
       tag = tag.substring(0, idx);
@@ -81,11 +88,12 @@ class XUIElementHTML extends XUIElement {
     return "[" + tag + "]";
   }
 
-  dynamic searchPropertyXUI(String tag, int deep) {
+  dynamic searchPropertyXUI(String tag, int deep, ParseInfo parseInfo) {
     if (tag == cst.ATTR_XID) {
       // ne cherche pas sur les parent
-      return calculatePropertyXUI(this.originElemXUI.xid);
+      return calculatePropertyXUI(this.originElemXUI.xid, parseInfo);
     } else if (tag == cst.ATTR_PARENT_XID) {
+      // cas du parent XID
       XUIElementHTML p = this.parent;
       while (p != null) {
         if (p.originElemXUI != null && p.originElemXUI.xid != null) {
@@ -94,7 +102,7 @@ class XUIElementHTML extends XUIElement {
         p = p.parent;
       }
 
-      return p.calculatePropertyXUI(p.originElemXUI.xid);
+      return p.calculatePropertyXUI(p.originElemXUI.xid, parseInfo);
     }
 
     /// gestion de la recherche sur des enfant (@-1) ou les parents (@0+)
@@ -103,40 +111,48 @@ class XUIElementHTML extends XUIElement {
       tag = atTag[0];
       var atScope = atTag[1];
       if (atScope == "-1") {
-        return firstChildNoText().searchPropertyXUI(tag, 0);
+        return firstChildNoText().searchPropertyXUI(tag, 0, parseInfo);
       }
       if (atScope == "0+") {
-        return searchPropertyXUI(tag, -2);
+        return searchPropertyXUI(tag, -2, parseInfo);
       }
       int scope = int.tryParse(atScope) ?? 0;
-      return searchPropertyXUI(tag, scope);
+      return searchPropertyXUI(tag, scope, parseInfo);
     } else if (deep == -1) {
       // par defaut uniquement dans himself (@0)
       deep = 0;
     }
 
     XUIProperty prop = propertiesXUI == null ? null : propertiesXUI[tag];
+
     if (prop != null) {
+      if (parseInfo.mode == ParseInfoMode.ATTR &&
+          parseInfo.context == "class" &&
+          (prop.content == true || prop.content == "true")) {
+        return tag;
+      }
+
       return prop.content;
     } else if (parent != null && (deep < 0 || deep > 0)) {
-      return parent.searchPropertyXUI(tag, deep - 1);
+      return parent.searchPropertyXUI(tag, deep - 1, parseInfo);
     }
   }
 
   /// generation du contenu avec [[]] d'un balise <div>CONTENT<div>
-  dynamic processContent(XUIEngine engine, String content, ParseInfoMode mode) {
-    ParseInfo parseInfo = ParseInfo(content, mode);
+  dynamic processContent(XUIEngine engine, ParseInfo parseInfo) {
     try {
       XUIProperty.parse(parseInfo, (String tag) {
-        var ret = searchPropertyXUI(tag, -1);
+        var ret = searchPropertyXUI(tag, -1, parseInfo);
 
         return ret != null
             ? ret
-            : ((mode == ParseInfoMode.CONTENT ? (doPropPlaceHolder(tag)) : ""));
+            : ((parseInfo.mode == ParseInfoMode.CONTENT
+                ? (doPropPlaceHolder(tag))
+                : ""));
       });
     } catch (e, s) {
       print("pb parse $e $s");
-      print(content);
+      print(parseInfo.parsebuilder.toString());
       rethrow;
     }
 
@@ -153,65 +169,84 @@ class XUIElementHTML extends XUIElement {
       buffer = XUIHtmlBuffer();
     }
 
-    if (tag == cst.TAG_NO_DOM || tag==TAG_RELOADER) {
+    // gestion du xui-if
+    if (this.propertiesXUI != null &&
+        this.propertiesXUI.containsKey(ATTR_XUI_IF)) {
+      ParseInfo parseInfo = ParseInfo(
+          this.propertiesXUI[ATTR_XUI_IF].content, null, ParseInfoMode.ATTR);
+      var valIf = processContent(engine, parseInfo);
+      if (valIf == "" || valIf == "false") {
+        return;
+      }
+    }
+
+    if (tag == cst.TAG_NO_DOM || tag == TAG_RELOADER) {
       // cas des slot ou des reloader
       bool isReloader = false;
       bool isRoot = buffer.html.isEmpty;
-      bool hasTagReloader = (tag==TAG_RELOADER) || ( this.propertiesXUI != null &&
-          this.propertiesXUI.containsKey(ATTR_RELOADER));
+      bool hasTagReloader = (tag == TAG_RELOADER) ||
+          (this.propertiesXUI != null &&
+              this.propertiesXUI.containsKey(ATTR_RELOADER));
 
       if (!isRoot && engine.isModeDesign() && hasTagReloader) {
         isReloader = true;
         var xid = this.originElemXUI.xid;
-        var xidCal = processContent(engine, xid, ParseInfoMode.ATTR);
-         var modeDisplay = "contents";
-        if (this.propertiesXUI[ATTR_MODE_DISPLAY]!=null)
-        {
-            modeDisplay=this.propertiesXUI[ATTR_MODE_DISPLAY]?.content.toString();
+        ParseInfo parseInfo = ParseInfo(xid, null, ParseInfoMode.ATTR);
+        var xidCal = processContent(engine, parseInfo);
+        var modeDisplay = "contents";
+        if (this.propertiesXUI[ATTR_MODE_DISPLAY] != null) {
+          modeDisplay =
+              this.propertiesXUI[ATTR_MODE_DISPLAY]?.content.toString();
         }
-        buffer.html.write(
-            "<v-xui-reloader modedisplay=\"" + modeDisplay + "\" partid=\"" + xidCal + "\"></v-xui-reloader>");
+        buffer.html.write("<v-xui-reloader modedisplay=\"" +
+            modeDisplay +
+            "\" partid=\"" +
+            xidCal +
+            "\"></v-xui-reloader>");
       }
 
       if (!isReloader) {
         toChildrenPhase3(engine, buffer);
       }
+      // pas de tag hmtl ajouté dans la page
       return;
-    }
-
-    if (this.propertiesXUI != null && this.propertiesXUI.containsKey("if"))
-    {
-        var valIf = processContent(engine, this.propertiesXUI["if"].content, ParseInfoMode.ATTR);
-        if (valIf != "true")
-        {
-            return;
-        }
     }
 
     buffer.addTab();
     buffer.html.write('<' + this.tag);
 
+    // gestion des attributs
     this.attributes?.entries?.forEach((f) {
       var c = f.value.content;
-      String keyAttr = processContent(engine, f.key, ParseInfoMode.KEY);
+      ParseInfo parseInfo = ParseInfo(f.key, null, ParseInfoMode.KEY);
+
+      String keyAttr = processContent(engine, parseInfo);
       var valProp = c;
 
       if (keyAttr != "" && c != null) {
         if (c is String) {
-          valProp = processContent(engine, c, ParseInfoMode.ATTR);
+          ParseInfo parseInfo;
+          if (keyAttr == "class") {
+            parseInfo = ParseInfo(c, keyAttr, ParseInfoMode.ATTR);
+          } else {
+            parseInfo = ParseInfo(c, keyAttr, ParseInfoMode.ATTR);
+          }
+
+          valProp = processContent(engine, parseInfo);
           bool mustAdd = true;
           bool isBool = false;
 
           if (c != valProp) {
+            // si dynamique
             //supprime les balise class et style faussement non vide
             if (keyAttr == "class") {
               valProp = valProp.toString().trim();
             }
             if (keyAttr == "style") {
               valProp = valProp.toString().trim();
-              if (valProp==";" || valProp==";;")
-              {
-                 valProp="";
+              // mieux gerer : decoupe split ';'  et controle 'color:;' ne pas mettre color
+              if (valProp == ";" || valProp == ";;") {
+                valProp = "";
               }
             }
 
@@ -228,19 +263,12 @@ class XUIElementHTML extends XUIElement {
             }
             buffer.html.write(" ");
 
-            // // gestion des - devant des attr pour bypasser les correcteurs de syntaxe de vscode -style="[[xxx]]"
-            // if (keyAttr.toString().startsWith("-")) {
-            //   keyAttr = keyAttr.toString().substring(1);
-            // }
-
             buffer.html.write(keyAttr);
 
             if (!isBool) {
               /// pas d'ajout de valeur si boolean   exemple : dark="true" donne dark
               buffer.html.write("=");
-              isBool
-                  ? (buffer.html.write(valProp))
-                  : (buffer.html.write('"' + valProp + '"'));
+              buffer.html.write('"' + valProp + '"');
             }
 
             engine.dataBindingInfo.parseAttr(this, keyAttr, valProp.toString());
@@ -296,7 +324,8 @@ class XUIElementHTMLText extends XUIElementHTML {
 
   @override
   void processPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
-    var cont = processContent(engine, content, ParseInfoMode.CONTENT);
+    ParseInfo parseInfo = ParseInfo(content, null, ParseInfoMode.CONTENT);
+    var cont = processContent(engine, parseInfo);
     engine.dataBindingInfo.parseContent(this, cont);
     buffer.html.write(cont);
   }

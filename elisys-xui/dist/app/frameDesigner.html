@@ -13,7 +13,8 @@
         <xui-prop id="title" val="PWA Designer"></xui-prop>
 
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>  <!--#1d9da0 vert-->
-        <xui-prop id="copyrightApp" val="Elisys 2020 v0.1.7 01/05/20"></xui-prop>
+        <xui-prop id="colorBg" val="white"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.2.1 28/05/20"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
@@ -72,7 +73,7 @@
 
     <xui-design xid="tab-editor-tab-0">
         <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
-        <span style='margin-left: 5px;'>frame1</span>
+        <span style='margin-left: 5px;'>Page</span>
     </xui-design>
     
     <xui-design xid="tab-editor-tab-item-0">
@@ -84,7 +85,11 @@
                 </iframe>
             </div>
             <div class="main-item main-item-3">
-                <design-action xid="action-tab"></design-action>
+                <v-overlay :value="saveLayout" style="height: 100%;position: relative;">
+                    <v-btn>Save in progress</v-btn> 
+                </v-overlay>
+                <design-action style="position: absolute; top: 0px;width: 250px;height: 100%;" xid="action-tab">                
+                </design-action>
             </div>
         </div>
     </xui-design>
@@ -93,16 +98,16 @@
     </xui-tabs>
 
     <!---------------------------------------------------------------------------> 
-    <xui-design xid="tab-editor-tab-1"><v-icon>mdi-palette</v-icon><span>style1</span></xui-design>
+    <xui-design xid="tab-editor-tab-1"><v-icon>mdi-palette</v-icon><span>Style</span></xui-design>
     <xui-design xid="tab-editor-tab-item-1"><div>Coming soon...</div></xui-design>
     <!---------------------------------------------------------------------------> 
 
     <xui-design xid="main-tab-tab-item-1">
-        <xui-tabs xid="tab-code" class="tab-code" xui-dark=true height="32px" xui-nb="2"></xui-tabs>
+        <xui-tabs xid="tab-code" class="tab-code" xui-dark=true height="32px" xui-nb="3"></xui-tabs>
     </xui-design>
 
     <!---------------------------------------------------------------------------> 
-    <xui-design xid="tab-code-tab-0"><div> Html </div></xui-design>
+    <xui-design xid="tab-code-tab-0"><span> Html </span></xui-design>
     <xui-design xid="tab-code-tab-item-0">
         <div class="main-code">
             <pre>
@@ -111,11 +116,20 @@
         </div>
     </xui-design>
 
-    <xui-design xid="tab-code-tab-1"><div> YAML </div></xui-design>
+    <xui-design xid="tab-code-tab-1"><span>XUI</span></xui-design>
     <xui-design xid="tab-code-tab-item-1">
         <div class="main-code">
             <pre>
-                <code id="xui-code-yaml" spellcheck="false"></code>
+                <code id="xui-code-xui" spellcheck="false"></code>
+            </pre>
+        </div>
+    </xui-design>
+
+    <xui-design xid="tab-code-tab-2"><span>JSON</span></xui-design>
+    <xui-design xid="tab-code-tab-item-2">
+        <div class="main-code">
+            <pre>
+                <code id="xui-code-json" spellcheck="false"></code>
             </pre>
         </div>
     </xui-design>
@@ -152,7 +166,6 @@
         <xui-btn-small @click="$xui.modePhone()"><v-icon>mdi-monitor-cellphone</v-icon></xui-btn-small>
         <span style="width:20px"></span>
         <xui-btn-small @click="$xui.refreshAction('template:reload')"><v-icon>mdi-refresh</v-icon></xui-btn-small>
-        <xui-btn-small @click="$xui.saveProperties()"><v-icon>mdi-content-save</v-icon></xui-btn-small>
     </xui-design>
 
     <!---------------------------------------------------------------------------> 
@@ -187,7 +200,8 @@
             redoDisabled  : true,
             activeTab : 0,
             activeAction : 0,
-            contentEditor: ''
+            contentEditor: '',
+            saveLayout: false
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
     </xui-design>
@@ -198,13 +212,13 @@
     
     <xui-design xid="inject-other-header">
         <link href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css" rel="stylesheet" />
-        <link href="app/frameDesigner.css" rel="stylesheet" />
+        <link href="app/frameDesigner.css" type="text/css" rel="stylesheet" />
     </xui-design>
 
     <xui-design xid="inject-after-body">
         <script defer src="app/frameDesigner.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-yaml.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>
         <script defer src="https://unpkg.com/region2d@1.0.0/plain/region2d.min.js"></script> 
         <script defer src="libxui.dart.js"></script>
         <script defer src="app/frameDesignerWatch.js"></script>

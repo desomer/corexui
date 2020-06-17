@@ -49,9 +49,12 @@ class XUIDesignManager {
       await lock.synchronized(() async {
         xuiEngine = XUIEngine();
         var provider = ProviderAjax();
-        print("initialize file : read ${uri}");
-        var reader = HTMLReader(uri, provider);
-        await xuiEngine.initialize(reader, ctx);
+        if (uri.endsWith(".html"))
+        {
+          print("initialize file html : read ${uri}");
+          var reader = HTMLReader(uri, provider);
+          await xuiEngine.initialize(reader, ctx);
+        }
       });
     }
   }
@@ -94,8 +97,13 @@ class XUIDesignManager {
     XUIActionManager(xuiEngine).removeDesign(id, modeDelete);
   }
 
-  void moveDesign(String id, String modeDelete, String moveTo) {
-    XUIActionManager(xuiEngine).moveDesign(id, modeDelete, moveTo);
+  void moveDesign(String id, String mode, String moveTo) {
+    XUIActionManager(xuiEngine).moveDesign(id, mode, moveTo);
+  }
+
+  String cloneDesign(String id , String idMove , String mode, String idClone) {
+    XUIActionManager(xuiEngine).cloneDesign(id, idMove, mode, idClone);
+    return id;
   }
 
   ///------------------------------------------------------------------------------------------
@@ -341,10 +349,13 @@ class XUIDesignManager {
       print("****<" + keyCache + ">=>" + template);
       cacheTemplateEditor[keyCache] = template;
     }
+    titleCmp = titleCmp ?? ("xid = " + design.slotInfo.xid);
+    if (design.slotInfo.slotname!=null) {
+       titleCmp = titleCmp + " ("+design.slotInfo.slotname+")";
+    }
 
     template = template.replaceAll("##xid##", design.slotInfo.xid);
-    template = template.replaceAll(
-        "##title##", titleCmp ?? ("xid = " + design.slotInfo.xid));
+    template = template.replaceAll("##title##", titleCmp);
 
     ret.bufTemplate
         .write("<div class='xui-over-prop-xid' id='${design.slotInfo.xid}'>");

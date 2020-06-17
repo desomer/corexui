@@ -1,31 +1,19 @@
-import 'dart:collection';
 
 import 'package:html/dom.dart';
 
 import '../XUIEngine.dart';
 
-abstract class XMLElemReader {
-  dynamic parseElem(dynamic parent, XMLElem element) {}
-}
-
-class XMLElem {
-  String tag;
-  String text;
-  LinkedHashMap<dynamic, String> attributs;
-}
 
 ///------------------------------------------------------------------
-class HTMLReader {
-  Provider provider;
-  var id;
- // var content;
+class HTMLReader extends XUIReader {
 
   HTMLReader(String id, Provider provider) {
     this.provider=provider;
     this.id=id;
   }
 
- Future parseElem(XMLElemReader elemReader) async {
+ @override
+ Future parseFile(XMLElemReader elemReader) async {
 
     var text = await provider.getResourceFutur(id);
 
@@ -62,7 +50,7 @@ class HTMLReader {
     } 
     else if (elem is Comment)
     {
-      // un commentaire
+      // un commentaire = ne fait rien
       return Future.value();
     }
     else 

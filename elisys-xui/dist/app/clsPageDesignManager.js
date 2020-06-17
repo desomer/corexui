@@ -1,8 +1,14 @@
 export class PageDesignManager {
 
     codeHtml = null;
-    codeYaml = null;
+    codeXUIdata= null;
+    codeXUI= null;
     db = null;
+
+    getPageId()
+    {
+        return "frame1";
+    }
 
     loadPage(html) {
         // console.debug("load", html);
@@ -14,7 +20,7 @@ export class PageDesignManager {
             $xui.displayPropertiesJS("root", "root")
         }, 100);
 
-        var name = "frame1"
+        var name = this.getPageId();
         var version = localStorage.getItem('xui_version_' + name);
         if (version != null)
         {
@@ -36,7 +42,7 @@ export class PageDesignManager {
         $xui.unDisplaySelector();
 
         if (param.mode == "template") {
-            // change uniquement template de la page aprés le demarrage en mode design
+            // change uniquement template de la page aprés le demarrage en mode design et les reloader
             document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "param": param }, "*");
         }
         else if (param.mode == "preview") {
@@ -51,28 +57,30 @@ export class PageDesignManager {
         }
 
         this.codeHtml = param.html;
-        this.codeYaml = param.yaml;
+        this.codeXUIdata = param.xuidata;
+        this.codeXUI = param.xuifile;
 
         if (param.action!="reload" && param.action!="clear")
-            this.store();
+            this.store(); // save un nouvelle version
 
         if ($xui.rootdata.activeTab == 1)  // si onglet 1 actif
         {
             this.loadCode();   // affiche le code du mode (template, preview, final )
-            this.loadCodeYaml();
+            this.loadCodeXUI();
+            this.loadCodeJson();
         }
 
     }
 
     store() {
-        var name = "frame1"
+        var name = this.getPageId();
         var version = localStorage.getItem('xui_version_' + name);
         if (version == null)
             version = "0";
 
         var ver = parseInt(version);
 
-        localStorage.setItem('xui_yaml_' + name + '_' + ver, this.codeYaml);
+        localStorage.setItem('xui_data_' + name + '_' + ver, this.codeXUIdata);
         ver++;
         localStorage.setItem('xui_version_' + name, "" + ver);
         localStorage.setItem('xui_version_max_' + name, "" + ver);
@@ -98,16 +106,24 @@ export class PageDesignManager {
         }
     }
 
-    loadCodeYaml() {
-        var codeElem = document.querySelector("#xui-code-yaml");
+    loadCodeJson() {
+        var codeElem = document.querySelector("#xui-code-json");
         if (codeElem != null) {
-            const code = Prism.highlight(this.codeYaml, Prism.languages.yaml, 'yaml');
+            const code = Prism.highlight(this.codeXUIdata, Prism.languages.json, 'json');
+            codeElem.innerHTML = code;
+        }
+    }
+
+    loadCodeXUI() {
+        var codeElem = document.querySelector("#xui-code-xui");
+        if (codeElem != null) {
+            const code = Prism.highlight(this.codeXUI, Prism.languages.html, 'html');
             codeElem.innerHTML = code;
         }
     }
 
     undo() {
-        var name = "frame1"
+        var name = this.getPageId();
         var version = localStorage.getItem('xui_version_' + name);
         if (version == null)
             version = "0";
@@ -122,7 +138,7 @@ export class PageDesignManager {
     }
 
     redo() {
-        var name = "frame1"
+        var name = this.getPageId();
         var versionMax = localStorage.getItem('xui_version_max_' + name);
         var version = localStorage.getItem('xui_version_' + name);
 

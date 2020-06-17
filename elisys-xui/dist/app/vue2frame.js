@@ -53,10 +53,12 @@ $xui.loadApplicationJS = () => {
 
 	/******************************************************************************/
 	$xui.listReloader = {};
+	$xui.nbRefeshReloader = 0;
+
 	Vue.component("v-xui-reloader",
 		{
 			template: '<component v-bind:is="componentToReload"></component>',
-			props: ['partid','modedisplay'],
+			props: ['partid', 'modedisplay'],
 			data: () => { return { componentToReload: "", id: 1 }; },
 			methods: {
 				rload: function (e) {
@@ -67,13 +69,23 @@ $xui.loadApplicationJS = () => {
 
 					this.id++; //passe en composant suivant
 					var newId = this.partid + "-" + this.id;        //all:unset; box-sizing: inherit;
-					Vue.component(newId, 
-						{ template: '<div style="display:'+this.modedisplay+'">' + e.template + '</div>' });
+					Vue.component(newId,
+						{ template: '<div style="display:' + this.modedisplay + '">' + e.template + '</div>' });
 					this.componentToReload = newId;
+					this.$nextTick(function () {
+						$xui.nbRefeshReloader--;
+						//console.debug("nbRefeshReloader ", $xui.nbRefeshReloader);
+						if ($xui.nbRefeshReloader == 0) {
+							var message = {
+								action: "reloader finish",
+							};
+							window.parent.postMessage(message, "*");
+						}
+					});
 				},
 				reload: function () {
 					//console.debug("reload **************", this.partid);
-
+					$xui.nbRefeshReloader++;
 					var message = {
 						action: "load reloader",
 						xid: this.partid,
@@ -121,6 +133,11 @@ $xui.loadApplicationJS = () => {
 		data: $xui.rootdata,
 		components: { RootComponent },
 		template: "<RootComponent ref='root'></RootComponent>",
-		vuetify: new Vuetify(configVuetify)
+		vuetify: new Vuetify(configVuetify),
+		errorCaptured: function(err, component, details) {
+			console.error(err, component, details);
+			alert("xui reporting " + err + " details " +details);
+			throw err;
+		}
 	});
 }

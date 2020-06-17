@@ -2,14 +2,14 @@
 
     <div xid="bottom-editor" style="display:flex">
         <v-icon style="font-size:18px"  @click="$xui.deleteCmp()">mdi-delete</v-icon>
-        <v-icon style="font-size:18px">mdi-plus-box</v-icon>
+        <v-icon style="font-size:18px"  @click="$xui.addAction()">mdi-plus-box</v-icon>
         <v-icon style="font-size:18px">mdi-pencil</v-icon>
     </div>
 
     <!------------------------------------------------------------------------------------->
 
     <xui-slot xid="editor-header">
-        <v-subheader @click='[[selectAction@1]]' class='elevation-2 xui-style-prop'>[[title@2]]<v-spacer></v-spacer>
+        <v-subheader @click='[[selectAction@1]]' class='elevation-2 xui-style-prop'><span class='text-truncate'>[[title@3]]</span><v-spacer></v-spacer>
             <v-icon dark >mdi-dots-horizontal</v-icon>
         </v-subheader>
         <v-divider></v-divider>

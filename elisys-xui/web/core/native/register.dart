@@ -44,7 +44,7 @@ class NativeSlot extends XUIElementNative {
     var isModeDesign = engine.isModeDesign();
     var xidCal;
     if (isModeDesign && html.originElemXUI != null) {
-      xidCal = html.calculatePropertyXUI(html.originElemXUI.xid);
+      xidCal = html.calculatePropertyXUI(html.originElemXUI.xid, null);
     }
 
     var isSlotButNotTrashcan = slotName != null && xidCal != XUI_TRASHCAN_SLOT;
@@ -57,7 +57,7 @@ class NativeSlot extends XUIElementNative {
 
       newChild.attributes = HashMap<String, XUIProperty>();
       newChild.attributes["class"] = XUIProperty("text-truncate");  // trunc le texte si trop long
-      
+
       if (html.originElemXUI.attributes != null) {
         // affecte les styles et les class du slot  (ex : flow et le display:inline flex)
         newChild.attributes = HashMap<String, XUIProperty>();

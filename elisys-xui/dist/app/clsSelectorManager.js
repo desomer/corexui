@@ -10,27 +10,28 @@ export class SelectorManager {
             }
         };
 
+        /************************************************************************************ */
         $xui.displaySelectorByPosition = (position) => {
 
             if ($xui.hasPropertiesChanged) {
+                /*******************************************************/
                 // sauvegarde automatique
-                $xui.saveProperties().then(() => {
-                    console.debug("auto save ok");
-                    if ($xui.modeDisplaySelection) {
-                        console.debug("reselect after save ", $xui.propertiesDesign);
-                        setTimeout(() => {   // attente prise en compte par l'iFrame
-                            $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, true);
-                        }, 500);
-                    }
-                }
-                )
+                /*******************************************************/
+                $xui.saveProperties()
+                return;
             }
 
+            /*******************************************************/
             var node = document.getElementById("xui-display-selector");
             if (node == null) {
+                /************************************************* */
+                // le node selector draggable
                 node = document.createElement("div");
                 node.id = "xui-display-selector";
                 node.classList.add("xui-style-selector");
+
+                node.setAttribute("draggable", true);
+                node.addEventListener("dragstart", function (event) { $xui.dragMoveStart(event); }, false);
 
                 node.addEventListener("click", (e) => {
                     e.currentTarget.style.display = "none";   // retire sur le click
@@ -41,24 +42,26 @@ export class SelectorManager {
                     e.currentTarget.style.display = "none";   // retire sur le wheel
                 }, { capture: false })
 
+                /************************************************* */
+                // le node action
                 var nodeAction = document.createElement("div");
                 nodeAction.id = "xui-display-selector-action";
                 node.appendChild(nodeAction);
-                node.setAttribute("draggable", true);
-
-                node.addEventListener("dragstart", function (event) { $xui.dragMoveStart(event); }, false);
+                /************************************************* */
 
                 document.body.appendChild(node);
 
-
-                node = document.createElement("div");
-                node.id = "xui-display-selector-margin";
-                node.classList.add("xui-style-selector-margin");
-                node.addEventListener("click", (e) => {
+                /************************************************* */
+                // le node margin
+                var nodeMargin = document.createElement("div");
+                nodeMargin.id = "xui-display-selector-margin";
+                nodeMargin.classList.add("xui-style-selector-margin");
+                nodeMargin.addEventListener("click", (e) => {
                     e.currentTarget.style.display = "none";   // retire sur le click
                     $xui.modeDisplaySelection = false;
                 }, { capture: false })
-                document.body.appendChild(node);
+                document.body.appendChild(nodeMargin);
+                /************************************************* */
             }
 
             var nodeMargin = document.getElementById("xui-display-selector-margin");
@@ -81,13 +84,13 @@ export class SelectorManager {
                 nodeMargin.style.display = "none";
             }
 
-            $xui.rootdata.activeAction = 0;
 
+            // affiche les action du Node
             $xui.displayAction($xui.propertiesDesign.xid, null);
 
         }
 
-
+        /************************************************************************************ */
         // selection par click des properties
         $xui.displaySelectorByXid = (xid, xid_slot, noDisplayProp) => {
 
@@ -95,21 +98,20 @@ export class SelectorManager {
 
             // recherche xid simple
             let winFrame = document.querySelector("#rootFrame").contentWindow;
-            var elemRect = winFrame.getInfoForSelector("[data-xid=" + xid + "]");
+            let elemRect = winFrame.getInfoForSelector("[data-xid=" + xid + "]");
             if (elemRect != null) {
-                console.debug("displaySelectorByXid 1 ", xid);
+                //console.debug("displaySelectorByXid 1 ", xid);
                 $xui.displaySelectorByPosition(elemRect);
             }
 
             if (elemRect == null) {
                 elemRect = winFrame.getInfoForSelector("[data-xid-slot-" + xid + "=true]");
                 if (elemRect != null) {
-                    console.debug("displaySelectorByXid 2 ", xid);
+                    //console.debug("displaySelectorByXid 2 ", xid);
                     $xui.displaySelectorByPosition(elemRect);
                 }
             }
            
-
             // recherche xid de slot invisible sur les div enfant => realise un merge des clientRect
             if (elemRect == null) {
                 var listNode = document.querySelector("#rootFrame").contentDocument.querySelectorAll("[data-xid-slot=" + xid + "]")
@@ -119,9 +121,9 @@ export class SelectorManager {
                     let parent = true;   
                     elemRect = winFrame.getInfoForSelector("[data-xid-slot=" + xid + "]", parent);
                     if (elemRect != null) {
-                        console.debug("displaySelectorByXid 3 ", xid);
                         if (elemRect.width!=0 && elemRect.height!=0)
                         {
+                            //console.debug("displaySelectorByXid 3 ", xid);
                             $xui.displaySelectorByPosition(elemRect);
                             found=true;
                         }
@@ -130,7 +132,7 @@ export class SelectorManager {
                 
                 if (!found && listNode != null && listNode.length > 0) {
                     // gestion des d'intersection des region des enfants
-                    var myRegion = null;
+                    let myRegion = null;
                     for (const aNode of listNode) {
                         let elemRect = aNode.getBoundingClientRect();
                         if (myRegion == null)
@@ -138,22 +140,24 @@ export class SelectorManager {
                         else
                             myRegion = myRegion.union(new Region2D(elemRect));
                     }
-                    console.debug("displaySelectorByXid 4 ", xid);
+                    //console.debug("displaySelectorByXid 4 ", xid);
                     $xui.displaySelectorByPosition(myRegion.getBounds());
                 }
-                else
+                else if (!found)
                 {
                     console.debug("displaySelectorByXid 5 no found ", xid);
                 }
             }
 
             if (!noDisplayProp) {
+                // affiche les properties
                 $xui.modeDisplaySelection = true;
-                setTimeout(() => { $xui.displayPropertiesJS(xid, xid_slot); }, 100);
+                setTimeout(() => { $xui.displayPropertiesJS(xid, xid_slot); }, 10);
             }
         }
     }
 
+    /************************************************************************************ */
     getInfoCmp(targetAction) {
         let elemRect = targetAction.getBoundingClientRect();
         let s = document.querySelector("#rootFrame").contentWindow.getComputedStyle(targetAction);

@@ -24,13 +24,14 @@ const ATTR_NO_DOM = "no-dom";
 const ATTR_RELOADER = "reloader";
 const ATTR_MODE_DISPLAY = "modedisplay";
 const ATTR_CONVERT_JSON = "convert-json";
+const ATTR_XUI_IF = "if";
 
 const ATTR_STYLE_SLOT = "style-slot";
 
 const TAG_ESCAPE =
     "xui-escape-"; // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
 const TAG_NO_DOM = "xui-no-dom";
-const TAG_RELOADER = "xui-reloader";  
+const TAG_RELOADER = "xui-reloader";
 
 const TAG_DOC = "xui-doc";
 const TAG_DESIGN = "xui-design";
@@ -96,6 +97,24 @@ class DicoOrdered<T extends XUIModel> {
 ///      converti les xml en xui (XUIComponent, XUIDesign, XUIModel)
 ///------------------------------------------------------------------
 
+abstract class XUIReader {
+  Provider provider;
+  var id;
+
+  Future parseFile(XMLElemReader elemReader) async {}
+}
+
+abstract class XMLElemReader {
+  dynamic parseElem(dynamic parent, XMLElem element) {}
+}
+
+class XMLElem {
+  String tag;
+  String text;
+  LinkedHashMap<dynamic, String> attributs;
+}
+
+/// representation d'un fichier XUI
 class XUIResource extends XMLElemReader {
   var components = LinkedHashMap<String, DicoOrdered<XUIComponent>>();
   var designs = LinkedHashMap<String, DicoOrdered<XUIDesign>>();
@@ -104,7 +123,7 @@ class XUIResource extends XMLElemReader {
   /// les imports
   List<XUIResource> listImport = [];
 
-  HTMLReader reader;
+  XUIReader reader;
   XUIContext context;
 
   ///------------------------------------------------------------------
@@ -197,10 +216,13 @@ class XUIResource extends XMLElemReader {
     var compo = [];
     components.forEach((k, v) {
       for (XUIComponent item in v.list) {
-        var des = {};
-        des["xid"] = item.elemXUI.xid;
-        des["mode"] = item.mode;
-        compo.add(des);
+        if (item.elemXUI.idRessource != null) {
+          var des = {};
+          des["xid"] = item.elemXUI.xid;
+          des["tag"] = item.elemXUI.tag;
+          //des["mode"] = item.mode;
+          compo.add(des);
+        }
       }
     });
 
@@ -212,7 +234,7 @@ class XUIResource extends XMLElemReader {
 
   Future parse() {
     NativeRegister(this);
-    return this.reader.parseElem(this);
+    return this.reader.parseFile(this);
   }
 
   DicoOrdered<XUIComponent> searchComponent(String tag) {
@@ -413,8 +435,6 @@ class XUIEngine {
   var docInfo = HashMap<String, DocInfo>();
   var dataBindingInfo = XUIParseJSDataBinding();
 
-  //String lastDeleteXid;
-
   Future initialize(HTMLReader reader, XUIContext ctx) async {
     xuiFile = XUIResource(reader, ctx);
 
@@ -448,7 +468,7 @@ class XUIEngine {
       if (html.originElemXUI != null &&
           html.originElemXUI.propertiesXUI != null &&
           html.originElemXUI.propertiesXUI.containsKey(ATTR_RELOADER)) {
-        reloaderId = html.calculatePropertyXUI(html.originElemXUI.xid);
+        reloaderId = html.calculatePropertyXUI(html.originElemXUI.xid, null);
         html = null;
       } else {
         html = html.parent;
@@ -496,9 +516,9 @@ class XUIEngine {
   toHTMLString(XUIHtmlBuffer writer, String xid, XUIContext ctx) async {
     xuiFile.context = ctx;
     if (writer == null) {
-      print("toHTMLString for init xid=" + xid);
+      print("toHTMLString for only init XUI xid=" + xid);
     } else {
-      print("toHTMLString on " + writer.toString() + " xid=" + xid);
+      print("toHTMLString for generate html xid=" + xid);
     }
 
     var listCmp = xuiFile.searchComponent(xid);

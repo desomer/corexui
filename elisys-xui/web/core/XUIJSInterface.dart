@@ -43,15 +43,17 @@ class VueParamJS {
 class Options {
   external String get mode;
   external String get html;
-  external String get yaml;
+  external String get xuidata;
+  external String get xuifile;
   external List get listReloader;
   external String get action;
   external set html(String html);
   external set mode(String mode);
-  external set yaml(String yaml);
+  external set xuidata(String xuidata);
+  external set xuifile(String xuifile);
   external set listReloader(List listReloader);
   external set action(String action);
-  external factory Options({String mode, dynamic html, dynamic yaml});
+  external factory Options({String mode, dynamic html, dynamic xuidata});
 }
 
 @JS()

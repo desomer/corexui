@@ -6,6 +6,7 @@
 if (typeof window.$xui === 'undefined')
     window.$xui = {};
 
+/****************************************************************************************/
 
 import("./clsPageDesignManager.js").then((module) => {
     $xui.pageDesignManager = new module.PageDesignManager();
@@ -20,64 +21,43 @@ import("./clsSelectorManager.js").then((module) => {
 });
 
 /****************************************************************************************/
-
 $xui.isModePreview = false;
-$xui.modeDisplaySelection = false;    //affichage de la selection en cours
+$xui.modeDisplaySelection = false;
 $xui.editorOpenId = null;
 
-
-
-
-
-var workerEnable = false;
-var monWorker = null;
-
-if (workerEnable) {
-    monWorker = new Worker('./libxuiworker.js');
-
-    monWorker.onmessage = function (e) {
-        console.log('Message depuis le worker', e);
-    }
+function getInfoFile(mode) {
+    return { file: 'app/frame1.html', xid: 'root', mode: mode };
 }
 
+function waitForXuiLib(key, callback) {
+    if ($xui[key] != null) {
+        callback();
+    } else {
+        setTimeout(function () { waitForXuiLib(key, callback); }, 100);
+    }
+};
+
+waitForXuiLib("initPage", function () {
+    var infoFile = getInfoFile("design");
+    $xui.initPage(infoFile);
+});
+
 /******************************************************************************** */
+
 $xui.loadPageJS = (html) => {
     $xui.pageDesignManager.loadPage(html);
 };
 
 $xui.changePageJS = (param) => {
     $xui.pageDesignManager.changePageJS(param);
+    $xui.doPromiseJS("changePage");
 };
 
-$xui.undo = () => {
-    $xui.pageDesignManager.undo();
-};
-
-$xui.redo = () => {
-    $xui.pageDesignManager.redo();
-};
-
-
-var listIcon = null;
-var listImage = null;
-$xui.openTabUrl = (url) => {
-    if (url == "listIcon") {
-        if (listIcon == null || listIcon.closed)
-            listIcon = window.open('https://cdn.materialdesignicons.com/5.1.45/', '_blank');
-        listIcon.focus()
-    }
-    if (url == "siteImage") {
-        if (listImage == null || listImage.closed)
-            listImage = window.open('https://unsplash.com/', '_blank');
-        listImage.focus()
-    }
-
-};
 
 /******************************************************************************** */
 // gestion des button refresh de la page
 $xui.refreshAction = (mode) => {
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: mode };
+    var infoFile = getInfoFile(mode);
     if (mode == "template:reload") {
         infoFile.mode = "template";
         infoFile.action = "reload";  // pas de store
@@ -86,7 +66,7 @@ $xui.refreshAction = (mode) => {
         infoFile.mode = "design";
         infoFile.action = "clear";   // pas de store
     }
-    $xui.refresh(infoFile);    // lance le dart
+    $xui.refreshXUI(infoFile);
 };
 
 $xui.fullScreen = () => {
@@ -104,88 +84,315 @@ $xui.modePhone = () => {
     document.querySelector("#rootFrame").classList.toggle("iframe-phone");
 }
 
+/***************************************************************************************************************/
+const observer = new ReportingObserver((reports, observer) => {
+    for (const report of reports) {
+        console.log("******************************************", report.type, report.url, report.body, observer);
+    }
+}, { buffered: true });
+
+console.log("***************start reporting ********************");
+observer.observe();
+
+window.onunhandledrejection = function (e) {
+    console.log("*************** onunhandledrejection", e);
+    alert('Error object: ' + e.reason.message + "\n" + e.reason.stack);
+}
+
+window.addEventListener('error', function (e) {
+
+    console.log("*************** error", e);
+
+})
+
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+    console.log("***************error reporting OK ********************");
+    var string = msg.toLowerCase();
+    var substring = "script error";
+    if (string.indexOf(substring) > -1) {
+        alert('Script Error: See Browser Console for Detail');
+    } else {
+        var message = [
+            'XUI reporting Message: ' + msg,
+            'URL: ' + url,
+            'Line: ' + lineNo,
+            'Column: ' + columnNo,
+            'Error object: ' + JSON.stringify(error)
+        ].join(' - ');
+
+        alert(message);
+    }
+
+    return false;
+};
+
+function wrapErrors(fn) {
+    // don't wrap function more than once
+    if (!fn.__wrapped__) {
+        fn.__wrapped__ = function () {
+            try {
+                return fn.apply(this, arguments);
+            } catch (e) {
+                captureError(e); // report the error
+                throw e; // re-throw the error
+            }
+        };
+    }
+
+    return fn.__wrapped__;
+}
+
+function captureError(e) {
+    alert(e.message)
+    console.debug("------- send info error -------", e)
+}
+
+//    wrapErrors(function () {
+//    --------
+//    })();
+
+console.log("***************start reporting OK ********************");
+
+/***************************************************************************************************************/
+
+let lastActionDate = Date.now();
+let lastAction = null;
+let currentAction = null;
+
+$xui.setCurrentAction = (actionName) => {
+
+
+    if (currentAction != null)
+        throw (new SpecifiedError("action en cours " + actionName + " => " + lastAction));
+
+
+
+    $xui.rootdata.saveLayout = true;
+
+    lastActionDate = Date.now();
+    lastAction = actionName;
+    currentAction = actionName;
+    console.debug("START ------- " + actionName + " ---------")
+    var displayMode = "root"
+    var undisplaySelector = true;
+    var reselect = $xui.modeDisplaySelection;
+
+    /**************************/
+    if (actionName == "addCmp")
+        displayMode = "none";
+
+    if (actionName == "saveProperties" || actionName == "addAction")
+        displayMode = "current";
+
+    if (actionName == "addSlot")
+        displayMode = "current";
+    /**************************/
+
+    if (undisplaySelector)
+        $xui.unDisplaySelector();
+
+    var prom = getPromise("changePageFinish");
+    prom.then(() => {
+        $xui.rootdata.saveLayout = false;
+        currentAction = null;
+        if (displayMode == "current") {
+            if (reselect)
+                $xui.modeDisplaySelection = true;
+
+            console.debug("changePageFinish ok", $xui.modeDisplaySelection);
+            if ($xui.modeDisplaySelection) {
+                setTimeout(() => {   // attente prise en compte chargement des images
+                    console.debug("reselect after change ", $xui.propertiesDesign);
+                    $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, true);
+                }, 50);
+            }
+        }
+    });
+
+    var prom = getPromise("changePage");
+    prom.then(() => {
+        if (displayMode == "root") {
+            $xui.displayPropertiesJS("root", "root");   // reaffecte le nouveau mapping sur la page
+        }
+        else if (displayMode == "current") {
+            $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);   // reaffecte le nouveau mapping
+        }
+        console.debug("END ------ " + actionName + " ------")
+    }
+    );
+
+    return true;
+}
+
+/***************************************************************************************************************/
 $xui.clearAll = () => {
+    $xui.setCurrentAction("clearAll");
     $xui.pageDesignManager.clearAll();
     $xui.refreshAction("template:clearAll");
 }
 
-/************************************************************************** */
 $xui.addCmp = (cmp) => {
-    window.$xui.unDisplaySelector();
+    $xui.setCurrentAction("addCmp");
     console.debug("addCmp", cmp, $xui.propertiesComponent);
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
-    const newXid = $xui.getNewXid($xui.propertiesComponent, cmp);
+    let infoFile = getInfoFile("template");
+    const newXid = $xui.getNewXid($xui.propertiesComponent.xid, cmp.xid);
     const currentXid = $xui.propertiesComponent.xid;
     const template = "<xui-design xid=\"" + currentXid + "\"><" + cmp.xid + " xid=\"" + newXid + "\"></" + cmp.xid + "></xui-design>";
     $xui.addDesign(infoFile, $xui.propertiesComponent.xid, template, true, false);
-    // todo 
-    // gerer .then($xui.changePage())
-}
-
-$xui.getNewXid = (parent, cmp) => {
-    var d = new Date().getTime();
-    d += (parseInt(Math.random() * 100)).toString();
-
-    var idxUUID = parent.xid.indexOf("_");
-    var pxid = idxUUID == -1 ? parent.xid : (parent.xid.substring(0, idxUUID));
-    var ret = pxid + "-" + cmp.xid.replace("xui-", "") + "_" + d;
-    return ret;
 }
 
 $xui.deleteCmp = () => {
-    $xui.unDisplaySelector();
     console.debug("deleteCmp", $xui.propertiesDesign);
     if ($xui.propertiesDesign.isSlot) {
         console.debug("deleteCmp slot impossible");
         return false;
     }
     else {
-        var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
-        $xui.deleteDesign(infoFile, $xui.propertiesDesign.xid);
+        $xui.setCurrentAction("deleteCmp");
+        $xui.deleteDesign(getInfoFile("template"), $xui.propertiesDesign.xid);
         return true;
     }
 }
 
-$xui.cutCmp = () => {
-    $xui.unDisplaySelector();
-    console.debug("cutCmp", $xui.propertiesDesign);
+$xui.cutCmp = (forMove) => {
+
     if ($xui.propertiesDesign.isSlot) {
         console.debug("deleteCmp slot impossible");
         return false;
     }
     else {
-        var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
-        $xui.cutDesign(infoFile, $xui.propertiesDesign.xid);
+        if (!forMove)
+            $xui.setCurrentAction("cutCmp");
+
+        $xui.cutDesign(getInfoFile("template"), $xui.propertiesDesign.xid);
         $xui.rootdata.pasteDisabled = false;
         return true;
     }
 }
 
-$xui.pasteTo = () => {
-    $xui.unDisplaySelector();
-    console.debug("pasteTo", $xui.propertiesDesign);
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
+$xui.pasteTo = (forMove) => {
+    if (forMove) {
+        $xui.setCurrentAction("movePasteTo");
+    }
+    else
+        $xui.setCurrentAction("pasteTo");
+
+    let infoFile = getInfoFile("template");
     var info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xui.moveDesign(infoFile, null, info.xid);
     $xui.rootdata.pasteDisabled = true;
 }
 
-//********************************************************************************************/
+$xui.moveTo = (data) => {
+    if ($xui.cutCmp(true)) {   // suppression de source
+        // selection de la target
+        var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
+        prom.then(() => {
+            $xui.pasteTo(true);
+        })
+    }
+}
+
+$xui.addAction = () => {
+
+    let infoFile = getInfoFile("template");
+    let info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    let infoParent = $xui.getInfo(infoFile, info.parentXid, info.parentXid);
+    console.debug("infoParent", info, infoParent);
+
+    $xui.rootdata.activeAction = 3;
+
+    if ($xui.propertiesDesign.isSlot) {
+
+        if (info.docId == "xui-no-dom:xui-flow"
+            || info.docId == "v-col:xui-row-grid-responsive"
+            || info.docId == "v-col:xui-row-1"
+            || info.docId == "v-col:xui-form-row-1"
+            || info.docId == "v-tab:xui-tabs"
+        ) {
+            addSlotByVariable(infoFile, info);
+            return true
+        }
+        else {
+            console.debug("addAction sur slot impossible");
+            return false;
+        }
+    }
+    else {
+        if (infoParent.docId == "xui-no-dom:xui-flow") {
+            addSlotByVariable(infoFile, infoParent);
+            return true
+        }
+        else {
+            // surround
+            $xui.setCurrentAction("addAction");
+            let cmp = { xid: 'xui-flow' };
+            const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
+            const currentXid = info.parentXid;
+            const template = "<xui-design xid=\"" + currentXid + "\"><" + cmp.xid + " xid=\"" + newXid + "\"></" + cmp.xid + "></xui-design>";
+            $xui.surroundDesign(infoFile, $xui.propertiesDesign.xid, template, newXid);
+            return true;
+        }
+    }
+}
+
+function addSlotByVariable(infoFile, infoParent) {
+    $xui.setCurrentAction("addSlot");
+    infoFlow = $xui.getInfo(infoFile, infoParent.parentXid, infoParent.parentXid);
+    for (const aProp of $xui.rootDataProperties.data) {
+        if (aProp.xid == infoFlow.xid && aProp.variable == "nb") {
+            aProp.value = "" + (parseInt(aProp.value) + 1);
+        }
+    }
+    // save properties
+    $xui.hasPropertiesChanged = false;
+    $xui.setDesignProperties(getInfoFile("template"), $xui.propertiesDesign.json);
+}
+
+$xui.undo = () => {
+    $xui.setCurrentAction("undo");
+    $xui.pageDesignManager.undo();
+};
+
+$xui.redo = () => {
+    $xui.setCurrentAction("redo");
+    $xui.pageDesignManager.redo();
+};
 
 $xui.saveProperties = () => {
+    $xui.setCurrentAction("saveProperties");
     console.debug("saveProperties", $xui.propertiesDesign.json);
 
     $xui.hasPropertiesChanged = false;
-
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
-    var prom = getPromise("setDesignProperties");
-    $xui.setDesignProperties(infoFile, "save", $xui.propertiesDesign.json);
-    prom.then(xidProp => {
-        console.debug("saveProperties ok", xidProp);
-        $xui.displayPropertiesJS(xidProp, xidProp);   // reaffecte le nouveau mapping
-    });
-    return prom;
+    $xui.setDesignProperties(getInfoFile("template"), $xui.propertiesDesign.json);
 }
+
+/***************************************************************************************************************/
+$xui.getNewXid = (xidParent, nameCmp) => {
+    var d = new Date().getTime();
+    d += (parseInt(Math.random() * 100)).toString();
+
+    var idxUUID = xidParent.indexOf("_");
+    var pxid = idxUUID == -1 ? xidParent : (xidParent.substring(0, idxUUID));
+    var ret = pxid + "-" + nameCmp.replace("xui-", "") + "_" + d;
+    return ret;
+}
+
+/***************************************************************************************************************/
+var listIcon = null;
+var listImage = null;
+$xui.openTabUrl = (url) => {
+    if (url == "listIcon") {
+        if (listIcon == null || listIcon.closed)
+            listIcon = window.open('https://cdn.materialdesignicons.com/5.1.45/', '_blank');
+        listIcon.focus()
+    }
+    if (url == "siteImage") {
+        if (listImage == null || listImage.closed)
+            listImage = window.open('https://unsplash.com/', '_blank');
+        listImage.focus()
+    }
+};
 
 $xui.openClassEditor = (id) => {
     $xui.editorOpenId = id;
@@ -201,7 +408,6 @@ $xui.openClassEditor = (id) => {
             new DesignClassManager().initClassSelector(aProperty.value, $xui.rootdata.listCatClass);
         }
     }
-
 }
 
 $xui.closeClassEditor = () => {
@@ -214,29 +420,27 @@ $xui.closeClassEditor = () => {
             $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
         }
     }
-
 }
 
-
-/******************************************************************************** */
-
+/***************************************************************************************************************/
 $xui.displayPropertiesJS = (xid, xid_slot) => {
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
+    let infoFile = getInfoFile("template");
 
-    var param = { infoFile: infoFile, xid: xid, xid_slot: xid_slot };
+    let posScroll = -1;
+    if ($xui.propertiesDesign != null && xid == $xui.propertiesDesign.xid) {
+        posScroll = document.getElementById("AppPropertiesSetting").scrollTop;
+    }
 
-    // gestion en thread
-    if (monWorker != null)
-        monWorker.postMessage([param]);
-
-    // var info = $xui.getInfo(infoFile, xid, xid_slot);
-
-    var prom = getPromise("getDesignProperties");
-
+    let prom = getPromise("getDesignProperties");
     $xui.getDesignProperties(infoFile, xid, xid_slot);
-
     prom.then(prop => {
         $xui.hasPropertiesChanged = false;
+
+        if (prop.path == "") {
+            console.debug("displayPropertiesJS **** INCONNU ****", $xui.propertiesDesign);
+            return;
+        }
+
         $xui.propertiesDesign = prop;
         $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
         $xui.propertiesDesign.json = $xui.parseJson($xui.propertiesDesign.data);
@@ -272,29 +476,32 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
             },
             mounted: function () {
                 this.$nextTick(function () {
-                    /*******************************************************/
+                    if (posScroll >= 0) {
+                        document.getElementById("AppPropertiesSetting").scrollTop = posScroll;
+                    }
                     // gestion de la selection sur le mouseover
-                    /*******************************************************/
                     var listOver = document.querySelectorAll(".xui-over-prop-xid");
-                    $xui.last = null;
+                    $xui.lastPropOver = null;
+
                     listOver.forEach((aDivOver) => {
-                        aDivOver.style.border = "1px solid #bdbdbd";
-                        aDivOver.addEventListener('mouseover', () => {
-                            aDivOver.style.border = "1px solid #202020";
-                            if ($xui.last != aDivOver.id) {
-                                $xui.last = aDivOver.id;
-                                //console.debug("sel over", aDivOver.id);
+                        aDivOver.addEventListener('mouseover', (e) => {
+                            if ($xui.lastPropOver != aDivOver.id) {
+                                $xui.lastPropOver = aDivOver.id;
                                 $xui.displaySelectorByXid(aDivOver.id, aDivOver.id, true);
                             }
                         });
-                        aDivOver.addEventListener('mouseleave', () => {
-                            aDivOver.style.border = "1px solid #bdbdbd";
+                        aDivOver.addEventListener('mouseleave', (e) => {
+                            // pas de sauvegarde ni de selection si au dessus d'une list de combobox
+                            if (e.toElement != null && e.toElement.closest('.v-select-list') != null)
+                                return;
+
+                            $xui.lastPropOver = null;
+                            // lance aussi la sauvegarde
                             $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xid, true);
                             if (!$xui.modeDisplaySelection)
                                 $xui.unDisplaySelector();
                         });
                     });
-                    /*******************************************************/
                 })
             }
         });
@@ -303,16 +510,23 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
     return prom;
 }
 
-
+/***************************************************************************************************************/
 $xui.displayComponents = (xid, xid_slot) => {
 
-    var infoFile = { file: 'app/frame1.html', xid: 'root', mode: 'template' };
+    let infoFile = getInfoFile("template");
 
     $xui.propertiesComponent = $xui.getComponents(infoFile, xid, xid_slot);
     //console.debug("displayComponents", $xui.propertiesComponent);
+
+    /************************************************************ */
+    if ($xui.vuejsAppCmpSetting != null) {
+        return; // pas de raffraichissement dynamique en fonction du composant
+    }
+    /************************************************************ */
+
     $xui.propertiesComponent.json = $xui.parseJson($xui.propertiesComponent.data);
     $xui.rootDataComponents = { data: $xui.propertiesComponent.json, item: null };
-    if ($xui.vuejsDesign != null) {
+    if ($xui.vuejsAppCmpSetting != null) {
         $xui.vuejsAppCmpSetting.$destroy();
     }
     $xui.vuejsAppCmpSetting = new Vue({
@@ -329,9 +543,10 @@ $xui.displayComponents = (xid, xid_slot) => {
 
 }
 
-var lastHtmlAction = null;
+/***************************************************************************************************************/
+var cacheHtmlAction = null;
 $xui.displayAction = (xid, xid_slot) => {
-    if (lastHtmlAction == null) {
+    if (cacheHtmlAction == null) {
         var infoFile = { file: 'app/cmpDesignEditor.html', xid: 'bottom-editor', mode: 'final' };
         var prom = getPromise("displayActionPromise");
         $xui.getHtmlFrom(infoFile, "displayActionPromise");
@@ -351,12 +566,14 @@ $xui.displayAction = (xid, xid_slot) => {
                     }
                 }
             });
-            lastHtmlAction = html;
+            cacheHtmlAction = html;
         });
     }
 
 }
 
+/***************************************************************************************************************/
+/***************************************************************************************************************/
 $xui.updateDirectProperty = (value, variable, xid) => {
     console.debug("updateDirectProperty", value, variable, xid, $xui.rootDataProperties);
     for (const aProp of $xui.rootDataProperties.data) {
@@ -366,8 +583,9 @@ $xui.updateDirectProperty = (value, variable, xid) => {
     }
 }
 
-/********************************************************************************** */
+/***************************************************************************************************************/
 var dicoPromise = {};
+
 
 function compileTemplate(template) {
     return Vue.compile(template);
@@ -396,7 +614,10 @@ function getPromise(id) {
 }
 
 $xui.doPromiseJS = (idPromise, ret) => {
-    dicoPromise[idPromise].resolve_ex(ret);
+    if (dicoPromise[idPromise] != null) {
+        dicoPromise[idPromise].resolve_ex(ret);
+        dicoPromise[idPromise] = null;
+    }
 }
 
 
@@ -407,3 +628,15 @@ $xui.parseJson = (str) => {
         console.debug("pb parse json", error, str);
     }
 }
+
+// Create a custom error
+var SpecifiedError = function SpecifiedError(message) {
+    this.name = 'SpecifiedError';
+    this.message = message || '';
+    this.stack = (new Error()).stack;
+};
+
+SpecifiedError.prototype = new Error();
+SpecifiedError.prototype.constructor = SpecifiedError;
+
+

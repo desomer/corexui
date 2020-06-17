@@ -17,12 +17,12 @@ class XUIProperty {
     String endTag= "]]";
 
     int next = parse.indexOf(startTag, idx);
-    if (next==-1)
-    {
-        startTag="--";
-        endTag= "--";
-        next = parse.indexOf(startTag, idx);
-    }
+    // if (next==-1)
+    // {
+    //     startTag="--";
+    //     endTag= "--";
+    //     next = parse.indexOf(startTag, idx);
+    // }
     
     int nextEnd = next;
     if (next >= 0) {
@@ -54,10 +54,12 @@ class ParseInfo
     StringBuffer parsebuilder;
     int nbTag=0;
     ParseInfoMode mode;
+    String context; // nom de l'attibut 
 
-    ParseInfo(String content, ParseInfoMode mode)
+    ParseInfo(String content, String context, ParseInfoMode mode)
     {
         parsebuilder = StringBuffer(content);
+        this.context = context;
         this.mode=mode;
     }
 }

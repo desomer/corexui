@@ -25,8 +25,25 @@ $xui.isModePreview = false;
 $xui.modeDisplaySelection = false;
 $xui.editorOpenId = null;
 
+function getInfoFile(mode) {
+    return { file: 'app/frame1.html', xid: 'root', mode: mode };
+}
+
+function waitForXuiLib(key, callback) {
+    if ($xui[key] != null) {
+        callback();
+    } else {
+        setTimeout(function () { waitForXuiLib(key, callback); }, 100);
+    }
+};
+
+waitForXuiLib("initPage", function () {
+    var infoFile = getInfoFile("design");
+    $xui.initPage(infoFile);
+});
 
 /******************************************************************************** */
+
 $xui.loadPageJS = (html) => {
     $xui.pageDesignManager.loadPage(html);
 };
@@ -68,13 +85,93 @@ $xui.modePhone = () => {
 }
 
 /***************************************************************************************************************/
+const observer = new ReportingObserver((reports, observer) => {
+    for (const report of reports) {
+        console.log("******************************************", report.type, report.url, report.body, observer);
+    }
+}, { buffered: true });
+
+console.log("***************start reporting ********************");
+observer.observe();
+
+window.onunhandledrejection = function (e) {
+    console.log("*************** onunhandledrejection", e);
+    alert('Error object: ' + e.reason.message + "\n" + e.reason.stack);
+}
+
+window.addEventListener('error', function (e) {
+
+    console.log("*************** error", e);
+
+})
+
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+    console.log("***************error reporting OK ********************");
+    var string = msg.toLowerCase();
+    var substring = "script error";
+    if (string.indexOf(substring) > -1) {
+        alert('Script Error: See Browser Console for Detail');
+    } else {
+        var message = [
+            'XUI reporting Message: ' + msg,
+            'URL: ' + url,
+            'Line: ' + lineNo,
+            'Column: ' + columnNo,
+            'Error object: ' + JSON.stringify(error)
+        ].join(' - ');
+
+        alert(message);
+    }
+
+    return false;
+};
+
+function wrapErrors(fn) {
+    // don't wrap function more than once
+    if (!fn.__wrapped__) {
+        fn.__wrapped__ = function () {
+            try {
+                return fn.apply(this, arguments);
+            } catch (e) {
+                captureError(e); // report the error
+                throw e; // re-throw the error
+            }
+        };
+    }
+
+    return fn.__wrapped__;
+}
+
+function captureError(e) {
+    alert(e.message)
+    console.debug("------- send info error -------", e)
+}
+
+//    wrapErrors(function () {
+//    --------
+//    })();
+
+console.log("***************start reporting OK ********************");
+
+/***************************************************************************************************************/
+
 let lastActionDate = Date.now();
 let lastAction = null;
+let currentAction = null;
+
 $xui.setCurrentAction = (actionName) => {
+
+
+    if (currentAction != null)
+        throw (new SpecifiedError("action en cours " + actionName + " => " + lastAction));
+
+
+
     $xui.rootdata.saveLayout = true;
 
     lastActionDate = Date.now();
     lastAction = actionName;
+    currentAction = actionName;
     console.debug("START ------- " + actionName + " ---------")
     var displayMode = "root"
     var undisplaySelector = true;
@@ -97,6 +194,7 @@ $xui.setCurrentAction = (actionName) => {
     var prom = getPromise("changePageFinish");
     prom.then(() => {
         $xui.rootdata.saveLayout = false;
+        currentAction = null;
         if (displayMode == "current") {
             if (reselect)
                 $xui.modeDisplaySelection = true;
@@ -106,7 +204,7 @@ $xui.setCurrentAction = (actionName) => {
                 setTimeout(() => {   // attente prise en compte chargement des images
                     console.debug("reselect after change ", $xui.propertiesDesign);
                     $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, true);
-                }, 10);
+                }, 50);
             }
         }
     });
@@ -164,6 +262,7 @@ $xui.cutCmp = (forMove) => {
     }
     else {
         if (!forMove)
+            // to do  remove
             $xui.setCurrentAction("cutCmp");
 
         $xui.cutDesign(getInfoFile("template"), $xui.propertiesDesign.xid);
@@ -174,6 +273,7 @@ $xui.cutCmp = (forMove) => {
 
 $xui.pasteTo = (forMove) => {
     if (forMove) {
+        // to do  remove
         $xui.setCurrentAction("movePasteTo");
     }
     else
@@ -182,17 +282,21 @@ $xui.pasteTo = (forMove) => {
     let infoFile = getInfoFile("template");
     var info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xui.moveDesign(infoFile, null, info.xid);
-    $xui.rootdata.pasteDisabled = true;
+   // $xui.rootdata.pasteDisabled = true;
 }
 
 $xui.moveTo = (data) => {
-    if ($xui.cutCmp(true)) {   // suppression de source
-        // selection de la target
-        var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
-        prom.then(() => {
-            $xui.pasteTo(true);
-        })
-    }
+    let infoFile = getInfoFile("template");
+    var info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    $xui.moveDesign(infoFile, info.xid, data.xid_slot);
+
+    // if ($xui.cutCmp(true)) {   // suppression de source
+    //     // selection de la target
+    //     var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
+    //     prom.then(() => {
+    //         $xui.pasteTo(true);
+    //     })
+    // }
 }
 
 $xui.addAction = () => {
@@ -207,7 +311,7 @@ $xui.addAction = () => {
     if ($xui.propertiesDesign.isSlot) {
 
         if (info.docId == "xui-no-dom:xui-flow"
-            || info.docId == "v-col:xui-row-grid"
+            || info.docId == "v-col:xui-row-grid-responsive"
             || info.docId == "v-col:xui-row-1"
             || info.docId == "v-col:xui-form-row-1"
             || info.docId == "v-tab:xui-tabs"
@@ -386,13 +490,17 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
                     $xui.lastPropOver = null;
 
                     listOver.forEach((aDivOver) => {
-                        aDivOver.addEventListener('mouseover', () => {
+                        aDivOver.addEventListener('mouseover', (e) => {
                             if ($xui.lastPropOver != aDivOver.id) {
                                 $xui.lastPropOver = aDivOver.id;
                                 $xui.displaySelectorByXid(aDivOver.id, aDivOver.id, true);
                             }
                         });
-                        aDivOver.addEventListener('mouseleave', () => {
+                        aDivOver.addEventListener('mouseleave', (e) => {
+                            // pas de sauvegarde ni de selection si au dessus d'une list de combobox
+                            if (e.toElement != null && e.toElement.closest('.v-select-list') != null)
+                                return;
+
                             $xui.lastPropOver = null;
                             // lance aussi la sauvegarde
                             $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xid, true);
@@ -484,9 +592,6 @@ $xui.updateDirectProperty = (value, variable, xid) => {
 /***************************************************************************************************************/
 var dicoPromise = {};
 
-function getInfoFile(mode) {
-    return { file: 'app/frame1.html', xid: 'root', mode: mode };
-}
 
 function compileTemplate(template) {
     return Vue.compile(template);
@@ -529,3 +634,15 @@ $xui.parseJson = (str) => {
         console.debug("pb parse json", error, str);
     }
 }
+
+// Create a custom error
+var SpecifiedError = function SpecifiedError(message) {
+    this.name = 'SpecifiedError';
+    this.message = message || '';
+    this.stack = (new Error()).stack;
+};
+
+SpecifiedError.prototype = new Error();
+SpecifiedError.prototype.constructor = SpecifiedError;
+
+

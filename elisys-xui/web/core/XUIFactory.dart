@@ -79,7 +79,7 @@ class XUIModel implements Comparable<XUIModel> {
     await processPhase1Children(elemHtml, engine);
 
     // calcul le xid  (ex : __parentxid__ , __idx__)
-    var xidCal = elemHtml.calculatePropertyXUI(elemXUI.xid);
+    var xidCal = elemHtml.calculatePropertyXUI(elemXUI.xid, null);
 
     // lance les design (pour affectation property utilise)
     await processPhase1Design(xidCal, engine, elemHtml);
@@ -140,7 +140,7 @@ class XUIModel implements Comparable<XUIModel> {
         varIdx = xuifor.content.toString();
 
         nb = int.parse(elemHtml.calculatePropertyXUI(
-            elemHtml.propertiesXUI["nb"]?.content?.toString() ?? "1"));
+            elemHtml.propertiesXUI["nb"]?.content?.toString() ?? "1" , null) );
       }
     }
     /****************************************/
@@ -263,7 +263,7 @@ class XUIModel implements Comparable<XUIModel> {
         if (elemHtml?.propertiesXUI != null &&
             elemHtml.propertiesXUI[ATTR_NO_DESIGN] != null) {
           addSlotInfo = false;
-          print("--------------------- no designable ---> " + slotInfo.xid);
+          //print("--------------------- no designable ---> " + slotInfo.xid);
         }
         if (addSlotInfo && elemHtml?.propertiesXUI != null) {
           slotInfo.slotname = elemHtml.propertiesXUI[ATTR_SLOT_NAME]?.content;
@@ -296,7 +296,7 @@ class XUIModel implements Comparable<XUIModel> {
       slotInfo.docId = getDocumentationID(elemHtml);
 
       if (slotInfo.slotname != null) {
-        slotInfo.slotname = elemHtml.calculatePropertyXUI(slotInfo.slotname);
+        slotInfo.slotname = elemHtml.calculatePropertyXUI(slotInfo.slotname, null);
       }
 
       engine.mapInfo[slotInfo.xid] = slotInfo;

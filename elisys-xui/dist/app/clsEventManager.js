@@ -2,7 +2,7 @@ export class EventManager {
 
     init() {
 
-        // gestion du drag de nouveau composant
+        // gestion du drag de nouveau composant sur selector
         $xui.dragStart = (item, e) => {
             $xui.dragItem = item;
             $xui.dragMoveItem = null;
@@ -10,17 +10,18 @@ export class EventManager {
             $xui.unDisplaySelector();
         }
         
-        // gestion du déplacement de composant
+        // gestion du déplacement de composant entre slot sur selector
         $xui.dragMoveStart = (e) => {
             $xui.dragMoveItem = $xui.propertiesDesign;
             $xui.dragItem = null;
             e.dataTransfer.setData('text/plain', "move " + $xui.propertiesDesign.xid);
         }
 
+        // gestion de la fermeture par ctrl Q
         document.addEventListener("keydown", function (event) {
 
-            if (event.ctrlKey && event.keyCode == 80) {    // ctrl + Q
-                // mode preview  : gestion de la fermeture par ctrl Q
+            if (event.ctrlKey && event.keyCode == 80) {    // ctrl + P
+                // mode preview  : gestion de l'ouverture par ctrl P
                 event.stopPropagation();
                 event.preventDefault();
                 $xui.modePreview();
@@ -35,8 +36,12 @@ export class EventManager {
                 this.console.debug(data);
                 $xui.displaySelectorByPosition(data.position);
                 $xui.modeDisplaySelection = true;
+
+                // se repositionne sur l'onglet 0
+                $xui.rootdata.activeAction = 0;
                 // 250 = delay d'animation des v-tabs
-                setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, 250);
+                const delayWaitEndAnim = 250;
+                setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, delayWaitEndAnim);
             }
             if (data.action == "unselect") {
                 $xui.unDisplaySelector();
@@ -50,21 +55,11 @@ export class EventManager {
                 }
                 if ($xui.dragMoveItem != null) {
                     // gestion de drag entre slot
-                    if ($xui.cutCmp()) {   // suppression de source
-                        // selection de la target
-                        var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
-                        prom.then(() => {  
-                            $xui.pasteTo();
-                        })
-
-                        // setTimeout(() => {   // todo gestion par promise
-                        //     $xui.pasteTo();
-                        // }, 200);  // attend la fin du displayPropertiesJS
-                    }
+                    $xui.moveTo(data);
                 }
             }
             if (data.action == "ctrlQ") {
-                $xui.modePreview();
+                $xui.modePreview();  // fermeture 
             }
 
             if (data.action == "updateDirectProp") {
@@ -72,16 +67,25 @@ export class EventManager {
                 $xui.updateDirectProperty(data.value, data.variable, data.xid);
             }
 
+            // gestion d'un hot load reloader
             if (data.action == "load reloader") {
-                var infoFileCmp = { file: "app/frame1.html", xid: "root", mode: 'template',  part:data.xid };
+                var infoFileCmp = getInfoFile('template');
+                infoFileCmp.part=data.xid;
+                //  { file: "app/frame1.html", xid: "root", mode: 'template',  part:data.xid };
                 var prom = getPromise("getVueCmp")
                 $xui.getHtmlFrom(infoFileCmp, "getVueCmp");
                 prom.then(template => {
                   document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeReloader", "xid": data.xid , "template": template }, "*");
                 })
-
             }
 
+            if (data.action == "reloader finish")
+            {
+               // this.console.debug("reloader finish");
+                $xui.doPromiseJS("changePageFinish");
+            }
+
+            // ajoute un composant vueJS depuis un fichier XUI (ex: xui-split-1)
             if (data.action == "getCmpForFile")
             {
                 //this.console.debug("***********getCmpForFile***********", data);
