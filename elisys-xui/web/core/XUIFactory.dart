@@ -298,7 +298,9 @@ class XUIModel implements Comparable<XUIModel> {
       if (slotInfo.slotname != null) {
         slotInfo.slotname = elemHtml.calculatePropertyXUI(slotInfo.slotname, null);
       }
-
+      if (false) {
+        print("slot info phase 2 " + slotInfo.xid);
+      }
       engine.mapInfo[slotInfo.xid] = slotInfo;
     }
 

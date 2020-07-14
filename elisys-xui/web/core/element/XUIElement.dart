@@ -25,7 +25,9 @@ abstract class XUIElement {
   HashMap<String, XUIProperty> propertiesXUI;
 
   bool isEmpty() {
-    return attributes == null && children == null && propertiesXUI == null;
+    return (attributes == null || attributes.isEmpty) &&
+        (children == null || children.isEmpty) &&
+        (propertiesXUI == null || propertiesXUI.isEmpty);
   }
 }
 

@@ -9,7 +9,7 @@ export class EventManager {
             e.dataTransfer.setData('text/plain', "add cmp " + item.xid);
             $xui.unDisplaySelector();
         }
-        
+
         // gestion du déplacement de composant entre slot sur selector
         $xui.dragMoveStart = (e) => {
             $xui.dragMoveItem = $xui.propertiesDesign;
@@ -43,13 +43,13 @@ export class EventManager {
                 const delayWaitEndAnim = 250;
                 setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, delayWaitEndAnim);
             }
-            if (data.action == "unselect") {
+            else if (data.action == "unselect") {
                 $xui.unDisplaySelector();
             }
-            if (data.action == "drop") {
+            else if (data.action == "drop") {
                 if ($xui.dragItem != null) {
                     // gestion drag de nouveau component sur l'Iframe
-                    $xui.displayPropertiesJS(data.xid, data.xid_slot);
+//                    $xui.displayPropertiesJS(data.xid, data.xid_slot);
                     $xui.displayComponents(data.xid, data.xid_slot);
                     $xui.addCmp($xui.dragItem);
                 }
@@ -58,38 +58,53 @@ export class EventManager {
                     $xui.moveTo(data);
                 }
             }
-            if (data.action == "ctrlQ") {
+            else if (data.action == "ctrlP") {
                 $xui.modePreview();  // fermeture 
             }
-
-            if (data.action == "updateDirectProp") {
+            else if (data.action == "ctrlX") {
+                $xui.cutCmp();
+            }
+            else if (data.action == "ctrlC") {
+                $xui.copyCmp();
+            }
+            else if (data.action == "ctrlV") {
+                if (!$xui.rootdata.pasteDisabled) {
+                    $xui.pasteTo();
+                }
+            }
+            else if (data.action == "ctrlZ") {
+                if (!$xui.rootdata.undoDisabled) {
+                    $xui.undo();
+                }
+            }
+            else if (data.action == "ctrlY") {
+                if (!$xui.rootdata.redoDisabled) {
+                    $xui.redo();
+                }
+            }
+            else if (data.action == "updateDirectProp") {
                 $xui.unDisplaySelector();
                 $xui.updateDirectProperty(data.value, data.variable, data.xid);
             }
-
             // gestion d'un hot load reloader
-            if (data.action == "load reloader") {
+            else if (data.action == "load reloader") {
                 var infoFileCmp = getInfoFile('template');
-                infoFileCmp.part=data.xid;
+                infoFileCmp.part = data.xid;
                 //  { file: "app/frame1.html", xid: "root", mode: 'template',  part:data.xid };
                 var prom = getPromise("getVueCmp")
                 $xui.getHtmlFrom(infoFileCmp, "getVueCmp");
                 prom.then(template => {
-                  document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeReloader", "xid": data.xid , "template": template }, "*");
+                    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeReloader", "xid": data.xid, "template": template }, "*");
                 })
             }
-
-            if (data.action == "reloader finish")
-            {
-               // this.console.debug("reloader finish");
+            else if (data.action == "reloader finish") {
+                // this.console.debug("reloader finish");
                 $xui.doPromiseJS("changePageFinish");
             }
-
             // ajoute un composant vueJS depuis un fichier XUI (ex: xui-split-1)
-            if (data.action == "getCmpForFile")
-            {
+            else if (data.action == "getCmpForFile") {
                 //this.console.debug("***********getCmpForFile***********", data);
-                var act = "returnCmpForFile_"+data.infoFileCmp.file+"_"+data.infoFileCmp.xid;
+                var act = "returnCmpForFile_" + data.infoFileCmp.file + "_" + data.infoFileCmp.xid;
 
                 var prom = getPromise(act)
                 $xui.getHtmlFrom(data.infoFileCmp, act);

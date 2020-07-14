@@ -55,7 +55,7 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <div xid="xui-session" class="[[class]]" -style="[[style]]" xui-for="idxr">
+    <div xid="xui-session" class="[[class]]" -style="[[style]];flex: 1 0 auto" xui-for="idxr">
         <xui-slot xui-reloader=true xid="[[parent-xid]]-session-[[idxr@0+]]"  xui-slot-name="session">
             <session class="xui-session [[class@-1]]" -style="[[style@-1]]">
                 <xui-slot xui-slot-full xid="[[parent-xid]]-item" xui-slot-name="session [[idxr@0+]]"></xui-slot>
@@ -79,6 +79,7 @@
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
+        <xui-prop id="add-remove">incNb</xui-prop>
 
         <xui-prop var="nb" def="3" editor="int">nb de slots</xui-prop>
         
@@ -102,6 +103,7 @@
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
+
 
     <v-list xid="xui-list" xui-for="idxr" 
         class="[[class]]"
@@ -320,6 +322,10 @@
 
         <xui-prop var="nb" def="2" editor="int">nb de lignes</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
+        <xui-prop var="fluid" editor="bool">fluid (fill width)</xui-prop>
+        <xui-prop var="dense" editor="bool">dense gutters</xui-prop>
+        <xui-prop var="no-gutters" editor="bool">no gutters</xui-prop>
+
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
@@ -328,15 +334,14 @@
         <xui-prop id="name">Grid Row</xui-prop>
         <xui-prop id="desc">Une ligne</xui-prop>
         <xui-prop var="nb" editor="int">nb col dans la ligne</xui-prop>
-
+   
         <xui-prop var="justify" editor="combo"
         list='["start", "center", "end", "space-between", "space-around"]'>justify (horiz.)</xui-prop>  
         <xui-prop var="align" editor="combo"
         list='["start", "center", "end", "baseline", "stretch"]'>align cell  (vert.)</xui-prop>
         <xui-prop var="align-content" editor="combo"
         list='["start", "center", "end", "space-between", "space-around", "stretch"]'>align content (vert.)</xui-prop>  
-    
-        
+     
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style (ex: height:100%)</xui-prop>
     </xui-doc>
@@ -349,10 +354,11 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-container xid="xui-grid-responsive" fill-height=[[fill-height]] class="xui-grid [[class]]" -style="[[style]]" xui-for="idxr">
+    <v-container xid="xui-grid-responsive" fluid=[[fluid]] fill-height=[[fill-height]] class="xui-grid [[class]]" -style="[[style]]" xui-for="idxr">
         <v-row class="[[class@-1]]"
                -style="[[style@-1]]"
-               no-gutters
+               no-gutters="[[no-gutters@1]]"
+               dense="[[dense@1]]"
                align="[[align@-1]]"
                align-content="[[align-content@-1]]"
                justify="[[justify@-1]]">
@@ -368,9 +374,7 @@
 
     <xui-design xid="inject-style">
         <style xui-no-dom>
-            .xui-grid {
-                padding: 0px 0px;
-                margin: 0px 0px;
+            .xui-grid2 {
                 max-width: unset;
             }
         </style>
@@ -404,7 +408,7 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-container xid="xui-form-1" xui-for="idxr" class="xui-form [[class]]" -style="[[style]]">
+    <v-container xid="xui-form-1" xui-for="idxr" fuild class="xui-form [[class]]" -style="[[style]]">
         <v-row class="xui-form-gutter [[class@-1]]" -style="[[style@-1]]">
             <xui-form-row-1 xid="[[parent-xid]]-row-[[idxr@2]]" xui-nb="1" xui-slot-name="row [[idxr@2]]">
             </xui-form-row-1>
@@ -419,9 +423,6 @@
 
     <xui-design xid="inject-style">
         <style xui-no-dom>
-            .xui-form {
-                max-width: unset;
-            }
 
             .xui-form-gutter>.col,
             .xui-form-gutter>[class*=col-] {
@@ -448,10 +449,18 @@
 
         <xui-prop var="color" editor="text">color</xui-prop>
         <xui-prop var="background-color" editor="text">background color</xui-prop>
-
-
+        <xui-prop var="slider-color" editor="text">slider color</xui-prop>
         <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
         <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+
+        <xui-prop var="icons-and-text" editor="bool">stack icon and text vertically</xui-prop>
+        <xui-prop var="show-arrows" editor="bool">show arrows</xui-prop>
+        <xui-prop var="center-active" editor="bool">center tab active</xui-prop>
+        
+        <xui-prop var="fixed-tabs" editor="bool">fixed tabs</xui-prop>
+        <xui-prop var="centered" editor="bool">centered</xui-prop>
+        <xui-prop var="right" editor="bool">right</xui-prop>
+    
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
@@ -460,6 +469,7 @@
         <xui-prop id="favorite">text;icon;composer</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
         <xui-prop id="include"></xui-prop>
+        <xui-prop id="add-remove">incNb</xui-prop>
 
         <xui-prop id="name">Tab</xui-prop>
         <xui-prop id="desc">Titre de l'onglet</xui-prop>
@@ -471,12 +481,22 @@
         <xui-prop id="favorite">container</xui-prop>
     </xui-doc>
 
-    <v-tabs class="[[fill-height]] [[class]]" -style="[[style]]" xid="xui-tabs" 
+    <v-tabs xid="xui-tabs" class="[[fill-height]] [[class]]" -style="[[style]]"  
         vertical=[[vertical]] 
         dark="[[dark]]"
+        light="[[light]]"
         color="[[color]]"
         background-color="[[background-color]]"
-        light="[[light]]"
+        slider-color="[[slider-color]]"
+
+        icons-and-text="[[icons-and-text]]"
+        show-arrows="[[show-arrows]]"
+        fixed-tabs="[[fixed-tabs]]"
+        centered="[[centered]]"
+        right="[[right]]"
+
+        center-active="[[center-active]]"
+
         xui-for="idx">
         <v-tab>
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-[[idx@0+]]" xui-slot-name="tab [[idx@0+]]"></xui-slot>
@@ -612,13 +632,13 @@
             .xui-class-slot {
                 border: 1px dashed lightgray;
                 box-sizing: border-box;
-                min-height: 20px;
-                min-width: 20px;
+                min-height: 15px;
+                min-width: 15px;
                 text-decoration: underline dotted;
                 font-style: italic;
                 user-select: none;
                 cursor : pointer;
-                opacity: .6;
+                opacity: .7;
                 white-space: nowrap;
                 overflow: hidden;
             }

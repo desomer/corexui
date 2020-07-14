@@ -11,11 +11,13 @@ class SlotInfoJS {
   external String get slotname;
   external String get docId;
   external String get idRessource;
+  external String get addRemoveAction;
   external set xid(String xid);
-  external set parentXid(String xid);
-  external set slotname(String xid);
-  external set docId(String xid);
-  external set idRessource(String xid);
+  external set parentXid(String parentXid);
+  external set slotname(String slotname);
+  external set docId(String docId);
+  external set idRessource(String idRessource);
+  external set addRemoveAction(String addRemoveAction);
 }
 
 @JS()

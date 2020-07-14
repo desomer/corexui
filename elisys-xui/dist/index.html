@@ -7,7 +7,7 @@
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" type="text/css"></link>
       <script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
       <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.x/themes/prism.css"></link>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css"></link>
       <link rel="stylesheet" href="app/frameDesigner.css" type="text/css"></link>
       <script defer src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
    </head>
@@ -16,7 +16,7 @@
          <v-app>
             <v-navigation-drawer v-model="navdrawer" app temporary>
             </v-navigation-drawer>
-            <v-app-bar color="#ff5900" app height="32px" dark>
+            <v-app-bar color="#ff5900" app height="32" dark>
                <v-app-bar-nav-icon @click.stop="navdrawer = !navdrawer"></v-app-bar-nav-icon>
                <v-toolbar-title>
                   <span class="xui-path-component">{{selectedxui}}</span>
@@ -36,7 +36,7 @@
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
             </v-app-bar>
-            <v-content style="background:">
+            <v-main style="background:" class="fill-height">
                <v-tabs v-model="activeTab" vertical class="main-tab" dark>
                   <v-tab>
                      <v-icon>mdi-square-edit-outline</v-icon>
@@ -188,13 +188,16 @@
                      </v-card-actions>
                   </v-card>
                </v-dialog>
-            </v-content>
-            <v-footer app color="#ff5900" style="padding: 0px 10px;" :height="heightFooter" dark>
+            </v-main>
+            <v-footer app color="#ff5900" style="padding: 0px 10px;" height="32" dark>
                <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
                <v-btn small class="xui-btn-action" @click="$xui.cutCmp()">
                   <v-icon>mdi-content-cut</v-icon>
+               </v-btn>
+               <v-btn small class="xui-btn-action" @click="$xui.copyCmp()">
+                  <v-icon>mdi-content-copy</v-icon>
                </v-btn>
                <v-btn small :disabled="pasteDisabled" class="xui-btn-action" @click="$xui.pasteTo()">
                   <v-icon>mdi-content-paste</v-icon>
@@ -233,7 +236,6 @@
 			$xui = {};
 
 		$xui.rootdata = {
-			heightFooter: 32,
 			navdrawer: false
 		};
 
@@ -252,12 +254,12 @@
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
     
-            $xui.initComponentVuejs.push(() => {
-                new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
-                    "vue-xui-split");
-            }
-            );
-        
+        $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
+            new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
+                "vue-xui-split");
+        }
+        );
+    
 
             var listDesignClass = [
                 {
@@ -320,13 +322,13 @@
                     open: false,
                     nb: "0",
                     listClass: [
-                        { sel: false, text: 'all', value: 'pa', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'x', value: 'px', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'y', value: 'py', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'top', value: 'pt', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'bottom', value: 'pb', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'left', value: 'pl', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'right', value: 'pr', type: 'list', vl: '1', list: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'all', value: 'pa', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'x', value: 'px', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'y', value: 'py', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'top', value: 'pt', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'bottom', value: 'pb', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'left', value: 'pl', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'right', value: 'pr', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
                     ],
                 },
                 {
@@ -411,32 +413,28 @@
            </script>
    <style id="xui-style">
 
-            /* .v-navigation-drawer__content {
-                color: rgba(0, 0, 0, 0); 
-                transition: color .5s ease;
-            }
+			.v-main__wrap {
+				display: contents;
+				height: 100%;
+			}
+		
+			.v-navigation-drawer__content::-webkit-scrollbar {
+				width: 10px;
+			}
 
-            .v-navigation-drawer__content:hover {
-                color: rgba(0, 0, 0, 0.2); 
-            } */
+			.v-navigation-drawer__content::-webkit-scrollbar-track {
+				box-shadow: inset 0 0 6px 0px rgba(0, 0, 0, 0.1);
+			}
 
-            .v-navigation-drawer__content::-webkit-scrollbar {
-                width: 10px;
-            }
+			.v-navigation-drawer__content:hover::-webkit-scrollbar-track {
+				box-shadow: inset 0 0 6px 0px rgba(0, 0, 0, 0.3);
+			}
 
-            .v-navigation-drawer__content::-webkit-scrollbar-track {
-                box-shadow: inset 0 0 6px 0px  rgba(0, 0, 0, 0.1);
-            }
-            .v-navigation-drawer__content:hover::-webkit-scrollbar-track {
-               box-shadow: inset 0 0 6px 0px  rgba(0, 0, 0, 0.3);
-            }
-
-            .v-navigation-drawer__content::-webkit-scrollbar-thumb {
-                box-shadow: inset 0 0 15px 0px;
-                border-radius: 5px;
-            }
-
-        
+			.v-navigation-drawer__content::-webkit-scrollbar-thumb {
+				box-shadow: inset 0 0 15px 0px;
+				border-radius: 5px;
+			}
+		
             .xui-session {
                 display: block;
             }
@@ -503,8 +501,6 @@
 
         
             .xui-grid {
-                padding: 0px 0px;
-                margin: 0px 0px;
                 max-width: unset;
             }
         
@@ -539,10 +535,9 @@
                 height: 100%;
                 width: 100%;
             }
-            .xui-fill-height {
-                position: absolute; top:0px; bottom:0px;
-                width:100%;
-            }
+            .xui-p-relative {position:relative}
+            .xui-p-absolute {position:absolute}
+
             .xui-overflow {
                 overflow: auto;
                 width:100%;

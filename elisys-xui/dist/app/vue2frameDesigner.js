@@ -89,11 +89,15 @@ window.addEventListener('message', function (e) {
     var data = e.data;
     if (data.action == "changeTemplate") {
         if (data.param.listReloader != null) {
-            this.console.info("changeTemplate event reloader", data.param);
-            if ($xui.listReloader[data.param.listReloader[0]] != null)
-                $xui.listReloader[data.param.listReloader[0]].reload();
+            var uniqReloader = [...new Set(data.param.listReloader)];
+            this.console.info("changeTemplate event reloader", data.param.listReloader);
+
+            for (const idReloader of uniqReloader) {
+                if ($xui.listReloader[idReloader] != null)
+                $xui.listReloader[idReloader].reload();
             else
-                this.console.error("+-+-+-+-+-+-+-+-+ pb reloader inconnu", data.param.listReloader, $xui.listReloader);
+                this.console.error("+-+-+-+-+-+-+-+-+ pb reloader inconnu", idReloader, $xui.listReloader);
+            }
         }
         else {
             this.console.info("changeTemplate event all", data.param);
@@ -132,6 +136,12 @@ $xui.updateDirectPropInnerText = (event, variable, xid, selectAll) => {
     window.parent.postMessage(message, "*");
 }
 
+$xui.updateDirectPropBlur = () =>
+{
+    window.getSelection().removeAllRanges();
+} 
+
+// ne sert plus
 $xui.updateDirectPropValue = (value, variable, xid) => {
     var message = {
         action: "updateDirectProp",
@@ -142,6 +152,7 @@ $xui.updateDirectPropValue = (value, variable, xid) => {
     };
     window.parent.postMessage(message, "*");
 }
+
 
 window.getInfoForSelector = (selector, parent) => {
     var targetAction = document.querySelector(selector)
@@ -155,6 +166,8 @@ window.getInfoForSelector = (selector, parent) => {
     let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
 
     var ret = {
+        selector : selector,
+        parent : parent,
         hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
         height: elemRect.height,
         width: elemRect.width,

@@ -17,17 +17,6 @@ html::-webkit-scrollbar {
 }
 
 /*********************************************************/
-.main-tab > * > * > * > .v-tab {
-    min-width: 40px;
-    width: 40px;
-    height: 40px !important;
-}
-
-.tab-action > * > * > * > .v-tab {
-    min-width: 40px;
-    width: 40px;
-}
-
 .main-container { 
     height: calc(100vh - 64px - 32px);
     width: 100%;
@@ -36,6 +25,33 @@ html::-webkit-scrollbar {
     grid-template-rows: 100%; 
     }
  
+
+.main-tab > * > * > * > .v-tab {
+    min-width: 40px;
+    width: 40px;
+    height: 40px !important;
+}
+
+.main-tab > .v-tabs-items
+{
+    height : 100%    /* teb vertical */
+}
+
+.tab-action > .v-tabs-items
+{
+    height: calc(100% - 40px)
+}
+
+.tab-editor > .v-tabs-items
+{
+    height: calc(100% - 40px)
+}
+
+.tab-action > * > * > * > .v-tab {
+    min-width: 40px;
+    width: 40px;
+}
+
 /* container de l'Iframe */    
 .main-item-2 {
     border: 1px solid #cecece;
@@ -46,7 +62,8 @@ html::-webkit-scrollbar {
 #rootFrame { width:100%; height:100%; position:relative; border: 0px; padding: 0px; margin: 0px;}
 
 .iframe-phone {
-    width : 330px !important
+    width : 414px !important;
+    max-height : 736px;
 }
 
 .main-code {
@@ -60,19 +77,20 @@ pre, code {
 }
 pre {
     overflow: auto;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 pre > code {
     display: block;
-    padding: 1rem;
-    word-wrap: normal;
     position: absolute;
     right: 0px;
     height: 100%;
     width: 100%;
-    overflow: auto;
     color: black !important;
     white-space: unset !important;
     font-weight: unset !important;
+    background-color: unset !important;
 }
 
 /*************************************************************/

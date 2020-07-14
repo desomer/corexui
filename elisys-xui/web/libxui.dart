@@ -3,9 +3,9 @@ library xuiapp;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:html';
 import 'dart:js';
-import 'dart:math';
 
 import 'package:js/js.dart';
 
@@ -36,6 +36,9 @@ external set _getHtmlFrom(void Function(FileDesignInfo, String) f);
 @JS('cutDesign')
 external set _cutDesign(void Function(FileDesignInfo, String) f);
 
+@JS('copyDesign')
+external set _copyDesign(void Function(FileDesignInfo, String) f);
+
 @JS('deleteDesign')
 external set _deleteDesign(void Function(FileDesignInfo, String) f);
 
@@ -45,6 +48,9 @@ external set _surroundDesign(
 
 @JS('moveDesign')
 external set _moveDesign(void Function(FileDesignInfo, String, String) f);
+
+@JS('insertChild')
+external set _insertChild(void Function(FileDesignInfo, String) f);
 
 @JS('getInfo')
 external set _getInfo(dynamic Function(FileDesignInfo, String, String) f);
@@ -118,7 +124,8 @@ dynamic getComponents(FileDesignInfo fileInfo, String id, String idslot) {
 
 /// retourne les info d'un xid
 dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
-  var info = getDesignManager(fileInfo).xuiEngine.getSlotInfo(id, idslot);
+  var engine = getDesignManager(fileInfo).xuiEngine;
+  var info = engine.getSlotInfo(id, idslot);
 
   var InfoJS = SlotInfoJS();
   if (info != null) {
@@ -127,6 +134,18 @@ dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
     InfoJS.parentXid = info.parentXid;
     InfoJS.slotname = info.slotname;
     InfoJS.xid = info.xid;
+    DocInfo doc = engine.docInfo[info.docId];
+    if (doc==null)
+    {
+        //recherche la doc du parent
+        int idx=info.docId.indexOf(":");
+        if (idx>0)
+        {
+          var docId=info.docId.substring(idx+1);
+          doc = engine.docInfo[docId];
+        }
+    }
+    InfoJS.addRemoveAction = doc?.addRemove;
   }
   return InfoJS;
 }
@@ -138,12 +157,9 @@ void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
 
   if (!reload && init == true) {
     var ctx = XUIContext(fileInfo.mode);
-    // SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
-    // print("initHtml addDesign " +fileInfo.xid + " >> " + info.parentXid );
-    // fileInfo.xid=info.parentXid;
     await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
   } else {
-    if (id != XUI_TRASHCAN_SLOT) designMgr.listXidChanged.add(id);
+    if (id != XUI_COPYZONE_SLOT) designMgr.listXidChanged.add(id);
     if (reload) {
       // voir removeDesign  : evite de faire 2 reload
       await _reload(fileInfo);
@@ -152,9 +168,9 @@ void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
 }
 
 ///****************************************************************** */
-String getContentTrashcanID(XUIDesignManager designMgr) {
+String getContentCopyZoneID(XUIDesignManager designMgr) {
   SlotInfo infoTrash =
-      designMgr.xuiEngine.getSlotInfo(XUI_TRASHCAN_SLOT, XUI_TRASHCAN_SLOT);
+      designMgr.xuiEngine.getSlotInfo(XUI_COPYZONE_SLOT, XUI_COPYZONE_SLOT);
 
   XUIElementHTML contentTrash = infoTrash?.elementHTML?.children?.first;
   var lastDeleteXid = contentTrash?.originElemXUI?.xid;
@@ -175,22 +191,48 @@ void cutDesign(FileDesignInfo fileInfo, String id) async {
 
   SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
 
-  String lastDeleteXid = getContentTrashcanID(designMgr);
+  String lastCopyXid = getContentCopyZoneID(designMgr);
 
-  if (lastDeleteXid != null) {
+  if (lastCopyXid != null) {
     // supprime la vielle trashcan
-    designMgr.removeDesign(lastDeleteXid, null);
+    designMgr.removeDesign(lastCopyXid, null);
   }
 
   // ajoute un design a la trashcan
-  String slot = "<xui-design xid=\"" + XUI_TRASHCAN_SLOT + "\"></xui-design>";
-  await addDesign(fileInfo, XUI_TRASHCAN_SLOT, slot, false, true);
+  String slot = "<xui-design xid=\"" + XUI_COPYZONE_SLOT + "\"></xui-design>";
+  await addDesign(fileInfo, XUI_COPYZONE_SLOT, slot, false,
+      true); //todo ajout direct xuiDesign
 
   // move id vers la trashcan
-  designMgr.moveDesign(id, null, XUI_TRASHCAN_SLOT);
+  designMgr.moveDesign(id, null, XUI_COPYZONE_SLOT);
 
   // lance le reload
   designMgr.listXidChanged.add(info.parentXid);
+  await _reload(fileInfo);
+}
+
+void copyDesign(FileDesignInfo fileInfo, String id) async {
+  XUIDesignManager designMgr = getDesignManager(fileInfo);
+
+  String lastCopyXid = getContentCopyZoneID(designMgr);
+
+  if (lastCopyXid != null) {
+    // supprime la vielle trashcan
+    designMgr.removeDesign(lastCopyXid, null);
+  }
+
+  // ajoute un design a la trashcan
+  String slot = "<xui-design xid=\"" + XUI_COPYZONE_SLOT + "\"></xui-design>";
+  await addDesign(fileInfo, XUI_COPYZONE_SLOT, slot, false, true);
+
+  // designMgr.addDesignEmpty(XUI_COPYZONE_SLOT);   // a terminer
+  //todo ajout direct xuiDesign
+
+  // move id vers la trashcan
+  designMgr.cloneDesign(id, XUI_COPYZONE_SLOT, null);
+
+  // lance le reload
+  designMgr.listXidChanged.add(id);
   await _reload(fileInfo);
 }
 
@@ -201,6 +243,7 @@ void surroundDesign(FileDesignInfo fileInfo, String id, String template,
   SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
   // ajoute un design au tempory
   String slot = "<xui-design xid=\"" + XUI_TEMPORARY_SLOT + "\"></xui-design>";
+  //todo ajout direct xuiDesign
   await addDesign(fileInfo, XUI_TEMPORARY_SLOT, slot, false, true);
 
   // move id vers la tempory
@@ -209,7 +252,9 @@ void surroundDesign(FileDesignInfo fileInfo, String id, String template,
   await addDesign(fileInfo, info.parentXid, template, false, true);
 
   String targetXid = xidSurround + "-col-0";
-  String slotTarget = "<xui-design xid=\"" + targetXid + "\"></xui-design>";
+  String slotTarget = "<xui-design xid=\"" +
+      targetXid +
+      "\"></xui-design>"; //todo ajout direct xuiDesign
   await addDesign(fileInfo, targetXid, slotTarget, false, true);
 
   designMgr.moveDesign(id, null, targetXid);
@@ -223,19 +268,19 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
   XUIDesignManager designMgr = getDesignManager(fileInfo);
 
   if (id == null) {
-    // gestion du paste
-    id = getContentTrashcanID(designMgr);
+    // gestion du move avec clone ( ex : copy, paste)
+    id = getContentCopyZoneID(designMgr);
 
-    String idClone = getNewXid(idMoveTo, "clone");
-
-    designMgr.cloneDesign(id, idMoveTo, null, idClone);
+    designMgr.cloneDesign(id, idMoveTo, null);
     designMgr.listXidChanged.add(idMoveTo);
 
     await _reload(fileInfo);
   } else {
+    // gestion du move (ex : drag)
     // ajoute le design qui doit recevoir le composant
     String slot = "<xui-design xid=\"" + idMoveTo + "\"></xui-design>";
-    await addDesign(fileInfo, idMoveTo, slot, false, true);
+    await addDesign(
+        fileInfo, idMoveTo, slot, false, true); //todo ajout direct xuiDesign
     designMgr.moveDesign(id, null, idMoveTo);
     designMgr.listXidChanged.add(id);
     designMgr.listXidChanged.add(idMoveTo);
@@ -244,14 +289,31 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
   }
 }
 
-String getNewXid(String xidParent, String nameCmp) {
-  var d = DateTime.now().millisecondsSinceEpoch.toString();
-  d += Random().nextInt(100).toString();
+void insertChild(FileDesignInfo fileInfo, String idSlot) async {
+    var designManager = getDesignManager(fileInfo);
+    SlotInfo infoSlot = designManager.xuiEngine.getSlotInfo(idSlot, idSlot);
+    SlotInfo infoContainer = designManager.xuiEngine.getSlotInfo(infoSlot.parentXid, infoSlot.parentXid);
+    var nbItem = int. parse(infoContainer.elementHTML.propertiesXUI["nb"].content);
+    print(idSlot +" nbItem "+nbItem.toString());
+    inspect(infoContainer);
 
-  var idxUUID = xidParent.indexOf("_");
-  var pxid = idxUUID == -1 ? xidParent : (xidParent.substring(0, idxUUID));
-  var ret = pxid + "-" + nameCmp.replaceFirst("xui-", "") + "_" + d;
-  return ret;
+    var idx = idSlot.lastIndexOf("-")+1;
+    var suffix = idSlot.substring(0, idx);
+    var prefix = idSlot.substring(idx);
+    var startItem = int. parse( prefix );
+    for (var i = startItem; i < nbItem; i++) {
+        var idSlotToMove = suffix + i.toString();
+        var idSlotToDest = suffix + (i+1).toString();
+        //SlotInfo infoSlot = designManager.xuiEngine.getSlotInfo(idSlotToMove, idSlotToMove);
+        //
+        var listDesign = designManager.xuiEngine.xuiFile.designs[idSlotToMove];
+        if (listDesign != null) {
+            var xuiDesign = listDesign.sort(designManager.xuiEngine.xuiFile.context).first;
+            var id = ((xuiDesign.elemXUI.children.first) as XUIElementXUI).xid;
+            print("move => " + id + " to " + idSlotToDest);
+            inspect(xuiDesign.elemXUI);
+        }
+    }
 }
 
 Future refresh(FileDesignInfo fileInfo) async {
@@ -319,15 +381,14 @@ void _reload(FileDesignInfo fileInfo) async {
     var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
     options.html = str;
   } else {
-    //print("initHtml _reload " +fileInfo.xid );
     await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
     options.listReloader = listReloader;
   }
 
-  String dataXui = JsonEncoder.withIndent('   ')
+  String dataXui = JsonEncoder.withIndent('   ') //null
       .convert(designMgr.xuiEngine.xuiFile.getObject());
-  //final yamld = toYamlString(designMgr.xuiEngine.xuiFile.getObject());
-  options.xuidata = dataXui; //yamld.toString();
+
+  options.xuidata = dataXui;
   options.xuifile = HTMLWriter().toHTMLString(designMgr.xuiEngine.xuiFile);
   options.action = fileInfo.action;
   changePageJS(options);
@@ -341,8 +402,10 @@ void main() async {
   _refresh = allowInterop(refresh);
   _addDesign = allowInterop(addDesign);
   _cutDesign = allowInterop(cutDesign);
+  _copyDesign = allowInterop(copyDesign);
   _surroundDesign = allowInterop(surroundDesign);
   _moveDesign = allowInterop(moveDesign);
+  _insertChild = allowInterop(insertChild);
   _getInfo = allowInterop(getInfo);
   _getDesignProperties = allowInterop(getDesignProperties);
   _setDesignProperties = allowInterop(setDesignProperties);
@@ -350,26 +413,6 @@ void main() async {
   _getHtmlFrom = allowInterop(getHtmlFrom);
   _deleteDesign = allowInterop(deleteDesign);
   _initPage = allowInterop(initPage);
-
-  // FileDesignInfo fileInfo = FileDesignInfo();
-  // fileInfo.file = 'app/frame1.html';
-  // fileInfo.xid = 'root';
-
-  //initPage(fileInfo);
-
-  // var w = Worker('libxuiworker.js');   //libxuiworker.dart.js
-
-  // // Listen to Worker's postMessage().
-  // // dart.html convert the callback to a Stream.
-  // w.onMessage.listen((msg) {
-  //   print('master took back '+msg.data);
-  // });
-
-  // // After one second, post a message to the Worker.
-  // new Timer(Duration(seconds:10), () {
-  //   print("-------------SEND  --------------");
-  //   w.postMessage("ok");
-  // });
 }
 
 Future initPage(FileDesignInfo fileInfo) async {

@@ -254,43 +254,55 @@ $xui.deleteCmp = () => {
     }
 }
 
-$xui.cutCmp = (forMove) => {
+$xui.copyCmp = () => {
 
     if ($xui.propertiesDesign.isSlot) {
-        console.debug("deleteCmp slot impossible");
+        console.debug("copyCmp slot impossible");
         return false;
     }
     else {
-        if (!forMove)
-            $xui.setCurrentAction("cutCmp");
+        $xui.setCurrentAction("copyCmp");
+        $xui.copyDesign(getInfoFile("template"), $xui.propertiesDesign.xid);
+        $xui.rootdata.pasteDisabled = false;
+        return true;
+    }
+}
 
+$xui.cutCmp = () => {
+
+    if ($xui.propertiesDesign.isSlot) {
+        console.debug("cutCmp slot impossible");
+        return false;
+    }
+    else {
+        $xui.setCurrentAction("cutCmp");
         $xui.cutDesign(getInfoFile("template"), $xui.propertiesDesign.xid);
         $xui.rootdata.pasteDisabled = false;
         return true;
     }
 }
 
-$xui.pasteTo = (forMove) => {
-    if (forMove) {
-        $xui.setCurrentAction("movePasteTo");
-    }
-    else
-        $xui.setCurrentAction("pasteTo");
+$xui.pasteTo = () => {
+    $xui.setCurrentAction("pasteTo");
 
     let infoFile = getInfoFile("template");
     var info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xui.moveDesign(infoFile, null, info.xid);
-    $xui.rootdata.pasteDisabled = true;
+   // $xui.rootdata.pasteDisabled = true;
 }
 
 $xui.moveTo = (data) => {
-    if ($xui.cutCmp(true)) {   // suppression de source
-        // selection de la target
-        var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
-        prom.then(() => {
-            $xui.pasteTo(true);
-        })
-    }
+    let infoFile = getInfoFile("template");
+    var info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    $xui.moveDesign(infoFile, info.xid, data.xid_slot);
+
+    // if ($xui.cutCmp(true)) {   // suppression de source
+    //     // selection de la target
+    //     var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
+    //     prom.then(() => {
+    //         $xui.pasteTo(true);
+    //     })
+    // }
 }
 
 $xui.addAction = () => {

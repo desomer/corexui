@@ -55,7 +55,7 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <div xid="xui-session" class="[[class]]" -style="[[style]]" xui-for="idxr">
+    <div xid="xui-session" class="[[class]]" -style="[[style]];flex: 1 0 auto" xui-for="idxr">
         <xui-slot xui-reloader=true xid="[[parent-xid]]-session-[[idxr@0+]]"  xui-slot-name="session">
             <session class="xui-session [[class@-1]]" -style="[[style@-1]]">
                 <xui-slot xui-slot-full xid="[[parent-xid]]-item" xui-slot-name="session [[idxr@0+]]"></xui-slot>
@@ -139,7 +139,7 @@
 
 
         <xui-prop var="nb" def="2" editor="int">nb de cellules</xui-prop>
-        <xui-prop var="xui-fill-height" editor="bool">force fill height</xui-prop>
+        <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
         
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style (ex: height:100%)</xui-prop>
@@ -153,7 +153,7 @@
         <xui-prop var="style" cat="style" editor="style">style (ex: height:100%)</xui-prop>
     </xui-doc>
 
-    <div xid="xui-grid-layout-1" xui-for="idxc" class="xui-column-layout [[xui-fill-height]] [[class]]" 
+    <div xid="xui-grid-layout-1" xui-for="idxc" class="xui-column-layout [[fill-height]] [[class]]" 
         -style="grid-template-rows:[[rows]];grid-template-columns:[[cols]];grid-template-areas:[[area]];[[style]]">
         <div -style="display:content;grid-area:c[[idxc@1]];[[style@-1]]" class="[[class@-1]]">
             <xui-slot style-slot="height:100%" xid="[[parent-xid]]-col-[[idxc@0+]]"  
@@ -320,6 +320,10 @@
 
         <xui-prop var="nb" def="2" editor="int">nb de lignes</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
+        <xui-prop var="fluid" editor="bool">fluid (fill width)</xui-prop>
+        <xui-prop var="dense" editor="bool">dense gutters</xui-prop>
+        <xui-prop var="no-gutters" editor="bool">no gutters</xui-prop>
+
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
@@ -328,15 +332,14 @@
         <xui-prop id="name">Grid Row</xui-prop>
         <xui-prop id="desc">Une ligne</xui-prop>
         <xui-prop var="nb" editor="int">nb col dans la ligne</xui-prop>
-
+   
         <xui-prop var="justify" editor="combo"
         list='["start", "center", "end", "space-between", "space-around"]'>justify (horiz.)</xui-prop>  
         <xui-prop var="align" editor="combo"
         list='["start", "center", "end", "baseline", "stretch"]'>align cell  (vert.)</xui-prop>
         <xui-prop var="align-content" editor="combo"
         list='["start", "center", "end", "space-between", "space-around", "stretch"]'>align content (vert.)</xui-prop>  
-    
-        
+     
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style (ex: height:100%)</xui-prop>
     </xui-doc>
@@ -349,10 +352,11 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-container xid="xui-grid-responsive" fill-height=[[fill-height]] class="xui-grid [[class]]" -style="[[style]]" xui-for="idxr">
+    <v-container xid="xui-grid-responsive" fluid=[[fluid]] fill-height=[[fill-height]] class="xui-grid [[class]]" -style="[[style]]" xui-for="idxr">
         <v-row class="[[class@-1]]"
                -style="[[style@-1]]"
-               no-gutters
+               no-gutters="[[no-gutters@1]]"
+               dense="[[dense@1]]"
                align="[[align@-1]]"
                align-content="[[align-content@-1]]"
                justify="[[justify@-1]]">
@@ -368,9 +372,7 @@
 
     <xui-design xid="inject-style">
         <style xui-no-dom>
-            .xui-grid {
-                padding: 0px 0px;
-                margin: 0px 0px;
+            .xui-grid2 {
                 max-width: unset;
             }
         </style>
@@ -404,7 +406,7 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-container xid="xui-form-1" xui-for="idxr" class="xui-form [[class]]" -style="[[style]]">
+    <v-container xid="xui-form-1" xui-for="idxr" fuild class="xui-form [[class]]" -style="[[style]]">
         <v-row class="xui-form-gutter [[class@-1]]" -style="[[style@-1]]">
             <xui-form-row-1 xid="[[parent-xid]]-row-[[idxr@2]]" xui-nb="1" xui-slot-name="row [[idxr@2]]">
             </xui-form-row-1>
@@ -419,9 +421,6 @@
 
     <xui-design xid="inject-style">
         <style xui-no-dom>
-            .xui-form {
-                max-width: unset;
-            }
 
             .xui-form-gutter>.col,
             .xui-form-gutter>[class*=col-] {
@@ -570,6 +569,22 @@
 
     </v-card>
 
+    <!-------------------------------- SCROLLPANE ---------------------------->
+    <xui-doc xid="xui-scrollpane-1">
+        <xui-prop id="name">ScrollPane</xui-prop>
+        <xui-prop id="icon">mdi-page-layout-sidebar-right</xui-prop>
+        <xui-prop id="desc">Un ScrollPane</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+    
+    <div xid="xui-scrollpane-1" class="fill-height xui-p-relative [[class]]" -style="[[style]]">
+        <div class="xui-p-absolute xui-overflow"> 
+            <xui-slot xid="[[parent-xid]]-scroll" style-slot="height:100%" xui-slot-name="ScrollPane"></xui-slot>
+        </div>
+    </div>
+
     <!--------------------------  XUI-SLOT   ----------------------------->
     <div xid="xui-div-slot" class="xui-class-slot"></div>
 
@@ -579,10 +594,9 @@
                 height: 100%;
                 width: 100%;
             }
-            .xui-fill-height {
-                position: absolute; top:0px; bottom:0px;
-                width:100%;
-            }
+            .xui-p-relative {position:relative}
+            .xui-p-absolute {position:absolute}
+
             .xui-overflow {
                 overflow: auto;
                 width:100%;

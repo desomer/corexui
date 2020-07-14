@@ -8,6 +8,7 @@ import './XUIFactory.dart';
 import './parser/HTMLReader.dart';
 import './parser/ProviderAjax.dart';
 import 'XUIActionManager.dart';
+import 'element/XUIElement.dart';
 import 'element/XUIProperty.dart';
 import './XUIJSInterface.dart';
 
@@ -33,13 +34,14 @@ class XUIDesignManager {
   }
 
   ///------------------------------------------------------------------------------------------
+  /// generation de l'arbre XUIElementHTML avec bufferHtml
   Future<String> getHtml(XUIContext ctx, String uri, String xid) async {
-    var bufferHtml = XUIHtmlBuffer();
     await initEngine(uri, ctx);
 
     if (xid == null) {
       return null;
     }
+    var bufferHtml = XUIHtmlBuffer();
     await xuiEngine.toHTMLString(bufferHtml, xid, ctx);
     return Future.value(bufferHtml.html.toString());
   }
@@ -49,8 +51,7 @@ class XUIDesignManager {
       await lock.synchronized(() async {
         xuiEngine = XUIEngine();
         var provider = ProviderAjax();
-        if (uri.endsWith(".html"))
-        {
+        if (uri.endsWith(".html")) {
           print("initialize file html : read ${uri}");
           var reader = HTMLReader(uri, provider);
           await xuiEngine.initialize(reader, ctx);
@@ -59,6 +60,8 @@ class XUIDesignManager {
     }
   }
 
+  ///------------------------------------------------------------------------------------------
+  /// generation de l'arbre XUIElementHTML sans text
   void initHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
 
@@ -101,8 +104,9 @@ class XUIDesignManager {
     XUIActionManager(xuiEngine).moveDesign(id, mode, moveTo);
   }
 
-  String cloneDesign(String id , String idMove , String mode, String idClone) {
-    XUIActionManager(xuiEngine).cloneDesign(id, idMove, mode, idClone);
+  String cloneDesign(String id, String idMove, String mode) {
+    var cloneInfo = XUICloneDicoItem(id, idMove, null);
+    XUIActionManager(xuiEngine).cloneDesign(cloneInfo, mode);
     return id;
   }
 
@@ -111,57 +115,74 @@ class XUIDesignManager {
     print("${xid} a changer l'attribut <${variable}> par <${value}>");
     var listDesign = xuiEngine.xuiFile.designs[xid];
     if (listDesign == null) {
-      await addDesign(xid, "<xui-design></xui-design>");
+      addDesignEmpty(xid);
       listDesign = xuiEngine.xuiFile.designs[xid];
     }
 
     var xuiDesign = listDesign.sort(xuiEngine.xuiFile.context).first;
 
-    List<DesignInfo> designs = xuiEngine.getDesignInfo(xid, xid);
+    List<DesignInfo> designs = xuiEngine.getDesignInfo(xid, xid, false);
     for (var design in designs) {
       DocInfo doc = design.docInfo;
       if (doc != null && doc.variables.isNotEmpty) {
         for (var aVariable in doc.variables) {
           if (aVariable.id == variable) {
             print(
-                "var ${aVariable.id} def ${aVariable.def} editor ${aVariable.editor} ");
+                "variable xui <${doc.xid}> var <${aVariable.id}> def ${aVariable.def} editor ${aVariable.editor} ");
 
+            bool addValue = true;
+            var elemXui = xuiDesign.elemXUI;
             // affecte les valeur par defaut
             if (aVariable.editor == "bool" && aVariable.def == null) {
-              if (value == false && xuiDesign.elemXUI.propertiesXUI != null) {
+              if (value == false && elemXui.propertiesXUI != null) {
                 // vide la valeur
                 print("retire la variable bool a false");
-                xuiDesign.elemXUI.propertiesXUI.remove(variable);
-                return Future.value();
+                elemXui.propertiesXUI.remove(variable);
+                addValue = false;
               }
             }
 
             // teste si champs vider par la croix
-            if (value == null && xuiDesign.elemXUI.propertiesXUI != null) {
+            if (addValue && value == null && elemXui.propertiesXUI != null) {
               if ((aVariable.editor == "text" || aVariable.editor == "int") &&
                   aVariable.def != null) {
                 value = aVariable.def; // affecte la valeur par defaut
               } else {
                 // vide la valeur
                 print("retire la variable value à null");
-                xuiDesign.elemXUI.propertiesXUI.remove(variable);
-                return Future.value();
+                elemXui.propertiesXUI.remove(variable);
+                addValue = false;
               }
             }
-
-            // creer la propriete vide
-            xuiDesign.elemXUI.propertiesXUI ??= HashMap<String, XUIProperty>();
-            if (xuiDesign.elemXUI.propertiesXUI[variable] == null) {
-              xuiDesign.elemXUI.propertiesXUI[variable] = XUIProperty(null);
+            
+            if (addValue) {
+              // creer la propriete vide
+              elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
+              if (elemXui.propertiesXUI[variable] == null) {
+                elemXui.propertiesXUI[variable] = XUIProperty(null);
+              }
+              // affecte la prop
+              elemXui.propertiesXUI[variable].content = value;
             }
-            // affecte la prop
-            xuiDesign.elemXUI.propertiesXUI[variable].content = value;
           }
         }
+      }
+
+      if (xuiDesign.elemXUI.isEmpty()) {
+        print("delete design <$xid>");
+        xuiEngine.xuiFile.designs.remove(xid);
       }
     }
 
     return Future.value();
+  }
+
+  void addDesignEmpty(String xid) {
+    XUIElementXUI xuiElem = XUIElementXUI();
+    xuiElem.xid = xid;
+    xuiElem.idRessource = xuiEngine.xuiFile.reader.id;
+    xuiEngine.xuiFile.designs[xid] ??= DicoOrdered();
+    xuiEngine.xuiFile.designs[xid].add(XUIDesign(xuiElem, MODE_ALL));
   }
 
   ///------------------------------------------------------------------------------------------
@@ -199,7 +220,7 @@ class XUIDesignManager {
   ///------------------------------------------------------------------------------------------
   Future<JSDesignInfo> getJSDesignInfo(String id, String idslot) async {
     var ret = JSDesignInfo();
-    var designs = xuiEngine.getDesignInfo(id, idslot);
+    var designs = xuiEngine.getDesignInfo(id, idslot, true);
     ret.xid = id;
     ret.xidSlot = idslot;
 
@@ -350,8 +371,8 @@ class XUIDesignManager {
       cacheTemplateEditor[keyCache] = template;
     }
     titleCmp = titleCmp ?? ("xid = " + design.slotInfo.xid);
-    if (design.slotInfo.slotname!=null) {
-       titleCmp = titleCmp + " ("+design.slotInfo.slotname+")";
+    if (design.slotInfo.slotname != null) {
+      titleCmp = titleCmp + " (" + design.slotInfo.slotname + ")";
     }
 
     template = template.replaceAll("##xid##", design.slotInfo.xid);

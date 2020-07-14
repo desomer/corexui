@@ -47,10 +47,10 @@ class NativeSlot extends XUIElementNative {
       xidCal = html.calculatePropertyXUI(html.originElemXUI.xid, null);
     }
 
-    var isSlotButNotTrashcan = slotName != null && xidCal != XUI_TRASHCAN_SLOT;
+    var isSlotButNotCopyzone = slotName != null && xidCal != XUI_COPYZONE_SLOT;
 
-    // si mode design => creer un slot visible si pas d'enfant sauf XUI_TRASHCAN_SLOT
-    if (isModeDesign && html.children == null && isSlotButNotTrashcan) {
+    // si mode design => creer un slot visible si pas d'enfant sauf XUI_COPYZONE_SLOT
+    if (isModeDesign && html.children == null && isSlotButNotCopyzone) {
       var newChild = XUIElementXUI()..tag = TAG_DIV_SLOT;
       newChild.children = [];
       newChild.children.add(XUIElementText()..content = slotName);
@@ -79,7 +79,7 @@ class NativeSlot extends XUIElementNative {
     html.children?.forEach((childHtml) {
 
       // affecte le nom du slot sur les enfants si doit etre accessible (avoir un slot xid)
-      if (isModeDesign && isSlotButNotTrashcan) {
+      if (isModeDesign && isSlotButNotCopyzone) {
         childHtml.attributes ??= HashMap<String, XUIProperty>();
 
         // affecte le xid-slot sur les enfant non slot

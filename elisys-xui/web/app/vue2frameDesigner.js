@@ -136,6 +136,12 @@ $xui.updateDirectPropInnerText = (event, variable, xid, selectAll) => {
     window.parent.postMessage(message, "*");
 }
 
+$xui.updateDirectPropBlur = () =>
+{
+    window.getSelection().removeAllRanges();
+} 
+
+// ne sert plus
 $xui.updateDirectPropValue = (value, variable, xid) => {
     var message = {
         action: "updateDirectProp",
@@ -146,6 +152,7 @@ $xui.updateDirectPropValue = (value, variable, xid) => {
     };
     window.parent.postMessage(message, "*");
 }
+
 
 window.getInfoForSelector = (selector, parent) => {
     var targetAction = document.querySelector(selector)

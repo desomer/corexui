@@ -67,9 +67,19 @@ export class SelectorManager {
             var nodeMargin = document.getElementById("xui-display-selector-margin");
             var posFrame = rootFrame.getBoundingClientRect();
             //console.debug(position);
-            node.style.height = position.height + "px";
+
+            // si survole page (root) = affiche la totalité de la page (même si scroll)
+            if (position.selector=="[data-xid=root]")
+            {
+                position.top=0;
+            }
+            // ne depasse pas de l'iframe
+            var pt =  Math.max(0, position.top);
+            var ph =  Math.min((position.top - pt) + position.height, posFrame.height- pt);
+
+            node.style.height = ph + "px";
             node.style.left = (position.left + posFrame.left) + "px";
-            node.style.top = (position.top + posFrame.top) + "px";
+            node.style.top = (pt + posFrame.top) + "px";
             node.style.width = position.width + "px";
             node.style.display = null;   //affiche la div de selection
 
@@ -150,7 +160,7 @@ export class SelectorManager {
             }
 
             if (!noDisplayProp) {
-                // affiche les properties
+                // affiche les properties sur le click (pas sur le survole des properties)
                 $xui.modeDisplaySelection = true;
                 setTimeout(() => { $xui.displayPropertiesJS(xid, xid_slot); }, 10);
             }
@@ -158,7 +168,7 @@ export class SelectorManager {
     }
 
     /************************************************************************************ */
-    getInfoCmp(targetAction) {
+    getInfoPositionCmp(targetAction) {
         let elemRect = targetAction.getBoundingClientRect();
         let s = document.querySelector("#rootFrame").contentWindow.getComputedStyle(targetAction);
 

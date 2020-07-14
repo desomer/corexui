@@ -40,7 +40,7 @@ const TAG_IMPORT = "xui-import";
 const TAG_DIV_SLOT = "xui-div-slot";
 const TAG_PROP = "xui-prop";
 
-const XUI_TRASHCAN_SLOT = "xui-trashcan-slot";
+const XUI_COPYZONE_SLOT = "xui-copyzone-slot";
 const XUI_TEMPORARY_SLOT = "xui-temporary-slot";
 
 const MODE_ALL = "";
@@ -292,7 +292,9 @@ class XUIResource extends XMLElemReader {
           doc.icon = (prop.children.first as XUIElementText).content;
         } else if (id == "desc") {
           doc.desc = (prop.children.first as XUIElementText).content;
-        }
+        } else if (id == "add-remove") {
+          doc.addRemove = (prop.children.first as XUIElementText).content;
+        } 
       } else if (prop.attributes["var"] != null) {
         DocVariables propDoc = DocVariables();
         propDoc.id = prop.attributes["var"]?.content;
@@ -487,7 +489,7 @@ class XUIEngine {
     return listDoc;
   }
 
-  List<DesignInfo> getDesignInfo(String id, String idslot) {
+  List<DesignInfo> getDesignInfo(String id, String idslot, bool withParent) {
     List<DesignInfo> listDesignInfo = [];
     SlotInfo slotInfo = getSlotInfo(id, idslot);
     if (slotInfo == null) {
@@ -496,14 +498,16 @@ class XUIEngine {
     }
     DocInfo doc = docInfo[slotInfo.docId];
     listDesignInfo.add(DesignInfo(slotInfo, doc));
-    var next = slotInfo.parentXid;
-    while (next != null) {
-      slotInfo = getSlotInfo(next, next);
-      if (slotInfo.elementHTML.tag != TAG_RELOADER) {
-        doc = docInfo[slotInfo.docId];
-        listDesignInfo.add(DesignInfo(slotInfo, doc));
+    if (withParent) {
+      var next = slotInfo.parentXid;
+      while (next != null) {
+        slotInfo = getSlotInfo(next, next);
+        if (slotInfo.elementHTML.tag != TAG_RELOADER) {
+          doc = docInfo[slotInfo.docId];
+          listDesignInfo.add(DesignInfo(slotInfo, doc));
+        }
+        next = slotInfo.parentXid;
       }
-      next = slotInfo.parentXid;
     }
     return listDesignInfo;
   }
@@ -570,6 +574,7 @@ class DocInfo {
   String name;
   String icon;
   String desc;
+  String addRemove;
   List<DocVariables> variables = [];
 }
 

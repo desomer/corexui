@@ -1,13 +1,13 @@
 <xui-factory version="1.0">
 
     <xui-design xid="xui-script-data">
-        <script xui-no-dom>
-            $xui.initComponentVuejs.push(() => {
-                new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
-                    "vue-xui-split");
-            }
-            );
-        </script>
+    <script xui-no-dom>
+        $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
+            new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
+                "vue-xui-split");
+        }
+        );
+    </script>
     </xui-design>
 
     <!------------------------------------------------------------------------------>

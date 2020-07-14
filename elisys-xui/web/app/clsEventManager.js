@@ -33,7 +33,7 @@ export class EventManager {
         window.addEventListener('message', function (e) {
             var data = e.data;
             if (data.action == "select") {
-                this.console.debug(data);
+                //this.console.debug("message select ", data);
                 $xui.displaySelectorByPosition(data.position);
                 $xui.modeDisplaySelection = true;
 
@@ -65,7 +65,7 @@ export class EventManager {
                 $xui.cutCmp();
             }
             else if (data.action == "ctrlC") {
-                alert("ctrlC");
+                $xui.copyCmp();
             }
             else if (data.action == "ctrlV") {
                 if (!$xui.rootdata.pasteDisabled) {
@@ -81,9 +81,6 @@ export class EventManager {
                 if (!$xui.rootdata.redoDisabled) {
                     $xui.redo();
                 }
-            }
-            else if (data.action == "DEL") {
-                $xui.deleteCmp();
             }
             else if (data.action == "updateDirectProp") {
                 $xui.unDisplaySelector();

@@ -14,6 +14,7 @@
 
     <span xid="xui-title-1" class="[[class]]" -style="[[style]]" xui-mode="final;preview">[[text@1]]</span>
     <span xid="xui-title-1" class="[[class]]" -style="[[style]]" contenteditable="true"
+        @blur="$xui.updateDirectPropBlur()"
         @focus="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]', true)"
         @input="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]')" xui-mode="design;template"
         >[[text@1]]</span>
@@ -32,6 +33,7 @@
 
     <div xid="xui-text-1" class="[[class]]" -style="white-space: pre-wrap;[[style]]" xui-mode="final;preview">[[text@1]]</div>
     <div xid="xui-text-1" contenteditable="true"
+        @blur="$xui.updateDirectPropBlur()"
         @focus="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]', true)"
         @input="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]')" class="[[class]]" -style="white-space: pre-wrap;[[style]]"
         xui-mode="design;template">[[text@1]]</div>
@@ -82,11 +84,11 @@
         <xui-prop var="text" editor="text">text</xui-prop>
         <xui-prop var="btn-type" editor="combo" list='["depressed","outlined","rounded","text","tile","icon","fab"]'>type depressed/outlined/...</xui-prop>
         <xui-prop var="color" cat="style" editor="text">bgcolor</xui-prop>
-        <xui-prop var="dark" cat="style" def="false" editor="bool">on dark</xui-prop>
-        <xui-prop var="light" cat="style" def="false" editor="bool">on light</xui-prop>
+        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
         <xui-prop var="size" editor="combo"
             list='["large","small","x-small","x-large"]'>size</xui-prop>
-         <xui-prop var="disabled" cat="style" def="false" editor="bool">disabled</xui-prop>
+         <xui-prop var="disabled" cat="style" editor="bool">disabled</xui-prop>
          <xui-prop var="position" editor="combo"
          list='["block","absolute","fixed"]'>position</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
@@ -137,7 +139,7 @@
         <xui-prop id="desc">Un bouton Icon</xui-prop>
         <xui-prop id="componentAs">action</xui-prop>
 
-        <xui-prop var="btn-type" def="icon" editor="combo"
+        <xui-prop var="btn-type" def="fab" editor="combo"
         list='["depressed","outlined","rounded","text","tile","icon","fab"]'>type depressed/outlined/...</xui-prop>
 
         <xui-prop var="icon" def="mdi-plus" editor="icon">icon (mdi-xxx)</xui-prop>
@@ -182,8 +184,8 @@
         <xui-prop var="size" editor="combo"
             list='["dense","large","small","x-small","x-large"]'>size</xui-prop>
         <xui-prop var="sizeCustom" cat="style" editor="text">custom size (px,rem)</xui-prop>
-        <xui-prop var="dark" cat="style" def="false" editor="bool">on dark</xui-prop>
-        <xui-prop var="light" cat="style" def="false" editor="bool">on light</xui-prop>
+        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
@@ -233,6 +235,7 @@
 
     <v-subheader xid="xui-subheader-1" class="[[class]]" -style="white-space: pre-wrap;[[style]]" xui-mode="final;preview">[[text@1]]</v-subheader>
     <v-subheader xid="xui-subheader-1" contenteditable="true"
+        @blur="$xui.updateDirectPropBlur()"
         @focus="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]', true)"
         @input="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]')" class="[[class]]" -style="white-space: pre-wrap;[[style]]"
         xui-mode="design;template">[[text@1]]</v-subheader>

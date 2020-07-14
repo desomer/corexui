@@ -22,7 +22,6 @@ $xui.createComponentFromBody = (idTemplate, dataBinding) => {
 	}
 }
 
-
 /*********************************************************************************/
 $xui.loadApplicationJS = () => {
 	if ($xui.vuejs != null) {
