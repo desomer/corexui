@@ -33,7 +33,7 @@ export class EventManager {
         window.addEventListener('message', function (e) {
             var data = e.data;
             if (data.action == "select") {
-                this.console.debug(data);
+                //this.console.debug("message select ", data);
                 $xui.displaySelectorByPosition(data.position);
                 $xui.modeDisplaySelection = true;
 

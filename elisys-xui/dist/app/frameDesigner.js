@@ -158,14 +158,37 @@ console.log("***************start reporting OK ********************");
 let lastActionDate = Date.now();
 let lastAction = null;
 let currentAction = null;
+let mapAction = {
+    "clearAll": { text: "create new page", timeout: 1000 },
+    "addCmp": { text: "add component", timeout: 500 },
+    "deleteCmp": { text: "delete component", timeout: 1000 },
+    "cutCmp": { text: "cut component", timeout: 1000 },
+    "pasteTo": { text: "paste component", timeout: 1000 },
+    "copyCmp": { text: "copy component", timeout: 1000 },
+    "addSlot": { text: "add slot", timeout: 1500 },
+    "saveProperties": {},
+    "moveTo": {}
+}
+
 
 $xui.setCurrentAction = (actionName) => {
 
-
     if (currentAction != null)
-        throw (new SpecifiedError("action en cours " + actionName + " => " + lastAction));
+        throw (new SpecifiedError("action déjà en cours " + actionName + " => " + lastAction));
 
-
+    var actionDec = mapAction[actionName];
+    if (actionDec != null) {
+        if (actionDec.text != null) {
+            $xui.rootdata.snackbar_text = actionDec.text;
+            $xui.rootdata.snackbar_timeout = actionDec.timeout;
+            $xui.rootdata.snackbar = true;
+        }
+    }
+    else {
+        $xui.rootdata.snackbar_text = actionName;
+        $xui.rootdata.snackbar_timeout = 1000;
+        $xui.rootdata.snackbar = true;
+    }
 
     $xui.rootdata.saveLayout = true;
 
@@ -186,6 +209,9 @@ $xui.setCurrentAction = (actionName) => {
 
     if (actionName == "addSlot")
         displayMode = "current";
+
+    if (actionName == "moveTo")
+        displayMode = "current";
     /**************************/
 
     if (undisplaySelector)
@@ -195,6 +221,7 @@ $xui.setCurrentAction = (actionName) => {
     prom.then(() => {
         $xui.rootdata.saveLayout = false;
         currentAction = null;
+        console.debug("END changePageFinish ------ " + actionName + " ------")
         if (displayMode == "current") {
             if (reselect)
                 $xui.modeDisplaySelection = true;
@@ -217,7 +244,7 @@ $xui.setCurrentAction = (actionName) => {
         else if (displayMode == "current") {
             $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);   // reaffecte le nouveau mapping
         }
-        console.debug("END ------ " + actionName + " ------")
+        console.debug("END changePage ------ " + actionName + " ------")
     }
     );
 
@@ -234,17 +261,15 @@ $xui.clearAll = () => {
 $xui.addCmp = (cmp) => {
     $xui.setCurrentAction("addCmp");
     console.debug("addCmp", cmp, $xui.propertiesComponent);
-    let infoFile = getInfoFile("template");
-    const newXid = $xui.getNewXid($xui.propertiesComponent.xid, cmp.xid);
-    const currentXid = $xui.propertiesComponent.xid;
-    const template = "<xui-design xid=\"" + currentXid + "\"><" + cmp.xid + " xid=\"" + newXid + "\"></" + cmp.xid + "></xui-design>";
-    $xui.addDesign(infoFile, $xui.propertiesComponent.xid, template, true, false);
+    addCmpXID($xui.propertiesComponent.xid, cmp.xid);
 }
 
 $xui.deleteCmp = () => {
     console.debug("deleteCmp", $xui.propertiesDesign);
     if ($xui.propertiesDesign.isSlot) {
-        console.debug("deleteCmp slot impossible");
+        let infoFile = getInfoFile("template");
+        let info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+        console.debug("deleteCmp slot impossible " + $xui.propertiesDesign.xid + " -> " + info.docId);
         return false;
     }
     else {
@@ -255,7 +280,6 @@ $xui.deleteCmp = () => {
 }
 
 $xui.copyCmp = () => {
-
     if ($xui.propertiesDesign.isSlot) {
         console.debug("copyCmp slot impossible");
         return false;
@@ -269,7 +293,6 @@ $xui.copyCmp = () => {
 }
 
 $xui.cutCmp = () => {
-
     if ($xui.propertiesDesign.isSlot) {
         console.debug("cutCmp slot impossible");
         return false;
@@ -288,21 +311,15 @@ $xui.pasteTo = () => {
     let infoFile = getInfoFile("template");
     var info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xui.moveDesign(infoFile, null, info.xid);
-   // $xui.rootdata.pasteDisabled = true;
+    // $xui.rootdata.pasteDisabled = true;
 }
 
 $xui.moveTo = (data) => {
+    $xui.setCurrentAction("moveTo");
+
     let infoFile = getInfoFile("template");
     var info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xui.moveDesign(infoFile, info.xid, data.xid_slot);
-
-    // if ($xui.cutCmp(true)) {   // suppression de source
-    //     // selection de la target
-    //     var prom = $xui.displayPropertiesJS(data.xid, data.xid_slot);
-    //     prom.then(() => {
-    //         $xui.pasteTo(true);
-    //     })
-    // }
 }
 
 $xui.addAction = () => {
@@ -310,7 +327,7 @@ $xui.addAction = () => {
     let infoFile = getInfoFile("template");
     let info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     let infoParent = $xui.getInfo(infoFile, info.parentXid, info.parentXid);
-    console.debug("infoParent", info, infoParent);
+    console.debug("info add action ", info, infoParent);
 
     $xui.rootdata.activeAction = 3;
 
@@ -320,13 +337,21 @@ $xui.addAction = () => {
             || info.docId == "v-col:xui-row-grid-responsive"
             || info.docId == "v-col:xui-row-1"
             || info.docId == "v-col:xui-form-row-1"
-            || info.docId == "v-tab:xui-tabs"
         ) {
             addSlotByVariable(infoFile, info);
             return true
         }
         else {
-            console.debug("addAction sur slot impossible");
+            console.debug("addAction sur slot " + info.docId + " => " + info.addRemoveAction);
+            if (info.addRemoveAction == "addFlow") {
+                addCmpXID($xui.propertiesDesign.xidSlot, "xui-flow");
+                return true;
+            } else if (info.addRemoveAction == "incNb") {
+                addSlotByVariable(infoFile, info);
+                moveChildAfterInsert(infoFile, info)
+                return true
+            }
+
             return false;
         }
     }
@@ -346,6 +371,17 @@ $xui.addAction = () => {
             return true;
         }
     }
+}
+
+function moveChildAfterInsert(infoFile, info) {
+    $xui.insertChild(infoFile, info.xid);
+}
+
+function addCmpXID(xidDest, idCmp) {
+    let infoFile = getInfoFile("template");
+    const newXid = $xui.getNewXid(xidDest, idCmp);
+    const template = "<xui-design xid=\"" + xidDest + "\"><" + idCmp + " xid=\"" + newXid + "\"></" + idCmp + "></xui-design>";
+    $xui.addDesign(infoFile, xidDest, template, true, false);
 }
 
 function addSlotByVariable(infoFile, infoParent) {
@@ -622,6 +658,7 @@ function getPromise(id) {
 
     if (id != null)
         dicoPromise[id] = promise;
+
     return promise;
 }
 

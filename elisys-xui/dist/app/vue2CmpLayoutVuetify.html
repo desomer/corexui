@@ -79,6 +79,7 @@
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
+        <xui-prop id="add-remove">incNb</xui-prop>
 
         <xui-prop var="nb" def="3" editor="int">nb de slots</xui-prop>
         
@@ -102,6 +103,7 @@
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
+
 
     <v-list xid="xui-list" xui-for="idxr" 
         class="[[class]]"
@@ -447,10 +449,18 @@
 
         <xui-prop var="color" editor="text">color</xui-prop>
         <xui-prop var="background-color" editor="text">background color</xui-prop>
-
-
+        <xui-prop var="slider-color" editor="text">slider color</xui-prop>
         <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
         <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+
+        <xui-prop var="icons-and-text" editor="bool">stack icon and text vertically</xui-prop>
+        <xui-prop var="show-arrows" editor="bool">show arrows</xui-prop>
+        <xui-prop var="center-active" editor="bool">center tab active</xui-prop>
+        
+        <xui-prop var="fixed-tabs" editor="bool">fixed tabs</xui-prop>
+        <xui-prop var="centered" editor="bool">centered</xui-prop>
+        <xui-prop var="right" editor="bool">right</xui-prop>
+    
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
@@ -459,6 +469,7 @@
         <xui-prop id="favorite">text;icon;composer</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
         <xui-prop id="include"></xui-prop>
+        <xui-prop id="add-remove">incNb</xui-prop>
 
         <xui-prop id="name">Tab</xui-prop>
         <xui-prop id="desc">Titre de l'onglet</xui-prop>
@@ -470,12 +481,22 @@
         <xui-prop id="favorite">container</xui-prop>
     </xui-doc>
 
-    <v-tabs class="[[fill-height]] [[class]]" -style="[[style]]" xid="xui-tabs" 
+    <v-tabs xid="xui-tabs" class="[[fill-height]] [[class]]" -style="[[style]]"  
         vertical=[[vertical]] 
         dark="[[dark]]"
+        light="[[light]]"
         color="[[color]]"
         background-color="[[background-color]]"
-        light="[[light]]"
+        slider-color="[[slider-color]]"
+
+        icons-and-text="[[icons-and-text]]"
+        show-arrows="[[show-arrows]]"
+        fixed-tabs="[[fixed-tabs]]"
+        centered="[[centered]]"
+        right="[[right]]"
+
+        center-active="[[center-active]]"
+
         xui-for="idx">
         <v-tab>
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-[[idx@0+]]" xui-slot-name="tab [[idx@0+]]"></xui-slot>
@@ -611,13 +632,13 @@
             .xui-class-slot {
                 border: 1px dashed lightgray;
                 box-sizing: border-box;
-                min-height: 20px;
-                min-width: 20px;
+                min-height: 15px;
+                min-width: 15px;
                 text-decoration: underline dotted;
                 font-style: italic;
                 user-select: none;
                 cursor : pointer;
-                opacity: .6;
+                opacity: .7;
                 white-space: nowrap;
                 overflow: hidden;
             }

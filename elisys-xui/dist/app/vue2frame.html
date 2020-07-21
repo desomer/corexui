@@ -24,7 +24,7 @@
 	<!---------------------------------------------------------------------------------------->
 
 	<xui-doc xid="vue-content-1"">
-		<xui-prop id=" name">Content</xui-prop>
+		<xui-prop id="name">Main content</xui-prop>
 		<xui-prop id="desc">Contenu de la page</xui-prop>
 		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">couleur fond de page</xui-prop>
 	</xui-doc>
@@ -75,7 +75,7 @@
 		<xui-prop var="Headerscrolloffscreen" editor="bool">scroll off screen (if Extended)</xui-prop>
 
 		<xui-prop var="scroll-threshold" editor="int">scroll threshold (px)</xui-prop>
-		<xui-prop var="HeaderHeight" editor="int">Custom height (px)</xui-prop>
+		<xui-prop var="headerHeight" editor="int">Custom height (px)</xui-prop>
 
 		<xui-prop var="class" cat="class" editor="class">class</xui-prop>
 		<xui-prop var="style" cat="style" editor="style">style</xui-prop>
@@ -84,6 +84,7 @@
 	<xui-doc xid="v-toolbar-title:vue-apptoolbar-1">
 		<xui-prop id="name">Toolbar title slot</xui-prop>
 		<xui-prop id="desc">Toolbar title</xui-prop>
+		<xui-prop id="add-remove">addFlow</xui-prop>
 	</xui-doc>
 
 	<xui-doc xid="v-toolbar-items:vue-apptoolbar-1">
@@ -110,7 +111,7 @@
 	<xui-doc xid="vue-footer-1">
 		<xui-prop id="name">Footer</xui-prop>
 		<xui-prop id="desc">Pied de page</xui-prop>
-		<xui-prop var="FooterHeight" editor="int">Custom height (px)</xui-prop>
+		<xui-prop var="footerHeight" def="34" editor="int">height (px)</xui-prop>
 	</xui-doc>
 
 	<xui-doc xid="v-footer:vue-footer-1">
@@ -126,11 +127,22 @@
 	<xui-doc xid="vue-bottom-nav-1">
 		<xui-prop id="name">Bottom Navigation</xui-prop>
 		<xui-prop id="desc">Bottom Navigation</xui-prop>
+
+		<xui-prop var="color" editor="text" link="https://materialdesignicons.com/">color select</xui-prop>
+		<xui-prop var="colorApp" editor="text" link="https://materialdesignicons.com/">background color</xui-prop>
+
+		<xui-prop var="grow" editor="bool">force btn to take up all available space</xui-prop>
+		<xui-prop var="horizontal" editor="bool">horizontal</xui-prop>
+
+		<xui-prop var="hide-on-scroll" editor="bool">hide on scroll</xui-prop>
+		<xui-prop var="scroll-threshold" editor="int">scroll threshold (px)</xui-prop>
+
+		<xui-prop var="shift" editor="bool">hide text of btn when not active</xui-prop>
 	</xui-doc>
 
 	<xui-doc xid="v-bottom-navigation:vue-bottom-nav-1">
-		<xui-prop id="name">Bottom Navigation Action</xui-prop>
-		<xui-prop id="desc">Bottom Navigation Action</xui-prop>
+		<xui-prop id="name">Bottom Nav slot</xui-prop>
+		<xui-prop id="desc">Bottom Nav slot</xui-prop>
 	</xui-doc>
 
 	<!---------------------------------------------------------------------------------------->
@@ -138,22 +150,18 @@
 	<!---------------------------------------------------------------------------------------->
 	<!--  gestion page autonome -->
 	<html xid="frame-vuetify-1" xui-mode="final;design;preview" style="height:100vh;" xui-doc-id="page">
+		<head xid="header-vuetify" xui-no-design></head>
+		<body xid="body-vuetify" xui-no-design style="height:100vh"></body>
 
-	<head xid="header-vuetify" xui-no-design></head>
-
-	<body xid="body-vuetify" xui-no-design style="height:100vh"></body>
-
-	<xui-script-data></xui-script-data>
-	<style id="xui-style" xid="inject-style" xui-no-design></style>
-	<xui-slot xid="inject-after-body" xui-no-design></xui-slot>
-	<xui-init-vuetify></xui-init-vuetify>
-	<xui-init-designer></xui-init-designer>
-
+		<xui-script-data></xui-script-data>
+		<style id="xui-style" xid="inject-style" xui-no-design></style>
+		<xui-slot xid="inject-after-body" xui-no-design></xui-slot>
+		<xui-init-vuetify></xui-init-vuetify>
+		<xui-init-designer></xui-init-designer>
 	</html>
 
 	<!--  gestion du mode changement de template du mode designer -->
 	<xui-slot xid="frame-vuetify-1" xui-mode="template" xui-doc-id="page">
-
 		<body xid="body-vuetify" xui-no-design style="height:100vh"></body>
 	</xui-slot>
 
@@ -166,7 +174,8 @@
 		<link rel="stylesheet"
 			href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" />
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" />
-		<script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
+		<!--script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script-->
+		<script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
 		<xui-slot xid="inject-other-header" xui-no-design></xui-slot>
 	</xui-design>
@@ -205,7 +214,7 @@
 
 	<v-app-bar xid="vue-apptoolbar-1" xui-if=[[withAppBar@0+]] app clipped-left="[[clipped-left@0+]]" src="[[src]]"
 		fade-img-on-scroll="[[fade-img-on-scroll]]" dark="[[darkApp@0+]]" flat="[[HeaderFlat]]"
-		height="[[HeaderHeight]]" dense="[[HeaderDense]]" prominent="[[HeaderProminent]]"
+		height="[[headerHeight]]" dense="[[HeaderDense]]" prominent="[[HeaderProminent]]"
 		shrink-on-scroll="[[shrink-on-scroll]]" collapse-on-scroll="[[HeaderCollapseonscroll]]"
 		hide-on-scroll="[[HeaderHideonscroll]]" scroll-threshold="[[scroll-threshold]]" color="[[colorApp@0+]]"
 		class="[[class]]" -style="[[style]]">
@@ -225,23 +234,31 @@
 
 	<v-navigation-drawer v-model="navdrawer" xid="vue-nav-drawer-1" xui-if=[[withLeftNavigation@0+]]
 		clipped="[[clipped-left@0+]]" temporary="[[navTemporary@0+]]" permanent="[[navPermanent@0+]]" app>
-		<xui-slot style-slot="height:100%" xui-reloader=true xid="slot-navigation-drawer" xui-slot-name="navigation">
+		<xui-slot xid="slot-navigation-drawer" style-slot="height:100%" xui-reloader=true  xui-slot-name="navigation">
 		</xui-slot>
 	</v-navigation-drawer>
 
 	<v-main xid="vue-content-1" class="fill-height" -style="background:[[colorBg]]">
-		<xui-slot xui-reloader=true style-slot="height:100%;width:100%" xid="main" xui-slot-name="page content">
+		<xui-slot xid="main" xui-reloader=true style-slot="height:100%;width:100%"  xui-slot-name="page content">
 		</xui-slot>
 	</v-main>
 
-	<v-footer xid="vue-footer-1" xui-if=[[withFooter@0+]] app inset="[[inset-left@0+]]" height="[[FooterHeight]]"
-		dark="[[darkApp@0+]]" color="[[colorApp@0+]]" style="padding: 0px 10px;">
+	<v-footer xid="vue-footer-1" xui-if=[[withFooter@0+]] app inset="[[inset-left@0+]]" height="[[footerHeight@0+]]"
+		dark="[[darkApp@0+]]" color="[[colorApp@0+]]">
 		<xui-slot xui-reloader=true xid="slot-footer" style-slot="width:100%" xui-slot-name="footer"></xui-slot>
 	</v-footer>
 
 	<v-bottom-navigation xid="vue-bottom-nav-1" xui-if=[[withBottomNavigation@0+]] app
-		background-color="[[colorApp@0+]]" dark="[[darkApp@0+]]">
-		<xui-slot xui-reloader=true xid="slot-bottom-navigation" xui-slot-name="action bottom navigation"></xui-slot>
+		background-color="[[colorApp@0+]]" 
+		dark="[[darkApp@0+]]"
+		color="[[color]]"
+		horizontal="[[horizontal]]"
+		hide-on-scroll="[[hide-on-scroll]]"
+		scroll-threshold="[[scroll-threshold]]"
+		shift="[[shift]]"
+		grow="[[grow]]"
+		>
+		<xui-slot xui-reloader=true xid="slot-bottom-navigation" xui-slot-name="bottom navigation items"></xui-slot>
 	</v-bottom-navigation>
 
 	<!----------------------------  COPY ZONE ---------------------------------->

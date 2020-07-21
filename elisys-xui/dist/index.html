@@ -5,7 +5,7 @@
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css"></link>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" type="text/css"></link>
-      <script defer src="https://cdn.jsdelivr.net/npm/vue@2.6.x/dist/vue.min.js"></script>
+      <script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
       <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css"></link>
       <link rel="stylesheet" href="app/frameDesigner.css" type="text/css"></link>
@@ -14,6 +14,15 @@
    <body style="height:100vh">
       <template id="xui-rootTemplate">
          <v-app>
+            <v-snackbar v-model="snackbar" app :timeout="snackbar_timeout" elevation="12" color="blue-grey" top class="pt-0">
+
+        {{ snackbar_text }}
+                       <template v-slot:action="{ attrs }">
+                  <v-btn color="white" text v-bind="attrs" @click="snackbar = false">
+                Close
+            </v-btn>
+               </template>
+            </v-snackbar>
             <v-navigation-drawer v-model="navdrawer" app temporary>
             </v-navigation-drawer>
             <v-app-bar color="#ff5900" app height="32" dark>
@@ -87,7 +96,8 @@
                                     </v-tab>
                                     <v-tab-item eager :transition="false" :reverse-transition="false">
                                        <div>TreeView coming soon...</div>
-.                                    </v-tab-item>
+.
+                                        </v-tab-item>
                                  </v-tabs>
                               </div>
                            </div>
@@ -189,7 +199,7 @@
                   </v-card>
                </v-dialog>
             </v-main>
-            <v-footer app color="#ff5900" style="padding: 0px 10px;" height="32" dark>
+            <v-footer app color="#ff5900" height="32" dark>
                <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
@@ -224,7 +234,7 @@
                   <v-icon>mdi-autorenew</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2020 v0.2.1 28/05/20</span>
+               <span>&copy;&nbsp;Elisys 2020 v0.4.0 21/07/20</span>
             </v-footer>
          </v-app>
       </template>
@@ -241,19 +251,23 @@
 
 		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler  
 	
-        var json = { 
+        var json = {
             isDesignFrame : true,
-            selectedxui : "PWA Code Generator", 
+            selectedxui : "PWA Generator",
             pasteDisabled : true,
-            undoDisabled  : true,
-            redoDisabled  : true,
+            undoDisabled : true,
+            redoDisabled : true,
             activeTab : 0,
             activeAction : 0,
             contentEditor: '',
-            saveLayout: false
+            saveLayout: false,
+
+            snackbar: true,
+            snackbar_text: 'initialize in progress...',
+            snackbar_timeout: 3000,
         };
         $xui.rootdata= { ...$xui.rootdata, ...json};
-    
+        
         $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
             new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
                 "vue-xui-split");
@@ -500,13 +514,10 @@
             }
 
         
-            .xui-grid {
+            .xui-grid2 {
                 max-width: unset;
             }
         
-            .xui-form {
-                max-width: unset;
-            }
 
             .xui-form-gutter>.col,
             .xui-form-gutter>[class*=col-] {
@@ -572,6 +583,6 @@
 		import "./app/vue2frame.js";
 		$xui.loadApplicationJS();
 	
-            $xui.initVuejs($xui.vuejs);
+        $xui.initVuejs($xui.vuejs);
     </script>
 </html>
