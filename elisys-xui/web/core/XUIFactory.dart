@@ -70,22 +70,22 @@ class XUIModel implements Comparable<XUIModel> {
     if (tag != null) elemHtml.tag = tag;
 
     // properties
-    processAttributes(elemHtml);
+    _processAttributes(elemHtml);
 
     // properties
-    processProperties(elemHtml, engine.xuiFile);
+    _processProperties(elemHtml, engine.xuiFile);
 
     // lance les children
-    await processPhase1Children(elemHtml, engine);
+    await _processPhase1Children(elemHtml, engine);
 
     // calcul le xid  (ex : __parentxid__ , __idx__)
     var xidCal = elemHtml.calculatePropertyXUI(elemXUI.xid, null);
 
     // lance les design (pour affectation property utilise)
-    await processPhase1Design(xidCal, engine, elemHtml);
+    await _processPhase1Design(xidCal, engine, elemHtml);
 
     // lance implementation xui si affecter par le design (ex: remplace un slot par un div)
-    await processPhase1Component(engine, elemHtml);
+    await _processPhase1Component(engine, elemHtml);
 
     // affecte les xid uniquement si child (pas design ni component)
     if (elemXUI.xid != null && engine.xuiFile.context.mode != MODE_FINAL) {
@@ -98,7 +98,7 @@ class XUIModel implements Comparable<XUIModel> {
     return Future.value();
   }
 
-  Future processPhase1Component(
+  Future _processPhase1Component(
       XUIEngine engine, XUIElementHTML elemHtml) async {
     if (elemXUI.tag != null /*&& (elem.tag != tag || this is! XUIComponent)*/) {
       var cmp = engine.xuiFile.searchComponent(elemXUI.tag);
@@ -111,7 +111,7 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  Future processPhase1Design(
+  Future _processPhase1Design(
       String xid, XUIEngine engine, XUIElementHTML elemHtml) async {
     if (xid != null && this is! XUIDesign) {
       // if (xid=="xui-script-data") {
@@ -129,7 +129,7 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  Future processPhase1Children(
+  Future _processPhase1Children(
       XUIElementHTML elemHtml, XUIEngine engine) async {
     /**************** FOR  *****************/
     int nb = 1;
@@ -188,7 +188,7 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  void processAttributes(XUIElementHTML elemHtml) {
+  void _processAttributes(XUIElementHTML elemHtml) {
     if (elemXUI.attributes != null) {
       elemHtml.attributes ??= HashMap<String, XUIProperty>();
       elemXUI.attributes.entries.forEach((f) {
@@ -197,11 +197,11 @@ class XUIModel implements Comparable<XUIModel> {
         if (f.key.toLowerCase() == "style") {
           // complete les styles
           XUIProperty style = elemHtml.attributes[f.key];
-          completeAttribut(style, elemHtml, f, v, ";");
+          _completeAttribut(style, elemHtml, f, v, ";");
         } else if (f.key.toLowerCase() == "class") {
           // complete les classes
           XUIProperty classe = elemHtml.attributes[f.key];
-          completeAttribut(classe, elemHtml, f, v, " ");
+          _completeAttribut(classe, elemHtml, f, v, " ");
         } else {
           elemHtml.attributes[f.key] = XUIProperty(v);
         }
@@ -209,7 +209,7 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  void completeAttribut(XUIProperty style, XUIElementHTML elemHtml,
+  void _completeAttribut(XUIProperty style, XUIElementHTML elemHtml,
       MapEntry<String, XUIProperty> f, String v, String sep) {
     if (style == null) {
       elemHtml.attributes[f.key] = XUIProperty(v);
@@ -224,7 +224,7 @@ class XUIModel implements Comparable<XUIModel> {
     elemXUI.propertiesXUI[key] = XUIProperty(value);
   }
 
-  void processProperties(XUIElementHTML elemHtml, XUIResource xuifile) {
+  void _processProperties(XUIElementHTML elemHtml, XUIResource xuifile) {
     if (elemXUI.propertiesXUI != null) {
       elemXUI.propertiesXUI.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();

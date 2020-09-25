@@ -459,6 +459,14 @@ class XUIEngine {
     return info;
   }
 
+    void addXUIDesignEmpty(String xid) {
+    XUIElementXUI xuiElem = XUIElementXUI();
+    xuiElem.xid = xid;
+    xuiElem.idRessource = xuiFile.reader.id;
+    xuiFile.designs[xid] ??= DicoOrdered();
+    xuiFile.designs[xid].add(XUIDesign(xuiElem, MODE_ALL));
+  }
+
   getReloaderID(f) {
     SlotInfo info = getSlotInfo(f, f);
     if (info == null) {

@@ -7,29 +7,80 @@ import 'element/XUIElement.dart';
 import 'element/XUIProperty.dart';
 import 'parser/HTMLReader.dart';
 
-class XUICloneDico {
-  var dico = HashMap<String, XUICloneDicoItem>();
-  // List<XUICloneDicoItem> stack = [];
-
-  add(XUICloneDicoItem item) {
-    dico[item.xidSrc] = item;
-    //   stack.add(item);
-  }
-}
-
-class XUICloneDicoItem {
-  String xidSrc;
-  String xidDest;
-  String xidNew;
-
-  XUICloneDicoItem(this.xidSrc, this.xidDest, this.xidNew);
-}
-
+///------------------------------------------------------------------------------------
 class XUIActionManager {
   XUIEngine engine;
 
   XUIActionManager(this.engine);
 
+  ///------------------------------------------------------------------------------------
+  /// change une property de design
+  Future changeProperty(String xid, String variable, dynamic value) async {
+    var listDesign = engine.xuiFile.designs[xid];
+    if (listDesign == null) {
+      engine.addXUIDesignEmpty(xid);
+      listDesign = engine.xuiFile.designs[xid];
+    }
+
+    var xuiDesign = listDesign.sort(engine.xuiFile.context).first;
+
+    List<DesignInfo> designs = engine.getDesignInfo(xid, xid, false);
+    for (var design in designs) {
+      DocInfo doc = design.docInfo;
+      if (doc != null && doc.variables.isNotEmpty) {
+        for (var aVariable in doc.variables) {
+          if (aVariable.id == variable) {
+            print(
+                "variable xui <${doc.xid}> var <${aVariable.id}> def ${aVariable.def} editor ${aVariable.editor} ");
+
+            bool addValue = true;
+            var elemXui = xuiDesign.elemXUI;
+            // affecte les valeur par defaut
+            if (aVariable.editor == "bool" && aVariable.def == null) {
+              if (value == false && elemXui.propertiesXUI != null) {
+                // vide la valeur
+                print("retire la variable bool a false");
+                elemXui.propertiesXUI.remove(variable);
+                addValue = false;
+              }
+            }
+
+            // teste si champs vider par la croix
+            if (addValue && value == null && elemXui.propertiesXUI != null) {
+              if ((aVariable.editor == "text" || aVariable.editor == "int") &&
+                  aVariable.def != null) {
+                value = aVariable.def; // affecte la valeur par defaut
+              } else {
+                // vide la valeur
+                print("retire la variable value à null");
+                elemXui.propertiesXUI.remove(variable);
+                addValue = false;
+              }
+            }
+
+            if (addValue) {
+              // creer la propriete vide
+              elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
+              if (elemXui.propertiesXUI[variable] == null) {
+                elemXui.propertiesXUI[variable] = XUIProperty(null);
+              }
+              // affecte la prop
+              elemXui.propertiesXUI[variable].content = value;
+            }
+          }
+        }
+      }
+
+      if (xuiDesign.elemXUI.isEmpty()) {
+        print("delete design <$xid>");
+        engine.xuiFile.designs.remove(xid);
+      }
+    }
+
+    return Future.value();
+  }
+
+  ///------------------------------------------------------------------------------------
   /// ajoute un nouveau composant  (html)
   ///     affecte les valeurs par defaut
   Future<XUIElementXUI> addDesign(String xid, String html) async {
@@ -97,7 +148,7 @@ class XUIActionManager {
     return null;
   }
 
-  String getNewXid(String xidParent, String nameCmp) {
+  String _getNewXid(String xidParent, String nameCmp) {
     var d = DateTime.now().millisecondsSinceEpoch.toString();
     d += Random().nextInt(100).toString();
 
@@ -110,14 +161,15 @@ class XUIActionManager {
   UndoAction cloneDesign(XUICloneDicoItem cloneInfo, String mode) {
     SlotInfo infoSrc = engine.getSlotInfo(cloneInfo.xidSrc, cloneInfo.xidSrc);
     if (infoSrc != null) {
-      cloneInfo.xidNew = getNewXid(cloneInfo.xidDest, infoSrc.implement);
+      cloneInfo.xidNew = _getNewXid(cloneInfo.xidDest, infoSrc.implement);
 
-      print("**** start clone "+ cloneInfo.xidSrc +
+      print("**** start clone " +
+          cloneInfo.xidSrc +
           " => " +
           cloneInfo.xidNew +
           " to " +
           cloneInfo.xidDest);
-      addClone(infoSrc, cloneInfo, mode);
+      _addClone(infoSrc, cloneInfo, mode);
 
       // gestion des enfant
       XUICloneDico cloneDico = XUICloneDico();
@@ -127,7 +179,7 @@ class XUIActionManager {
     return null;
   }
 
-  void addClone(SlotInfo infoSrc, XUICloneDicoItem cloneInfo, String mode) {
+  void _addClone(SlotInfo infoSrc, XUICloneDicoItem cloneInfo, String mode) {
     var tag = infoSrc.implement;
 
     // ajoute un xuidesign sur le parent pour ajouter le child
@@ -142,11 +194,6 @@ class XUIActionManager {
     xuiElem.children.add(child);
     engine.xuiFile.designs[cloneInfo.xidDest] ??= DicoOrdered();
     engine.xuiFile.designs[cloneInfo.xidDest].add(XUIDesign(xuiElem, MODE_ALL));
-
-    // var listDesign = engine.xuiFile.designs[xid];
-    // var xuiDesign = listDesign.sort(engine.xuiFile.context).first;
-    // XUIElementXUI xuiElemDesignSrc = xuiDesign.elemXUI;
-    // xuiElemDesignSrc.propertiesXUI;
 
     //clone du design (les propertiesXUI)  en ajoutant un xuidesign sur le child
     XUIDesign design = _getXUIDesign(infoSrc, mode);
@@ -181,7 +228,7 @@ class XUIActionManager {
                   for (var childDesign in design.elemXUI.children) {
                     if (childDesign is XUIElementXUI &&
                         childDesign.xid != null) {
-                      doClone(dico, design.elemXUI, childDesign, mode);
+                      _doClone(dico, design.elemXUI, childDesign, mode);
                     }
                   }
                 } else {
@@ -189,7 +236,7 @@ class XUIActionManager {
                   print("****** test doCloneOnlyDesign " + design.elemXUI.xid);
                   //SlotInfo info = engine.getSlotInfo(design.elemXUI.xid, design.elemXUI.xid);
                   //SlotInfo infoParent = engine.getSlotInfo(info.parentXid, info.parentXid);
-                  doCloneOnlyDesign(dico, design.elemXUI, mode);
+                  _doCloneOnlyDesign(dico, design.elemXUI, mode);
                 }
               }
             }
@@ -200,13 +247,13 @@ class XUIActionManager {
     }
   }
 
-  void doCloneOnlyDesign(XUICloneDico dico, XUIElementXUI parent, String mode) {
+  void _doCloneOnlyDesign(
+      XUICloneDico dico, XUIElementXUI parent, String mode) {
     var idxParentStartNum = parent.xid.indexOf("_");
     var idxParentEndNum = parent.xid.indexOf("-", idxParentStartNum);
 
-    if (idxParentEndNum==-1)
-    {
-      // ne provient pas d'un slot 
+    if (idxParentEndNum == -1) {
+      // ne provient pas d'un slot
       return;
     }
 
@@ -214,8 +261,13 @@ class XUIActionManager {
     var slotNameSuffix = parent.xid.substring(xidSrc.length);
     var newIDSlot = dico.dico[xidSrc].xidNew + slotNameSuffix;
     var xidClone = parent.xid;
-    
-    print("****** doCloneOnlydesign  xidSrc=<" + xidClone + "> xidNew=<"+newIDSlot+"> " + slotNameSuffix);
+
+    print("****** doCloneOnlydesign  xidSrc=<" +
+        xidClone +
+        "> xidNew=<" +
+        newIDSlot +
+        "> " +
+        slotNameSuffix);
     XUICloneDicoItem cloneInfo = XUICloneDicoItem(xidClone, null, newIDSlot);
     dico.add(cloneInfo);
 
@@ -240,19 +292,21 @@ class XUIActionManager {
     }
   }
 
-  void doClone(XUICloneDico dico, XUIElementXUI parent,
-      XUIElementXUI srcElem, String mode) {
-
+  void _doClone(XUICloneDico dico, XUIElementXUI parent, XUIElementXUI srcElem,
+      String mode) {
     //SlotInfo info = engine.getSlotInfo(childDesign.xid, childDesign.xid);
     // var design = _getXUIDesignParent(info, mode);
 
     //********** calcul du slotName a partir du parent *************
-    var idxParentStartNum = parent.xid.indexOf("_");    // ex : parent_1321132132-slot
+    var idxParentStartNum =
+        parent.xid.indexOf("_"); // ex : parent_1321132132-slot
     var idxParentEndNum = parent.xid.indexOf("-", idxParentStartNum);
 
-    var xidParentSansSlot = parent.xid.substring(0, idxParentEndNum);  // parent_1321132132
-    var slotNameSuffix = parent.xid.substring(xidParentSansSlot.length);  // -slot
-    
+    var xidParentSansSlot =
+        parent.xid.substring(0, idxParentEndNum); // parent_1321132132
+    var slotNameSuffix =
+        parent.xid.substring(xidParentSansSlot.length); // -slot
+
     /***************************************************************/
 
     var newIDSlot = dico.dico[xidParentSansSlot].xidNew + slotNameSuffix;
@@ -260,26 +314,33 @@ class XUIActionManager {
     var tagClone = srcElem.tag;
 
     XUICloneDicoItem cloneInfo = XUICloneDicoItem(xidClone, newIDSlot, null);
-    cloneInfo.xidNew = getNewXid(newIDSlot, tagClone);
+    cloneInfo.xidNew = _getNewXid(newIDSlot, tagClone);
     dico.add(cloneInfo);
 
-    print("****** doClone xidSrc=<" + xidClone + "> xidDesc=<"+newIDSlot+"> xidNew=" + cloneInfo.xidNew +  "(" +
+    print("****** doClone xidSrc=<" +
+        xidClone +
+        "> xidDesc=<" +
+        newIDSlot +
+        "> xidNew=" +
+        cloneInfo.xidNew +
+        "(" +
         tagClone +
         ")");
 
     SlotInfo infoSrc = engine.getSlotInfo(cloneInfo.xidSrc, cloneInfo.xidSrc);
-    addClone(infoSrc, cloneInfo, mode);
+    _addClone(infoSrc, cloneInfo, mode);
   }
 
-  /// gestion du remove
-  ///
+  ///------------------------------------------------------------------------------------
   UndoAction removeDesign(String xid, String mode, [bool withChild = true]) {
     return moveDesign(xid, mode, null, withChild);
   }
 
+  ///------------------------------------------------------------------------------------
   UndoAction moveDesign(String xid, String mode, String moveToXid,
       [bool withChild = true]) {
     SlotInfo info = engine.getSlotInfo(xid, xid);
+
     if (info == null) {
       throw "xid inconnu $xid";
     }
@@ -320,7 +381,7 @@ class XUIActionManager {
         }
       }
 
-      // supprime la parent si vide
+      // supprime le parent si vide
       if (design.elemXUI.isEmpty()) {
         print("delete design parent <$xidParent>");
         engine.xuiFile.designs.remove(xidParent);
@@ -330,7 +391,7 @@ class XUIActionManager {
         print("delete design <$xid>");
         engine.xuiFile.designs.remove(xid);
       } else if (elemToChange != null) {
-        moveToDesign(xid, moveToXid, mode, elemToChange);
+        _moveToDesign(info, xid, moveToXid, mode, elemToChange);
       }
     }
 
@@ -342,11 +403,12 @@ class XUIActionManager {
     return UndoAction();
   }
 
-  void moveToDesign(String xid, String moveToXid, String mode, elemToChange) {
-    SlotInfo info = engine.getSlotInfo(moveToXid, moveToXid);
+  void _moveToDesign(SlotInfo infoSrc, String xid, String moveToXid,
+      String mode, elemToChange) {
+    SlotInfo infoDest = engine.getSlotInfo(moveToXid, moveToXid);
     XUIDesign designMove;
-    if (info != null) {
-      designMove = _getXUIDesign(info, mode);
+    if (infoDest != null) {
+      designMove = _getXUIDesign(infoDest, mode);
     }
 
     if (designMove == null) {
@@ -358,9 +420,17 @@ class XUIActionManager {
     }
 
     if (designMove != null && elemToChange != null) {
-      print("move <$xid> to <$moveToXid>");
+      print("moveToDesign add <$xid> to <$moveToXid>");
       designMove.elemXUI.children ??= List<XUIElement>();
       designMove.elemXUI.children.add(elemToChange);
+
+      // change le slotInfo
+      // infoSrc.parentXid=moveToXid;
+      // infoSrc.elementHTML?.designBy?.clear();
+      // infoSrc.elementHTML?.designBy?.add(designMove);
+      // if (infoDest!=null) {
+      //   infoSrc.elementHTML?.parent=infoDest.elementHTML;
+      // }
     }
   }
 
@@ -393,4 +463,21 @@ class XUIActionManager {
   }
 }
 
+///------------------------------------------------------------------------------------
 class UndoAction {}
+
+class XUICloneDico {
+  var dico = HashMap<String, XUICloneDicoItem>();
+
+  add(XUICloneDicoItem item) {
+    dico[item.xidSrc] = item;
+  }
+}
+
+class XUICloneDicoItem {
+  String xidSrc;
+  String xidDest;
+  String xidNew;
+
+  XUICloneDicoItem(this.xidSrc, this.xidDest, this.xidNew);
+}

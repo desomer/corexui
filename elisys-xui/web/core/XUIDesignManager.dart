@@ -5,19 +5,20 @@ import 'package:synchronized/synchronized.dart';
 
 import './XUIEngine.dart';
 import './XUIFactory.dart';
+import './XUIJSInterface.dart';
 import './parser/HTMLReader.dart';
 import './parser/ProviderAjax.dart';
 import 'XUIActionManager.dart';
-import 'element/XUIElement.dart';
-import 'element/XUIProperty.dart';
-import './XUIJSInterface.dart';
 
 class XUIDesignManager {
   XUIEngine xuiEngine;
-  var listXidChanged = [];
   static final lock = Lock(); // gestion du lock car multiple iFrame
-
   static final _designManager = HashMap<String, XUIDesignManager>();
+  static var cacheTemplateEditor = HashMap<String, String>();
+
+  var listXidChanged = [];
+
+  ///------------------------------------------------------------------------------------------
   static XUIDesignManager getDesignManager(FileDesignInfo fileInfo) {
     if (_designManager[fileInfo.file] == null) {
       //print("create file ${fileInfo.file}");
@@ -27,6 +28,7 @@ class XUIDesignManager {
     return _designManager[fileInfo.file];
   }
 
+  ///------------------------------------------------------------------------------------------
   static void removeDesignManager(FileDesignInfo fileInfo) {
     if (_designManager[fileInfo.file] != null) {
       _designManager[fileInfo.file] = null;
@@ -46,6 +48,20 @@ class XUIDesignManager {
     return Future.value(bufferHtml.html.toString());
   }
 
+  ///------------------------------------------------------------------------------------------
+  /// generation de l'arbre XUIElementHTML sans text
+  void initHtml(XUIContext ctx, String uri, String xid) async {
+    await initEngine(uri, ctx);
+
+    if (xid == null) {
+      return;
+    }
+
+    await xuiEngine.toHTMLString(null, xid, ctx);
+  }
+
+  ///------------------------------------------------------------------------------------------
+  /// generation de l'arbre XUIElemXui
   Future initEngine(String uri, XUIContext ctx) async {
     if (xuiEngine == null) {
       await lock.synchronized(() async {
@@ -61,39 +77,8 @@ class XUIDesignManager {
   }
 
   ///------------------------------------------------------------------------------------------
-  /// generation de l'arbre XUIElementHTML sans text
-  void initHtml(XUIContext ctx, String uri, String xid) async {
-    await initEngine(uri, ctx);
-
-    if (xid == null) {
-      return;
-    }
-
-    await xuiEngine.toHTMLString(null, xid, ctx);
-  }
-
-  ///------------------------------------------------------------------------------------------
-  Future<XUIComponent> getXUIComponent(
-      XUIContext ctx, String uri, String idCmp) async {
-    if (xuiEngine == null) {
-      await lock.synchronized(() async {
-        xuiEngine = XUIEngine();
-        var provider = ProviderAjax();
-        print("initialize file for getXUIComponent : read ${uri}");
-        var reader = HTMLReader(uri, provider);
-        await xuiEngine.initialize(reader, ctx);
-      });
-    }
-
-    XUIComponent cmp = xuiEngine.xuiFile.components[idCmp].sort(ctx).first;
-    return cmp;
-  }
-
-  ///------------------------------------------------------------------------------------------
   Future addDesign(String id, String template) async {
-    print("add design on ${id}  template ${template}");
-    await XUIActionManager(xuiEngine).addDesign(id, template);
-    return Future.value();
+    return XUIActionManager(xuiEngine).addDesign(id, template);
   }
 
   void removeDesign(String id, String modeDelete) async {
@@ -110,79 +95,13 @@ class XUIDesignManager {
     return id;
   }
 
-  ///------------------------------------------------------------------------------------------
   Future changeProperty(String xid, String variable, dynamic value) async {
     print("${xid} a changer l'attribut <${variable}> par <${value}>");
-    var listDesign = xuiEngine.xuiFile.designs[xid];
-    if (listDesign == null) {
-      addDesignEmpty(xid);
-      listDesign = xuiEngine.xuiFile.designs[xid];
-    }
-
-    var xuiDesign = listDesign.sort(xuiEngine.xuiFile.context).first;
-
-    List<DesignInfo> designs = xuiEngine.getDesignInfo(xid, xid, false);
-    for (var design in designs) {
-      DocInfo doc = design.docInfo;
-      if (doc != null && doc.variables.isNotEmpty) {
-        for (var aVariable in doc.variables) {
-          if (aVariable.id == variable) {
-            print(
-                "variable xui <${doc.xid}> var <${aVariable.id}> def ${aVariable.def} editor ${aVariable.editor} ");
-
-            bool addValue = true;
-            var elemXui = xuiDesign.elemXUI;
-            // affecte les valeur par defaut
-            if (aVariable.editor == "bool" && aVariable.def == null) {
-              if (value == false && elemXui.propertiesXUI != null) {
-                // vide la valeur
-                print("retire la variable bool a false");
-                elemXui.propertiesXUI.remove(variable);
-                addValue = false;
-              }
-            }
-
-            // teste si champs vider par la croix
-            if (addValue && value == null && elemXui.propertiesXUI != null) {
-              if ((aVariable.editor == "text" || aVariable.editor == "int") &&
-                  aVariable.def != null) {
-                value = aVariable.def; // affecte la valeur par defaut
-              } else {
-                // vide la valeur
-                print("retire la variable value à null");
-                elemXui.propertiesXUI.remove(variable);
-                addValue = false;
-              }
-            }
-            
-            if (addValue) {
-              // creer la propriete vide
-              elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
-              if (elemXui.propertiesXUI[variable] == null) {
-                elemXui.propertiesXUI[variable] = XUIProperty(null);
-              }
-              // affecte la prop
-              elemXui.propertiesXUI[variable].content = value;
-            }
-          }
-        }
-      }
-
-      if (xuiDesign.elemXUI.isEmpty()) {
-        print("delete design <$xid>");
-        xuiEngine.xuiFile.designs.remove(xid);
-      }
-    }
-
-    return Future.value();
+    return XUIActionManager(xuiEngine).changeProperty(xid, variable, value);
   }
 
-  void addDesignEmpty(String xid) {
-    XUIElementXUI xuiElem = XUIElementXUI();
-    xuiElem.xid = xid;
-    xuiElem.idRessource = xuiEngine.xuiFile.reader.id;
-    xuiEngine.xuiFile.designs[xid] ??= DicoOrdered();
-    xuiEngine.xuiFile.designs[xid].add(XUIDesign(xuiElem, MODE_ALL));
+  void addXUIDesignEmpty(String xid) {
+    xuiEngine.addXUIDesignEmpty(xid);
   }
 
   ///------------------------------------------------------------------------------------------
@@ -235,15 +154,15 @@ class XUIDesignManager {
     for (var design in designs) {
       //------------------------------------------------------------------
       // gestion de l'entete
-      await getJSDesignHeader(fi, design, ctx, ret);
+      await _getJSDesignHeader(fi, design, ctx, ret);
       //------------------------------------------------------------------
       // gestion des variable du composant du widget
       for (DocVariables varCmp in design?.docInfo?.variables ?? const []) {
         String template =
-            await getJSDesignVariableTemplate(varCmp, fi, ctx, i, design);
+            await _getJSDesignVariableTemplate(varCmp, fi, ctx, i, design);
         ret.bufTemplate.write(template);
         //------------------------------------------------------------------
-        getJSDesignVariableData(varCmp, design, ret, i);
+        _getJSDesignVariableData(varCmp, design, ret, i);
         i++;
       }
       // fin de template
@@ -258,7 +177,7 @@ class XUIDesignManager {
     return ret;
   }
 
-  void getJSDesignVariableData(
+  void _getJSDesignVariableData(
       DocVariables varCmp, DesignInfo design, JSDesignInfo ret, int i) {
     String extend = "";
     if (varCmp.editor == "combo") {
@@ -283,7 +202,6 @@ class XUIDesignManager {
       value = "\"" + (varCmp.def ?? "") + "\"";
     }
 
-    //------------------------------------------------------------------
     if (i > 0) {
       ret.bufData.write(",");
     }
@@ -308,9 +226,7 @@ class XUIDesignManager {
         "}");
   }
 
-  static var cacheTemplateEditor = HashMap<String, String>();
-
-  Future<String> getJSDesignVariableTemplate(DocVariables varCmp,
+  Future<String> _getJSDesignVariableTemplate(DocVariables varCmp,
       FileDesignInfo fi, XUIContext ctx, int i, DesignInfo design) async {
     var keyCache = varCmp.editor;
     var template = cacheTemplateEditor[keyCache];
@@ -320,7 +236,7 @@ class XUIDesignManager {
         fi.xid = 'editor-combo';
         // affecte les items a la combobox grace au addProperties
         XUIComponent cmp =
-            await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
+            await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
         cmp.addProperties("items", "data[##idx##].items");
       } else if (varCmp.editor == "style") {
         fi.xid = 'editor-text';
@@ -330,7 +246,7 @@ class XUIDesignManager {
 
       XUIComponent cmp;
       try {
-        cmp = await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
+        cmp = await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
       } catch (e, s) {
         print("pb cmp ${fi.xid} $e $s");
         rethrow;
@@ -343,7 +259,7 @@ class XUIDesignManager {
       template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
 
       // insertion dans le cache
-      print("****<" + keyCache + ">=>" + template);
+      print("****add cacheTemplateEditor <" + keyCache + ">=>" + template);
       cacheTemplateEditor[keyCache] = template;
     }
     template = template.replaceAll("##idx##", i.toString());
@@ -352,8 +268,8 @@ class XUIDesignManager {
     return template;
   }
 
-  Future getJSDesignHeader(FileDesignInfo fi, DesignInfo design, XUIContext ctx,
-      JSDesignInfo ret) async {
+  Future _getJSDesignHeader(FileDesignInfo fi, DesignInfo design,
+      XUIContext ctx, JSDesignInfo ret) async {
     var keyCache = 'editor-header';
     var template = cacheTemplateEditor[keyCache];
     // titre du widget
@@ -362,7 +278,7 @@ class XUIDesignManager {
       fi.xid = 'editor-header';
 
       XUIComponent cmp =
-          await getDesignManager(fi).getXUIComponent(ctx, fi.file, fi.xid);
+          await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
       cmp.addProperties(
           "selectAction", "\$xui.displaySelectorByXid('##xid##', '##xid##')");
       cmp.addProperties("title", "##title##");
@@ -381,6 +297,71 @@ class XUIDesignManager {
     ret.bufTemplate
         .write("<div class='xui-over-prop-xid' id='${design.slotInfo.xid}'>");
     ret.bufTemplate.write(template);
+  }
+
+  Future<XUIComponent> _getXUIComponent(
+      XUIContext ctx, String uri, String idCmp) async {
+    if (xuiEngine == null) {
+      await lock.synchronized(() async {
+        xuiEngine = XUIEngine();
+        var provider = ProviderAjax();
+        print("initialize file for getXUIComponent : read ${uri}");
+        var reader = HTMLReader(uri, provider);
+        await xuiEngine.initialize(reader, ctx);
+      });
+    }
+
+    XUIComponent cmp = xuiEngine.xuiFile.components[idCmp].sort(ctx).first;
+    return cmp;
+  }
+
+  ///------------------------------------------------------------------------------------------
+
+  List getJSActions(XUIContext ctx, String id, String idslot, String action) {
+    List ret = [];
+
+    var designs = xuiEngine.getDesignInfo(id, idslot, true);
+    for (var design in designs) {
+      /*********************************** */
+      if (design.docInfo != null) {
+        if (design.docInfo.xid == "v-tab:xui-tabs") {
+          ObjectAction act = ObjectAction(
+              xid: design.slotInfo.xid,
+              action: "incNb",
+              icon: "mdi-tab",
+              title: "Add new Tab (after " + design.slotInfo.slotname + ")");
+          ret.add(act);
+
+        } else if (design.docInfo.xid == "xui-no-dom:xui-flow") {
+          ObjectAction act = ObjectAction(
+              xid: design.slotInfo.xid,
+              action: "incNb",
+              icon: "mdi-transfer-right",
+              title: "Add new Slot (after " + design.slotInfo.slotname + ")");
+          ret.add(act);
+
+        } else {
+          var ti = (design.docInfo.addRemove ?? "nar") +
+              "|" +
+              (design.slotInfo.slotname ?? "ns") +
+              "|" +
+              design.docInfo.xid +
+              "|" +
+              design.docInfo.name +
+              "|" +
+              design.slotInfo.implement;
+
+          ObjectAction act = ObjectAction(
+              xid: design.slotInfo.xid,
+              action: "incNb",
+              icon: "mdi-web",
+              title: ti);
+          ret.add(act);
+        }
+      }
+    }
+
+    return ret;
   }
 }
 

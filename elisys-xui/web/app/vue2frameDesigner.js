@@ -39,7 +39,7 @@ document.addEventListener('pointerdown', e => {
     targetActionStart = e.target.closest("[data-xid]");
 });
 
-document.addEventListener('pointerup', function (e) {    //dblclick
+document.addEventListener('pointerup', function (e) {  
     //console.debug("pointerup", e);
     if (e.button != 0)
         return;

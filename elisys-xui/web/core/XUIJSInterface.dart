@@ -5,81 +5,95 @@ import 'package:js/js.dart';
 
 @JS()
 @anonymous
-class SlotInfoJS {
-  external String get xid;
-  external String get parentXid;
-  external String get slotname;
-  external String get docId;
-  external String get idRessource;
-  external String get addRemoveAction;
-  external set xid(String xid);
-  external set parentXid(String parentXid);
-  external set slotname(String slotname);
-  external set docId(String docId);
-  external set idRessource(String idRessource);
-  external set addRemoveAction(String addRemoveAction);
-}
-
-@JS()
-@anonymous
-class VueParamJS {
-  external String get target;
-  external String get template;
-  external String get data;
-  external String get path;
-  external String get xid;
-  external String get xidSlot;
-  external bool get isSlot;
-
-  external set target(String xid);
-  external set template(String xid);
-  external set data(String xid);
-  external set path(String path);
-  external set xid(String xid);
-  external set xidSlot(String xidSlot);
-  external set isSlot(bool isSlot);
-}
-
-@JS()
-@anonymous
-class Options {
-  external String get mode;
-  external String get html;
-  external String get xuidata;
-  external String get xuifile;
-  external List get listReloader;
+class FileDesignInfo {
   external String get action;
-  external set html(String html);
-  external set mode(String mode);
-  external set xuidata(String xuidata);
-  external set xuifile(String xuifile);
-  external set listReloader(List listReloader);
   external set action(String action);
-  external factory Options({String mode, dynamic html, dynamic xuidata});
+  external String get file; 
+  external set file(String file); 
+  external String get mode;
+
+  external set mode(String mode);
+  external String get part;
+  external set part(String part);
+  external String get xid;
+  external set xid(String xid);
+}
+
+@JS()
+@anonymous
+class ObjectAction {
+  external factory ObjectAction({String xid, String action, String icon, String title});
+  external String get action;
+  external set action(String action);
+  external String get icon;
+  external set icon(String icon);
+  external String get title;
+  external set title(String title);
+  external String get xid;
+  external set xid(String xid);
 }
 
 @JS()
 @anonymous
 class ObjectDesign {
-  external String get xid;
-  external String get variable;
+  external bool get exist;
   external String get value;
   external String get value_orig;
-  external bool get exist;
+  external String get variable;
+  external String get xid;
 }
 
 @JS()
 @anonymous
-class FileDesignInfo {
-  external String get file;
-  external String get xid;
-  external String get mode; 
-  external String get action; 
-  external String get part;
-
-  external set file(String file);
-  external set xid(String xid);
-  external set mode(String mode);
+class Options {
+  external factory Options({String mode, dynamic html, dynamic xuidata});
+  external String get action;
   external set action(String action);
-  external set part(String part);
+  external String get html;
+  external set html(String html);
+  external List get listReloader;
+  external set listReloader(List listReloader);
+  external String get mode;
+  external set mode(String mode);
+  external String get xuidata;
+  external set xuidata(String xuidata);
+  external String get xuifile;
+  external set xuifile(String xuifile);
+}
+
+@JS()
+@anonymous
+class SlotInfoJS {
+  external String get addRemoveAction;
+  external set addRemoveAction(String addRemoveAction);
+  external String get docId;
+  external set docId(String docId);
+  external String get idRessource;
+  external set idRessource(String idRessource);
+  external String get parentXid;
+  external set parentXid(String parentXid);
+  external String get slotname;
+  external set slotname(String slotname);
+  external String get xid;
+  external set xid(String xid);
+}
+
+@JS()
+@anonymous
+class VueParamJS {
+  external String get data;
+  external set data(String xid);
+  external bool get isSlot;
+  external set isSlot(bool isSlot);
+  external String get path;
+  external set path(String path);
+  external String get target;
+
+  external set target(String xid);
+  external String get template;
+  external set template(String xid);
+  external String get xid;
+  external set xid(String xid);
+  external String get xidSlot;
+  external set xidSlot(String xidSlot);
 }

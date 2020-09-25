@@ -26,7 +26,7 @@ external void changePageJS(obj);
 @JS('refreshXUI')
 external set _refresh(void Function(FileDesignInfo) f);
 
-@JS('addDesign')
+@JS('addDesignXUI')
 external set _addDesign(
     void Function(FileDesignInfo, String, String, bool, bool) f);
 
@@ -49,14 +49,17 @@ external set _surroundDesign(
 @JS('moveDesign')
 external set _moveDesign(void Function(FileDesignInfo, String, String) f);
 
-@JS('insertChild')
-external set _insertChild(void Function(FileDesignInfo, String) f);
+@JS('changeChild')
+external set _changeChild(void Function(FileDesignInfo, String, String) f);
 
 @JS('getInfo')
 external set _getInfo(dynamic Function(FileDesignInfo, String, String) f);
 
 @JS('getComponents')
 external set _getComponents(dynamic Function(FileDesignInfo, String, String) f);
+
+@JS('getActionsXUI')
+external set _getActions(dynamic Function(FileDesignInfo, String, String, String) f);
 
 @JS('getDesignProperties')
 external set _getDesignProperties(
@@ -72,7 +75,7 @@ external set _initPage(dynamic Function(FileDesignInfo) f);
 
 /// change les properties
 void setDesignProperties(FileDesignInfo fileInfo, dynamic listDesg) async {
-  XUIDesignManager designMgr = getDesignManager(fileInfo);
+  XUIDesignManager designMgr = _getDesignManager(fileInfo);
   List listDesign = listDesg;
 
   for (ObjectDesign item in listDesign) {
@@ -92,7 +95,8 @@ void setDesignProperties(FileDesignInfo fileInfo, dynamic listDesg) async {
 
 void getDesignProperties(
     FileDesignInfo fileInfo, String id, String idslot) async {
-  var designInfo = await getDesignManager(fileInfo).getJSDesignInfo(id, idslot);
+  var designInfo =
+      await _getDesignManager(fileInfo).getJSDesignInfo(id, idslot);
 
   var ret = {
     "xid": designInfo.xid,
@@ -108,8 +112,9 @@ void getDesignProperties(
       .callMethod("doPromiseJS", ["getDesignProperties", JsObject.jsify(ret)]);
 }
 
+/// Retourne la liste des composants
 dynamic getComponents(FileDesignInfo fileInfo, String id, String idslot) {
-  var designInfo = getDesignManager(fileInfo).getJSComponentInfo(id, idslot);
+  var designInfo = _getDesignManager(fileInfo).getJSComponentInfo(id, idslot);
   var vueParamJS = VueParamJS();
   vueParamJS.xid = designInfo.xid;
   vueParamJS.xidSlot = designInfo.xidSlot;
@@ -124,7 +129,7 @@ dynamic getComponents(FileDesignInfo fileInfo, String id, String idslot) {
 
 /// retourne les info d'un xid
 dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
-  var engine = getDesignManager(fileInfo).xuiEngine;
+  var engine = _getDesignManager(fileInfo).xuiEngine;
   var info = engine.getSlotInfo(id, idslot);
 
   var InfoJS = SlotInfoJS();
@@ -135,15 +140,13 @@ dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
     InfoJS.slotname = info.slotname;
     InfoJS.xid = info.xid;
     DocInfo doc = engine.docInfo[info.docId];
-    if (doc==null)
-    {
-        //recherche la doc du parent
-        int idx=info.docId.indexOf(":");
-        if (idx>0)
-        {
-          var docId=info.docId.substring(idx+1);
-          doc = engine.docInfo[docId];
-        }
+    if (doc == null) {
+      //recherche la doc du parent
+      int idx = info.docId.indexOf(":");
+      if (idx > 0) {
+        var docId = info.docId.substring(idx + 1);
+        doc = engine.docInfo[docId];
+      }
     }
     InfoJS.addRemoveAction = doc?.addRemove;
   }
@@ -152,7 +155,7 @@ dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
 
 void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
     bool init) async {
-  XUIDesignManager designMgr = getDesignManager(fileInfo);
+  XUIDesignManager designMgr = _getDesignManager(fileInfo);
   await designMgr.addDesign(id, template);
 
   if (!reload && init == true) {
@@ -168,17 +171,9 @@ void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
 }
 
 ///****************************************************************** */
-String getContentCopyZoneID(XUIDesignManager designMgr) {
-  SlotInfo infoTrash =
-      designMgr.xuiEngine.getSlotInfo(XUI_COPYZONE_SLOT, XUI_COPYZONE_SLOT);
-
-  XUIElementHTML contentTrash = infoTrash?.elementHTML?.children?.first;
-  var lastDeleteXid = contentTrash?.originElemXUI?.xid;
-  return lastDeleteXid;
-}
 
 void deleteDesign(FileDesignInfo fileInfo, String id) async {
-  XUIDesignManager designMgr = getDesignManager(fileInfo);
+  XUIDesignManager designMgr = _getDesignManager(fileInfo);
   SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
   await designMgr.removeDesign(id, null);
   // lance le reload
@@ -187,11 +182,11 @@ void deleteDesign(FileDesignInfo fileInfo, String id) async {
 }
 
 void cutDesign(FileDesignInfo fileInfo, String id) async {
-  XUIDesignManager designMgr = getDesignManager(fileInfo);
+  XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
   SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
 
-  String lastCopyXid = getContentCopyZoneID(designMgr);
+  String lastCopyXid = _getContentCopyZoneID(designMgr);
 
   if (lastCopyXid != null) {
     // supprime la vielle trashcan
@@ -212,9 +207,9 @@ void cutDesign(FileDesignInfo fileInfo, String id) async {
 }
 
 void copyDesign(FileDesignInfo fileInfo, String id) async {
-  XUIDesignManager designMgr = getDesignManager(fileInfo);
+  XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
-  String lastCopyXid = getContentCopyZoneID(designMgr);
+  String lastCopyXid = _getContentCopyZoneID(designMgr);
 
   if (lastCopyXid != null) {
     // supprime la vielle trashcan
@@ -222,11 +217,10 @@ void copyDesign(FileDesignInfo fileInfo, String id) async {
   }
 
   // ajoute un design a la trashcan
-  String slot = "<xui-design xid=\"" + XUI_COPYZONE_SLOT + "\"></xui-design>";
-  await addDesign(fileInfo, XUI_COPYZONE_SLOT, slot, false, true);
+  // String slot = "<xui-design xid=\"" + XUI_COPYZONE_SLOT + "\"></xui-design>";
+  // await addDesign(fileInfo, XUI_COPYZONE_SLOT, slot, false, true);
 
-  // designMgr.addDesignEmpty(XUI_COPYZONE_SLOT);   // a terminer
-  //todo ajout direct xuiDesign
+  designMgr.addXUIDesignEmpty(XUI_COPYZONE_SLOT);
 
   // move id vers la trashcan
   designMgr.cloneDesign(id, XUI_COPYZONE_SLOT, null);
@@ -238,49 +232,40 @@ void copyDesign(FileDesignInfo fileInfo, String id) async {
 
 void surroundDesign(FileDesignInfo fileInfo, String id, String template,
     String xidSurround) async {
-  XUIDesignManager designMgr = getDesignManager(fileInfo);
+  XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
   SlotInfo info = designMgr.xuiEngine.getSlotInfo(id, id);
+  var xidParent = info.parentXid;
   // ajoute un design au tempory
-  String slot = "<xui-design xid=\"" + XUI_TEMPORARY_SLOT + "\"></xui-design>";
-  //todo ajout direct xuiDesign
-  await addDesign(fileInfo, XUI_TEMPORARY_SLOT, slot, false, true);
+  designMgr.addXUIDesignEmpty(XUI_TEMPORARY_SLOT);
 
   // move id vers la tempory
   designMgr.moveDesign(id, null, XUI_TEMPORARY_SLOT);
 
-  await addDesign(fileInfo, info.parentXid, template, false, true);
+  await addDesign(fileInfo, xidParent, template, false, true);
 
   String targetXid = xidSurround + "-col-0";
-  String slotTarget = "<xui-design xid=\"" +
-      targetXid +
-      "\"></xui-design>"; //todo ajout direct xuiDesign
-  await addDesign(fileInfo, targetXid, slotTarget, false, true);
-
+  designMgr.addXUIDesignEmpty(targetXid);
   designMgr.moveDesign(id, null, targetXid);
 
   // lance le reload
-  designMgr.listXidChanged.add(info.parentXid);
+  designMgr.listXidChanged.add(xidParent);
   await _reload(fileInfo);
 }
 
 void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
-  XUIDesignManager designMgr = getDesignManager(fileInfo);
+  XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
   if (id == null) {
     // gestion du move avec clone ( ex : copy, paste)
-    id = getContentCopyZoneID(designMgr);
-
+    id = _getContentCopyZoneID(designMgr);
     designMgr.cloneDesign(id, idMoveTo, null);
     designMgr.listXidChanged.add(idMoveTo);
 
     await _reload(fileInfo);
   } else {
     // gestion du move (ex : drag)
-    // ajoute le design qui doit recevoir le composant
-    String slot = "<xui-design xid=\"" + idMoveTo + "\"></xui-design>";
-    await addDesign(
-        fileInfo, idMoveTo, slot, false, true); //todo ajout direct xuiDesign
+    designMgr.addXUIDesignEmpty(idMoveTo);
     designMgr.moveDesign(id, null, idMoveTo);
     designMgr.listXidChanged.add(id);
     designMgr.listXidChanged.add(idMoveTo);
@@ -289,31 +274,85 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
   }
 }
 
-void insertChild(FileDesignInfo fileInfo, String idSlot) async {
-    var designManager = getDesignManager(fileInfo);
-    SlotInfo infoSlot = designManager.xuiEngine.getSlotInfo(idSlot, idSlot);
-    SlotInfo infoContainer = designManager.xuiEngine.getSlotInfo(infoSlot.parentXid, infoSlot.parentXid);
-    var nbItem = int. parse(infoContainer.elementHTML.propertiesXUI["nb"].content);
-    print(idSlot +" nbItem "+nbItem.toString());
-    inspect(infoContainer);
+/// change les enfant avec le nb (ex: tab, grid, etc...)
+void changeChild(FileDesignInfo fileInfo, String idSlot, String action) async {
+  var designManager = _getDesignManager(fileInfo);
+  SlotInfo infoSlot = designManager.xuiEngine.getSlotInfo(idSlot, idSlot);
+  SlotInfo infoContainer = designManager.xuiEngine
+      .getSlotInfo(infoSlot.parentXid, infoSlot.parentXid);
 
-    var idx = idSlot.lastIndexOf("-")+1;
-    var suffix = idSlot.substring(0, idx);
-    var prefix = idSlot.substring(idx);
-    var startItem = int. parse( prefix );
+  var nbItem = int.parse(infoContainer.elementHTML.propertiesXUI["nb"].content);
+
+  if (action != "delete") {
+    // ajoute un slot
+    await designManager.changeProperty(
+        infoSlot.parentXid, "nb", (nbItem + 1).toString());
+  }
+
+  print(
+      "changeChild " + action + " " + idSlot + " nbItem " + nbItem.toString());
+  var idx = idSlot.lastIndexOf("-") + 1;
+  var suffix = idSlot.substring(0, idx);
+  var prefix = idSlot.substring(idx);
+  var startItem = int.parse(prefix);
+
+  if (action == "prev") {
+    startItem = startItem - 1;
+  }
+
+  if (action == "delete") {
     for (var i = startItem; i < nbItem; i++) {
-        var idSlotToMove = suffix + i.toString();
-        var idSlotToDest = suffix + (i+1).toString();
-        //SlotInfo infoSlot = designManager.xuiEngine.getSlotInfo(idSlotToMove, idSlotToMove);
-        //
-        var listDesign = designManager.xuiEngine.xuiFile.designs[idSlotToMove];
-        if (listDesign != null) {
-            var xuiDesign = listDesign.sort(designManager.xuiEngine.xuiFile.context).first;
-            var id = ((xuiDesign.elemXUI.children.first) as XUIElementXUI).xid;
-            print("move => " + id + " to " + idSlotToDest);
-            inspect(xuiDesign.elemXUI);
-        }
+      // decalage des enfant vers la gauche
+      await _doMoveChildByIdx(suffix, i, i - 1, designManager, fileInfo);
+      if (infoContainer.docId == "xui-tabs") {
+        await _doMoveChildByIdx(
+            suffix + "item-", i, i - 1, designManager, fileInfo);
+      }
     }
+  } else {
+    for (var i = nbItem - 1; i > startItem; i--) {
+      // decalage des enfant vers la droite
+      await _doMoveChildByIdx(suffix, i, i + 1, designManager, fileInfo);
+      if (infoContainer.docId == "xui-tabs") {
+        await _doMoveChildByIdx(
+            suffix + "item-", i, i + 1, designManager, fileInfo);
+      }
+    }
+  }
+
+  if (action == "delete") {
+    // retire un slot
+    await designManager.changeProperty(
+        infoSlot.parentXid, "nb", (nbItem - 1).toString());
+  }
+
+  designManager.listXidChanged.add(infoSlot.parentXid);
+  await _reload(fileInfo);
+}
+
+Future _doMoveChildByIdx(String suffix, int i, int idst,
+    XUIDesignManager designManager, FileDesignInfo fileInfo) async {
+  var idSlotToMove = suffix + i.toString();
+  var idSlotToDest = suffix + idst.toString();
+  //SlotInfo infoSlot = designManager.xuiEngine.getSlotInfo(idSlotToMove, idSlotToMove);
+  //
+  var listDesign = designManager.xuiEngine.xuiFile.designs[idSlotToMove];
+  if (listDesign != null) {
+    var xuiDesign =
+        listDesign.sort(designManager.xuiEngine.xuiFile.context).first;
+    var id = ((xuiDesign.elemXUI.children.first) as XUIElementXUI).xid;
+    print("move => " + id + " to " + idSlotToDest);
+    inspect(xuiDesign.elemXUI);
+
+    // ajoute le design qui doit recevoir le composant
+    designManager.addXUIDesignEmpty(idSlotToDest);
+    //String slot = "<xui-design xid=\"" + idSlotToDest + "\"></xui-design>";
+    //await addDesign(fileInfo, idSlotToDest, slot, false, true);
+    var ctx = XUIContext(fileInfo.mode);
+    await designManager.initHtml(ctx, fileInfo.file, fileInfo.xid);
+
+    designManager.moveDesign(id, null, idSlotToDest);
+  }
 }
 
 Future refresh(FileDesignInfo fileInfo) async {
@@ -321,16 +360,16 @@ Future refresh(FileDesignInfo fileInfo) async {
     print("reload all from storage");
     XUIDesignManager.removeDesignManager(fileInfo);
     var ctx = XUIContext(MODE_TEMPLATE);
-    var designManager = getDesignManager(fileInfo);
+    var designManager = _getDesignManager(fileInfo);
 
-    await initStoreVersion(designManager, fileInfo, ctx);
+    await _initStoreVersion(designManager, fileInfo, ctx);
   }
 
   if (fileInfo.action == "clear") {
     print("clear all from storage");
     XUIDesignManager.removeDesignManager(fileInfo);
     var ctx = XUIContext(MODE_TEMPLATE);
-    var designManager = getDesignManager(fileInfo);
+    var designManager = _getDesignManager(fileInfo);
     await designManager.initEngine(fileInfo.file, ctx);
   }
 
@@ -338,9 +377,10 @@ Future refresh(FileDesignInfo fileInfo) async {
   return Future.value();
 }
 
+/// retourne le code html d'un xui
 void getHtmlFrom(FileDesignInfo fileInfo, String idPromise) async {
   var ctx = XUIContext(fileInfo.mode);
-  var designMgr = getDesignManager(fileInfo);
+  var designMgr = _getDesignManager(fileInfo);
   var html;
 
   if (fileInfo.part == null) {
@@ -358,7 +398,7 @@ void getHtmlFrom(FileDesignInfo fileInfo, String idPromise) async {
 }
 
 void _reload(FileDesignInfo fileInfo) async {
-  var designMgr = getDesignManager(fileInfo);
+  var designMgr = _getDesignManager(fileInfo);
 
   List listReloader = [];
   designMgr.listXidChanged.forEach((key) {
@@ -394,8 +434,26 @@ void _reload(FileDesignInfo fileInfo) async {
   changePageJS(options);
 }
 
-XUIDesignManager getDesignManager(FileDesignInfo fileInfo) {
-  return XUIDesignManager.getDesignManager(fileInfo);
+Future initPage(FileDesignInfo fileInfo) async {
+  print("-------------- start initPage xui ----------------");
+
+  var ctx = XUIContext(MODE_DESIGN);
+  var designManager = _getDesignManager(fileInfo);
+
+  await _initStoreVersion(designManager, fileInfo, ctx);
+
+  String str = await designManager.getHtml(ctx, fileInfo.file, fileInfo.xid);
+
+  loadPageJS(str);
+}
+
+dynamic getActions(FileDesignInfo fileInfo, String id,  String idSlot, String action) {
+  print("-------------- getActions ----------------");
+
+  var ctx = XUIContext(MODE_DESIGN);
+  var designManager = _getDesignManager(fileInfo);
+
+  return designManager.getJSActions(ctx, id, idSlot, action);
 }
 
 void main() async {
@@ -405,7 +463,7 @@ void main() async {
   _copyDesign = allowInterop(copyDesign);
   _surroundDesign = allowInterop(surroundDesign);
   _moveDesign = allowInterop(moveDesign);
-  _insertChild = allowInterop(insertChild);
+  _changeChild = allowInterop(changeChild);
   _getInfo = allowInterop(getInfo);
   _getDesignProperties = allowInterop(getDesignProperties);
   _setDesignProperties = allowInterop(setDesignProperties);
@@ -413,23 +471,15 @@ void main() async {
   _getHtmlFrom = allowInterop(getHtmlFrom);
   _deleteDesign = allowInterop(deleteDesign);
   _initPage = allowInterop(initPage);
+  _getActions = allowInterop(getActions);
 }
 
-Future initPage(FileDesignInfo fileInfo) async {
-  print("-------------- start initPage xui ----------------");
-
-  var ctx = XUIContext(MODE_DESIGN);
-  var designManager = getDesignManager(fileInfo);
-
-  await initStoreVersion(designManager, fileInfo, ctx);
-
-  String str = await designManager.getHtml(ctx, fileInfo.file, fileInfo.xid);
-
-  loadPageJS(str);
+XUIDesignManager _getDesignManager(FileDesignInfo fileInfo) {
+  return XUIDesignManager.getDesignManager(fileInfo);
 }
 
-Future initStoreVersion(XUIDesignManager designManager, FileDesignInfo fileInfo,
-    XUIContext ctx) async {
+Future _initStoreVersion(XUIDesignManager designManager,
+    FileDesignInfo fileInfo, XUIContext ctx) async {
   var name = "frame1";
 
   var ver = window.localStorage['xui_version_' + name];
@@ -449,4 +499,13 @@ Future initStoreVersion(XUIDesignManager designManager, FileDesignInfo fileInfo,
       }
     }
   }
+}
+
+String _getContentCopyZoneID(XUIDesignManager designMgr) {
+  SlotInfo infoTrash =
+      designMgr.xuiEngine.getSlotInfo(XUI_COPYZONE_SLOT, XUI_COPYZONE_SLOT);
+
+  XUIElementHTML contentTrash = infoTrash?.elementHTML?.children?.first;
+  var lastDeleteXid = contentTrash?.originElemXUI?.xid;
+  return lastDeleteXid;
 }

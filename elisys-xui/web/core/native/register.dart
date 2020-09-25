@@ -66,8 +66,8 @@ class NativeSlot extends XUIElementNative {
               html.originElemXUI.attributes[ATTR_STYLE_SLOT];
         }
 
-        addAttributClassStyle("class", html, newChild," ");
-        addAttributClassStyle("style", html, newChild,";");
+        _addAttributClassStyle("class", html, newChild," ");
+        _addAttributClassStyle("style", html, newChild,";");
       }
       // affecte l'implementation du TAG_DIV_SLOT sur le newChild
       await XUIModel(this, MODE_ALL).doChildPhase1(newChild, html, engine);
@@ -93,8 +93,8 @@ class NativeSlot extends XUIElementNative {
 
       // affecte la class full sur l'enfant si full et unique
       if (nbChild == 1) {
-        addAttributClassStyle("class", html, childHtml," ");
-        addAttributClassStyle("style", html, childHtml,";");
+        _addAttributClassStyle("class", html, childHtml," ");
+        _addAttributClassStyle("style", html, childHtml,";");
 
         if (isFull) {
           childHtml.attributes ??= HashMap<String, XUIProperty>();
@@ -126,7 +126,7 @@ class NativeSlot extends XUIElementNative {
     return Future.value();
   }
 
-  void addAttributClassStyle(
+  void _addAttributClassStyle(
       String attr, XUIElementHTML html, XUIElement newChild, String sep) {
     if (html?.originElemXUI?.attributes != null &&
         html.originElemXUI.attributes[attr] != null) {

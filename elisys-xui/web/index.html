@@ -23,6 +23,20 @@
             </v-btn>
                </template>
             </v-snackbar>
+            <div style="position:absolute;top:100px;left: 100px;" id="xui-display-selector-popup" class="xui-popup-class">
+               <v-list dense>
+                  <v-list-item :key="j" v-for="(itemPopup, j) in listPopupAdd" @click="$xui.doActionPopup(itemPopup)">
+                     <v-list-item-icon>
+                        <v-icon>{{itemPopup.icon}}</v-icon>
+                     </v-list-item-icon>
+                     <v-list-item-content>
+                        <v-list-item-title>
+                           <span>{{itemPopup.title}}</span>
+                        </v-list-item-title>
+                     </v-list-item-content>
+                  </v-list-item>
+               </v-list>
+            </div>
             <v-navigation-drawer v-model="navdrawer" app temporary>
             </v-navigation-drawer>
             <v-app-bar color="#ff5900" app height="32" dark>
@@ -199,7 +213,7 @@
                   </v-card>
                </v-dialog>
             </v-main>
-            <v-footer app color="#ff5900" height="32" dark>
+            <v-footer app color="#ff5900" style="padding-top: 2px;" height="32" dark>
                <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
@@ -234,7 +248,7 @@
                   <v-icon>mdi-autorenew</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2020 v0.4.0 21/07/20</span>
+               <span>&copy;&nbsp;Elisys 2020 v0.4.1 26/07/20</span>
             </v-footer>
          </v-app>
       </template>
@@ -251,22 +265,7 @@
 
 		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler  
 	
-        var json = {
-            isDesignFrame : true,
-            selectedxui : "PWA Generator",
-            pasteDisabled : true,
-            undoDisabled : true,
-            redoDisabled : true,
-            activeTab : 0,
-            activeAction : 0,
-            contentEditor: '',
-            saveLayout: false,
-
-            snackbar: true,
-            snackbar_text: 'initialize in progress...',
-            snackbar_timeout: 3000,
-        };
-        $xui.rootdata= { ...$xui.rootdata, ...json};
+            // empty js
         
         $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
             new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
@@ -321,13 +320,13 @@
                     open: false,
                     nb: "0",
                     listClass: [
-                        { sel: false, text: 'all', value: 'ma', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'x', value: 'mx', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'y', value: 'my', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'top', value: 'mt', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'bottom', value: 'mb', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'left', value: 'ml', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'right', value: 'mr', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'all', value: 'ma', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'x', value: 'mx', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'y', value: 'my', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'top', value: 'mt', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'bottom', value: 'mb', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'left', value: 'ml', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'right', value: 'mr', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
                     ],
                 },
                 {
@@ -578,6 +577,7 @@
    <script defer src="https://unpkg.com/region2d@1.0.0/plain/region2d.min.js"></script>
    <script defer src="libxui.dart.js"></script>
    <script defer src="app/frameDesignerWatch.js"></script>
+   <script defer src="app/frameDesignerData.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/vue2-editor@2.6.6/dist/vue2-editor.min.js"></script>
    <script type="module">
 		import "./app/vue2frame.js";

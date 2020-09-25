@@ -2,7 +2,7 @@
 
     <div xid="bottom-editor" style="display:flex">
         <v-icon style="font-size:18px"  @click="$xui.deleteCmp()">mdi-delete</v-icon>
-        <v-icon style="font-size:18px"  @click="$xui.addAction()">mdi-plus-box</v-icon>
+        <v-icon style="font-size:18px"  @click="$xui.addAction($event)">mdi-plus-box</v-icon>
         <v-icon style="font-size:18px">mdi-pencil</v-icon>
     </div>
 
@@ -21,7 +21,7 @@
     </v-text-field>"
 
     <div xid="editor-class" style="display: inline-flex;">
-        <v-text-field  dense class='mx-1 mt-3' hide-details clearable
+        <v-text-field dense class='mx-1 mt-3' hide-details clearable
             :label='[[label@1]]' 
             v-model='[[value@1]]'>
         </v-text-field>
@@ -29,7 +29,7 @@
     </div>
 
     <div xid="editor-icon" style="display: inline-flex;">
-        <v-text-field  dense class='mx-1 mt-3' hide-details clearable
+        <v-text-field dense class='mx-1 mt-3' hide-details clearable
             :label='[[label@1]]' 
             v-model='[[value@1]]'>
         </v-text-field>
@@ -37,7 +37,7 @@
     </div>
 
     <div xid="editor-image" style="display: inline-flex;">
-        <v-text-field  dense class='mx-1 mt-3' hide-details clearable
+        <v-text-field dense class='mx-1 mt-3' hide-details clearable
             :label='[[label@1]]' 
             v-model='[[value@1]]'>
         </v-text-field>

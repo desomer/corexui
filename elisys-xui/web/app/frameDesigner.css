@@ -95,6 +95,7 @@ pre > code {
 
 /*************************************************************/
 .xui-div-design {
+    /*background-color: #565656;  //dark */
     overflow-y: scroll; overflow-x: hidden; height: calc(100% + 48px - 35px);
 }
 
@@ -122,6 +123,13 @@ pre > code {
     position: absolute; 
     z-index: 999;
     border: 1px dashed rgb(255, 115, 0); 
+}
+
+.xui-popup-class {
+    border: 1px solid rgb(183 183 183);
+    z-index: 1001;
+    box-shadow: 4px 3px 3px 0px #828282; 
+    display: none;
 }
 
 
@@ -160,6 +168,7 @@ pre > code {
     width: 20px;
     margin: 7px 0px 0px 0px;
 }
+
 
 /******************************************************************************/
 .xui-list-cmp .v-list-item__icon {

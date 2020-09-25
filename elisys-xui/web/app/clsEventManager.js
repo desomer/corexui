@@ -1,3 +1,9 @@
+/**
+ * class de gestion des events du designer
+ * 
+ *          
+ */
+
 export class EventManager {
 
     init() {
@@ -29,10 +35,17 @@ export class EventManager {
 
         });
 
+        window.addEventListener('pointerup', function (e) {  
+            if (e.button==0) {
+                $xui.closePopup();
+            }
+        });
+
         // gestion des evenements entre le designer et l'iframe
         window.addEventListener('message', function (e) {
             var data = e.data;
             if (data.action == "select") {
+                $xui.closePopup();
                 //this.console.debug("message select ", data);
                 $xui.displaySelectorByPosition(data.position);
                 $xui.modeDisplaySelection = true;
@@ -43,7 +56,8 @@ export class EventManager {
                 const delayWaitEndAnim = 250;
                 setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, delayWaitEndAnim);
             }
-            else if (data.action == "unselect") {
+            else if (data.action == "unselect") {   // sur scroll ou resize
+                $xui.closePopup();
                 $xui.unDisplaySelector();
             }
             else if (data.action == "drop") {

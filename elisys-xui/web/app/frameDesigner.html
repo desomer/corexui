@@ -15,7 +15,7 @@
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
         <!--#1d9da0 vert-->
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2020 v0.4.0 21/07/20"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.4.1 26/07/20"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
@@ -26,13 +26,14 @@
 
     <xui-design xid="maincontent">
         <xui-snackbar-dialog></xui-snackbar-dialog>
+        <xui-popup-action></xui-popup-action>
     </xui-design>
 
     <xui-design xid="toolbar">
         <xui-prop id="headerHeight" val="32"></xui-prop>
     </xui-design>
 
-    <xui-design xid="footer">
+    <xui-design xid="footer" style="padding-top: 2px;">
         <xui-prop id="footerHeight" val="32"></xui-prop>
     </xui-design>
 
@@ -65,6 +66,23 @@
             </v-btn>
         </template>
     </v-snackbar>
+
+    <div xid="xui-popup-action" id="xui-display-selector-popup" 
+        class="xui-popup-class"
+        style="position:absolute;top:100px;left: 100px;"> 
+        <v-list dense>
+               <v-list-item v-for="(itemPopup, j) in listPopupAdd" :key="j" @click="$xui.doActionPopup(itemPopup)">
+                    <v-list-item-icon>
+                        <v-icon>{{itemPopup.icon}}</v-icon>
+                    </v-list-item-icon>
+                  <v-list-item-content>
+                     <v-list-item-title>
+                        <span>{{itemPopup.title}}</span>
+                     </v-list-item-title>
+                  </v-list-item-content>
+               </v-list-item>
+         </v-list>
+    </div>
 
     <!--------------------------------------------------------------------------->
     <xui-design xid="main">
@@ -277,22 +295,7 @@
     <!--------------------------------------------------------------------------->
     <xui-design xid="xui-script-data">
         <script xui-no-dom>
-        var json = {
-            isDesignFrame : true,
-            selectedxui : "PWA Generator",
-            pasteDisabled : true,
-            undoDisabled : true,
-            redoDisabled : true,
-            activeTab : 0,
-            activeAction : 0,
-            contentEditor: '',
-            saveLayout: false,
-
-            snackbar: true,
-            snackbar_text: 'initialize in progress...',
-            snackbar_timeout: 3000,
-        };
-        $xui.rootdata= { ...$xui.rootdata, ...json};
+            // empty js
         </script>
     </xui-design>
 
@@ -312,6 +315,7 @@
         <script defer src="https://unpkg.com/region2d@1.0.0/plain/region2d.min.js"></script>
         <script defer src="libxui.dart.js"></script>
         <script defer src="app/frameDesignerWatch.js"></script>
+        <script defer src="app/frameDesignerData.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/vue2-editor@2.6.6/dist/vue2-editor.min.js"></script>
 
         <!-- <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script> -->

@@ -265,16 +265,22 @@ $xui.addCmp = (cmp) => {
 }
 
 $xui.deleteCmp = () => {
-    console.debug("deleteCmp", $xui.propertiesDesign);
-    if ($xui.propertiesDesign.isSlot) {
-        let infoFile = getInfoFile("template");
-        let info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    let infoFile = getInfoFile("template");
+    let info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    let infoParent = $xui.getInfo(infoFile, info.parentXid, info.parentXid);
+    console.debug("info deleteCmp ", $xui.propertiesDesign, info, infoParent);
+
+    if ($xui.propertiesDesign.isSlot || info.addRemoveAction != null) {
+        if (info.addRemoveAction == "incNb") {
+            $xui.changeChild(infoFile, info.xid, "delete");
+            return true
+        }
         console.debug("deleteCmp slot impossible " + $xui.propertiesDesign.xid + " -> " + info.docId);
         return false;
     }
     else {
         $xui.setCurrentAction("deleteCmp");
-        $xui.deleteDesign(getInfoFile("template"), $xui.propertiesDesign.xid);
+        $xui.deleteDesign(infoFile, $xui.propertiesDesign.xid);
         return true;
     }
 }
@@ -322,17 +328,68 @@ $xui.moveTo = (data) => {
     $xui.moveDesign(infoFile, info.xid, data.xid_slot);
 }
 
-$xui.addAction = () => {
+$xui.closePopup = (event) => {
+    var popupNode = document.getElementById("xui-display-selector-popup");
+    if (popupNode.style.display == "block")
+    {
+        popupNode.style.display = "none";
+    }
+}
+
+$xui.addAction = (event) => {
+    //--------------------------------------------------------
+    console.debug("addAction", event);
 
     let infoFile = getInfoFile("template");
+    var ret = $xui.getActionsXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, "addAction");
+    console.debug(ret);
+
+    $xui.rootdata.listPopupAdd.length=0;
+   // $xui.rootdata.listPopupAdd.push( { icon: "mdi-tab", title: "add Tab", action: "incNb", xid: xid } );
+    $xui.rootdata.listPopupAdd.push(...ret);
+
+    var popupNode = document.getElementById("xui-display-selector-popup");
+    popupNode.style.left = (event.clientX) + "px";
+    popupNode.style.top = (event.clientY) + "px";
+
+    var hpopup = 16+(40*$xui.rootdata.listPopupAdd.length);
+
+    if (event.clientY > window.innerHeight-100-hpopup)
+    {
+        popupNode.style.top = (event.clientY - hpopup) + "px";
+    }
+
+    popupNode.style.display = "block";   //affiche la div de selection des actions (itemPopup)
+
+
+
+    // { icon: "mdi-apps", title: "add Slot", action: "addFlow" },
+    // { icon: "mdi-cog", title: "add Tab", action: "incNb" },
+    // { icon: "mdi-cog", title: "add Title", action: "addcmp", idCmp: "xui-title-1" },
+    // { icon: "mdi-cog", title: "add Icon", action: "addcmp", idCmp: "xui-btn-icon-1" },
+}
+
+$xui.doActionPopup = (actionId) => {
+    console.debug("doActionPopup", actionId);
+    //--------------------------------------------------------
+    let infoFile = getInfoFile("template");
+
+
+    $xui.rootdata.activeAction = 3;  // affiche la liste des composants
+
+    if (actionId.action=="incNb")
+    {
+        $xui.changeChild(infoFile, actionId.xid, "after");
+        console.debug("doActionPopup OK");
+        return true; 
+    }
+
     let info = $xui.getInfo(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     let infoParent = $xui.getInfo(infoFile, info.parentXid, info.parentXid);
-    console.debug("info add action ", info, infoParent);
+    console.debug("info add action ", $xui.propertiesDesign, info, infoParent);
 
-    $xui.rootdata.activeAction = 3;
-
-    if ($xui.propertiesDesign.isSlot) {
-
+    if ($xui.propertiesDesign.isSlot || info.addRemoveAction != null) {
+        // ajout dans un slot ou avec un addRemoveAction
         if (info.docId == "xui-no-dom:xui-flow"
             || info.docId == "v-col:xui-row-grid-responsive"
             || info.docId == "v-col:xui-row-1"
@@ -347,8 +404,7 @@ $xui.addAction = () => {
                 addCmpXID($xui.propertiesDesign.xidSlot, "xui-flow");
                 return true;
             } else if (info.addRemoveAction == "incNb") {
-                addSlotByVariable(infoFile, info);
-                moveChildAfterInsert(infoFile, info)
+                $xui.changeChild(infoFile, info.xid, "after");
                 return true
             }
 
@@ -361,7 +417,7 @@ $xui.addAction = () => {
             return true
         }
         else {
-            // surround
+            // ajoute un surround de type xui-flow
             $xui.setCurrentAction("addAction");
             let cmp = { xid: 'xui-flow' };
             const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
@@ -373,15 +429,12 @@ $xui.addAction = () => {
     }
 }
 
-function moveChildAfterInsert(infoFile, info) {
-    $xui.insertChild(infoFile, info.xid);
-}
 
 function addCmpXID(xidDest, idCmp) {
     let infoFile = getInfoFile("template");
     const newXid = $xui.getNewXid(xidDest, idCmp);
     const template = "<xui-design xid=\"" + xidDest + "\"><" + idCmp + " xid=\"" + newXid + "\"></" + idCmp + "></xui-design>";
-    $xui.addDesign(infoFile, xidDest, template, true, false);
+    $xui.addDesignXUI(infoFile, xidDest, template, true, false);
 }
 
 function addSlotByVariable(infoFile, infoParent) {
@@ -499,7 +552,7 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         var template = "<div id='AppPropertiesSetting' class='barcustom xui-div-design'>" + $xui.propertiesDesign.template + "</div>";
         var tmpCompiled = compileTemplate(template);
 
-        if ($xui.vuejsDesign != null) {
+        if ($xui.vuejsAppPropertiesSetting != null) {
             $xui.vuejsAppPropertiesSetting.$destroy();
         }
         $xui.vuejsAppPropertiesSetting = new Vue({
