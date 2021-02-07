@@ -1,3 +1,32 @@
+<!--
+
+main
+    main-tab
+
+        tab-editor   : editor de page
+            tab-editor-tab-0  : la previsualisation
+                main-container  
+                        main-item-1  : vide
+                        main-item-2  
+                            RootFrame    :    iframe
+                        main-item-3
+                            action-tab  : les action sur iFrame
+                                action-tab-tab-item-0
+                                    AppPropertiesSetting  : les properties
+                                action-tab-tab-item-1   : style
+                                action-tab-tab-item-2   : binding
+                                action-tab-tab-item-3
+                                    AppComponents           : les composants
+                                action-tab-tab-item-4   : treeview
+
+            tab-editor-tab-1    : le style
+
+        tab-code :  visu du code
+            tab-code-tab-0  : html
+            tab-code-tab-1  : xui
+            tab-code-tab-2  : json
+-->
+
 <xui-factory version="1.0">
     <xui-import xui-path="app/vue2frame.html"></xui-import>
     <xui-import xui-path="app/vue2CmpLayoutVuetify.html"></xui-import>
@@ -15,7 +44,7 @@
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
         <!--#1d9da0 vert-->
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2020 v0.4.1 26/07/20"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.5.0 07/02/2021"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
@@ -114,7 +143,7 @@
         <v-icon>mdi-border-inside</v-icon>
     </xui-design>
 
-    <!--------------------------------------------------------------------------->
+    <!---------------------------Editor de page ------------------------------------>
     <xui-design xid="main-tab-tab-item-0">
         <xui-tabs xid="tab-editor" class="tab-editor" xui-dark=true height="32px" xui-nb="3"></xui-tabs>
     </xui-design>
@@ -144,7 +173,7 @@
     <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true class="tab-action" height="35px" xui-nb="5">
     </xui-tabs>
 
-    <!--------------------------------------------------------------------------->
+    <!-----------------------------Le style de la page -------------------------------->
     <xui-design xid="tab-editor-tab-1">
         <v-icon>mdi-palette</v-icon><span>Style</span>
     </xui-design>
@@ -233,7 +262,7 @@
     <!--------------------------------------------------------------------------->
     <xui-design xid="slot-action-header">
         <xui-btn-small @click="$xui.fullScreen()">
-            <v-icon>mdi-fullScreen</v-icon>
+            <v-icon>mdi-fullscreen</v-icon>
         </xui-btn-small>
         <xui-btn-small @click="$xui.modePreview()">
             <v-icon>mdi-television-play</v-icon>

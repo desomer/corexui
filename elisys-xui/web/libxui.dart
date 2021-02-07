@@ -17,21 +17,27 @@ import 'core/XUIJSInterface.dart';
 import 'core/element/XUIElement.dart';
 import 'core/parser/HTMLWriter.dart';
 
+///------------------------- methode XUI vers JS -----------------------------
+
 @JS()
 external void loadPageJS(obj);
 
 @JS()
 external void changePageJS(obj);
 
-@JS('refreshXUI')
-external set _refresh(void Function(FileDesignInfo) f);
+///-------------------------- methode JS vers XUI ----------------------------
+@JS('initPageXUI')
+external set _initPageXUI(dynamic Function(FileDesignInfo) f);
+
+@JS('refreshPageXUI')
+external set _refreshPageXUI(void Function(FileDesignInfo) f);
 
 @JS('addDesignXUI')
-external set _addDesign(
+external set _addDesignXUI(
     void Function(FileDesignInfo, String, String, bool, bool) f);
 
-@JS('getHtmlFrom')
-external set _getHtmlFrom(void Function(FileDesignInfo, String) f);
+@JS('getHtmlFromXUI')
+external set _getHtmlFromXUI(void Function(FileDesignInfo, String) f);
 
 @JS('cutDesign')
 external set _cutDesign(void Function(FileDesignInfo, String) f);
@@ -52,31 +58,65 @@ external set _moveDesign(void Function(FileDesignInfo, String, String) f);
 @JS('changeChild')
 external set _changeChild(void Function(FileDesignInfo, String, String) f);
 
-@JS('getInfo')
-external set _getInfo(dynamic Function(FileDesignInfo, String, String) f);
+@JS('getInfoXUI')
+external set _getInfoXUI(dynamic Function(FileDesignInfo, String, String) f);
 
-@JS('getComponents')
-external set _getComponents(dynamic Function(FileDesignInfo, String, String) f);
+@JS('getComponentsXUI')
+external set _getComponentsXUI(dynamic Function(FileDesignInfo, String, String) f);
 
 @JS('getActionsXUI')
 external set _getActions(dynamic Function(FileDesignInfo, String, String, String) f);
 
+/// retourne les properties
 @JS('getDesignProperties')
 external set _getDesignProperties(
     void Function(FileDesignInfo, String, String) f);
 
+/// change les properties
 @JS('setDesignProperties')
 external set _setDesignProperties(dynamic Function(FileDesignInfo, dynamic) f);
 
-@JS('initPage')
-external set _initPage(dynamic Function(FileDesignInfo) f);
-
 ///------------------------------------------------------------------
+Future initPageXUI(FileDesignInfo fileInfo) async {
+  print("-------------- start initPage xui ----------------");
+
+  var ctx = XUIContext(fileInfo.mode);
+  var designManager = _getDesignManager(fileInfo);
+
+  await _initStoreVersion(designManager, fileInfo, ctx);
+
+  String str = await designManager.getHtml(ctx, fileInfo.file, fileInfo.xid);
+
+  loadPageJS(str);
+}
+
+// recharge la page  (reload ou clear)
+Future refreshPageXUI(FileDesignInfo fileInfo) async {
+  if (fileInfo.action == "reload") {
+    print("reload all from storage");
+    XUIDesignManager.removeDesignManager(fileInfo);
+    var ctx = XUIContext(MODE_TEMPLATE);
+    var designManager = _getDesignManager(fileInfo);
+
+    await _initStoreVersion(designManager, fileInfo, ctx);
+  }
+
+  if (fileInfo.action == "clear") {
+    print("clear all from storage");
+    XUIDesignManager.removeDesignManager(fileInfo);
+    var ctx = XUIContext(MODE_TEMPLATE);
+    var designManager = _getDesignManager(fileInfo);
+    await designManager.initEngine(fileInfo.file, ctx);
+  }
+
+  await _reload(fileInfo);
+  return Future.value();
+}
 
 /// change les properties
-void setDesignProperties(FileDesignInfo fileInfo, dynamic listDesg) async {
+void setDesignProperties(FileDesignInfo fileInfo, dynamic listDesig) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
-  List listDesign = listDesg;
+  List listDesign = listDesig;
 
   for (ObjectDesign item in listDesign) {
     if (item.value != item.value_orig) {
@@ -113,7 +153,7 @@ void getDesignProperties(
 }
 
 /// Retourne la liste des composants
-dynamic getComponents(FileDesignInfo fileInfo, String id, String idslot) {
+dynamic getComponentsXUI(FileDesignInfo fileInfo, String id, String idslot) {
   var designInfo = _getDesignManager(fileInfo).getJSComponentInfo(id, idslot);
   var vueParamJS = VueParamJS();
   vueParamJS.xid = designInfo.xid;
@@ -128,7 +168,7 @@ dynamic getComponents(FileDesignInfo fileInfo, String id, String idslot) {
 }
 
 /// retourne les info d'un xid
-dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
+dynamic getInfoXUI(FileDesignInfo fileInfo, String id, String idslot) {
   var engine = _getDesignManager(fileInfo).xuiEngine;
   var info = engine.getSlotInfo(id, idslot);
 
@@ -153,7 +193,7 @@ dynamic getInfo(FileDesignInfo fileInfo, String id, String idslot) {
   return InfoJS;
 }
 
-void addDesign(FileDesignInfo fileInfo, String id, String template, bool reload,
+void addDesignXUI(FileDesignInfo fileInfo, String id, String template, bool reload,
     bool init) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
   await designMgr.addDesign(id, template);
@@ -195,7 +235,7 @@ void cutDesign(FileDesignInfo fileInfo, String id) async {
 
   // ajoute un design a la trashcan
   String slot = "<xui-design xid=\"" + XUI_COPYZONE_SLOT + "\"></xui-design>";
-  await addDesign(fileInfo, XUI_COPYZONE_SLOT, slot, false,
+  await addDesignXUI(fileInfo, XUI_COPYZONE_SLOT, slot, false,
       true); //todo ajout direct xuiDesign
 
   // move id vers la trashcan
@@ -242,7 +282,7 @@ void surroundDesign(FileDesignInfo fileInfo, String id, String template,
   // move id vers la tempory
   designMgr.moveDesign(id, null, XUI_TEMPORARY_SLOT);
 
-  await addDesign(fileInfo, xidParent, template, false, true);
+  await addDesignXUI(fileInfo, xidParent, template, false, true);
 
   String targetXid = xidSurround + "-col-0";
   designMgr.addXUIDesignEmpty(targetXid);
@@ -355,30 +395,8 @@ Future _doMoveChildByIdx(String suffix, int i, int idst,
   }
 }
 
-Future refresh(FileDesignInfo fileInfo) async {
-  if (fileInfo.action == "reload") {
-    print("reload all from storage");
-    XUIDesignManager.removeDesignManager(fileInfo);
-    var ctx = XUIContext(MODE_TEMPLATE);
-    var designManager = _getDesignManager(fileInfo);
-
-    await _initStoreVersion(designManager, fileInfo, ctx);
-  }
-
-  if (fileInfo.action == "clear") {
-    print("clear all from storage");
-    XUIDesignManager.removeDesignManager(fileInfo);
-    var ctx = XUIContext(MODE_TEMPLATE);
-    var designManager = _getDesignManager(fileInfo);
-    await designManager.initEngine(fileInfo.file, ctx);
-  }
-
-  await _reload(fileInfo);
-  return Future.value();
-}
-
 /// retourne le code html d'un xui
-void getHtmlFrom(FileDesignInfo fileInfo, String idPromise) async {
+void getHtmlFromXUI(FileDesignInfo fileInfo, String idPromise) async {
   var ctx = XUIContext(fileInfo.mode);
   var designMgr = _getDesignManager(fileInfo);
   var html;
@@ -434,19 +452,6 @@ void _reload(FileDesignInfo fileInfo) async {
   changePageJS(options);
 }
 
-Future initPage(FileDesignInfo fileInfo) async {
-  print("-------------- start initPage xui ----------------");
-
-  var ctx = XUIContext(MODE_DESIGN);
-  var designManager = _getDesignManager(fileInfo);
-
-  await _initStoreVersion(designManager, fileInfo, ctx);
-
-  String str = await designManager.getHtml(ctx, fileInfo.file, fileInfo.xid);
-
-  loadPageJS(str);
-}
-
 dynamic getActions(FileDesignInfo fileInfo, String id,  String idSlot, String action) {
   print("-------------- getActions ----------------");
 
@@ -457,20 +462,20 @@ dynamic getActions(FileDesignInfo fileInfo, String id,  String idSlot, String ac
 }
 
 void main() async {
-  _refresh = allowInterop(refresh);
-  _addDesign = allowInterop(addDesign);
+  _refreshPageXUI = allowInterop(refreshPageXUI);
+  _addDesignXUI = allowInterop(addDesignXUI);
   _cutDesign = allowInterop(cutDesign);
   _copyDesign = allowInterop(copyDesign);
   _surroundDesign = allowInterop(surroundDesign);
   _moveDesign = allowInterop(moveDesign);
   _changeChild = allowInterop(changeChild);
-  _getInfo = allowInterop(getInfo);
+  _getInfoXUI = allowInterop(getInfoXUI);
   _getDesignProperties = allowInterop(getDesignProperties);
   _setDesignProperties = allowInterop(setDesignProperties);
-  _getComponents = allowInterop(getComponents);
-  _getHtmlFrom = allowInterop(getHtmlFrom);
+  _getComponentsXUI = allowInterop(getComponentsXUI);
+  _getHtmlFromXUI = allowInterop(getHtmlFromXUI);
   _deleteDesign = allowInterop(deleteDesign);
-  _initPage = allowInterop(initPage);
+  _initPageXUI = allowInterop(initPageXUI);
   _getActions = allowInterop(getActions);
 }
 
@@ -480,7 +485,7 @@ XUIDesignManager _getDesignManager(FileDesignInfo fileInfo) {
 
 Future _initStoreVersion(XUIDesignManager designManager,
     FileDesignInfo fileInfo, XUIContext ctx) async {
-  var name = "frame1";
+  var name = fileInfo.fileID;
 
   var ver = window.localStorage['xui_version_' + name];
   if (ver != null) {

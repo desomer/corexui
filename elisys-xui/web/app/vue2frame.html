@@ -151,7 +151,7 @@
 	<!--  gestion page autonome -->
 	<html xid="frame-vuetify-1" xui-mode="final;design;preview" style="height:100vh;" xui-doc-id="page">
 		<head xid="header-vuetify" xui-no-design></head>
-		<body xid="body-vuetify" xui-no-design style="height:100vh"></body>
+		<body xid="body-vuetify" xui-no-design style="height:100vh;"></body>
 
 		<xui-script-data></xui-script-data>
 		<style id="xui-style" xid="inject-style" xui-no-design></style>
@@ -238,7 +238,7 @@
 		</xui-slot>
 	</v-navigation-drawer>
 
-	<v-main xid="vue-content-1" class="fill-height" -style="background:[[colorBg]]">
+	<v-main xid="vue-content-1" class="fill-height" -style="background:[[colorBg@0+]]">
 		<xui-slot xid="main" xui-reloader=true style-slot="height:100%;width:100%"  xui-slot-name="page content">
 		</xui-slot>
 	</v-main>
@@ -298,13 +298,14 @@
 			}
 
 			html::-webkit-scrollbar-track {
+				border-radius: 6px;
 				background: #ffffffd9;
-				box-shadow: inset 0 0 3px 0px rgba(0, 0, 0, 0.1);
+				box-shadow: inset 2px 1px 5px 0px rgb(154 148 148)
 			}
 
 			html::-webkit-scrollbar-thumb {
-				box-shadow: inset 0 0 15px 0px rgba(0, 0, 0, 0.2);
-				border-radius: 3px;
+				box-shadow: inset -1px 1px 5px 2px rgb(0 0 0 / 20%);
+				border-radius: 6px;
 			}
 		</style>
 	</xui-design>

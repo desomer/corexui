@@ -8,11 +8,11 @@ export class ComponentManager {
 
             if ($xui.rootdata.isDesignFrame) {
 
-                this.waitForGlobal("getHtmlFrom", function () {
+                this.waitForGlobal("getHtmlFromXUI", function () {
 
                     var infoFileCmp = { file: file, xid: xid, mode: 'final' };
                     var prom = getPromise("getVueCmp")
-                    $xui.getHtmlFrom(infoFileCmp, "getVueCmp");
+                    $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp");
                     prom.then(jsCmp => {
 
                         this.initComponent(jsCmp, resolve);

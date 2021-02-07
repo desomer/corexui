@@ -37,9 +37,9 @@ function waitForXuiLib(key, callback) {
     }
 };
 
-waitForXuiLib("initPage", function () {
+waitForXuiLib("initPageXUI", function () {
     var infoFile = getInfoFile("design");
-    $xui.initPage(infoFile);
+    $xui.initPageXUI(infoFile);
 });
 
 /******************************************************************************** */

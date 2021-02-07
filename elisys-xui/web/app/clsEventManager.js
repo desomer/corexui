@@ -102,11 +102,10 @@ export class EventManager {
             }
             // gestion d'un hot load reloader
             else if (data.action == "load reloader") {
-                var infoFileCmp = getInfoFile('template');
+                var infoFileCmp = $xui.pageDesignManager.getInfoFile('template');
                 infoFileCmp.part = data.xid;
-                //  { file: "app/frame1.html", xid: "root", mode: 'template',  part:data.xid };
                 var prom = getPromise("getVueCmp")
-                $xui.getHtmlFrom(infoFileCmp, "getVueCmp");
+                $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp");
                 prom.then(template => {
                     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeReloader", "xid": data.xid, "template": template }, "*");
                 })
@@ -121,7 +120,7 @@ export class EventManager {
                 var act = "returnCmpForFile_" + data.infoFileCmp.file + "_" + data.infoFileCmp.xid;
 
                 var prom = getPromise(act)
-                $xui.getHtmlFrom(data.infoFileCmp, act);
+                $xui.getHtmlFromXUI(data.infoFileCmp, act);
                 prom.then(jsCmp => {
                     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": act, jsCmp: jsCmp }, "*");
                 });

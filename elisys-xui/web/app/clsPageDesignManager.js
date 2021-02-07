@@ -5,9 +5,22 @@ export class PageDesignManager {
     codeXUI= null;
     db = null;
 
+    getInfoFile(mode) {
+        return { fileID: window.$xui.frameName,  file: 'app/'+window.$xui.frameName+'.html', xid: 'root', mode: mode };
+    }
+    
+    waitForXuiLib(key, callback) {
+        if ($xui[key] != null) {
+            callback();
+        } else {
+            setTimeout(function () { this.waitForXuiLib(key, callback); }.bind(this), 100);
+        }
+    };
+    
+
     getPageId()
     {
-        return "frame1";
+        return window.$xui.frameName;
     }
 
     loadPage(html) {

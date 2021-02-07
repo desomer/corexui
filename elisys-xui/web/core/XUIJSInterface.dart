@@ -10,8 +10,11 @@ class FileDesignInfo {
   external set action(String action);
   external String get file; 
   external set file(String file); 
-  external String get mode;
 
+  external String get fileID; 
+  external set fileID(String fileID); 
+
+  external String get mode;
   external set mode(String mode);
   external String get part;
   external set part(String part);

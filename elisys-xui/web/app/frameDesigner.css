@@ -1,3 +1,4 @@
+/*********************barcustom  pour la zone d'action ************************/
 .barcustom::-webkit-scrollbar {
     width: 10px;
 }
@@ -12,20 +13,27 @@
     border-radius: 10px;
 }
 
+/*********************************************************/
+
 html::-webkit-scrollbar {
      width: 0px;  /*pas de scrollbar */
 }
 
 /*********************************************************/
+/* .v-tabs-items {
+    height: calc(100% - 32px);
+} */
+
+
 .main-container { 
-    height: calc(100vh - 64px - 32px);
+    height: calc(100vh - 64px - 32px);    /* entete * 2 + hauteur onglet  */
     width: 100%;
     display: grid; 
     grid-template-columns: 0px auto 250px;
     grid-template-rows: 100%; 
     }
  
-
+/* les tab editor/code/api  */
 .main-tab > * > * > * > .v-tab {
     min-width: 40px;
     width: 40px;
@@ -34,23 +42,28 @@ html::-webkit-scrollbar {
 
 .main-tab > .v-tabs-items
 {
-    height : 100%    /* teb vertical */
+    height : 100%    /* tab vertical */
 }
 
-.tab-action > .v-tabs-items
-{
-    height: calc(100% - 40px)
-}
 
-.tab-editor > .v-tabs-items
-{
-    height: calc(100% - 40px)
-}
 
+/* largeur tab prop/style/bind/cmp/tree */
 .tab-action > * > * > * > .v-tab {
     min-width: 40px;
     width: 40px;
 }
+
+.tab-action > .v-tabs-items
+{
+    height: calc(100% - 35px)
+}
+
+.tab-editor > .v-tabs-items
+{
+    height: calc(100% - 32px)
+}
+
+
 
 /* container de l'Iframe */    
 .main-item-2 {
@@ -96,7 +109,7 @@ pre > code {
 /*************************************************************/
 .xui-div-design {
     /*background-color: #565656;  //dark */
-    overflow-y: scroll; overflow-x: hidden; height: calc(100% + 48px - 35px);
+    overflow-y: scroll; overflow-x: hidden; height: 100%;
 }
 
 .xui-btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}

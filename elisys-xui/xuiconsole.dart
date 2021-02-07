@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'web/core/parser/HTMLReader.dart';
 import 'web/core/XUIEngine.dart';
-import 'web/core/XUIActionManager.dart';
 import 'web/core/XUIFactory.dart';
 import 'web/core/parser/ProviderFile.dart';
 import 'web/core/XUIEngine.dart' as cst;
@@ -16,17 +15,17 @@ import 'web/core/XUIEngine.dart' as cst;
 ///   https://dashboard.fauna.com/
 
 void main() async {
-  final myJsonAsString = '{"a": 1, "b": "c"}';
-  final jsond = json.decode(myJsonAsString);
-  print('json=' + jsond.toString());
+//  final myJsonAsString = '{"a": 1, "b": "c"}';
+//  final jsond = json.decode(myJsonAsString);
+//  print('json=' + jsond.toString());
 
 //try {
 
-  var provider = ProviderFile('C:/src_dart/elisys-xui/web/');
+  var provider = ProviderFile('C:/src_dart/corexui/elisys-xui/web/');
 
   var bufferHtml = XUIHtmlBuffer();
 
-  bool designer = true;
+  bool designer = false;
 
   if (designer) {
     var reader = HTMLReader('app/frameDesigner.html', provider);
@@ -38,15 +37,15 @@ void main() async {
     print(bufferHtml.html);
 
     print("write ok size=${bufferHtml.html.length}");
-    var path = 'C:/src_dart/elisys-xui/web/index.html';
+    var path = 'C:/src_dart/corexui/elisys-xui/web/index.html';
     File(path).writeAsStringSync(bufferHtml.html.toString());
 
 
   } else {
 
-    var reader = HTMLReader('app/frame1.html', provider);
+    var reader = HTMLReader('app/frame2.html', provider);
     var xuiEngine = XUIEngine();
-    var ctx = XUIContext(cst.MODE_TEMPLATE);
+    var ctx = XUIContext(cst.MODE_DESIGN);
     await xuiEngine.initialize(reader, ctx);
 
     // await xuiEngine.addDesign(
@@ -64,9 +63,9 @@ void main() async {
 
     await xuiEngine.toHTMLString(bufferHtml, "root", ctx);
 
-    XUIActionManager(xuiEngine).removeDesign("onglet", null);
+   // XUIActionManager(xuiEngine).removeDesign("onglet", null);
 
-    await xuiEngine.toHTMLString(bufferHtml, "root", ctx);
+    //await xuiEngine.toHTMLString(bufferHtml, "root", ctx);
 
     // var design = xuiEngine.getDesignInfo("onglet-tab-1", "onglet-tab-1");
     // var design2 =
@@ -76,7 +75,7 @@ void main() async {
     print(bufferHtml.html);
 
     print("write ok size=${bufferHtml.html.length}");
-    var path = 'c:/xui/assets/test.html';
+    var path = 'C:/src_dart/corexui/elisys-xui/web/frame2.html';
     File(path).writeAsStringSync(bufferHtml.html.toString());
   }
 }

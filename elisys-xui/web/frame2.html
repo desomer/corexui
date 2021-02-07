@@ -1,0 +1,303 @@
+<html style="height:100vh;" data-xid="root" data-xid-slot-inject-after-body=true>
+   <head data-xid-slot-inject-other-header=true data-xid="header-vuetify">
+      <title>Test2</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"></meta>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css"></link>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"></link>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" type="text/css"></link>
+      <script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
+      <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+   </head>
+   <body style="height:100vh;" data-xid="body-vuetify">
+      <template data-xid-slot-xui-temporary-slot=true id="xui-rootTemplate">
+         <v-app data-xid-slot-inject-design-ui=true data-xid="maincontent">
+            <v-app-bar color="red" data-xid="toolbar" app>
+               <v-toolbar-title>
+<v-xui-reloader modedisplay="contents" partid="slot-toolbar-title"></v-xui-reloader>               </v-toolbar-title>
+               <v-spacer></v-spacer>
+<v-xui-reloader modedisplay="contents" partid="slot-action-header"></v-xui-reloader>            </v-app-bar>
+            <v-main style="background:white" class="fill-height" data-xid="contentpage">
+<v-xui-reloader modedisplay="contents" partid="main"></v-xui-reloader>            </v-main>
+         </v-app>
+         <div data-xid-slot-xui-copyzone-slot=true style="display:none; z-index: 100; 
+				background-color: white;position: absolute;
+				border: 1px solid #0b00ff;
+				top: 10vh;left: 10vw;height: 80vh;width: 80vw;">
+         </div>
+      </template>
+      <div id="app"></div>
+   </body>
+   <script>
+		if (typeof $xui === 'undefined')
+			$xui = {};
+
+		$xui.rootdata = {
+			navdrawer: false
+		};
+
+		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler  
+	</script>
+   <style id="xui-style" data-xid="inject-style">
+
+			input[disabled],
+			button[disabled] {
+				pointer-events: auto !important;
+				/* click de selection pour le designer accessible sur les disables */
+			}
+
+			[contenteditable]:focus {
+				background: #fff;
+				color: black;
+			}
+
+			[contenteditable]::selection {
+				background: #d9dcff;
+				color: black;
+			}
+		
+			html::-webkit-scrollbar {
+				width: 10px;
+			}
+
+			html::-webkit-scrollbar-track {
+				background: #ffffffd9;
+				box-shadow: inset 0 0 3px 0px rgba(0, 0, 0, 0.1);
+			}
+
+			html::-webkit-scrollbar-thumb {
+				box-shadow: inset 0 0 15px 0px rgba(0, 0, 0, 0.2);
+				border-radius: 3px;
+			}
+		
+			.v-main__wrap {
+				display: contents;
+				height: 100%;
+			}
+		
+			.v-navigation-drawer__content::-webkit-scrollbar {
+				width: 10px;
+			}
+
+			.v-navigation-drawer__content::-webkit-scrollbar-track {
+				box-shadow: inset 0 0 6px 0px rgba(0, 0, 0, 0.1);
+			}
+
+			.v-navigation-drawer__content:hover::-webkit-scrollbar-track {
+				box-shadow: inset 0 0 6px 0px rgba(0, 0, 0, 0.3);
+			}
+
+			.v-navigation-drawer__content::-webkit-scrollbar-thumb {
+				box-shadow: inset 0 0 15px 0px;
+				border-radius: 5px;
+			}
+		   </style>
+   <script type="module">
+		import "./app/vue2frame.js";
+		$xui.loadApplicationJS();
+	</script>
+   <script>
+
+		document.addEventListener("keydown", function (event) {
+			listShortCut = [
+				{ ctrl: true, keyCode: 80, action: "ctrlP" },  // preview
+				{ ctrl: true, keyCode: 67, action: "ctrlC" },
+				{ ctrl: true, keyCode: 88, action: "ctrlX" },
+				{ ctrl: true, keyCode: 86, action: "ctrlV" },
+				{ ctrl: true, keyCode: 90, action: "ctrlZ" },
+				{ ctrl: true, keyCode: 89, action: "ctrlY" },
+			];
+
+			//console.debug( event.keyCode );
+
+			for (const shortKey of listShortCut) {
+				if (event.ctrlKey == shortKey.ctrl && event.keyCode == shortKey.keyCode) {
+					event.preventDefault();
+					var message = {
+						action: shortKey.action,
+					};
+					window.parent.postMessage(message, "*");
+				}
+			}
+
+		});
+	document.addEventListener('dragenter', function (e) {
+    var slotDroppable = e.target.closest('.xui-class-slot')
+    if (slotDroppable) {
+        slotDroppable.classList.add("xui-class-dragover");
+    }
+});
+
+document.addEventListener('dragleave', function (e) {
+    var slotDroppable = e.target.closest('.xui-class-slot')
+    if (slotDroppable)
+        slotDroppable.classList.remove("xui-class-dragover");
+});
+
+document.addEventListener('dragover', function (e) {
+    var slotDroppable = e.target.closest('.xui-class-slot')
+    if (slotDroppable)
+        e.preventDefault();
+});
+
+document.addEventListener('drop', function (e) {
+    var slotDroppable = e.target.closest('.xui-class-slot')
+    if (slotDroppable) {
+        e.preventDefault();
+        var idCmp = e.dataTransfer.getData('text/plain');
+        let targetAction = e.target.closest("[data-xid]");
+        console.debug("drop ", idCmp, targetAction);
+        var message = { action: "drop", xid: targetAction.dataset.xid, xid_slot: targetAction.dataset.xidSlot };
+        window.parent.postMessage(message, "*");
+    }
+});
+
+// Cet événement détecte n'importe quel drag & drop qui se termine, autant le mettre sur « document » :
+document.addEventListener('dragend', function () {
+});
+
+/***********************************************************************************/
+
+document.addEventListener('pointerdown', e => {
+    targetActionStart = e.target.closest("[data-xid]");
+});
+
+document.addEventListener('pointerup', function (e) {  
+    //console.debug("pointerup", e);
+    if (e.button != 0)
+        return;
+
+    let targetAction = e.target.closest("[data-xid]");
+    if (targetActionStart != targetAction)
+        return;  // ne fait rien sur le drag (ex : Split)
+
+    let elemRect = targetAction.getBoundingClientRect();
+    let s = getComputedStyle(targetAction);
+    let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
+
+    var message = {
+        action: "select",
+        xid: targetAction.dataset.xid,
+        xid_slot: targetAction.dataset.xidSlot,
+        position: {
+            hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
+            height: elemRect.height,
+            width: elemRect.width,
+            left: elemRect.left,
+            top: elemRect.top,
+            ...margin
+        },
+    };
+    //console.debug("***********message", message, targetAction, targetActionStart);
+    window.parent.postMessage(message, "*");
+});
+
+document.addEventListener('scroll', function (event) {
+    var message = {
+        action: "unselect",
+    };
+    window.parent.postMessage(message, "*");
+});
+
+window.addEventListener('resize', function (event) {
+    var message = {
+        action: "unselect",
+    };
+    window.parent.postMessage(message, "*");
+});
+
+//******************************************************************************* */
+
+window.addEventListener('message', function (e) {
+    var data = e.data;
+    if (data.action == "changeTemplate") {
+        if (data.param.listReloader != null) {
+            var uniqReloader = [...new Set(data.param.listReloader)];
+            this.console.info("changeTemplate event reloader", data.param.listReloader);
+
+            for (const idReloader of uniqReloader) {
+                if ($xui.listReloader[idReloader] != null)
+                $xui.listReloader[idReloader].reload();
+            else
+                this.console.error("+-+-+-+-+-+-+-+-+ pb reloader inconnu", idReloader, $xui.listReloader);
+            }
+        }
+        else {
+            this.console.info("changeTemplate event all", data.param);
+            let styleXui = this.document.body.querySelector("#xui-style");
+            if (styleXui!=null) {
+                this.console.debug("+++++++++++>  move style to header")
+                styleXui.remove()
+                this.document.head.appendChild(styleXui);
+            }
+            
+            this.document.body.innerHTML = data.param.html;
+            $xui.loadApplicationJS();
+        }
+    }
+    if (data.action == "changeReloader") {
+        //console.debug("load reloader", data.xid, data);
+        if ($xui.listReloader[data.xid] == null)
+            console.error("changeReloader on error", data, $xui.listReloader);
+        $xui.listReloader[data.xid].rload(data);
+    }
+});
+
+//******************************************************************************* */
+
+$xui.updateDirectPropInnerText = (event, variable, xid, selectAll) => {
+    if (selectAll)
+        setTimeout(() => { document.execCommand('selectAll', false, null); }, 300);
+
+    var message = {
+        action: "updateDirectProp",
+        xid: xid,
+        xid_slot: xid,
+        variable: variable,
+        value: event.target.innerText
+    };
+    window.parent.postMessage(message, "*");
+}
+
+$xui.updateDirectPropBlur = () =>
+{
+    window.getSelection().removeAllRanges();
+} 
+
+// ne sert plus
+$xui.updateDirectPropValue = (value, variable, xid) => {
+    var message = {
+        action: "updateDirectProp",
+        xid: xid,
+        xid_slot: xid,
+        variable: variable,
+        value: value.target.value
+    };
+    window.parent.postMessage(message, "*");
+}
+
+
+window.getInfoForSelector = (selector, parent) => {
+    var targetAction = document.querySelector(selector)
+    if (targetAction == null) return null;
+    if (parent)
+        targetAction = targetAction.parentNode;
+
+    let elemRect = targetAction.getBoundingClientRect();
+    let s = getComputedStyle(targetAction);
+
+    let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
+
+    var ret = {
+        selector : selector,
+        parent : parent,
+        hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
+        height: elemRect.height,
+        width: elemRect.width,
+        left: elemRect.left,
+        top: elemRect.top,
+        ...margin
+    };
+
+    return ret;
+}   </script>
+</html>
