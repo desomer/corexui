@@ -198,21 +198,21 @@
 
 	<xui-design xid="maincontent">
 		<xui-slot xid="inject-design-ui" xui-no-design></xui-slot>
-		<vue-systembar-1 xid="systembar"></vue-systembar-1>
-		<vue-nav-drawer-1 xid="navdrawerleft"></vue-nav-drawer-1>
-		<vue-apptoolbar-1 xid="toolbar"></vue-apptoolbar-1>
+		<vue-systembar-1 xid="systembar"  xui-if=[[withSysBar@0+]]></vue-systembar-1>
+		<vue-nav-drawer-1 xid="navdrawerleft" xui-if=[[withLeftNavigation@0+]]></vue-nav-drawer-1>
+		<vue-apptoolbar-1 xid="toolbar" xui-if=[[withAppBar@0+]]></vue-apptoolbar-1>
 		<vue-content-1 xid="contentpage"></vue-content-1>
-		<vue-footer-1 xid="footer"></vue-footer-1>
-		<vue-bottom-nav-1 xid="bottom-nav"></vue-bottom-nav-1>
+		<vue-footer-1 xid="footer" xui-if=[[withFooter@0+]]></vue-footer-1>
+		<vue-bottom-nav-1 xid="bottom-nav" xui-if=[[withBottomNavigation@0+]]></vue-bottom-nav-1>
 	</xui-design>
 
-	<v-system-bar xid="vue-systembar-1" xui-if=[[withSysBar@0+]] class="[[class]]" -style="[[style]]" app
+	<v-system-bar xid="vue-systembar-1" class="[[class]]" -style="[[style]]" app
 		dark="[[darkApp@0+]]">
 		<xui-slot xui-reloader=true xid="slot-content-systembar" xui-slot-full xui-slot-name="system bar content">
 		</xui-slot>
 	</v-system-bar>
 
-	<v-app-bar xid="vue-apptoolbar-1" xui-if=[[withAppBar@0+]] app clipped-left="[[clipped-left@0+]]" src="[[src]]"
+	<v-app-bar xid="vue-apptoolbar-1"  app clipped-left="[[clipped-left@0+]]" src="[[src]]"
 		fade-img-on-scroll="[[fade-img-on-scroll]]" dark="[[darkApp@0+]]" flat="[[HeaderFlat]]"
 		height="[[headerHeight]]" dense="[[HeaderDense]]" prominent="[[HeaderProminent]]"
 		shrink-on-scroll="[[shrink-on-scroll]]" collapse-on-scroll="[[HeaderCollapseonscroll]]"
@@ -232,7 +232,7 @@
 		</template>
 	</v-app-bar>
 
-	<v-navigation-drawer v-model="navdrawer" xid="vue-nav-drawer-1" xui-if=[[withLeftNavigation@0+]]
+	<v-navigation-drawer v-model="navdrawer" xid="vue-nav-drawer-1"
 		clipped="[[clipped-left@0+]]" temporary="[[navTemporary@0+]]" permanent="[[navPermanent@0+]]" app>
 		<xui-slot xid="slot-navigation-drawer" style-slot="height:100%" xui-reloader=true  xui-slot-name="navigation">
 		</xui-slot>
@@ -243,12 +243,12 @@
 		</xui-slot>
 	</v-main>
 
-	<v-footer xid="vue-footer-1" xui-if=[[withFooter@0+]] app inset="[[inset-left@0+]]" height="[[footerHeight@0+]]"
+	<v-footer xid="vue-footer-1" app inset="[[inset-left@0+]]" height="[[footerHeight@0+]]"
 		dark="[[darkApp@0+]]" color="[[colorApp@0+]]">
 		<xui-slot xui-reloader=true xid="slot-footer" style-slot="width:100%" xui-slot-name="footer"></xui-slot>
 	</v-footer>
 
-	<v-bottom-navigation xid="vue-bottom-nav-1" xui-if=[[withBottomNavigation@0+]] app
+	<v-bottom-navigation xid="vue-bottom-nav-1" app
 		background-color="[[colorApp@0+]]" 
 		dark="[[darkApp@0+]]"
 		color="[[color]]"

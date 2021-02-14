@@ -1,7 +1,7 @@
 <!--
 
 main
-    main-tab
+    main-tab    (vertical)
 
         tab-editor   : editor de page
             tab-editor-tab-0  : la previsualisation
@@ -42,9 +42,8 @@ main
         <xui-prop id="title" val="PWA Designer"></xui-prop>
 
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
-        <!--#1d9da0 vert-->
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2020 v0.5.0 07/02/2021"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.5.0 14/02/2021"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
@@ -56,13 +55,14 @@ main
     <xui-design xid="maincontent">
         <xui-snackbar-dialog></xui-snackbar-dialog>
         <xui-popup-action></xui-popup-action>
+        <xui-class-editor></xui-class-editor>
     </xui-design>
 
     <xui-design xid="toolbar">
         <xui-prop id="headerHeight" val="32"></xui-prop>
     </xui-design>
 
-    <xui-design xid="footer" style="padding-top: 2px;">
+    <xui-design xid="footer" style="padding-top: 1px;">
         <xui-prop id="footerHeight" val="32"></xui-prop>
     </xui-design>
 
@@ -115,10 +115,8 @@ main
 
     <!--------------------------------------------------------------------------->
     <xui-design xid="main">
-        <xui-tabs xid="main-tab" xui-nb="7" xui-vertical=true xui-dark=true v-model="activeTab" class="main-tab">
+        <xui-tabs xid="main-tab" xui-nb="7" xui-vertical=true xui-tabs-dense=true xui-dark=true v-model="activeTab"  class="fill-height main-tab">
         </xui-tabs>
-
-        <xui-class-editor></xui-class-editor>
     </xui-design>
 
     <xui-design xid="main-tab-tab-0">
@@ -145,7 +143,7 @@ main
 
     <!---------------------------Editor de page ------------------------------------>
     <xui-design xid="main-tab-tab-item-0">
-        <xui-tabs xid="tab-editor" class="tab-editor" xui-dark=true height="32px" xui-nb="3"></xui-tabs>
+        <xui-tabs xid="tab-editor" class="fill-height" xui-dark=true xui-height-tabs="35px" xui-nb="3"></xui-tabs>
     </xui-design>
 
     <xui-design xid="tab-editor-tab-0">
@@ -154,7 +152,7 @@ main
     </xui-design>
 
     <xui-design xid="tab-editor-tab-item-0">
-        <div class="main-container">
+        <div class="main-container fill-height">
             <div class="main-item main-item-1"></div>
             <div class="main-item main-item-2">
                 <iframe id='rootFrame'>
@@ -164,32 +162,68 @@ main
                 <v-overlay :value="saveLayout" style="height: 100%;position: relative;">
                     <v-btn>Save in progress</v-btn>
                 </v-overlay>
-                <design-action style="position: absolute; top: 0px;width: 250px;height: 100%;" xid="action-tab">
+                <design-action xid="action-tab" style="position: absolute; top: 0px; width: 300px;" >
                 </design-action>
             </div>
         </div>
     </xui-design>
 
-    <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true class="tab-action" height="35px" xui-nb="5">
-    </xui-tabs>
-
     <!-----------------------------Le style de la page -------------------------------->
     <xui-design xid="tab-editor-tab-1">
         <v-icon>mdi-palette</v-icon><span>Style</span>
     </xui-design>
+
     <xui-design xid="tab-editor-tab-item-1">
         <div>Coming soon...</div>
     </xui-design>
+
+    <!-------------------------------Les actions & properties ---------------------------------->
+
+    <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true xui-tabs-dense=true class="fill-height" xui-height-tabs="35px" xui-nb="5">
+    </xui-tabs>
+
+    <xui-design xid="action-tab-tab-0">
+        <v-icon>mdi-layers-triple</v-icon>
+    </xui-design>
+    <xui-design xid="action-tab-tab-1">
+        <v-icon>mdi-plus-box-multiple</v-icon>
+    </xui-design>
+    <xui-design xid="action-tab-tab-2">
+        <v-icon>mdi-palette-swatch</v-icon>
+    </xui-design>
+    <xui-design xid="action-tab-tab-3">
+        <v-icon>mdi-database-import</v-icon>
+    </xui-design>
+    <xui-design xid="action-tab-tab-4">
+        <v-icon>mdi-file-tree</v-icon>
+    </xui-design>
+
+    <xui-design xid="action-tab-tab-item-0">
+        <div id="AppPropertiesSetting"></div>
+    </xui-design>
+    <xui-design xid="action-tab-tab-item-1">
+        <div id="AppComponents"></div>
+    </xui-design>
+    <xui-design xid="action-tab-tab-item-2">
+        <div>Extended Style coming soon...</div>
+    </xui-design>
+    <xui-design xid="action-tab-tab-item-3">
+        <div>Data binding coming soon...</div>
+    </xui-design>
+    <xui-design xid="action-tab-tab-item-4">
+        <div>TreeView coming soon...</div>.
+    </xui-design>
+
     <!--------------------------------------------------------------------------->
 
     <xui-design xid="main-tab-tab-item-1">
-        <xui-tabs xid="tab-code" class="tab-code" xui-dark=true height="32px" xui-nb="3"></xui-tabs>
+        <xui-tabs xid="tab-code" class="tab-code fill-height" xui-dark=true xui-height-tabs="35px" xui-nb="3"></xui-tabs>
     </xui-design>
 
     <!--------------------------------------------------------------------------->
     <xui-design xid="tab-code-tab-0"><span> Html </span></xui-design>
     <xui-design xid="tab-code-tab-item-0">
-        <div class="main-code">
+        <div class="fill-height">
             <pre>
                 <code id="xui-code-html" spellcheck="false"></code>
             </pre>
@@ -198,7 +232,7 @@ main
 
     <xui-design xid="tab-code-tab-1"><span>XUI</span></xui-design>
     <xui-design xid="tab-code-tab-item-1">
-        <div class="main-code">
+        <div class="fill-height">
             <pre>
                 <code id="xui-code-xui" spellcheck="false"></code>
             </pre>
@@ -207,7 +241,7 @@ main
 
     <xui-design xid="tab-code-tab-2"><span>JSON</span></xui-design>
     <xui-design xid="tab-code-tab-item-2">
-        <div class="main-code">
+        <div class="fill-height">
             <pre>
                 <code id="xui-code-json" spellcheck="false"></code>
             </pre>
@@ -226,38 +260,7 @@ main
         </div>
     </xui-design>
 
-    <!--------------------------------------------------------------------------->
-    <xui-design xid="action-tab-tab-0">
-        <v-icon>mdi-layers-triple</v-icon>
-    </xui-design>
-    <xui-design xid="action-tab-tab-1">
-        <v-icon>mdi-palette-swatch</v-icon>
-    </xui-design>
-    <xui-design xid="action-tab-tab-2">
-        <v-icon>mdi-database-import</v-icon>
-    </xui-design>
-    <xui-design xid="action-tab-tab-3">
-        <v-icon>mdi-plus-box-multiple</v-icon>
-    </xui-design>
-    <xui-design xid="action-tab-tab-4">
-        <v-icon>mdi-file-tree</v-icon>
-    </xui-design>
 
-    <xui-design xid="action-tab-tab-item-0">
-        <div id="AppPropertiesSetting"></div>
-    </xui-design>
-    <xui-design xid="action-tab-tab-item-1">
-        <div>Extended Style coming soon...</div>
-    </xui-design>
-    <xui-design xid="action-tab-tab-item-2">
-        <div>Data binding coming soon...</div>
-    </xui-design>
-    <xui-design xid="action-tab-tab-item-3">
-        <div id="AppComponents"></div>
-    </xui-design>
-    <xui-design xid="action-tab-tab-item-4">
-        <div>TreeView coming soon...</div>.
-    </xui-design>
 
     <!--------------------------------------------------------------------------->
     <xui-design xid="slot-action-header">

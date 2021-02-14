@@ -445,9 +445,10 @@
         <xui-prop id="desc">Des onglets</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
 
-        <xui-prop var="nb" def="3" editor="int">Nb d'onglet</xui-prop>
-        <xui-prop var="vertical" editor="bool">onglet vertical</xui-prop>
+        <xui-prop var="nb" def="3" editor="int">Nb tab(s)</xui-prop>
+        <xui-prop var="vertical" editor="bool">vertical</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
+        <xui-prop var="tabs-dense" editor="bool">dense</xui-prop>
 
         <xui-prop var="color" editor="text">color</xui-prop>
         <xui-prop var="background-color" editor="text">background color</xui-prop>
@@ -462,6 +463,8 @@
         <xui-prop var="fixed-tabs" editor="bool">fixed tabs</xui-prop>
         <xui-prop var="centered" editor="bool">centered</xui-prop>
         <xui-prop var="right" editor="bool">right</xui-prop>
+
+        <xui-prop var="height-tabs" editor="text">height tabs (48px)</xui-prop>
     
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
@@ -483,7 +486,8 @@
         <xui-prop id="favorite">container</xui-prop>
     </xui-doc>
 
-    <v-tabs xid="xui-tabs" class="[[fill-height]] [[class]]" -style="[[style]]"  
+    <v-tabs xid="xui-tabs" class="xui-tabs [[fill-height]] [[tabs-dense]] [[class]]" height="[[height-tabs]]" -style="--xui-tab-h:[[height-tabs]];[[style]]"  
+        -style=";2"
         vertical=[[vertical]] 
         dark="[[dark]]"
         light="[[light]]"
@@ -498,7 +502,6 @@
         right="[[right]]"
 
         center-active="[[center-active]]"
-
         xui-for="idx">
         <v-tab>
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-[[idx@0+]]" xui-slot-name="tab [[idx@0+]]"></xui-slot>
@@ -512,16 +515,26 @@
 
     <xui-design xid="inject-style">
         <style xui-no-dom>
-            .v-tabs-items {
-                height: calc(100% - 48px);
+
+            .xui-tabs:not(.v-tabs--vertical) > .v-tabs-items {
+                height: calc(100% - var(--xui-tab-h, 48px));
                 background-color: unset !important;
             }
 
-            .v-tabs-items>.v-window__container {
+            .xui-tabs > .v-tabs-items {
+                background-color: unset !important;
+            }
+
+            .xui-tabs.tabs-dense > * > * > * > .v-tab {
+                min-width: 0px;
+                padding: 0px 10px;
+            }
+
+            .xui-tabs > .v-tabs-items > .v-window__container {
                 height: 100% !important
             }
 
-            .v-tabs-items>.v-window__container>.v-window-item {
+            .xui-tabs > .v-tabs-items > .v-window__container>.v-window-item {
                 height: 100%
             }
         </style>

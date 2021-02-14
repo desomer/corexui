@@ -539,7 +539,7 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         console.debug("displayPropertiesJS", $xui.propertiesDesign);
 
         $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
-        var template = "<div id='AppPropertiesSetting' class='barcustom xui-div-design'>" + $xui.propertiesDesign.template + "</div>";
+        var template = "<div id='AppPropertiesSetting' class='barcustom xui-div-scroll-vertical'>" + $xui.propertiesDesign.template + "</div>";
         var tmpCompiled = compileTemplate(template);
 
         if ($xui.vuejsAppPropertiesSetting != null) {
@@ -621,7 +621,7 @@ $xui.displayComponents = (xid, xid_slot) => {
         $xui.vuejsAppCmpSetting.$destroy();
     }
     $xui.vuejsAppCmpSetting = new Vue({
-        template: "<div id='AppComponents' class='xui-div-design barcustom'>" + $xui.propertiesComponent.template + "</div>",
+        template: "<div id='AppComponents' class='xui-div-scroll-vertical barcustom'>" + $xui.propertiesComponent.template + "</div>",
         el: '#AppComponents',
         vuetify: new Vuetify(),
         data: $xui.rootDataComponents,
