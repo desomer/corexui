@@ -58,6 +58,10 @@
 		<xui-prop id="name">Header</xui-prop>
 		<xui-prop id="desc">Entete</xui-prop>
 
+        <xui-prop var="colorApp" editor="text">background color</xui-prop>
+        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+
 		<xui-prop var="HeaderDense" editor="bool">dense</xui-prop>
 		<xui-prop var="HeaderProminent" editor="bool">prominent</xui-prop>
 		<xui-prop var="HeaderExtended" editor="bool">extended</xui-prop>
@@ -111,6 +115,11 @@
 	<xui-doc xid="vue-footer-1">
 		<xui-prop id="name">Footer</xui-prop>
 		<xui-prop id="desc">Pied de page</xui-prop>
+		
+		<xui-prop var="colorApp" editor="text">background color</xui-prop>
+        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+
 		<xui-prop var="footerHeight" def="34" editor="int">height (px)</xui-prop>
 	</xui-doc>
 
@@ -130,6 +139,8 @@
 
 		<xui-prop var="color" editor="text" link="https://materialdesignicons.com/">color select</xui-prop>
 		<xui-prop var="colorApp" editor="text" link="https://materialdesignicons.com/">background color</xui-prop>
+        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
 
 		<xui-prop var="grow" editor="bool">force btn to take up all available space</xui-prop>
 		<xui-prop var="horizontal" editor="bool">horizontal</xui-prop>

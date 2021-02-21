@@ -55,8 +55,8 @@ external set _surroundDesign(
 @JS('moveDesign')
 external set _moveDesign(void Function(FileDesignInfo, String, String) f);
 
-@JS('changeChild')
-external set _changeChild(void Function(FileDesignInfo, String, String) f);
+@JS('changeChildXUI')
+external set _changeChildXUI(void Function(FileDesignInfo, String, String) f);
 
 @JS('getInfoXUI')
 external set _getInfoXUI(dynamic Function(FileDesignInfo, String, String) f);
@@ -65,7 +65,7 @@ external set _getInfoXUI(dynamic Function(FileDesignInfo, String, String) f);
 external set _getComponentsXUI(dynamic Function(FileDesignInfo, String, String) f);
 
 @JS('getActionsXUI')
-external set _getActions(dynamic Function(FileDesignInfo, String, String, String) f);
+external set _getActionsXUI(dynamic Function(FileDesignInfo, String, String, String) f);
 
 /// retourne les properties
 @JS('getDesignProperties')
@@ -315,7 +315,7 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
 }
 
 /// change les enfant avec le nb (ex: tab, grid, etc...)
-void changeChild(FileDesignInfo fileInfo, String idSlot, String action) async {
+void changeChildXUI(FileDesignInfo fileInfo, String idSlot, String action) async {
   var designManager = _getDesignManager(fileInfo);
   SlotInfo infoSlot = designManager.xuiEngine.getSlotInfo(idSlot, idSlot);
   SlotInfo infoContainer = designManager.xuiEngine
@@ -340,6 +340,7 @@ void changeChild(FileDesignInfo fileInfo, String idSlot, String action) async {
     startItem = startItem - 1;
   }
 
+  // decalage des enfants
   if (action == "delete") {
     for (var i = startItem; i < nbItem; i++) {
       // decalage des enfant vers la gauche
@@ -361,6 +362,12 @@ void changeChild(FileDesignInfo fileInfo, String idSlot, String action) async {
   }
 
   if (action == "delete") {
+
+    if (nbItem - 1==0)
+    {
+      return await deleteDesign(fileInfo,infoSlot.parentXid);
+    }
+
     // retire un slot
     await designManager.changeProperty(
         infoSlot.parentXid, "nb", (nbItem - 1).toString());
@@ -452,13 +459,13 @@ void _reload(FileDesignInfo fileInfo) async {
   changePageJS(options);
 }
 
-dynamic getActions(FileDesignInfo fileInfo, String id,  String idSlot, String action) {
-  print("-------------- getActions ----------------");
+dynamic getActionsXUI(FileDesignInfo fileInfo, String id,  String idSlot, String action) {
+  print("-------------- getActionsXUI ----------------   "+ action);
 
   var ctx = XUIContext(MODE_DESIGN);
   var designManager = _getDesignManager(fileInfo);
 
-  return designManager.getJSActions(ctx, id, idSlot, action);
+  return designManager.getActionsPopup(ctx, id, idSlot, action);
 }
 
 void main() async {
@@ -468,7 +475,7 @@ void main() async {
   _copyDesign = allowInterop(copyDesign);
   _surroundDesign = allowInterop(surroundDesign);
   _moveDesign = allowInterop(moveDesign);
-  _changeChild = allowInterop(changeChild);
+  _changeChildXUI = allowInterop(changeChildXUI);
   _getInfoXUI = allowInterop(getInfoXUI);
   _getDesignProperties = allowInterop(getDesignProperties);
   _setDesignProperties = allowInterop(setDesignProperties);
@@ -476,7 +483,7 @@ void main() async {
   _getHtmlFromXUI = allowInterop(getHtmlFromXUI);
   _deleteDesign = allowInterop(deleteDesign);
   _initPageXUI = allowInterop(initPageXUI);
-  _getActions = allowInterop(getActions);
+  _getActionsXUI = allowInterop(getActionsXUI);
 }
 
 XUIDesignManager _getDesignManager(FileDesignInfo fileInfo) {

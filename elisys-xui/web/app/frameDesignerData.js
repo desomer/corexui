@@ -4,6 +4,7 @@ var json = {
     pasteDisabled: true,
     undoDisabled: true,
     redoDisabled: true,
+    frameName:"frame1",
 
     activeTab: 0,
     activeAction: 0,

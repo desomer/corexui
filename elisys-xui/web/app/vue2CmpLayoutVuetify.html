@@ -1,78 +1,5 @@
 <xui-factory version="1.0">
 
-    <!--------------------------  XUI-FLOW   ------------------------------->
-    <xui-doc xid="xui-flow">
-        <xui-prop id="name">Flow</xui-prop>
-        <xui-prop id="icon">mdi-transfer-right</xui-prop>
-        <xui-prop id="desc">Flows</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-        <xui-prop var="nb" def="2" editor="int">nb slot</xui-prop>
-       
-    </xui-doc>
-
-    <xui-doc xid="xui-no-dom:xui-flow">
-        <xui-prop id="name">Flow item</xui-prop>
-        <xui-prop id="desc">Un Slot</xui-prop>
-        <xui-prop id="add-remove">incNb</xui-prop>
-    </xui-doc>
-
-    <xui-slot xid="xui-flow" xui-for="idxf" xui-slot-name="Flow">
-        <xui-slot style-slot="display:inline-flex" xid="[[parent-xid]]-col-[[idxf@2]]" xui-slot-name="Flow [[idxf@2]]">
-        </xui-slot>
-    </xui-slot>
-
-        <!--------------------------  XUI-BLOCK   ------------------------------->
-        <xui-doc xid="xui-block">
-            <xui-prop id="name">Block</xui-prop>
-            <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
-            <xui-prop id="desc">Un block</xui-prop>
-            <xui-prop id="componentAs">container</xui-prop>
-            <xui-prop id="favorite">listitem</xui-prop>
-            <xui-prop id="exclude">container</xui-prop>
-    
-            <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-            <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-        </xui-doc>
-    
-        <div xid="xui-block" class="[[class]]" -style="[[style]]">
-            <xui-slot style-slot="height:100%" xid="[[parent-xid]]-block" xui-slot-name="Block"></xui-slot>
-        </div>
-
-    <!--------------------------  XUI-SESSION   ------------------------------->
-    <xui-doc xid="xui-session">
-        <xui-prop id="name">Sessions</xui-prop>
-        <xui-prop id="icon">mdi-view-day</xui-prop>
-        <xui-prop id="desc">Une session</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-
-        <xui-prop var="nb" def="3" editor="int">nb de session</xui-prop>
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-    </xui-doc>
-
-    <xui-doc xid="session:xui-slot">
-        <xui-prop id="name">Session item</xui-prop>
-        <xui-prop id="desc">Une session item</xui-prop>
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-    </xui-doc>
-
-    <div xid="xui-session" class="[[class]]" -style="[[style]];flex: 1 0 auto" xui-for="idxr">
-        <xui-slot xui-reloader=true xid="[[parent-xid]]-session-[[idxr@0+]]"  xui-slot-name="session">
-            <session class="xui-session [[class@-1]]" -style="[[style@-1]]">
-                <xui-slot xui-slot-full xid="[[parent-xid]]-item" xui-slot-name="session [[idxr@0+]]"></xui-slot>
-            </session>
-        </xui-slot>
-    </div>
-
-    <xui-design xid="inject-style">
-        <style xui-no-dom>
-            .xui-session {
-                display: block;
-            }
-        </style>
-    </xui-design>
-
     <!--------------------------  XUI-LIST   ------------------------------->
     <xui-doc xid="xui-list">
         <xui-prop id="name">List</xui-prop>
@@ -464,7 +391,7 @@
         <xui-prop var="centered" editor="bool">centered</xui-prop>
         <xui-prop var="right" editor="bool">right</xui-prop>
 
-        <xui-prop var="height-tabs" editor="text">height tabs (48px)</xui-prop>
+        <xui-prop var="height-tabs" def="48px" editor="text">height tabs (48px)</xui-prop>
     
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>

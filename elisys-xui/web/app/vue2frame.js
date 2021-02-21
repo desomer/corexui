@@ -1,17 +1,16 @@
 import Vuex from "https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.esm.browser.min.js";
-import * as vue2CmpMgr from "./vue2MgrCmp.js";
+import VueRouter from "https://cdn.jsdelivr.net/npm/vue-router@3.5.1/dist/vue-router.esm.browser.min.js";
 
+import * as vue2CmpMgr from "./vue2MgrCmp.js";
 
 // https://codesandbox.io/s/vue-template-o4j2g
 
 Vue.config.devtools = true;
 Vue.config.productionTip = false;
 
-//console.debug(vue2CmpMgr);
-window.vue2CmpMgr = vue2CmpMgr;
 
 /*********************************************************************************/
-$xui.createComponentFromBody = (idTemplate, dataBinding) => {
+$xui.createComponentFromTemplate = (idTemplate, dataBinding) => {
 	return {
 		template: document.querySelector("#" + idTemplate).innerHTML,
 		data: () => { return $xui.rootdata; },
@@ -22,7 +21,9 @@ $xui.createComponentFromBody = (idTemplate, dataBinding) => {
 	}
 }
 
-/*********************************************************************************/
+/******************************* INIT DU vue2CmpMgr *******************************/
+window.vue2CmpMgr = vue2CmpMgr;
+
 $xui.loadApplicationJS = () => {
 	if ($xui.vuejs != null) {
 		$xui.vuejs.$destroy();
@@ -51,64 +52,15 @@ $xui.loadApplicationJS = () => {
 	$xui.store.commit('increment');
 
 	/******************************************************************************/
-	$xui.listReloader = {};
-	$xui.nbRefeshReloader = 0;
-
-	Vue.component("v-xui-reloader",
-		{
-			template: '<component v-bind:is="componentToReload"></component>',
-			props: ['partid', 'modedisplay'],
-			data: () => { return { componentToReload: "", id: 1 }; },
-			methods: {
-				rload: function (e) {
-
-					var oldId = this.partid + "-" + this.id;
-					//console.debug("reload " + oldId + " reponse **************", e);
-					delete Vue.options.components[oldId];
-
-					this.id++; //passe en composant suivant
-					var newId = this.partid + "-" + this.id;        //all:unset; box-sizing: inherit;
-					Vue.component(newId,
-						{ template: '<div style="display:' + this.modedisplay + '">' + e.template + '</div>' });
-					this.componentToReload = newId;
-					this.$nextTick(function () {
-						$xui.nbRefeshReloader--;
-						//console.debug("nbRefeshReloader ", $xui.nbRefeshReloader);
-						if ($xui.nbRefeshReloader == 0) {
-							var message = {
-								action: "reloader finish",
-							};
-							window.parent.postMessage(message, "*");
-						}
-					});
-				},
-				reload: function () {
-					//console.debug("reload **************", this.partid);
-					$xui.nbRefeshReloader++;
-					var message = {
-						action: "load reloader",
-						xid: this.partid,
-					};
-					window.parent.postMessage(message, "*");
-				}
-			},
-			mounted: function () {
-				this.reload();
-				$xui.listReloader[this.partid] = this;
-			},
-			computed: {
-				$xui: () => $xui
-			}
-		});
-
-	/******************************************************************************/
 
 	var dataBinding = Vuex.mapState({ titre: 'count' });
-	const RootComponent = $xui.createComponentFromBody("xui-rootTemplate", dataBinding);
+	var darkTheme = document.querySelector("#xui-rootTemplate").attributes["dark"];
+
+	const RootComponent = $xui.createComponentFromTemplate("xui-rootTemplate", dataBinding);
 
 	const configVuetify = {
 		theme: {
-			dark: false,
+			dark: ((darkTheme != null) ? true : false),
 			themes: {
 				light: {
 					primary: '#000000',
@@ -126,16 +78,33 @@ $xui.loadApplicationJS = () => {
 		},
 	};
 
+
+	const defaut = { template: '<div>def</div>' }
+	const Unknown = { template: '<div>unknown</div>' }
+	const routeMgr = new vue2CmpMgr.ComponentManager();
+
+	const routes = [
+		{ path: '/', component: defaut },
+		 routeMgr.getRoute('/foo', 'app/frameDesigner.html', 'routeA'),
+		 routeMgr.getRoute('/bar', 'app/frameDesigner.html', 'routeB'),
+		{ path: '*', component: Unknown }
+	]
+
+	$xui.router = new VueRouter({
+		routes // short for `routes: routes`
+	})
+
 	$xui.vuejs = new Vue({
 		el: '#app',
 		store: $xui.store,
+		router: $xui.router,
 		data: $xui.rootdata,
 		components: { RootComponent },
 		template: "<RootComponent ref='root'></RootComponent>",
 		vuetify: new Vuetify(configVuetify),
-		errorCaptured: function(err, component, details) {
+		errorCaptured: function (err, component, details) {
 			console.error(err, component, details);
-			alert("xui reporting " + err + " details " +details);
+			alert("vue errorCaptured " + err + " details " + details);
 			throw err;
 		}
 	});

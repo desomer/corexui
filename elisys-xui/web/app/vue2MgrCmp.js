@@ -1,46 +1,67 @@
 export class ComponentManager {
 
+
+    getRoute(path, file, xid) {
+        return {
+            path: path, component: () => {
+                return new Promise((resolve, reject) => {
+                    console.debug("create route " + path +" to "+xid);
+                    new vue2CmpMgr.ComponentManager().getVueTemplate(file, xid, 'final',
+                        (str) => {
+                            resolve({ template: str });
+                        }
+                    );
+                })
+            }
+        }
+    }
+
+    getVueTemplate(file, xid, mode, aPromise) {
+
+        if (window.parent==window) { // test si loader
+            this.waitForGlobal("getHtmlFromXUI", function () {
+                console.debug("getVueTemplate local ", xid)
+                var infoFileCmp = { file: file, xid: xid, mode: mode };
+                var prom = getPromise("getVueCmp"+xid)
+                $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp"+xid);
+                prom.then(jsCmp => {
+                    console.debug("returnCmpForFile ", jsCmp)
+                    aPromise(jsCmp);
+                });
+            }.bind(this));
+
+        } else {
+            console.debug("getVueTemplate on parent ", xid)
+            var infoFileCmp = { file: file, xid: xid, mode: mode };
+            var message = {
+                action: "getCmpForFile",
+                infoFileCmp: infoFileCmp
+            };
+            window.parent.postMessage(message, "*");
+
+            window.addEventListener('message', function (e) {
+                var data = e.data;
+                if (data.action == "returnCmpForFile_" + file + "_" + xid) {
+                    console.debug("returnCmpForFile ", data)
+                    aPromise(data.jsCmp);
+                }
+            }.bind(this));
+        }
+    }
+
+    //------------------------------------------------------------------
     registerVueComponent(idCmp, file, xid) {
 
         console.debug("init component xui vuejs " + idCmp);
 
         Vue.component(idCmp, function (resolve, reject) {
-
-            if ($xui.rootdata.isDesignFrame) {
-
-                this.waitForGlobal("getHtmlFromXUI", function () {
-
-                    var infoFileCmp = { file: file, xid: xid, mode: 'final' };
-                    var prom = getPromise("getVueCmp")
-                    $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp");
-                    prom.then(jsCmp => {
-
-                        this.initComponent(jsCmp, resolve);
-
-                    });
-                }.bind(this));
-            }
-            else
-            {
-                var infoFileCmp = { file: file, xid: xid, mode: 'final' };
-                var message = {
-                    action: "getCmpForFile",
-                    infoFileCmp : infoFileCmp
-                };
-                window.parent.postMessage(message, "*");
-
-                window.addEventListener('message', function (e) {
-                    var data = e.data;
-                    if (data.action == "returnCmpForFile_"+file+"_"+xid) {
-                        //console.debug("returnCmpForFile ", data)
-                        this.initComponent(data.jsCmp, resolve);
-                    }
-                }.bind(this));
-            }
-        }.bind(this))
+            this.getVueTemplate(file, xid, "final", function (str) {
+                this.initComponent(str, resolve);
+            }.bind(this))
+        }.bind(this));
 
     }
-
+    //------------------------------------------------------------------
     initComponent(jsCmp, resolve) {
         const dataUri = ComponentManager.esm`${jsCmp}`;
         import(dataUri)
@@ -60,6 +81,7 @@ export class ComponentManager {
                 resolve(cmp);
             });
     }
+
 
     /*******************************************************************/
 

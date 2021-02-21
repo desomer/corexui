@@ -317,7 +317,7 @@ class XUIDesignManager {
 
   ///------------------------------------------------------------------------------------------
 
-  List getJSActions(XUIContext ctx, String id, String idslot, String action) {
+  List getActionsPopup(XUIContext ctx, String id, String idslot, String action) {
     List ret = [];
 
     var designs = xuiEngine.getDesignInfo(id, idslot, true);
@@ -341,9 +341,9 @@ class XUIDesignManager {
           ret.add(act);
 
         } else {
-          var ti = (design.docInfo.addRemove ?? "nar") +
+          var ti = (design.docInfo.addRemove ?? "noAddRemove") +
               "|" +
-              (design.slotInfo.slotname ?? "ns") +
+              (design.slotInfo.slotname ?? "noSlotName") +
               "|" +
               design.docInfo.xid +
               "|" +
@@ -353,8 +353,8 @@ class XUIDesignManager {
 
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid,
-              action: "incNb",
-              icon: "mdi-web",
+              action: "addFlow",
+              icon: "mdi-table-row",
               title: ti);
           ret.add(act);
         }

@@ -6,21 +6,13 @@ export class PageDesignManager {
     db = null;
 
     getInfoFile(mode) {
-        return { fileID: window.$xui.frameName,  file: 'app/'+window.$xui.frameName+'.html', xid: 'root', mode: mode };
+        return { fileID: window.$xui.rootdata.frameName,  file: 'app/'+window.$xui.rootdata.frameName+'.html', xid: 'root', mode: mode };
     }
-    
-    waitForXuiLib(key, callback) {
-        if ($xui[key] != null) {
-            callback();
-        } else {
-            setTimeout(function () { this.waitForXuiLib(key, callback); }.bind(this), 100);
-        }
-    };
     
 
     getPageId()
     {
-        return window.$xui.frameName;
+        return window.$xui.rootdata.frameName;
     }
 
     loadPage(html) {

@@ -6,16 +6,15 @@
 if (typeof window.$xui === 'undefined')
     window.$xui = {};
 
-window.$xui.frameName="frame1";
 /****************************************************************************************/
 
 import("./clsPageDesignManager.js").then((module) => {
     $xui.pageDesignManager = new module.PageDesignManager();
 
-    $xui.pageDesignManager.waitForXuiLib("initPageXUI", function () {
+    waitForXuiLib("initPageXUI", function () {
         var infoFile = $xui.pageDesignManager.getInfoFile("design");
         $xui.initPageXUI(infoFile);
-    });
+    }, this);
 });
 
 import("./clsEventManager.js").then((module) => {
@@ -262,7 +261,7 @@ $xui.deleteCmp = () => {
 
     if ($xui.propertiesDesign.isSlot || info.addRemoveAction != null) {
         if (info.addRemoveAction == "incNb") {
-            $xui.changeChild(infoFile, info.xid, "delete");
+            $xui.changeChildXUI(infoFile, info.xid, "delete");
             return true
         }
         console.debug("deleteCmp slot impossible " + $xui.propertiesDesign.xid + " -> " + info.docId);
@@ -365,18 +364,25 @@ $xui.doActionPopup = (actionId) => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
 
 
-    $xui.rootdata.activeAction = 3;  // affiche la liste des composants
+    $xui.rootdata.activeAction = 1;  // affiche la liste des composants
 
     if (actionId.action=="incNb")
     {
-        $xui.changeChild(infoFile, actionId.xid, "after");
-        console.debug("doActionPopup OK");
+        $xui.changeChildXUI(infoFile, actionId.xid, "after");
+        console.debug("doActionPopup incNb OK");
         return true; 
     }
 
     let info = $xui.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     let infoParent = $xui.getInfoXUI(infoFile, info.parentXid, info.parentXid);
     console.debug("info add action ", $xui.propertiesDesign, info, infoParent);
+
+    if (actionId.action=="addFlow")
+    {
+        addCmpXID($xui.propertiesDesign.xidSlot, "xui-flow");
+        console.debug("doActionPopup addFlow OK");
+        return true; 
+    }
 
     if ($xui.propertiesDesign.isSlot || info.addRemoveAction != null) {
         // ajout dans un slot ou avec un addRemoveAction
@@ -394,7 +400,7 @@ $xui.doActionPopup = (actionId) => {
                 addCmpXID($xui.propertiesDesign.xidSlot, "xui-flow");
                 return true;
             } else if (info.addRemoveAction == "incNb") {
-                $xui.changeChild(infoFile, info.xid, "after");
+                $xui.changeChildXUI(infoFile, info.xid, "after");
                 return true
             }
 
@@ -420,6 +426,7 @@ $xui.doActionPopup = (actionId) => {
 }
 
 
+/// ajoute un composant
 function addCmpXID(xidDest, idCmp) {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
     const newXid = $xui.getNewXid(xidDest, idCmp);
@@ -427,6 +434,8 @@ function addCmpXID(xidDest, idCmp) {
     $xui.addDesignXUI(infoFile, xidDest, template, true, false);
 }
 
+
+/// incremente le nb du composant
 function addSlotByVariable(infoFile, infoParent) {
     $xui.setCurrentAction("addSlot");
     infoFlow = $xui.getInfoXUI(infoFile, infoParent.parentXid, infoParent.parentXid);
@@ -440,6 +449,8 @@ function addSlotByVariable(infoFile, infoParent) {
     $xui.setDesignProperties($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.json);
 }
 
+
+//-------------------------------------------------------------------
 $xui.undo = () => {
     $xui.setCurrentAction("undo");
     $xui.pageDesignManager.undo();
@@ -470,8 +481,15 @@ $xui.getNewXid = (xidParent, nameCmp) => {
 }
 
 /***************************************************************************************************************/
+$xui.sendInTab = () => {
+    window.open('http://127.0.0.1:8080/loader.html?id='+$xui.rootdata.frameName, '_blank');
+}
+
+
+/***************************************************************************************************************/
 var listIcon = null;
 var listImage = null;
+
 $xui.openTabUrl = (url) => {
     if (url == "listIcon") {
         if (listIcon == null || listIcon.closed)
@@ -675,42 +693,43 @@ $xui.updateDirectProperty = (value, variable, xid) => {
 }
 
 /***************************************************************************************************************/
-var dicoPromise = {};
-
-
 function compileTemplate(template) {
     return Vue.compile(template);
 }
 
-function getPromise(id) {
+/***************************************************************************************************************/
 
-    var _resolve, _reject;
+// var dicoPromise = {};
 
-    var promise = new Promise((resolve, reject) => {
-        _reject = reject;
-        _resolve = resolve;
-    });
+// function getPromise(id) {
 
-    promise.resolve_ex = (value) => {
-        _resolve(value);
-    };
+//     var _resolve, _reject;
 
-    promise.reject_ex = (value) => {
-        _reject(value);
-    };
+//     var promise = new Promise((resolve, reject) => {
+//         _reject = reject;
+//         _resolve = resolve;
+//     });
 
-    if (id != null)
-        dicoPromise[id] = promise;
+//     promise.resolve_ex = (value) => {
+//         _resolve(value);
+//     };
 
-    return promise;
-}
+//     promise.reject_ex = (value) => {
+//         _reject(value);
+//     };
 
-$xui.doPromiseJS = (idPromise, ret) => {
-    if (dicoPromise[idPromise] != null) {
-        dicoPromise[idPromise].resolve_ex(ret);
-        dicoPromise[idPromise] = null;
-    }
-}
+//     if (id != null)
+//         dicoPromise[id] = promise;
+
+//     return promise;
+// }
+
+// $xui.doPromiseJS = (idPromise, ret) => {
+//     if (dicoPromise[idPromise] != null) {
+//         dicoPromise[idPromise].resolve_ex(ret);
+//         dicoPromise[idPromise] = null;
+//     }
+// }
 
 
 $xui.parseJson = (str) => {

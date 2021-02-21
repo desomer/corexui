@@ -1,3 +1,65 @@
+/******************************** Creation du reloader **************************************/
+var $xui = window.$xui;  // car module
+
+$xui.listReloader = {};  // liste des reloader   ajouter dans le vue2frameDesigner
+$xui.nbRefeshReloader = 0;
+
+$xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
+
+    Vue.component("v-xui-reloader",
+        {
+            template: '<component v-bind:is="componentToReload"></component>',
+            props: ['partid', 'modedisplay'],
+            data: () => { return { componentToReload: "", id: 1 }; },
+            methods: {
+                doChangeComponent: function (e) {
+
+                    var oldId = this.partid + "-" + this.id;
+                    //console.debug("doChangeComponent " + oldId + " reponse **************", e);
+                    delete Vue.options.components[oldId];
+
+                    this.id++; //passe en composant suivant
+                    var newId = this.partid + "-" + this.id;
+
+                    // creation du composant 
+                    Vue.component(newId,
+                        { template: '<div style="display:' + this.modedisplay + '">' + e.template + '</div>' });
+                    this.componentToReload = newId;   // change le contenu du composant  id = componentToReload
+
+                    this.$nextTick(function () {
+                        $xui.nbRefeshReloader--;
+                        //console.debug("nbRefeshReloader ", $xui.nbRefeshReloader);
+                        if ($xui.nbRefeshReloader == 0) {
+                            var message = {
+                                action: "reloader finish",
+                            };
+                            window.parent.postMessage(message, "*");
+                        }
+                    });
+                },
+                reload: function () {
+                    //console.debug("reload **************", this.partid);
+                    $xui.nbRefeshReloader++;
+                    var message = {
+                        action: "get template reloader",
+                        xid: this.partid,
+                    };
+                    window.parent.postMessage(message, "*");
+                }
+            },
+            mounted: function () {
+                this.reload();
+                $xui.listReloader[this.partid] = this;  // enregistre le loader
+            },
+            computed: {
+                $xui: () => $xui
+            }
+        });
+}
+);
+/***********************************************************************************/
+
+
 document.addEventListener('dragenter', function (e) {
     var slotDroppable = e.target.closest('.xui-class-slot')
     if (slotDroppable) {
@@ -36,17 +98,17 @@ document.addEventListener('dragend', function () {
 /***********************************************************************************/
 
 document.addEventListener('pointerdown', e => {
-    targetActionStart = e.target.closest("[data-xid]");
+    $xui.targetActionStart = e.target.closest("[data-xid]");
 });
 
-document.addEventListener('pointerup', function (e) {  
+document.addEventListener('pointerup', function (e) {
     //console.debug("pointerup", e);
     if (e.button != 0)
         return;
 
     let targetAction = e.target.closest("[data-xid]");
-    if (targetActionStart != targetAction)
-        return;  // ne fait rien sur le drag (ex : Split)
+    if ($xui.targetActionStart != targetAction)
+        return;  // ne fait rien sur le drag si drag sur le même composant  (ex : Split)
 
     let elemRect = targetAction.getBoundingClientRect();
     let s = getComputedStyle(targetAction);
@@ -94,29 +156,29 @@ window.addEventListener('message', function (e) {
 
             for (const idReloader of uniqReloader) {
                 if ($xui.listReloader[idReloader] != null)
-                $xui.listReloader[idReloader].reload();
-            else
-                this.console.error("+-+-+-+-+-+-+-+-+ pb reloader inconnu", idReloader, $xui.listReloader);
+                    $xui.listReloader[idReloader].reload();
+                else
+                    this.console.error("+-+-+-+-+-+-+-+-+ pb reloader inconnu", idReloader, $xui.listReloader);
             }
         }
         else {
             this.console.info("changeTemplate event all", data.param);
-            let styleXui = this.document.body.querySelector("#xui-style");
-            if (styleXui!=null) {
+            let styleXui = this.document.body.querySelector("#xui-style");   // retire tous le style
+            if (styleXui != null) {
                 this.console.debug("+++++++++++>  move style to header")
                 styleXui.remove()
                 this.document.head.appendChild(styleXui);
             }
-            
-            this.document.body.innerHTML = data.param.html;
+
+            this.document.body.innerHTML = data.param.html; // change tous le body
             $xui.loadApplicationJS();
         }
     }
-    if (data.action == "changeReloader") {
+    if (data.action == "doChangeComponent") {
         //console.debug("load reloader", data.xid, data);
         if ($xui.listReloader[data.xid] == null)
-            console.error("changeReloader on error", data, $xui.listReloader);
-        $xui.listReloader[data.xid].rload(data);
+            console.error("doChangeComponent on error", data, $xui.listReloader);
+        $xui.listReloader[data.xid].doChangeComponent(data);
     }
 });
 
@@ -136,10 +198,9 @@ $xui.updateDirectPropInnerText = (event, variable, xid, selectAll) => {
     window.parent.postMessage(message, "*");
 }
 
-$xui.updateDirectPropBlur = () =>
-{
+$xui.updateDirectPropBlur = () => {
     window.getSelection().removeAllRanges();
-} 
+}
 
 // ne sert plus
 $xui.updateDirectPropValue = (value, variable, xid) => {
@@ -153,7 +214,7 @@ $xui.updateDirectPropValue = (value, variable, xid) => {
     window.parent.postMessage(message, "*");
 }
 
-
+// TODO a changer window. par xui.
 window.getInfoForSelector = (selector, parent) => {
     var targetAction = document.querySelector(selector)
     if (targetAction == null) return null;
@@ -166,8 +227,8 @@ window.getInfoForSelector = (selector, parent) => {
     let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
 
     var ret = {
-        selector : selector,
-        parent : parent,
+        selector: selector,
+        parent: parent,
         hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
         height: elemRect.height,
         width: elemRect.width,
@@ -178,3 +239,28 @@ window.getInfoForSelector = (selector, parent) => {
 
     return ret;
 }
+
+//************************************************************************************************** */
+document.addEventListener("keydown", function (event) {
+    var listShortCut = [
+        { ctrl: true, keyCode: 80, action: "ctrlP" },  // preview
+        { ctrl: true, keyCode: 67, action: "ctrlC" },
+        { ctrl: true, keyCode: 88, action: "ctrlX" },
+        { ctrl: true, keyCode: 86, action: "ctrlV" },
+        { ctrl: true, keyCode: 90, action: "ctrlZ" },
+        { ctrl: true, keyCode: 89, action: "ctrlY" },
+    ];
+
+    //console.debug( event.keyCode );
+
+    for (const shortKey of listShortCut) {
+        if (event.ctrlKey == shortKey.ctrl && event.keyCode == shortKey.keyCode) {
+            event.preventDefault();
+            var message = {
+                action: shortKey.action,
+            };
+            window.parent.postMessage(message, "*");
+        }
+    }
+
+});

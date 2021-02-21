@@ -36,6 +36,9 @@ main
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
 
+    <div xid="routeA">routeDefault.........A</div>
+    <div xid="routeB">root.........A</div>
+
     <v-btn xid="xui-btn-small" small class="xui-btn-action"></v-btn>
 
     <xui-design xid="root">
@@ -43,13 +46,12 @@ main
 
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2020 v0.5.0 14/02/2021"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.5.1 20/02/2021"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
         <xui-prop id="withFooter" val="true"></xui-prop>
         <xui-prop id="navTemporary" val="true"></xui-prop>
-        <xui-prop id="darkApp" val="true"></xui-prop>
     </xui-design>
 
     <xui-design xid="maincontent">
@@ -60,10 +62,12 @@ main
 
     <xui-design xid="toolbar">
         <xui-prop id="headerHeight" val="32"></xui-prop>
+        <xui-prop id="dark" val="true"></xui-prop>
     </xui-design>
 
     <xui-design xid="footer" style="padding-top: 1px;">
         <xui-prop id="footerHeight" val="32"></xui-prop>
+        <xui-prop id="dark" val="true"></xui-prop>
     </xui-design>
 
     <xui-design xid="slot-toolbar-title">
@@ -148,7 +152,7 @@ main
 
     <xui-design xid="tab-editor-tab-0">
         <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
-        <span style='margin-left: 5px;'>Page</span>
+        <span style='margin-left: 5px;'>Page {{frameName}}</span>
     </xui-design>
 
     <xui-design xid="tab-editor-tab-item-0">
@@ -179,7 +183,7 @@ main
 
     <!-------------------------------Les actions & properties ---------------------------------->
 
-    <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true xui-tabs-dense=true class="fill-height" xui-height-tabs="35px" xui-nb="5">
+    <xui-tabs xid="design-action" v-model="activeAction" xui-dark=true xui-tabs-dense=true class="fill-height" xui-height-tabs="35px" xui-nb="6">
     </xui-tabs>
 
     <xui-design xid="action-tab-tab-0">
@@ -197,6 +201,9 @@ main
     <xui-design xid="action-tab-tab-4">
         <v-icon>mdi-file-tree</v-icon>
     </xui-design>
+    <xui-design xid="action-tab-tab-5">
+        <v-icon>mdi-chevron-right-box</v-icon>
+    </xui-design>
 
     <xui-design xid="action-tab-tab-item-0">
         <div id="AppPropertiesSetting"></div>
@@ -211,10 +218,13 @@ main
         <div>Data binding coming soon...</div>
     </xui-design>
     <xui-design xid="action-tab-tab-item-4">
-        <div>TreeView coming soon...</div>.
+        <div>TreeView coming soon...</div>
+    </xui-design>
+    <xui-design xid="action-tab-tab-item-5">
+        <div>CLI coming soon...</div>
     </xui-design>
 
-    <!--------------------------------------------------------------------------->
+    <!------------------------------- ONGLEt CODE------------------------------------>
 
     <xui-design xid="main-tab-tab-item-1">
         <xui-tabs xid="tab-code" class="tab-code fill-height" xui-dark=true xui-height-tabs="35px" xui-nb="3"></xui-tabs>
@@ -260,8 +270,19 @@ main
         </div>
     </xui-design>
 
-
-
+    <!--------------------------------------------------------------------------->
+    <xui-design xid="main-tab-tab-item-3">
+        <p>
+            <!-- utilisez le composant router-link pour la navigation. -->
+            <!-- spécifiez le lien en le passant à la prop `to` -->
+            <!-- `<router-link>` sera rendu en tag `<a>` par défaut -->
+            <router-link to="/foo">Aller a Foo</router-link>
+            <router-link to="/bar">Aller a Bar</router-link>
+        </p>
+        <!-- balise pour le composant router-view -->
+        <!-- le composant correspondant à la route sera rendu ici -->
+        <router-view></router-view>
+    </xui-design>
     <!--------------------------------------------------------------------------->
     <xui-design xid="slot-action-header">
         <xui-btn-small @click="$xui.fullScreen()">
@@ -277,6 +298,11 @@ main
         <xui-btn-small @click="$xui.refreshAction('template:reload')">
             <v-icon>mdi-refresh</v-icon>
         </xui-btn-small>
+        <span style="width:20px"></span>
+        <xui-btn-small @click="$xui.sendInTab()">
+            <v-icon>mdi-application-export</v-icon>
+        </xui-btn-small>
+
     </xui-design>
 
     <!--------------------------------------------------------------------------->
@@ -341,6 +367,7 @@ main
     </xui-design>
 
     <xui-design xid="inject-after-body">
+        <script defer src="app/loader.js"></script>
         <script defer src="app/frameDesigner.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>

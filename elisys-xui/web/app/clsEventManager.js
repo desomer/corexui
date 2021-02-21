@@ -7,7 +7,28 @@
 export class EventManager {
 
     init() {
+        this.initEvent();
+        this.initBuild();
+    }
 
+    initBuild() {
+        window.addEventListener('message', function (e) {
+            var data = e.data;
+            if (data.action == "getCmpForFile") {
+                var act = "returnCmpForFile_" + data.infoFileCmp.file + "_" + data.infoFileCmp.xid;
+                var prom = getPromise(act)
+                waitForXuiLib("getHtmlFromXUI", function () {
+                    $xui.getHtmlFromXUI(data.infoFileCmp, act);
+                    prom.then(jsCmp => {
+                        document.querySelector("#rootFrame").contentWindow.postMessage({ "action": act, jsCmp: jsCmp }, "*");
+                    });
+                }, this);
+
+            }
+        });
+    }
+
+    initEvent() {
         // gestion du drag de nouveau composant sur selector
         $xui.dragStart = (item, e) => {
             $xui.dragItem = item;
@@ -35,8 +56,8 @@ export class EventManager {
 
         });
 
-        window.addEventListener('pointerup', function (e) {  
-            if (e.button==0) {
+        window.addEventListener('pointerup', function (e) {
+            if (e.button == 0) {
                 $xui.closePopup();
             }
         });
@@ -63,7 +84,7 @@ export class EventManager {
             else if (data.action == "drop") {
                 if ($xui.dragItem != null) {
                     // gestion drag de nouveau component sur l'Iframe
-//                    $xui.displayPropertiesJS(data.xid, data.xid_slot);
+                    //                    $xui.displayPropertiesJS(data.xid, data.xid_slot);
                     $xui.displayComponents(data.xid, data.xid_slot);
                     $xui.addCmp($xui.dragItem);
                 }
@@ -101,31 +122,18 @@ export class EventManager {
                 $xui.updateDirectProperty(data.value, data.variable, data.xid);
             }
             // gestion d'un hot load reloader
-            else if (data.action == "load reloader") {
+            else if (data.action == "get template reloader") {
                 var infoFileCmp = $xui.pageDesignManager.getInfoFile('template');
                 infoFileCmp.part = data.xid;
                 var prom = getPromise("getVueCmp")
                 $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp");
                 prom.then(template => {
-                    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeReloader", "xid": data.xid, "template": template }, "*");
+                    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "doChangeComponent", "xid": data.xid, "template": template }, "*");
                 })
             }
             else if (data.action == "reloader finish") {
                 // this.console.debug("reloader finish");
                 $xui.doPromiseJS("changePageFinish");
-            }
-            // ajoute un composant vueJS depuis un fichier XUI (ex: xui-split-1)
-            else if (data.action == "getCmpForFile") {
-                //this.console.debug("***********getCmpForFile***********", data);
-                var act = "returnCmpForFile_" + data.infoFileCmp.file + "_" + data.infoFileCmp.xid;
-
-                var prom = getPromise(act)
-                $xui.getHtmlFromXUI(data.infoFileCmp, act);
-                prom.then(jsCmp => {
-                    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": act, jsCmp: jsCmp }, "*");
-                });
-
-
             }
         });
     }

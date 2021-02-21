@@ -11,7 +11,7 @@
       <link rel="stylesheet" href="app/frameDesigner.css" type="text/css"></link>
       <script defer src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
    </head>
-   <body style="height:100vh">
+   <body style="height:100vh;">
       <template id="xui-rootTemplate">
          <v-app>
             <v-snackbar v-model="snackbar" app :timeout="snackbar_timeout" elevation="12" color="blue-grey" top class="pt-0">
@@ -37,7 +37,21 @@
                   </v-list-item>
                </v-list>
             </div>
-            <v-navigation-drawer v-model="navdrawer" app temporary>
+            <v-dialog v-model="dialogClass" v-on:click:outside="$xui.closeClassEditor()" max-width="80vw">
+               <v-card>
+                  <div style="height:50px; background-image: linear-gradient(20deg, #484848, black);" class="white--text elevation-6">
+                     <v-card-title>Gestion class & style</v-card-title>
+                  </div>
+                  <div style="height:65vh; overflow-y: scroll;">
+                     <cmp-list-class></cmp-list-class>
+                  </div>
+                  <v-card-actions class="elevation-6">
+                     <v-btn text @click="dialogClass=false;">Cancel</v-btn>
+                     <v-btn text @click="$xui.closeClassEditor(); dialogClass=false;">Save</v-btn>
+                  </v-card-actions>
+               </v-card>
+            </v-dialog>
+            <v-navigation-drawer width="30vw" temporary overlay-color="red" v-model="navdrawer" app src="https://images.unsplash.com/photo-1556089290-cc6d3dcf9c13?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80" expand-on-hover overlay-opacity=".9">
             </v-navigation-drawer>
             <v-app-bar color="#ff5900" app height="32" dark>
                <v-app-bar-nav-icon @click.stop="navdrawer = !navdrawer"></v-app-bar-nav-icon>
@@ -46,7 +60,7 @@
                </v-toolbar-title>
                <v-spacer></v-spacer>
                <v-btn small class="xui-btn-action" @click="$xui.fullScreen()">
-                  <v-icon>mdi-fullScreen</v-icon>
+                  <v-icon>mdi-fullscreen</v-icon>
                </v-btn>
                <v-btn small class="xui-btn-action" @click="$xui.modePreview()">
                   <v-icon>mdi-television-play</v-icon>
@@ -59,19 +73,19 @@
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
             </v-app-bar>
-            <v-main style="background:" class="fill-height">
-               <v-tabs v-model="activeTab" vertical class="main-tab" dark>
+            <v-main style="background:white" class="fill-height">
+               <v-tabs v-model="activeTab" style="--xui-tab-h:;" vertical class="fill-height main-tab xui-tabs  tabs-dense" dark>
                   <v-tab>
                      <v-icon>mdi-square-edit-outline</v-icon>
                   </v-tab>
                   <v-tab-item eager :transition="false" :reverse-transition="false">
-                     <v-tabs height="32px" class="tab-editor" dark>
+                     <v-tabs style="--xui-tab-h:35px;" height="35px" class="fill-height xui-tabs" dark>
                         <v-tab>
                            <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
-                           <span style="margin-left: 5px;">Page</span>
+                           <span style="margin-left: 5px;">Page {{frameName}}</span>
                         </v-tab>
                         <v-tab-item eager :transition="false" :reverse-transition="false">
-                           <div class="main-container">
+                           <div class="main-container fill-height">
                               <div class="main-item main-item-1"></div>
                               <div class="main-item main-item-2">
                                  <iframe id="rootFrame"></iframe>
@@ -80,12 +94,18 @@
                                  <v-overlay :value="saveLayout" style="height: 100%;position: relative;">
                                     <v-btn>Save in progress</v-btn>
                                  </v-overlay>
-                                 <v-tabs v-model="activeAction" style="position: absolute; top: 0px;width: 250px;height: 100%;;" height="35px" class="tab-action" dark>
+                                 <v-tabs v-model="activeAction" style="position: absolute; top: 0px; width: 300px;;--xui-tab-h:35px;" height="35px" class="fill-height xui-tabs  tabs-dense" dark>
                                     <v-tab>
                                        <v-icon>mdi-layers-triple</v-icon>
                                     </v-tab>
                                     <v-tab-item eager :transition="false" :reverse-transition="false">
                                        <div id="AppPropertiesSetting"></div>
+                                    </v-tab-item>
+                                    <v-tab>
+                                       <v-icon>mdi-plus-box-multiple</v-icon>
+                                    </v-tab>
+                                    <v-tab-item eager :transition="false" :reverse-transition="false">
+                                       <div id="AppComponents"></div>
                                     </v-tab-item>
                                     <v-tab>
                                        <v-icon>mdi-palette-swatch</v-icon>
@@ -100,18 +120,17 @@
                                        <div>Data binding coming soon...</div>
                                     </v-tab-item>
                                     <v-tab>
-                                       <v-icon>mdi-plus-box-multiple</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager :transition="false" :reverse-transition="false">
-                                       <div id="AppComponents"></div>
-                                    </v-tab-item>
-                                    <v-tab>
                                        <v-icon>mdi-file-tree</v-icon>
                                     </v-tab>
                                     <v-tab-item eager :transition="false" :reverse-transition="false">
                                        <div>TreeView coming soon...</div>
-.
-                                        </v-tab-item>
+                                    </v-tab-item>
+                                    <v-tab>
+                                       <v-icon>mdi-chevron-right-box</v-icon>
+                                    </v-tab>
+                                    <v-tab-item eager :transition="false" :reverse-transition="false">
+                                       <div>CLI coming soon...</div>
+                                    </v-tab-item>
                                  </v-tabs>
                               </div>
                            </div>
@@ -133,12 +152,12 @@
                      <v-icon>mdi-code-tags</v-icon>
                   </v-tab>
                   <v-tab-item eager :transition="false" :reverse-transition="false">
-                     <v-tabs height="32px" class="tab-code" dark>
+                     <v-tabs style="--xui-tab-h:35px;" height="35px" class="tab-code fill-height xui-tabs" dark>
                         <v-tab>
                            <span> Html </span>
                         </v-tab>
                         <v-tab-item eager :transition="false" :reverse-transition="false">
-                           <div class="main-code">
+                           <div class="fill-height">
                               <pre>
                                  <code spellcheck id="xui-code-html"></code>
                               </pre>
@@ -148,7 +167,7 @@
                            <span>XUI</span>
                         </v-tab>
                         <v-tab-item eager :transition="false" :reverse-transition="false">
-                           <div class="main-code">
+                           <div class="fill-height">
                               <pre>
                                  <code spellcheck id="xui-code-xui"></code>
                               </pre>
@@ -158,7 +177,7 @@
                            <span>JSON</span>
                         </v-tab>
                         <v-tab-item eager :transition="false" :reverse-transition="false">
-                           <div class="main-code">
+                           <div class="fill-height">
                               <pre>
                                  <code spellcheck id="xui-code-json"></code>
                               </pre>
@@ -181,6 +200,11 @@
                      <v-icon>mdi-database</v-icon>
                   </v-tab>
                   <v-tab-item eager :transition="false" :reverse-transition="false">
+                     <p>
+                        <router-link to="/foo">Aller a Foo</router-link>
+                        <router-link to="/bar">Aller a Bar</router-link>
+                     </p>
+                     <router-view></router-view>
                   </v-tab-item>
                   <v-tab>
                      <v-icon>mdi-apps</v-icon>
@@ -198,22 +222,8 @@
                   <v-tab-item eager :transition="false" :reverse-transition="false">
                   </v-tab-item>
                </v-tabs>
-               <v-dialog v-model="dialogClass" v-on:click:outside="$xui.closeClassEditor()" max-width="80vw">
-                  <v-card>
-                     <div style="height:50px; background-image: linear-gradient(20deg, #484848, black);" class="white--text elevation-6">
-                        <v-card-title>Gestion class & style</v-card-title>
-                     </div>
-                     <div style="height:65vh; overflow-y: scroll;">
-                        <cmp-list-class></cmp-list-class>
-                     </div>
-                     <v-card-actions class="elevation-6">
-                        <v-btn text @click="dialogClass=false;">Cancel</v-btn>
-                        <v-btn text @click="$xui.closeClassEditor(); dialogClass=false;">Save</v-btn>
-                     </v-card-actions>
-                  </v-card>
-               </v-dialog>
             </v-main>
-            <v-footer app color="#ff5900" style="padding-top: 2px;" height="32" dark>
+            <v-footer app style="padding-top: 1px;" height="32" color="#ff5900" dark>
                <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
@@ -248,7 +258,7 @@
                   <v-icon>mdi-autorenew</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2020 v0.4.1 26/07/20</span>
+               <span>&copy;&nbsp;Elisys 2020 v0.5.1 20/02/2021</span>
             </v-footer>
          </v-app>
       </template>
@@ -267,12 +277,12 @@
 	
             // empty js
         
-        $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
-            new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
-                "vue-xui-split");
-        }
-        );
-    
+            $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
+                new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
+                    "vue-xui-split");
+            }
+            );
+        
 
             var listDesignClass = [
                 {
@@ -427,7 +437,7 @@
    <style id="xui-style">
 
 			.v-main__wrap {
-				display: contents;
+				display: contents; /* no div de type block */   
 				height: 100%;
 			}
 		
@@ -448,10 +458,6 @@
 				border-radius: 5px;
 			}
 		
-            .xui-session {
-                display: block;
-            }
-        
             .xui-column-layout {
                 display:grid;
                 width: 100%;
@@ -528,16 +534,26 @@
                 font-size: 0.9rem;
             }
         
-            .v-tabs-items {
-                height: calc(100% - 48px);
+
+            .xui-tabs:not(.v-tabs--vertical) > .v-tabs-items {
+                height: calc(100% - var(--xui-tab-h, 48px));
                 background-color: unset !important;
             }
 
-            .v-tabs-items>.v-window__container {
+            .xui-tabs > .v-tabs-items {
+                background-color: unset !important;
+            }
+
+            .xui-tabs.tabs-dense > * > * > * > .v-tab {
+                min-width: 0px;
+                padding: 0px 10px;
+            }
+
+            .xui-tabs > .v-tabs-items > .v-window__container {
                 height: 100% !important
             }
 
-            .v-tabs-items>.v-window__container>.v-window-item {
+            .xui-tabs > .v-tabs-items > .v-window__container>.v-window-item {
                 height: 100%
             }
         
@@ -552,6 +568,10 @@
                 overflow: auto;
                 width:100%;
                 height: 100%;
+            }
+        
+            .xui-session {
+                display: block;
             }
         
             .xui-split {
@@ -571,6 +591,7 @@
                 cursor: col-resize;
             }
            </style>
+   <script defer src="app/loader.js"></script>
    <script defer src="app/frameDesigner.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>

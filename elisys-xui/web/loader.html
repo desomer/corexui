@@ -5,23 +5,33 @@
     </iframe>
 </body>
 
-<script defer src="libxui.dart.js"></script>
-
-<script type="module">
-
+<script >
     if (typeof window.$xui === 'undefined')
         window.$xui = {};
 
+    if (window.$xui.rootdata == null)
+         window.$xui.rootdata = {};
+</script>
+
+<script defer src="libxui.dart.js"></script>
+<script defer src="app/loader.js"></script>
+
+<script type="module">
+
     const urlParams = new URLSearchParams(window.location.search);
-    window.$xui.frameName = urlParams.get("id");
+    window.$xui.rootdata.frameName = urlParams.get("id");
+
+    import("./app/clsEventManager.js").then((module) => {
+        new module.EventManager().initBuild();
+    });
 
     import("./app/clsPageDesignManager.js").then((module) => {
         $xui.pageDesignManager = new module.PageDesignManager();
 
-        $xui.pageDesignManager.waitForXuiLib("initPageXUI", function () {
+        waitForXuiLib("initPageXUI", function () {
             var infoFile = $xui.pageDesignManager.getInfoFile("final");
             $xui.initPageXUI(infoFile);
-        });
+        }, this);
     });
 
     // lancer par le initPageXUI

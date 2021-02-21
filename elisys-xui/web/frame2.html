@@ -60,13 +60,14 @@
 			}
 
 			html::-webkit-scrollbar-track {
+				border-radius: 6px;
 				background: #ffffffd9;
-				box-shadow: inset 0 0 3px 0px rgba(0, 0, 0, 0.1);
+				box-shadow: inset 2px 1px 5px 0px rgb(154 148 148)
 			}
 
 			html::-webkit-scrollbar-thumb {
-				box-shadow: inset 0 0 15px 0px rgba(0, 0, 0, 0.2);
-				border-radius: 3px;
+				box-shadow: inset -1px 1px 5px 2px rgb(0 0 0 / 20%);
+				border-radius: 6px;
 			}
 		
 			.v-main__wrap {
@@ -90,37 +91,220 @@
 				box-shadow: inset 0 0 15px 0px;
 				border-radius: 5px;
 			}
-		   </style>
+		
+            .xui-divider {
+                min-height: 3px;
+                min-width: 3px;
+            }
+        
+            .spacer {
+                min-height: 20px;
+            }
+        
+            .xui-session {
+                display: block;
+            }
+        
+            .xui-column-layout {
+                display:grid;
+                width: 100%;
+            }
+        
+            .xui-column>[class*=col-] {max-width: 100% !important;}
+
+            .xui-column>.col-auto {
+                height: auto;
+                max-height: 100%
+            }
+
+            .xui-column>.col-1 {
+                max-height: 8.3333333333%
+            }
+
+            .xui-column>.col-2 {
+                max-height: 16.6666666667%
+            }
+
+            .xui-column>.col-3 {
+                max-height: 25%
+            }
+
+            .xui-column>.col-4 {
+                max-height: 33.3333333333%
+            }
+
+            .xui-column>.col-5 {
+                max-height: 41.6666666667%
+            }
+
+            .xui-column>.col-6 {
+                max-height: 50%
+            }
+
+            .xui-column>.col-7 {
+                max-height: 58.3333333333%
+            }
+
+            .xui-column>.col-8 {
+                max-height: 66.6666666667%
+            }
+
+            .xui-column>.col-9 {
+                max-height: 75%
+            }
+
+            .xui-column>.col-10 {
+                max-height: 83.3333333333%
+            }
+
+            .xui-column>.col-11 {
+                max-height: 91.6666666667%
+            }
+
+            .xui-column>.col-12 {
+                max-height: 100%
+            }
+
+        
+            .xui-grid2 {
+                max-width: unset;
+            }
+        
+
+            .xui-form-gutter>.col,
+            .xui-form-gutter>[class*=col-] {
+                padding: 5px 6px;
+            }
+
+            .xui-form .v-text-field input {
+                line-height: 14px;
+                font-size: 0.9rem;
+            }
+        
+
+            .xui-tabs:not(.v-tabs--vertical) > .v-tabs-items {
+                height: calc(100% - var(--xui-tab-h, 48px));
+                background-color: unset !important;
+            }
+
+            .xui-tabs > .v-tabs-items {
+                background-color: unset !important;
+            }
+
+            .xui-tabs.tabs-dense > * > * > * > .v-tab {
+                min-width: 0px;
+                padding: 0px 10px;
+            }
+
+            .xui-tabs > .v-tabs-items > .v-window__container {
+                height: 100% !important
+            }
+
+            .xui-tabs > .v-tabs-items > .v-window__container>.v-window-item {
+                height: 100%
+            }
+        
+            .xui-class-slot-full {
+                height: 100%;
+                width: 100%;
+            }
+            .xui-p-relative {position:relative}
+            .xui-p-absolute {position:absolute}
+
+            .xui-overflow {
+                overflow: auto;
+                width:100%;
+                height: 100%;
+            }
+        
+
+            .xui-class-slot {
+                border: 1px dashed lightgray;
+                box-sizing: border-box;
+                min-height: 15px;
+                min-width: 15px;
+                text-decoration: underline dotted;
+                font-style: italic;
+                user-select: none;
+                cursor : pointer;
+                opacity: .7;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .xui-class-slot:hover {
+                border: 1px dashed blue;
+            }
+
+            .xui-class-dragover {
+                border: 1px dashed blue !important;
+            }
+           </style>
    <script type="module">
-		import "./app/vue2frame.js";
-		$xui.loadApplicationJS();
-	</script>
-   <script>
 
-		document.addEventListener("keydown", function (event) {
-			listShortCut = [
-				{ ctrl: true, keyCode: 80, action: "ctrlP" },  // preview
-				{ ctrl: true, keyCode: 67, action: "ctrlC" },
-				{ ctrl: true, keyCode: 88, action: "ctrlX" },
-				{ ctrl: true, keyCode: 86, action: "ctrlV" },
-				{ ctrl: true, keyCode: 90, action: "ctrlZ" },
-				{ ctrl: true, keyCode: 89, action: "ctrlY" },
-			];
+		///******************************** Creation du reloader **************************************/
+var $xui = window.$xui;  // car module
 
-			//console.debug( event.keyCode );
+$xui.listReloader = {};  // liste des reloader   ajouter dans le vue2frameDesigner
+$xui.nbRefeshReloader = 0;
 
-			for (const shortKey of listShortCut) {
-				if (event.ctrlKey == shortKey.ctrl && event.keyCode == shortKey.keyCode) {
-					event.preventDefault();
-					var message = {
-						action: shortKey.action,
-					};
-					window.parent.postMessage(message, "*");
-				}
-			}
+$xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
 
-		});
-	document.addEventListener('dragenter', function (e) {
+    Vue.component("v-xui-reloader",
+        {
+            template: '<component v-bind:is="componentToReload"></component>',
+            props: ['partid', 'modedisplay'],
+            data: () => { return { componentToReload: "", id: 1 }; },
+            methods: {
+                doChangeComponent: function (e) {
+
+                    var oldId = this.partid + "-" + this.id;
+                    //console.debug("doChangeComponent " + oldId + " reponse **************", e);
+                    delete Vue.options.components[oldId];
+
+                    this.id++; //passe en composant suivant
+                    var newId = this.partid + "-" + this.id;
+
+                    // creation du composant 
+                    Vue.component(newId,
+                        { template: '<div style="display:' + this.modedisplay + '">' + e.template + '</div>' });
+                    this.componentToReload = newId;   // change le contenu du composant  id = componentToReload
+
+                    this.$nextTick(function () {
+                        $xui.nbRefeshReloader--;
+                        //console.debug("nbRefeshReloader ", $xui.nbRefeshReloader);
+                        if ($xui.nbRefeshReloader == 0) {
+                            var message = {
+                                action: "reloader finish",
+                            };
+                            window.parent.postMessage(message, "*");
+                        }
+                    });
+                },
+                reload: function () {
+                    //console.debug("reload **************", this.partid);
+                    $xui.nbRefeshReloader++;
+                    var message = {
+                        action: "get template reloader",
+                        xid: this.partid,
+                    };
+                    window.parent.postMessage(message, "*");
+                }
+            },
+            mounted: function () {
+                this.reload();
+                $xui.listReloader[this.partid] = this;  // enregistre le loader
+            },
+            computed: {
+                $xui: () => $xui
+            }
+        });
+}
+);
+/***********************************************************************************/
+
+
+document.addEventListener('dragenter', function (e) {
     var slotDroppable = e.target.closest('.xui-class-slot')
     if (slotDroppable) {
         slotDroppable.classList.add("xui-class-dragover");
@@ -158,17 +342,17 @@ document.addEventListener('dragend', function () {
 /***********************************************************************************/
 
 document.addEventListener('pointerdown', e => {
-    targetActionStart = e.target.closest("[data-xid]");
+    $xui.targetActionStart = e.target.closest("[data-xid]");
 });
 
-document.addEventListener('pointerup', function (e) {  
+document.addEventListener('pointerup', function (e) {
     //console.debug("pointerup", e);
     if (e.button != 0)
         return;
 
     let targetAction = e.target.closest("[data-xid]");
-    if (targetActionStart != targetAction)
-        return;  // ne fait rien sur le drag (ex : Split)
+    if ($xui.targetActionStart != targetAction)
+        return;  // ne fait rien sur le drag si drag sur le même composant  (ex : Split)
 
     let elemRect = targetAction.getBoundingClientRect();
     let s = getComputedStyle(targetAction);
@@ -216,29 +400,29 @@ window.addEventListener('message', function (e) {
 
             for (const idReloader of uniqReloader) {
                 if ($xui.listReloader[idReloader] != null)
-                $xui.listReloader[idReloader].reload();
-            else
-                this.console.error("+-+-+-+-+-+-+-+-+ pb reloader inconnu", idReloader, $xui.listReloader);
+                    $xui.listReloader[idReloader].reload();
+                else
+                    this.console.error("+-+-+-+-+-+-+-+-+ pb reloader inconnu", idReloader, $xui.listReloader);
             }
         }
         else {
             this.console.info("changeTemplate event all", data.param);
-            let styleXui = this.document.body.querySelector("#xui-style");
-            if (styleXui!=null) {
+            let styleXui = this.document.body.querySelector("#xui-style");   // retire tous le style
+            if (styleXui != null) {
                 this.console.debug("+++++++++++>  move style to header")
                 styleXui.remove()
                 this.document.head.appendChild(styleXui);
             }
-            
-            this.document.body.innerHTML = data.param.html;
+
+            this.document.body.innerHTML = data.param.html; // change tous le body
             $xui.loadApplicationJS();
         }
     }
-    if (data.action == "changeReloader") {
+    if (data.action == "doChangeComponent") {
         //console.debug("load reloader", data.xid, data);
         if ($xui.listReloader[data.xid] == null)
-            console.error("changeReloader on error", data, $xui.listReloader);
-        $xui.listReloader[data.xid].rload(data);
+            console.error("doChangeComponent on error", data, $xui.listReloader);
+        $xui.listReloader[data.xid].doChangeComponent(data);
     }
 });
 
@@ -258,10 +442,9 @@ $xui.updateDirectPropInnerText = (event, variable, xid, selectAll) => {
     window.parent.postMessage(message, "*");
 }
 
-$xui.updateDirectPropBlur = () =>
-{
+$xui.updateDirectPropBlur = () => {
     window.getSelection().removeAllRanges();
-} 
+}
 
 // ne sert plus
 $xui.updateDirectPropValue = (value, variable, xid) => {
@@ -275,7 +458,7 @@ $xui.updateDirectPropValue = (value, variable, xid) => {
     window.parent.postMessage(message, "*");
 }
 
-
+// TODO a changer window. par xui.
 window.getInfoForSelector = (selector, parent) => {
     var targetAction = document.querySelector(selector)
     if (targetAction == null) return null;
@@ -288,8 +471,8 @@ window.getInfoForSelector = (selector, parent) => {
     let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
 
     var ret = {
-        selector : selector,
-        parent : parent,
+        selector: selector,
+        parent: parent,
         hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
         height: elemRect.height,
         width: elemRect.width,
@@ -299,5 +482,37 @@ window.getInfoForSelector = (selector, parent) => {
     };
 
     return ret;
-}   </script>
+}
+
+//************************************************************************************************** */
+document.addEventListener("keydown", function (event) {
+    var listShortCut = [
+        { ctrl: true, keyCode: 80, action: "ctrlP" },  // preview
+        { ctrl: true, keyCode: 67, action: "ctrlC" },
+        { ctrl: true, keyCode: 88, action: "ctrlX" },
+        { ctrl: true, keyCode: 86, action: "ctrlV" },
+        { ctrl: true, keyCode: 90, action: "ctrlZ" },
+        { ctrl: true, keyCode: 89, action: "ctrlY" },
+    ];
+
+    //console.debug( event.keyCode );
+
+    for (const shortKey of listShortCut) {
+        if (event.ctrlKey == shortKey.ctrl && event.keyCode == shortKey.keyCode) {
+            event.preventDefault();
+            var message = {
+                action: shortKey.action,
+            };
+            window.parent.postMessage(message, "*");
+        }
+    }
+
+});
+		import "./app/vue2frameDesigner.js";
+	   </script>
+   <script type="module">
+		import "./app/vue2frame.js";
+		$xui.loadApplicationJS();
+	</script>
+   <xui-init-designer></xui-init-designer>
 </html>

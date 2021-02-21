@@ -109,7 +109,7 @@ class NativeSlot extends XUIElementNative {
       }
     });
 
-    if (isModeDesign && (nbChildNoSlot == 0)) {
+    if (isModeDesign && xidCal!=null && (nbChildNoSlot == 0)) {
       //recherche un parent affichable pour gerer la selection des slot (displaySelectorByXid)
       var p = html.parent;
       while (p != null) {
