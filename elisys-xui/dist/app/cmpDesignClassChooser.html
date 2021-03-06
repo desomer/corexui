@@ -2,7 +2,7 @@
 
     <xui-design xid="xui-script-data">
         <script xui-no-dom>
-            // ************** JS DU COMPOSANT  ******************************
+
             var listDesignClass = [
                 {
                     title: "style & elevation",
@@ -49,13 +49,13 @@
                     open: false,
                     nb: "0",
                     listClass: [
-                        { sel: false, text: 'all', value: 'ma', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'x', value: 'mx', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'y', value: 'my', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'top', value: 'mt', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'bottom', value: 'mb', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'left', value: 'ml', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'right', value: 'mr', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'all', value: 'ma', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'x', value: 'mx', type: 'list', vl: '0', list: ['auto', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'y', value: 'my', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'top', value: 'mt', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'bottom', value: 'mb', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'left', value: 'ml', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
+                        { sel: false, text: 'right', value: 'mr', type: 'list', vl: '0', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12'] },
                     ],
                 },
                 {
@@ -148,7 +148,6 @@
             };
             $xui.rootdata = { ...$xui.rootdata, ...json };
 
-            // ************** REGISTER DU COMPOSANT  ******************************
             $xui.initComponentVuejs.push(() => {
                 new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
             }
@@ -157,7 +156,6 @@
     </xui-design>
 
     <script xid="xui-list-class" xui-no-dom>
-        // ************** TEMPLATE VUEJS  ******************************
         export default {
             template: <vue-xui-list-class xui-convert-json></vue-xui-list-class>,
             watch: {
@@ -168,7 +166,6 @@
         }
     </script>
 
-    <!--  **************  TEMPLATE VUE JS   *****************************-->
     <v-tabs xid="vue-xui-list-class">
         <v-tab v-for="(itemCat, j) in listCatClass" :key="j">
             <v-badge overlap color="red" :content="itemCat.nb" :value="itemCat.open">
@@ -180,7 +177,7 @@
             <v-list dense class="xui-list-class">
                 <template v-for="(item, i) in itemCat.listClass">
                     <v-divider v-if="item.type=='divider'" :key="`divider-${i}`"></v-divider>
-                    <!----------------------------- SELECT CLASS -------------------------->
+                    <!------------------------------------------------------------------->
                     <v-list-item dense v-else-if="item.type=='list'" :key="`cl-cbo-${i}`">
                         <v-list-item-action>
                             <v-checkbox dense color="blue accent-4" v-model="item.sel">
@@ -193,7 +190,7 @@
                                 left: 185px;" :items="item.list"></v-select>
 
                     </v-list-item>
-                    <!------------------------------CHECK CLASS --------------------------->
+                    <!------------------------------------------------------------------->
                     <v-list-item dense v-else :key="`cl-${i}`">
                         <v-list-item-action>
                             <v-checkbox dense color="blue accent-4" v-model="item.sel"></v-checkbox>

@@ -1,3 +1,8 @@
+:root {
+    --width-properties:300px;
+}
+
+/*********************barcustom  pour la zone d'action ************************/
 .barcustom::-webkit-scrollbar {
     width: 10px;
 }
@@ -12,46 +17,20 @@
     border-radius: 10px;
 }
 
+/*********************************************************/
+
 html::-webkit-scrollbar {
-     width: 0px;  /*pas de scrollbar */
+     width: 0px;  /*pas de scrollbar pour l'éccran principale*/
 }
 
 /*********************************************************/
+
 .main-container { 
-    height: calc(100vh - 64px - 32px);
-    width: 100%;
     display: grid; 
-    grid-template-columns: 0px auto 250px;
+    grid-template-columns: 0px auto var(--width-properties);
     grid-template-rows: 100%; 
     }
  
-
-.main-tab > * > * > * > .v-tab {
-    min-width: 40px;
-    width: 40px;
-    height: 40px !important;
-}
-
-.main-tab > .v-tabs-items
-{
-    height : 100%    /* teb vertical */
-}
-
-.tab-action > .v-tabs-items
-{
-    height: calc(100% - 40px)
-}
-
-.tab-editor > .v-tabs-items
-{
-    height: calc(100% - 40px)
-}
-
-.tab-action > * > * > * > .v-tab {
-    min-width: 40px;
-    width: 40px;
-}
-
 /* container de l'Iframe */    
 .main-item-2 {
     border: 1px solid #cecece;
@@ -61,17 +40,9 @@ html::-webkit-scrollbar {
 
 #rootFrame { width:100%; height:100%; position:relative; border: 0px; padding: 0px; margin: 0px;}
 
-.iframe-phone {
-    width : 414px !important;
-    max-height : 736px;
-}
-
-.main-code {
-    height: calc(100vh - 64px - 32px);
-    width: 100%;
-}
 
 /***************************************************************/
+
 pre, code {
     font-family: monospace, monospace;
 }
@@ -93,13 +64,24 @@ pre > code {
     background-color: unset !important;
 }
 
-/*************************************************************/
-.xui-div-design {
-    overflow-y: scroll; overflow-x: hidden; height: calc(100% + 48px - 35px);
+/********************** style editor de property ************************/
+.xui-div-scroll-vertical {
+    /*background-color: #565656;  //dark */
+    overflow-y: scroll; overflow-x: hidden; height: 100%;
 }
 
+.xui-editor-action-btn
+{
+    min-width: 20px !important;
+    width: 20px;
+    margin: 7px 0px 0px 0px;
+}
+
+/****************************   Le bouton heade et footer *************************/
 .xui-btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
 
+
+/**********************************************************************************/
 .xui-style-selector { 
     position: absolute; 
     padding: 5px;  
@@ -124,7 +106,7 @@ pre > code {
     border: 1px dashed rgb(255, 115, 0); 
 }
 
-
+/**********************   entete de propriété  **************************/
 .xui-style-prop {    
     background: #565656;
     height: 24px;
@@ -142,6 +124,16 @@ pre > code {
     box-shadow: inset 0px 0px 6px 0px rgb(204, 205, 255);
 }
 
+/******************** sur popup action ***************************************/
+.xui-popup-class {
+    border: 1px solid rgb(183 183 183);
+    z-index: 1001;
+    box-shadow: 4px 3px 3px 0px #828282; 
+    display: none;
+}
+
+
+/******************************************************************************/
 .xui-frame-full-screen {
     position : fixed !important;
     top: 0px;
@@ -149,17 +141,17 @@ pre > code {
     z-index: 1000;
 }
 
+.iframe-phone {
+    width : 414px !important;
+    max-height : 736px;
+}
+/******************************************************************************/
+
 .xui-path-component
 {
     font-size: 1rem;
 }
 
-.xui-editor-action-btn
-{
-    min-width: 20px !important;
-    width: 20px;
-    margin: 7px 0px 0px 0px;
-}
 
 /******************************************************************************/
 .xui-list-cmp .v-list-item__icon {
@@ -171,7 +163,7 @@ pre > code {
 .xui-list-cmp .v-list-item {
     min-height: 32px;
 }
-/*****************************************/
+/********************************* l'editor de class ******************************/
 .xui-list-class .v-list-item--dense { 
     height: 30px;
     min-height: 25px; 
@@ -188,10 +180,10 @@ pre > code {
     margin: 0px 6px 0px -10px !important;
 }
 
-/******************************************************************************/
-.xui-textarea-editor {
+/************************************************************************************/
+/*.xui-textarea-editor {
     overflow: hidden;
     overflow-wrap: break-word;
     resize: none;
     height: 86px;
-}
+}*/

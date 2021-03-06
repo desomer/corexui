@@ -41,7 +41,8 @@ export class PageDesignManager {
         }
     }
 
-    changePageJS(param) {
+    
+    changePageOnFrame(param) {
         //console.debug("change page", param);
 
         $xui.unDisplaySelector();

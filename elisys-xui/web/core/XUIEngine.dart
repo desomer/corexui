@@ -16,20 +16,26 @@ const ATTR_SLOT_NAME = "slot-name";
 const ATTR_SLOT_FULL = "slot-full";
 const ATTR_XID_SLOT = "xid-slot";
 
+// ne genere pas de engine.mapInfo et de data-xui-slot
 const ATTR_NO_DESIGN = "no-design";
 const ATTR_DOC_ID = "doc-id";
 
+// choix du mode pour le design (MODE_FINAL, MODE_DESIGN, etc... )
 const ATTR_MODE = "mode";
-const ATTR_NO_DOM = "no-dom";
+// n'ajoute pas de noeud dom
+const ATTR_NO_DOM = "no-dom";         
 const ATTR_RELOADER = "reloader";
-const ATTR_MODE_DISPLAY = "modedisplay";
+// mode display des reloader.  par defaut display:content
+const ATTR_MODE_DISPLAY = "modedisplay";   
+
 const ATTR_CONVERT_JSON = "convert-json";
 const ATTR_XUI_IF = "if";
 
 const ATTR_STYLE_SLOT = "style-slot";
+// gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
 
-const TAG_ESCAPE =
-    "xui-escape-"; // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
+
+const TAG_ESCAPE = "xui-escape-";
 const TAG_NO_DOM = "xui-no-dom";
 const TAG_RELOADER = "xui-reloader";
 
@@ -129,7 +135,7 @@ class XUIResource extends XMLElemReader {
   ///------------------------------------------------------------------
   XUIResource(this.reader, this.context);
 
-  void addObject(var aDesign) {
+  void addObjectDesign(var aDesign) {
     var curDesign = designs[aDesign["xid"]];
     if (curDesign == null) {
       var elemXui = XUIElementXUI();
@@ -174,7 +180,7 @@ class XUIResource extends XMLElemReader {
     }
   }
 
-  dynamic getObject() {
+  dynamic getObjects() {
     var ret = {};
     var import = [];
 
@@ -294,7 +300,7 @@ class XUIResource extends XMLElemReader {
           doc.desc = (prop.children.first as XUIElementText).content;
         } else if (id == "add-remove") {
           doc.addRemove = (prop.children.first as XUIElementText).content;
-        } 
+        }
       } else if (prop.attributes["var"] != null) {
         DocVariables propDoc = DocVariables();
         propDoc.id = prop.attributes["var"]?.content;
@@ -437,6 +443,8 @@ class XUIEngine {
   var docInfo = HashMap<String, DocInfo>();
   var dataBindingInfo = XUIParseJSDataBinding();
 
+  bool reloaderEnable = true;
+
   Future initialize(HTMLReader reader, XUIContext ctx) async {
     xuiFile = XUIResource(reader, ctx);
 
@@ -459,7 +467,7 @@ class XUIEngine {
     return info;
   }
 
-    void addXUIDesignEmpty(String xid) {
+  void addXUIDesignEmpty(String xid) {
     XUIElementXUI xuiElem = XUIElementXUI();
     xuiElem.xid = xid;
     xuiElem.idRessource = xuiFile.reader.id;
@@ -469,7 +477,7 @@ class XUIEngine {
 
   getReloaderID(f) {
     SlotInfo info = getSlotInfo(f, f);
-    if (info == null) {
+    if (info == null || !reloaderEnable) {
       return null;
     }
     var html = info.elementHTML;
@@ -535,7 +543,7 @@ class XUIEngine {
 
     var listCmp = xuiFile.searchComponent(xid);
     if (listCmp == null) {
-      dynamic obj = xuiFile.getObject();
+      dynamic obj = xuiFile.getObjects();
 
       final yamld = toYamlString(obj);
       print("xid inconnu $xid\n" + yamld.toString());

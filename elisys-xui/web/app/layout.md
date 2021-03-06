@@ -51,3 +51,13 @@ mdi-chevron-right
 /********************** CMS **************************/
 
 https://app.takeshape.io/projects
+
+
+/------------------------------------------------------
+Store
+      api
+      module
+            data              ----->  vue
+      module
+            data/cmp           -----> boite de dialogue 
+            

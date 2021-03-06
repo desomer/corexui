@@ -317,29 +317,65 @@ class XUIDesignManager {
 
   ///------------------------------------------------------------------------------------------
 
-  List getActionsPopup(XUIContext ctx, String id, String idslot, String action) {
+  List getActionsPopup(
+      XUIContext ctx, String id, String idslot, String action) {
     List ret = [];
 
     var designs = xuiEngine.getDesignInfo(id, idslot, true);
+    var idx = 0;
     for (var design in designs) {
+      idx++;
+      if (idx > 5) {
+        break;
+      }
+      bool isSlot = id.startsWith(SLOT_PREFIX);
       /*********************************** */
       if (design.docInfo != null) {
         if (design.docInfo.xid == "v-tab:xui-tabs") {
+          if (idx == 1) {
+            // ajout un flox
+            ObjectAction act = ObjectAction(
+                xid: design.slotInfo.xid,
+                action: "addFlow",
+                icon: "mdi-table-row",
+                title: "Add flow");
+            ret.add(act);
+          }
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid,
-              action: "incNb",
+              action: "incNbBefore",
+              icon: "mdi-tab",
+              title: "Add new Tab (Before " + design.slotInfo.slotname + ")");
+          ret.add(act);
+          act = ObjectAction(
+              xid: design.slotInfo.xid,
+              action: "incNbAfter",
               icon: "mdi-tab",
               title: "Add new Tab (after " + design.slotInfo.slotname + ")");
           ret.add(act);
-
         } else if (design.docInfo.xid == "xui-no-dom:xui-flow") {
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid,
-              action: "incNb",
+              action: "incNbAfter",
               icon: "mdi-transfer-right",
-              title: "Add new Slot (after " + design.slotInfo.slotname + ")");
+              title: "Add right (after " + design.slotInfo.slotname + ")");
           ret.add(act);
-
+        } else if (idx == 1 && isSlot) {
+          // ajoute un slot
+          ObjectAction act = ObjectAction(
+              xid: design.slotInfo.xid,
+              action: "addFlow",
+              icon: "mdi-table-row",
+              title: "Add flow");
+          ret.add(act);
+        } else if (idx == 1 && !isSlot) {
+          // ajoute un slot
+          ObjectAction act = ObjectAction(
+              xid: design.slotInfo.xid,
+              action: "surroundRight",
+              icon: "mdi-table-row",
+              title: "Add right");
+          ret.add(act);
         } else {
           var ti = (design.docInfo.addRemove ?? "noAddRemove") +
               "|" +

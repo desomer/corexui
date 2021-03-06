@@ -51,7 +51,7 @@
                   </v-card-actions>
                </v-card>
             </v-dialog>
-            <v-navigation-drawer width="30vw" temporary overlay-color="red" v-model="navdrawer" app src="https://images.unsplash.com/photo-1556089290-cc6d3dcf9c13?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80" expand-on-hover overlay-opacity=".9">
+            <v-navigation-drawer temporary v-model="navdrawer" app>
             </v-navigation-drawer>
             <v-app-bar color="#ff5900" app height="32" dark>
                <v-app-bar-nav-icon @click.stop="navdrawer = !navdrawer"></v-app-bar-nav-icon>
@@ -72,156 +72,13 @@
                <v-btn small class="xui-btn-action" @click="$xui.refreshAction('template:reload')">
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
+               <span style="width:20px"></span>
+               <v-btn small class="xui-btn-action" @click="$xui.sendInTab()">
+                  <v-icon>mdi-application-export</v-icon>
+               </v-btn>
             </v-app-bar>
             <v-main style="background:white" class="fill-height">
-               <v-tabs v-model="activeTab" style="--xui-tab-h:;" vertical class="fill-height main-tab xui-tabs  tabs-dense" dark>
-                  <v-tab>
-                     <v-icon>mdi-square-edit-outline</v-icon>
-                  </v-tab>
-                  <v-tab-item eager :transition="false" :reverse-transition="false">
-                     <v-tabs style="--xui-tab-h:35px;" height="35px" class="fill-height xui-tabs" dark>
-                        <v-tab>
-                           <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
-                           <span style="margin-left: 5px;">Page {{frameName}}</span>
-                        </v-tab>
-                        <v-tab-item eager :transition="false" :reverse-transition="false">
-                           <div class="main-container fill-height">
-                              <div class="main-item main-item-1"></div>
-                              <div class="main-item main-item-2">
-                                 <iframe id="rootFrame"></iframe>
-                              </div>
-                              <div class="main-item main-item-3">
-                                 <v-overlay :value="saveLayout" style="height: 100%;position: relative;">
-                                    <v-btn>Save in progress</v-btn>
-                                 </v-overlay>
-                                 <v-tabs v-model="activeAction" style="position: absolute; top: 0px; width: 300px;;--xui-tab-h:35px;" height="35px" class="fill-height xui-tabs  tabs-dense" dark>
-                                    <v-tab>
-                                       <v-icon>mdi-layers-triple</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager :transition="false" :reverse-transition="false">
-                                       <div id="AppPropertiesSetting"></div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-plus-box-multiple</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager :transition="false" :reverse-transition="false">
-                                       <div id="AppComponents"></div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-palette-swatch</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager :transition="false" :reverse-transition="false">
-                                       <div>Extended Style coming soon...</div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-database-import</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager :transition="false" :reverse-transition="false">
-                                       <div>Data binding coming soon...</div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-file-tree</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager :transition="false" :reverse-transition="false">
-                                       <div>TreeView coming soon...</div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-chevron-right-box</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager :transition="false" :reverse-transition="false">
-                                       <div>CLI coming soon...</div>
-                                    </v-tab-item>
-                                 </v-tabs>
-                              </div>
-                           </div>
-                        </v-tab-item>
-                        <v-tab>
-                           <v-icon>mdi-palette</v-icon>
-                           <span>Style</span>
-                        </v-tab>
-                        <v-tab-item eager :transition="false" :reverse-transition="false">
-                           <div>Coming soon...</div>
-                        </v-tab-item>
-                        <v-tab>
-                        </v-tab>
-                        <v-tab-item eager :transition="false" :reverse-transition="false">
-                        </v-tab-item>
-                     </v-tabs>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-code-tags</v-icon>
-                  </v-tab>
-                  <v-tab-item eager :transition="false" :reverse-transition="false">
-                     <v-tabs style="--xui-tab-h:35px;" height="35px" class="tab-code fill-height xui-tabs" dark>
-                        <v-tab>
-                           <span> Html </span>
-                        </v-tab>
-                        <v-tab-item eager :transition="false" :reverse-transition="false">
-                           <div class="fill-height">
-                              <pre>
-                                 <code spellcheck id="xui-code-html"></code>
-                              </pre>
-                           </div>
-                        </v-tab-item>
-                        <v-tab>
-                           <span>XUI</span>
-                        </v-tab>
-                        <v-tab-item eager :transition="false" :reverse-transition="false">
-                           <div class="fill-height">
-                              <pre>
-                                 <code spellcheck id="xui-code-xui"></code>
-                              </pre>
-                           </div>
-                        </v-tab-item>
-                        <v-tab>
-                           <span>JSON</span>
-                        </v-tab>
-                        <v-tab-item eager :transition="false" :reverse-transition="false">
-                           <div class="fill-height">
-                              <pre>
-                                 <code spellcheck id="xui-code-json"></code>
-                              </pre>
-                           </div>
-                        </v-tab-item>
-                     </v-tabs>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-api</v-icon>
-                  </v-tab>
-                  <v-tab-item eager :transition="false" :reverse-transition="false">
-                     <div id="editorContent">
-                        <vue-editor v-model="contentEditor"></vue-editor>
-                     </div>
-                     <div id="resultContent">
-                        <div v-html="contentEditor"></div>
-                     </div>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-database</v-icon>
-                  </v-tab>
-                  <v-tab-item eager :transition="false" :reverse-transition="false">
-                     <p>
-                        <router-link to="/foo">Aller a Foo</router-link>
-                        <router-link to="/bar">Aller a Bar</router-link>
-                     </p>
-                     <router-view></router-view>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-apps</v-icon>
-                  </v-tab>
-                  <v-tab-item eager :transition="false" :reverse-transition="false">
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-image-multiple-outline</v-icon>
-                  </v-tab>
-                  <v-tab-item eager :transition="false" :reverse-transition="false">
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-border-inside</v-icon>
-                  </v-tab>
-                  <v-tab-item eager :transition="false" :reverse-transition="false">
-                  </v-tab-item>
-               </v-tabs>
+               <router-view></router-view>
             </v-main>
             <v-footer app style="padding-top: 1px;" height="32" color="#ff5900" dark>
                <v-btn small class="xui-btn-action" @click="$xui.deleteCmp()">
@@ -261,6 +118,151 @@
                <span>&copy;&nbsp;Elisys 2020 v0.5.1 20/02/2021</span>
             </v-footer>
          </v-app>
+      </template>
+      <template id="xui-route-default">
+         <v-tabs v-model="activeTab" style="--xui-tab-h:;" vertical class="fill-height main-tab xui-tabs  tabs-dense" dark>
+            <v-tab>
+               <v-icon>mdi-square-edit-outline</v-icon>
+            </v-tab>
+            <v-tab-item eager :transition="false" :reverse-transition="false">
+               <v-tabs style="--xui-tab-h:35px;" height="35px" class="fill-height xui-tabs" dark>
+                  <v-tab>
+                     <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
+                     <span style="margin-left: 5px;">Page {{frameName}}</span>
+                  </v-tab>
+                  <v-tab-item eager :transition="false" :reverse-transition="false">
+                     <div class="main-container fill-height">
+                        <div class="main-item main-item-1"></div>
+                        <div class="main-item main-item-2">
+                           <iframe id="rootFrame"></iframe>
+                        </div>
+                        <div class="main-item main-item-3">
+                           <v-overlay :value="saveLayout" style="height: 100%;position: relative;">
+                              <v-btn>Save in progress</v-btn>
+                           </v-overlay>
+                           <v-tabs v-model="activeAction" style="position: absolute; top: 0px; width: 300px;;--xui-tab-h:35px;" height="35px" class="fill-height xui-tabs  tabs-dense" dark>
+                              <v-tab>
+                                 <v-icon>mdi-layers-triple</v-icon>
+                              </v-tab>
+                              <v-tab-item eager :transition="false" :reverse-transition="false">
+                                 <div id="AppPropertiesSetting"></div>
+                              </v-tab-item>
+                              <v-tab>
+                                 <v-icon>mdi-plus-box-multiple</v-icon>
+                              </v-tab>
+                              <v-tab-item eager :transition="false" :reverse-transition="false">
+                                 <div id="AppComponents"></div>
+                              </v-tab-item>
+                              <v-tab>
+                                 <v-icon>mdi-palette-swatch</v-icon>
+                              </v-tab>
+                              <v-tab-item eager :transition="false" :reverse-transition="false">
+                                 <div>Extended Style coming soon...</div>
+                              </v-tab-item>
+                              <v-tab>
+                                 <v-icon>mdi-database-import</v-icon>
+                              </v-tab>
+                              <v-tab-item eager :transition="false" :reverse-transition="false">
+                                 <div>Data binding coming soon...</div>
+                              </v-tab-item>
+                              <v-tab>
+                                 <v-icon>mdi-file-tree</v-icon>
+                              </v-tab>
+                              <v-tab-item eager :transition="false" :reverse-transition="false">
+                                 <div>TreeView coming soon...</div>
+                              </v-tab-item>
+                              <v-tab>
+                                 <v-icon>mdi-chevron-right-box</v-icon>
+                              </v-tab>
+                              <v-tab-item eager :transition="false" :reverse-transition="false">
+                                 <div>CLI coming soon...</div>
+                              </v-tab-item>
+                           </v-tabs>
+                        </div>
+                     </div>
+                  </v-tab-item>
+                  <v-tab>
+                     <v-icon>mdi-palette</v-icon>
+                     <span>Style</span>
+                  </v-tab>
+                  <v-tab-item eager :transition="false" :reverse-transition="false">
+                     <div>Coming soon...</div>
+                  </v-tab-item>
+                  <v-tab>
+                  </v-tab>
+                  <v-tab-item eager :transition="false" :reverse-transition="false">
+                  </v-tab-item>
+               </v-tabs>
+            </v-tab-item>
+            <v-tab>
+               <v-icon>mdi-code-tags</v-icon>
+            </v-tab>
+            <v-tab-item eager :transition="false" :reverse-transition="false">
+               <v-tabs style="--xui-tab-h:35px;" height="35px" class="tab-code fill-height xui-tabs" dark>
+                  <v-tab>
+                     <span> Html </span>
+                  </v-tab>
+                  <v-tab-item eager :transition="false" :reverse-transition="false">
+                     <div class="fill-height">
+                        <pre>
+                           <code spellcheck id="xui-code-html"></code>
+                        </pre>
+                     </div>
+                  </v-tab-item>
+                  <v-tab>
+                     <span>XUI</span>
+                  </v-tab>
+                  <v-tab-item eager :transition="false" :reverse-transition="false">
+                     <div class="fill-height">
+                        <pre>
+                           <code spellcheck id="xui-code-xui"></code>
+                        </pre>
+                     </div>
+                  </v-tab-item>
+                  <v-tab>
+                     <span>JSON</span>
+                  </v-tab>
+                  <v-tab-item eager :transition="false" :reverse-transition="false">
+                     <div class="fill-height">
+                        <pre>
+                           <code spellcheck id="xui-code-json"></code>
+                        </pre>
+                     </div>
+                  </v-tab-item>
+               </v-tabs>
+            </v-tab-item>
+            <v-tab>
+               <v-icon>mdi-api</v-icon>
+            </v-tab>
+            <v-tab-item eager :transition="false" :reverse-transition="false">
+               <div id="editorContent">
+                  <vue-editor v-model="contentEditor"></vue-editor>
+               </div>
+               <div id="resultContent">
+                  <div v-html="contentEditor"></div>
+               </div>
+            </v-tab-item>
+            <v-tab>
+               <v-icon>mdi-database</v-icon>
+            </v-tab>
+            <v-tab-item eager :transition="false" :reverse-transition="false">
+            </v-tab-item>
+            <v-tab>
+               <v-icon>mdi-apps</v-icon>
+            </v-tab>
+            <v-tab-item eager :transition="false" :reverse-transition="false">
+            </v-tab-item>
+            <v-tab>
+               <v-icon>mdi-image-multiple-outline</v-icon>
+            </v-tab>
+            <v-tab-item eager :transition="false" :reverse-transition="false">
+            </v-tab-item>
+            <v-tab>
+               <v-icon>mdi-border-inside</v-icon>
+            </v-tab>
+            <v-tab-item eager :transition="false" :reverse-transition="false">
+            </v-tab-item>
+         </v-tabs>
       </template>
       <div id="app"></div>
    </body>
@@ -591,7 +593,7 @@
                 cursor: col-resize;
             }
            </style>
-   <script defer src="app/loader.js"></script>
+   <script defer src="app/vueHelper.js"></script>
    <script defer src="app/frameDesigner.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>

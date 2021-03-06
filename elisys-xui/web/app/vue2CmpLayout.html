@@ -1,18 +1,5 @@
 <xui-factory version="1.0">
 
-    <!------------------------------------------------------------------------------>
-
-
-    <xui-design xid="xui-script-data">
-        <script xui-no-dom>
-            $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
-                new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
-                    "vue-xui-split");
-            }
-            );
-        </script>
-    </xui-design>
-
 
     <!--------------------------  XUI-FLOW   ------------------------------->
     <xui-doc xid="xui-flow">
@@ -88,7 +75,7 @@
     </xui-design>
 
 
-    <!-------------------------------  SPLIT  ------------------------------->
+    <!-------------------------------  SPLIT 1  ------------------------------->
 
     <xui-doc xid="xui-split-1">
         <xui-prop id="name">Split</xui-prop>
@@ -125,7 +112,20 @@
     </v-xui-split>
 
 
-    <!------------------------------------------------------------------------------>
+    <!-------------------------------------  V-XUI-SPLIT  ------------------------------------->
+    <xui-design xid="inject-other-header">
+        <script defer src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
+    </xui-design>
+    
+    <xui-design xid="xui-script-data">
+        <script xui-no-dom>
+            $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
+                new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
+                    "vue-xui-split");
+            }
+            );
+        </script>
+    </xui-design>
 
     <script xid="vue-xui-split" xui-no-dom>
         export default {
@@ -191,10 +191,6 @@
                 cursor: col-resize;
             }
         </style>
-    </xui-design>
-
-    <xui-design xid="inject-other-header">
-        <script defer src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
     </xui-design>
 
 </xui-factory>

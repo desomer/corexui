@@ -47,9 +47,18 @@ export class SelectorManager {
                 var nodeAction = document.createElement("div");
                 nodeAction.id = "xui-display-selector-action";
                 node.appendChild(nodeAction);
+
+
+                /************************************************* */
+                document.body.appendChild(node);
+
                 /************************************************* */
 
-                document.body.appendChild(node);
+                // le node action
+                // var nodePopup = document.createElement("div");
+                // nodePopup.id = "xui-display-selector-popup";
+                // document.body.appendChild(nodePopup);
+
 
                 /************************************************* */
                 // le node margin

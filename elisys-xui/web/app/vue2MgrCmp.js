@@ -1,11 +1,27 @@
 export class ComponentManager {
 
+    static getComponentFromTemplate(idTemplate, computeDataBinding) {
+        const template = document.querySelector("#" + idTemplate);
+        if (template == null)
+            return {
+                template: "<div>no template</div>"
+            };
+        else
+            return {
+                template: template.innerHTML,
+                data: () => { return $xui.rootdata; },
+                computed: {
+                    $xui: () => $xui,  // pour les @click="$xui.doXXX()"
+                    ...computeDataBinding
+                }
+            }
+    }
 
-    getRoute(path, file, xid) {
+    static getRoute(path, file, xid) {
         return {
             path: path, component: () => {
                 return new Promise((resolve, reject) => {
-                    console.debug("create route " + path +" to "+xid);
+                    console.debug("create route " + path + " to " + xid);
                     new vue2CmpMgr.ComponentManager().getVueTemplate(file, xid, 'final',
                         (str) => {
                             resolve({ template: str });
@@ -18,17 +34,17 @@ export class ComponentManager {
 
     getVueTemplate(file, xid, mode, aPromise) {
 
-        if (window.parent==window) { // test si loader
-            this.waitForGlobal("getHtmlFromXUI", function () {
+        if (window.parent == window) { // test si loader
+            window.waitForXuiLib("getHtmlFromXUI", function () {
                 console.debug("getVueTemplate local ", xid)
                 var infoFileCmp = { file: file, xid: xid, mode: mode };
-                var prom = getPromise("getVueCmp"+xid)
-                $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp"+xid);
+                var prom = getPromise("getVueCmp" + xid)
+                $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp" + xid);
                 prom.then(jsCmp => {
                     console.debug("returnCmpForFile ", jsCmp)
                     aPromise(jsCmp);
                 });
-            }.bind(this));
+            }.bind(this), this);
 
         } else {
             console.debug("getVueTemplate on parent ", xid)
@@ -52,17 +68,18 @@ export class ComponentManager {
     //------------------------------------------------------------------
     registerVueComponent(idCmp, file, xid) {
 
-        console.debug("init component xui vuejs " + idCmp);
+        console.debug("create component from import " + idCmp);  // voir xui-split-1
 
         Vue.component(idCmp, function (resolve, reject) {
             this.getVueTemplate(file, xid, "final", function (str) {
-                this.initComponent(str, resolve);
+                this.initComponentFromImport(str, resolve);
             }.bind(this))
         }.bind(this));
 
     }
+
     //------------------------------------------------------------------
-    initComponent(jsCmp, resolve) {
+    initComponentFromImport(jsCmp, resolve) {
         const dataUri = ComponentManager.esm`${jsCmp}`;
         import(dataUri)
             .then((namespaceObject) => {
@@ -74,7 +91,8 @@ export class ComponentManager {
                     computed: {
                         $xui: function () {
                             return window.$xui;
-                        }
+                        },
+                        ...$xui.storeDataBinding
                     },
                     ...namespaceObject.default
                 };
@@ -92,13 +110,5 @@ export class ComponentManager {
         }
         return 'data:text/javascript;base64,' + btoa(js);
     }
-
-    waitForGlobal(key, callback) {
-        if ($xui[key] != null) {
-            callback();
-        } else {
-            setTimeout(function () { this.waitForGlobal(key, callback); }.bind(this), 100);
-        }
-    };
 
 }

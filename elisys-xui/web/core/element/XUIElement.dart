@@ -190,6 +190,10 @@ class XUIElementHTML extends XUIElement {
           (this.propertiesXUI != null &&
               this.propertiesXUI.containsKey(ATTR_RELOADER));
 
+      if (!engine.reloaderEnable) {
+        hasTagReloader = false;
+      }
+
       if (!isRoot && engine.isModeDesign() && hasTagReloader) {
         isReloader = true;
         var xid = this.originElemXUI.xid;

@@ -2,7 +2,7 @@ function waitForXuiLib(key, callback, self) {
     if ($xui[key] != null) {
         callback();
     } else {
-        setTimeout(function () { this.waitForXuiLib(key, callback); }.bind(self), 100);
+        setTimeout(function () { waitForXuiLib(key, callback); }.bind(self), 100);
     }
 };
 
@@ -29,6 +29,8 @@ function getPromise(id) {
 
     if (id != null)
         dicoPromise[id] = promise;
+
+    //console.debug("nb promise "+Object.keys(dicoPromise).length);
 
     return promise;
 }

@@ -5,7 +5,7 @@ $xui.listReloader = {};  // liste des reloader   ajouter dans le vue2frameDesign
 $xui.nbRefeshReloader = 0;
 
 $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
-
+    console.debug("create component v-xui-reloader")
     Vue.component("v-xui-reloader",
         {
             template: '<component v-bind:is="componentToReload"></component>',
@@ -23,7 +23,20 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
 
                     // creation du composant 
                     Vue.component(newId,
-                        { template: '<div style="display:' + this.modedisplay + '">' + e.template + '</div>' });
+                        { 
+                            template: '<div style="display:' + this.modedisplay + '">' + e.template + '</div>' ,
+                            data: function () {
+                                return $xui.rootdata;
+                            },
+                            computed: {
+                                $xui: function () {
+                                    return window.$xui;
+                                },
+                                ...$xui.storeDataBinding
+                            }
+                        }
+                        
+                        );
                     this.componentToReload = newId;   // change le contenu du composant  id = componentToReload
 
                     this.$nextTick(function () {
@@ -162,7 +175,7 @@ window.addEventListener('message', function (e) {
             }
         }
         else {
-            this.console.info("changeTemplate event all", data.param);
+            this.console.info("changeTemplate event all loadApplicationJS", data.param);
             let styleXui = this.document.body.querySelector("#xui-style");   // retire tous le style
             if (styleXui != null) {
                 this.console.debug("+++++++++++>  move style to header")
@@ -172,6 +185,11 @@ window.addEventListener('message', function (e) {
 
             this.document.body.innerHTML = data.param.html; // change tous le body
             $xui.loadApplicationJS();
+            this.console.debug("+++++++++++>  post le reloader finish")
+            var message = {
+                action: "reloader finish",
+            };
+            window.parent.postMessage(message, "*");
         }
     }
     if (data.action == "doChangeComponent") {

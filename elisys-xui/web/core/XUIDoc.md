@@ -9,7 +9,7 @@ DesignManager  = identifie un onglet de design
 Engine = converti les fichiers XML vers XUIResource de design et component XUI
     -    XUIResource :  correspond à un fichier XML 
                         utilise les parser
-                        getObject et setObject
+                        getObjects et addObjectDesign
     
 Factory =
     -   process phase 1 : creation de element HTML a partir des XUI

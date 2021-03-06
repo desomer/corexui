@@ -22,29 +22,6 @@
 	</xui-doc>
 
 	<!---------------------------------------------------------------------------------------->
-
-	<xui-doc xid="vue-systembar-1">
-		<xui-prop id="name">System bar</xui-prop>
-		<xui-prop id="desc">System bar</xui-prop>
-
-		<xui-prop var="class" cat="class" editor="class">class</xui-prop>
-		<xui-prop var="style" cat="style" editor="style">style</xui-prop>
-		<xui-prop var="height" editor="int">height (px)</xui-prop>
-		<xui-prop var="lights-out" editor="bool">lights-out</xui-prop>
-
-		<xui-prop var="color" editor="text">background color</xui-prop>
-		<xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
-        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
-	</xui-doc>
-
-	<xui-doc xid="v-system-bar:vue-systembar-1">
-		<xui-prop id="name">System bar slot</xui-prop>
-		<xui-prop id="desc">System bar slot</xui-prop>
-	</xui-doc>
-
-
-
-	<!---------------------------------------------------------------------------------------->
 	<!-------------------------------     PAGE      ------------------------------------------>
 	<!---------------------------------------------------------------------------------------->
 	<!--  gestion page autonome -->
@@ -71,6 +48,9 @@
 	<xui-design xid="header-vuetify">
 		<title>[[title@0+]]</title>
 		<viewport-no-zoom></viewport-no-zoom>
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" />
 		<link rel="stylesheet"
 			href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" />
@@ -82,7 +62,7 @@
 
 
 	<meta xid="viewport-no-zoom" name="viewport"
-		content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+		content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
 	</meta>
 
 	<xui-design xid="body-vuetify">
@@ -93,6 +73,10 @@
 			<xui-slot xid="xui-temporary-slot" xui-no-design></xui-slot>
 		</template>
 
+		<template id="xui-route-default">
+			<vue-content-1 xid="contentpage"></vue-content-1>
+		</template>
+
 		<div id="app"></div>
 	</xui-design>
 
@@ -101,17 +85,40 @@
 		<vue-systembar-1 xid="systembar"  xui-if=[[withSysBar@0+]]></vue-systembar-1>
 		<vue-nav-drawer-1 xid="navdrawerleft" xui-if=[[withLeftNavigation@0+]]></vue-nav-drawer-1>
 		<vue-apptoolbar-1 xid="toolbar" xui-if=[[withAppBar@0+]]></vue-apptoolbar-1>
-		<vue-content-1 xid="contentpage"></vue-content-1>
+		<v-main class="fill-height" -style="background:[[colorBg@0+]]">
+			<router-view></router-view>
+			<!--vue-content-1 xid="contentpage"></vue-content-1-->
+		</v-main>
 		<vue-footer-1 xid="footer" xui-if=[[withFooter@0+]]></vue-footer-1>
 		<vue-bottom-nav-1 xid="bottom-nav" xui-if=[[withBottomNavigation@0+]]></vue-bottom-nav-1>
 	</xui-design>
+
+	<!------------------------------------- SYSTEM BAR------------------------------------------->
+
+	<xui-doc xid="vue-systembar-1">
+		<xui-prop id="name">System bar</xui-prop>
+		<xui-prop id="desc">System bar</xui-prop>
+
+		<xui-prop var="class" cat="class" editor="class">class</xui-prop>
+		<xui-prop var="style" cat="style" editor="style">style</xui-prop>
+		<xui-prop var="height" editor="int">height (px)</xui-prop>
+		<xui-prop var="lights-out" editor="bool">lights-out</xui-prop>
+
+		<xui-prop var="color" editor="text">background color</xui-prop>
+		<xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+	</xui-doc>
+
+	<xui-doc xid="v-system-bar:vue-systembar-1">
+		<xui-prop id="name">System bar slot</xui-prop>
+		<xui-prop id="desc">System bar slot</xui-prop>
+	</xui-doc>
 
 	<v-system-bar xid="vue-systembar-1" class="[[class]]" -style="[[style]]" app
 		dark="[[dark@0+]]" light="[[light@0+]]" color="[[color@0+]]" height="[[height]]" lights-out="[[lights-out]]">
 		<xui-slot xui-reloader=true xid="slot-content-systembar" xui-slot-full xui-slot-name="system bar content">
 		</xui-slot>
 	</v-system-bar>
-
 
 	<!------------------------------------- elevate-on-scroll--------------------------------------------------->
 	<xui-doc xid="vue-apptoolbar-1">
@@ -234,10 +241,15 @@
 		<xui-prop id="desc">Contenu slot</xui-prop>
 	</xui-doc>
 
-	<v-main xid="vue-content-1" class="fill-height" -style="background:[[colorBg@0+]]">
+	<!--v-main xid="vue-content-1" class="fill-height" -style="background:[[colorBg@0+]]">
 		<xui-slot xid="main" xui-reloader=true style-slot="height:100%;width:100%"  xui-slot-name="page content">
 		</xui-slot>
-	</v-main>
+	</v-main-->
+
+	<div xid="vue-content-1" xui-no-dom>
+		<xui-slot xid="main" xui-reloader=true style-slot="height:100%;width:100%"  xui-slot-name="page content">
+		</xui-slot>
+	</div>
 
 	<!---------------------------------------   FOOTER  ---------------------------------------------->
 	<xui-doc xid="vue-footer-1">

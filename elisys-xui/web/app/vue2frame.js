@@ -8,35 +8,39 @@ import * as vue2CmpMgr from "./vue2MgrCmp.js";
 Vue.config.devtools = true;
 Vue.config.productionTip = false;
 
+Vue.use(Vuex);
+Vue.use(VueRouter);
 
 /*********************************************************************************/
-$xui.createComponentFromTemplate = (idTemplate, dataBinding) => {
-	return {
-		template: document.querySelector("#" + idTemplate).innerHTML,
-		data: () => { return $xui.rootdata; },
-		computed: {
-			$xui: () => $xui,  // pour les @click="$xui.doXXX()"
-			...dataBinding
-		}
-	}
-}
+// $xui.createComponentFromTemplate = (idTemplate, computeDataBinding) => {
+// 	return {
+// 		template: document.querySelector("#" + idTemplate).innerHTML,
+// 		data: () => { return $xui.rootdata; },
+// 		computed: {
+// 			$xui: () => $xui,  // pour les @click="$xui.doXXX()"
+// 			...computeDataBinding
+// 		}
+// 	}
+// }
 
 /******************************* INIT DU vue2CmpMgr *******************************/
 window.vue2CmpMgr = vue2CmpMgr;
 
 $xui.loadApplicationJS = () => {
 	if ($xui.vuejs != null) {
+		// suppression de vues
+		console.debug("Destroy vuejs");
 		$xui.vuejs.$destroy();
 	}
 	else {
-		// creation des composants xui/vuejs
+		/********************** creation des composants xui/vuejs  *****************/
 		var listFunctCreateCmp = $xui.initComponentVuejs;
 		for (const functCreateCmp of listFunctCreateCmp) {
 			functCreateCmp();
 		}
 	}
 
-	/******************************************/
+	/*********************************** STORE   *********************************/
 	$xui.store = new Vuex.Store({
 		state: {
 			count: 0
@@ -51,13 +55,30 @@ $xui.loadApplicationJS = () => {
 	$xui.store.commit('increment');
 	$xui.store.commit('increment');
 
-	/******************************************************************************/
+	// passer la valeur littérale 'count' revient à écrire `state => state.count`
+	var storeDataBinding = Vuex.mapState({ titre: 'count' });
+	$xui.storeDataBinding=storeDataBinding;
 
-	var dataBinding = Vuex.mapState({ titre: 'count' });
+	/***********************************  ROUTER   **********************************/
+	//const defaut = { template: '<div>dddd</div>' }
+	const defaut = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-route-default", storeDataBinding)
+	const info = { template: '<div>info</div>' }
+	const Unknown = { template: '<div>unknown</div>' }
+
+	const routes = [
+		{ path: '/', component: defaut },
+		{ path: '/info', component: info },
+	//	vue2CmpMgr.ComponentManager.getRoute('/foo', 'app/frameDesigner.html', 'routeA'),
+	//	vue2CmpMgr.ComponentManager.getRoute('/bar', 'app/frameDesigner.html', 'routeB'),
+		{ path: '*', component: Unknown }
+	]
+
+	$xui.router = new VueRouter({
+		routes // short for `routes: routes`
+	})
+
+	/*********************************** THEME ***********************************/
 	var darkTheme = document.querySelector("#xui-rootTemplate").attributes["dark"];
-
-	const RootComponent = $xui.createComponentFromTemplate("xui-rootTemplate", dataBinding);
-
 	const configVuetify = {
 		theme: {
 			dark: ((darkTheme != null) ? true : false),
@@ -78,28 +99,15 @@ $xui.loadApplicationJS = () => {
 		},
 	};
 
-
-	const defaut = { template: '<div>def</div>' }
-	const Unknown = { template: '<div>unknown</div>' }
-	const routeMgr = new vue2CmpMgr.ComponentManager();
-
-	const routes = [
-		{ path: '/', component: defaut },
-		 routeMgr.getRoute('/foo', 'app/frameDesigner.html', 'routeA'),
-		 routeMgr.getRoute('/bar', 'app/frameDesigner.html', 'routeB'),
-		{ path: '*', component: Unknown }
-	]
-
-	$xui.router = new VueRouter({
-		routes // short for `routes: routes`
-	})
-
+	/*********************************** VUEJS ***********************************/
+	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-rootTemplate", storeDataBinding);
 	$xui.vuejs = new Vue({
 		el: '#app',
 		store: $xui.store,
 		router: $xui.router,
 		data: $xui.rootdata,
 		components: { RootComponent },
+		computed: { ...$xui.storeDataBinding },
 		template: "<RootComponent ref='root'></RootComponent>",
 		vuetify: new Vuetify(configVuetify),
 		errorCaptured: function (err, component, details) {

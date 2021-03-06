@@ -55,17 +55,19 @@ external set _surroundDesign(
 @JS('moveDesign')
 external set _moveDesign(void Function(FileDesignInfo, String, String) f);
 
-@JS('changeChildXUI')
-external set _changeChildXUI(void Function(FileDesignInfo, String, String) f);
+@JS('changeNbChildXUI')
+external set _changeNbChildXUI(void Function(FileDesignInfo, String, String) f);
 
 @JS('getInfoXUI')
 external set _getInfoXUI(dynamic Function(FileDesignInfo, String, String) f);
 
 @JS('getComponentsXUI')
-external set _getComponentsXUI(dynamic Function(FileDesignInfo, String, String) f);
+external set _getComponentsXUI(
+    dynamic Function(FileDesignInfo, String, String) f);
 
 @JS('getActionsXUI')
-external set _getActionsXUI(dynamic Function(FileDesignInfo, String, String, String) f);
+external set _getActionsXUI(
+    dynamic Function(FileDesignInfo, String, String, String) f);
 
 /// retourne les properties
 @JS('getDesignProperties')
@@ -193,8 +195,8 @@ dynamic getInfoXUI(FileDesignInfo fileInfo, String id, String idslot) {
   return InfoJS;
 }
 
-void addDesignXUI(FileDesignInfo fileInfo, String id, String template, bool reload,
-    bool init) async {
+void addDesignXUI(FileDesignInfo fileInfo, String id, String template,
+    bool reload, bool init) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
   await designMgr.addDesign(id, template);
 
@@ -315,22 +317,25 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
 }
 
 /// change les enfant avec le nb (ex: tab, grid, etc...)
-void changeChildXUI(FileDesignInfo fileInfo, String idSlot, String action) async {
+void changeNbChildXUI(
+    FileDesignInfo fileInfo, String idSlot, String action) async {
   var designManager = _getDesignManager(fileInfo);
   SlotInfo infoSlot = designManager.xuiEngine.getSlotInfo(idSlot, idSlot);
   SlotInfo infoContainer = designManager.xuiEngine
       .getSlotInfo(infoSlot.parentXid, infoSlot.parentXid);
 
+
   var nbItem = int.parse(infoContainer.elementHTML.propertiesXUI["nb"].content);
 
+  print(
+      "changeChild " + action + " " + idSlot + " nbItem " + nbItem.toString());
+
   if (action != "delete") {
-    // ajoute un slot
+    // ajoute un slot en incrementant le nb
     await designManager.changeProperty(
         infoSlot.parentXid, "nb", (nbItem + 1).toString());
   }
 
-  print(
-      "changeChild " + action + " " + idSlot + " nbItem " + nbItem.toString());
   var idx = idSlot.lastIndexOf("-") + 1;
   var suffix = idSlot.substring(0, idx);
   var prefix = idSlot.substring(idx);
@@ -362,10 +367,8 @@ void changeChildXUI(FileDesignInfo fileInfo, String idSlot, String action) async
   }
 
   if (action == "delete") {
-
-    if (nbItem - 1==0)
-    {
-      return await deleteDesign(fileInfo,infoSlot.parentXid);
+    if (nbItem - 1 == 0) {
+      return await deleteDesign(fileInfo, infoSlot.parentXid);
     }
 
     // retire un slot
@@ -451,7 +454,7 @@ void _reload(FileDesignInfo fileInfo) async {
   }
 
   String dataXui = JsonEncoder.withIndent('   ') //null
-      .convert(designMgr.xuiEngine.xuiFile.getObject());
+      .convert(designMgr.xuiEngine.xuiFile.getObjects());
 
   options.xuidata = dataXui;
   options.xuifile = HTMLWriter().toHTMLString(designMgr.xuiEngine.xuiFile);
@@ -459,8 +462,9 @@ void _reload(FileDesignInfo fileInfo) async {
   changePageJS(options);
 }
 
-dynamic getActionsXUI(FileDesignInfo fileInfo, String id,  String idSlot, String action) {
-  print("-------------- getActionsXUI ----------------   "+ action);
+dynamic getActionsXUI(
+    FileDesignInfo fileInfo, String id, String idSlot, String action) {
+  print("-------------- getActionsXUI ----------------   " + action);
 
   var ctx = XUIContext(MODE_DESIGN);
   var designManager = _getDesignManager(fileInfo);
@@ -475,7 +479,7 @@ void main() async {
   _copyDesign = allowInterop(copyDesign);
   _surroundDesign = allowInterop(surroundDesign);
   _moveDesign = allowInterop(moveDesign);
-  _changeChildXUI = allowInterop(changeChildXUI);
+  _changeNbChildXUI = allowInterop(changeNbChildXUI);
   _getInfoXUI = allowInterop(getInfoXUI);
   _getDesignProperties = allowInterop(getDesignProperties);
   _setDesignProperties = allowInterop(setDesignProperties);
@@ -497,7 +501,11 @@ Future _initStoreVersion(XUIDesignManager designManager,
   var ver = window.localStorage['xui_version_' + name];
   if (ver != null) {
     int v = int.parse(ver) - 1;
-    await designManager.initEngine(fileInfo.file, ctx);
+
+    // force une page vide pour pouvoir tous surcharger
+    var fileName = 'app/frame0Empty.html'; //fileInfo.file;
+
+    await designManager.initEngine(fileName, ctx);
 
     if (v >= 0) {
       var db = window.localStorage['xui_data_' + name + '_' + v.toString()];
@@ -507,7 +515,13 @@ Future _initStoreVersion(XUIDesignManager designManager,
       var saveDb = json.decode(db); //loadYaml(db);
 
       for (var aDesign in saveDb["design"]) {
-        designManager.xuiEngine.xuiFile.addObject(aDesign);
+        designManager.xuiEngine.xuiFile.addObjectDesign(aDesign);
+      }
+      for (var anImport in saveDb["import"]) {
+        //designManager.xuiEngine.xuiFile.addObjectImport(anImport);
+      }
+      for (var aCmp in saveDb["component"]) {
+        //designManager.xuiEngine.xuiFile.addObjectCmp(aCmp);
       }
     }
   }

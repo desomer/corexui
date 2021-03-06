@@ -25,7 +25,7 @@ void main() async {
 
   var bufferHtml = XUIHtmlBuffer();
 
-  bool designer = true;
+  bool designer = false;
 
   if (designer) {
     var reader = HTMLReader('app/frameDesigner.html', provider);
@@ -45,7 +45,7 @@ void main() async {
 
     var reader = HTMLReader('app/frame2.html', provider);
     var xuiEngine = XUIEngine();
-    var ctx = XUIContext(cst.MODE_DESIGN);
+    var ctx = XUIContext(cst.MODE_FINAL);
     await xuiEngine.initialize(reader, ctx);
 
     // await xuiEngine.addDesign(
