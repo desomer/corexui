@@ -101,6 +101,8 @@ $xui.loadApplicationJS = () => {
 
 	/*********************************** VUEJS ***********************************/
 	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-rootTemplate", storeDataBinding);
+	//$xui.rootdata.toto="4444";
+
 	$xui.vuejs = new Vue({
 		el: '#app',
 		store: $xui.store,
@@ -112,8 +114,22 @@ $xui.loadApplicationJS = () => {
 		vuetify: new Vuetify(configVuetify),
 		errorCaptured: function (err, component, details) {
 			console.error(err, component, details);
-			alert("vue errorCaptured " + err + " details " + details);
+			alert("vue errorCaptured <" + err + "> details <" + details+">");
+			if (details=="render")
+			{
+				var variab = (""+err).split(' ')[1];
+				console.debug("renderer error ====>", variab);
+				//$xui.rootdata[variab]="wwsdsdsd";
+			}
 			throw err;
 		}
 	});
+	//$xui.rootdata.toto2="5555";
+	// setTimeout(() => {
+	// 	$xui.rootdata.toto2="5555";
+	// }, 10000);
+
+	//Vue.set($xui.vuejs, 'toto2');
+	//$xui.rootdata.toto="4444";
+	//console.debug("$xui.vuejs", $xui.vuejs.toto);
 }

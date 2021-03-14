@@ -281,7 +281,12 @@ class XUIDesignManager {
           await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
       cmp.addProperties(
           "selectAction", "\$xui.displaySelectorByXid('##xid##', '##xid##')");
+
+      cmp.addProperties(
+          "selectActionClick", "\$xui.displayBindingByXid('##xid##', '##xid##')");
+
       cmp.addProperties("title", "##title##");
+      
       template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
       print("****<" + keyCache + ">=>" + template);
       cacheTemplateEditor[keyCache] = template;
@@ -319,7 +324,7 @@ class XUIDesignManager {
 
   List getActionsPopup(
       XUIContext ctx, String id, String idslot, String action) {
-    List ret = [];
+    List<ObjectAction> ret = [];
 
     var designs = xuiEngine.getDesignInfo(id, idslot, true);
     var idx = 0;
@@ -333,10 +338,11 @@ class XUIDesignManager {
       if (design.docInfo != null) {
         if (design.docInfo.xid == "v-tab:xui-tabs") {
           if (idx == 1) {
-            // ajout un flox
+            // ajout un flow
             ObjectAction act = ObjectAction(
                 xid: design.slotInfo.xid,
                 action: "addFlow",
+                type:"flow",
                 icon: "mdi-table-row",
                 title: "Add flow");
             ret.add(act);
@@ -345,18 +351,29 @@ class XUIDesignManager {
               xid: design.slotInfo.xid,
               action: "incNbBefore",
               icon: "mdi-tab",
-              title: "Add new Tab (Before " + design.slotInfo.slotname + ")");
+              type:"tabs",
+              title: "Add new Tab (before " + design.slotInfo.slotname + ")");
           ret.add(act);
           act = ObjectAction(
               xid: design.slotInfo.xid,
               action: "incNbAfter",
               icon: "mdi-tab",
+              type:"tabs",
               title: "Add new Tab (after " + design.slotInfo.slotname + ")");
           ret.add(act);
+
         } else if (design.docInfo.xid == "xui-no-dom:xui-flow") {
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid,
+              action: "incNbBefore",
+              type:"flow",
+              icon: "mdi-transfer-left",
+              title: "Add right (before " + design.slotInfo.slotname + ")");
+          ret.add(act);
+          act = ObjectAction(
+              xid: design.slotInfo.xid,
               action: "incNbAfter",
+              type:"flow",
               icon: "mdi-transfer-right",
               title: "Add right (after " + design.slotInfo.slotname + ")");
           ret.add(act);
@@ -365,6 +382,7 @@ class XUIDesignManager {
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid,
               action: "addFlow",
+              type:"flow",
               icon: "mdi-table-row",
               title: "Add flow");
           ret.add(act);
@@ -373,31 +391,42 @@ class XUIDesignManager {
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid,
               action: "surroundRight",
+              type:"flow",
               icon: "mdi-table-row",
-              title: "Add right");
+              title: "Add right (surroundRight)");
           ret.add(act);
         } else {
-          var ti = (design.docInfo.addRemove ?? "noAddRemove") +
-              "|" +
-              (design.slotInfo.slotname ?? "noSlotName") +
-              "|" +
-              design.docInfo.xid +
-              "|" +
-              design.docInfo.name +
-              "|" +
-              design.slotInfo.implement;
+          // var ti = (design.docInfo.addRemove ?? "noAddRemove") +
+          //     "|" +
+          //     (design.slotInfo.slotname ?? "noSlotName") +
+          //     "|" +
+          //     design.docInfo.xid +
+          //     "|" +
+          //     design.docInfo.name +
+          //     "|" +
+          //     design.slotInfo.implement;
 
-          ObjectAction act = ObjectAction(
-              xid: design.slotInfo.xid,
-              action: "addFlow",
-              icon: "mdi-table-row",
-              title: ti);
-          ret.add(act);
+          // ObjectAction act = ObjectAction(
+          //     xid: design.slotInfo.xid,
+          //     action: "addFlow",
+          //     icon: "mdi-table-row",
+          //     title: ti);
+          // ret.add(act);
         }
       }
     }
 
-    return ret;
+    List<ObjectAction> retFiltered = [];
+     
+    for(var i=0;i<ret.length;i++){
+        retFiltered.add(ret[i]);
+        if (i>0 && ret[i].action=="incNbBefore" && ret[i].type!="tabs" && retFiltered[i-1].action=="surroundRight")
+        {
+          retFiltered.removeAt(i-1);
+        }
+    }
+
+    return retFiltered;
   }
 }
 

@@ -109,22 +109,46 @@ export class SelectorManager {
 
         }
 
+        $xui.idxGetInfoForSelectorOnIFrame=0;
+        $xui.getInfoForSelectorOnIFrame = (selector, parent) => {
+           $xui.idxGetInfoForSelectorOnIFrame++; 
+           var idx = $xui.idxGetInfoForSelectorOnIFrame;
+           var prom = getPromise("getInfoForSelectorOnIFrame"+idx);
+           let winFrame = document.querySelector("#rootFrame").contentWindow;
+           winFrame.postMessage({ "action": "getInfoForSelector", "selector": selector, "parent": parent, "idx": idx }, "*");
+           return prom;
+        }
+
+        ///////////////////////////////////////////////
+        ////////////////////////////////////////////    A changer
+        ///////////////////////////////////////////////
+        /////////////////////////////////////////////
+        $xui.getlistNodeOnIFrame= (xid) => {
+            var ret =  null;
+            try {
+                ret = document.querySelector("#rootFrame").contentDocument.querySelectorAll("[data-xid-slot=" + xid + "]");
+            } catch (error) {
+                alert("getlistNodeOnIFrame on error" + error);
+            }
+            return ret;
+        }
+
         /************************************************************************************ */
         // selection par click des properties
-        $xui.displaySelectorByXid = (xid, xid_slot, noDisplayProp) => {
+        $xui.displaySelectorByXid = async (xid, xid_slot, noDisplayProp) => {
 
             $xui.unDisplaySelector();
 
             // recherche xid simple
-            let winFrame = document.querySelector("#rootFrame").contentWindow;
-            let elemRect = winFrame.getInfoForSelector("[data-xid=" + xid + "]");
+            let elemRect = await $xui.getInfoForSelectorOnIFrame("[data-xid=" + xid + "]");
+
             if (elemRect != null) {
                 //console.debug("displaySelectorByXid 1 ", xid);
                 $xui.displaySelectorByPosition(elemRect);
             }
 
             if (elemRect == null) {
-                elemRect = winFrame.getInfoForSelector("[data-xid-slot-" + xid + "=true]");
+                elemRect = await $xui.getInfoForSelectorOnIFrame("[data-xid-slot-" + xid + "=true]");
                 if (elemRect != null) {
                     //console.debug("displaySelectorByXid 2 ", xid);
                     $xui.displaySelectorByPosition(elemRect);
@@ -133,16 +157,17 @@ export class SelectorManager {
            
             // recherche xid de slot invisible sur les div enfant => realise un merge des clientRect
             if (elemRect == null) {
-                var listNode = document.querySelector("#rootFrame").contentDocument.querySelectorAll("[data-xid-slot=" + xid + "]")
+                var listNode = $xui.getlistNodeOnIFrame(xid);
+                //console.debug("displaySelectorByXid 31 ", xid, listNode);
                 var found = false;
                 
                 if (listNode != null && listNode.length>0 && listNode.length == listNode[0].parentNode.children.length) {
                     let parent = true;   
-                    elemRect = winFrame.getInfoForSelector("[data-xid-slot=" + xid + "]", parent);
+                    elemRect = await $xui.getInfoForSelectorOnIFrame("[data-xid-slot=" + xid + "]", parent);
                     if (elemRect != null) {
                         if (elemRect.width!=0 && elemRect.height!=0)
                         {
-                            //console.debug("displaySelectorByXid 3 ", xid);
+                            //console.debug("displaySelectorByXid 32 ", xid);
                             $xui.displaySelectorByPosition(elemRect);
                             found=true;
                         }
@@ -177,21 +202,21 @@ export class SelectorManager {
     }
 
     /************************************************************************************ */
-    getInfoPositionCmp(targetAction) {
-        let elemRect = targetAction.getBoundingClientRect();
-        let s = document.querySelector("#rootFrame").contentWindow.getComputedStyle(targetAction);
+    // getInfoPositionCmp(targetAction) {
+    //     let elemRect = targetAction.getBoundingClientRect();
+    //     let s = document.querySelector("#rootFrame").contentWindow.getComputedStyle(targetAction);
 
-        let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
+    //     let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
 
-        var ret = {
-            hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
-            height: elemRect.height,
-            width: elemRect.width,
-            left: elemRect.left,
-            top: elemRect.top,
-            ...margin
-        };
+    //     var ret = {
+    //         hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
+    //         height: elemRect.height,
+    //         width: elemRect.width,
+    //         left: elemRect.left,
+    //         top: elemRect.top,
+    //         ...margin
+    //     };
 
-        return ret;
-    }
+    //     return ret;
+    // }
 }

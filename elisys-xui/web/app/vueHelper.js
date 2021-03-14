@@ -30,7 +30,8 @@ function getPromise(id) {
     if (id != null)
         dicoPromise[id] = promise;
 
-    //console.debug("nb promise "+Object.keys(dicoPromise).length);
+    if (Object.keys(dicoPromise).length>10)
+     console.debug("nb promise "+Object.keys(dicoPromise).length, dicoPromise);
 
     return promise;
 }
@@ -38,6 +39,6 @@ function getPromise(id) {
 $xui.doPromiseJS = (idPromise, ret) => {
     if (dicoPromise[idPromise] != null) {
         dicoPromise[idPromise].resolve_ex(ret);
-        dicoPromise[idPromise] = null;
+        delete  dicoPromise[idPromise];
     }
 }

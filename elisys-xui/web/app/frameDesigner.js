@@ -46,7 +46,7 @@ $xui.changePageJS = (param) => {
 
 
 /******************************************************************************** */
-// gestion des button refresh de la page
+// gestion des button refresh et export de la page
 $xui.refreshAction = (mode) => {
     var infoFile = $xui.pageDesignManager.getInfoFile(mode);
     if (mode == "template:reload") {
@@ -56,6 +56,10 @@ $xui.refreshAction = (mode) => {
     if (mode == "template:clearAll") {
         infoFile.mode = "design";
         infoFile.action = "clear";   // pas de store
+    }
+    if (mode == "export") {
+        infoFile.mode = "final";
+        infoFile.action = "export";   // pas de store
     }
     $xui.refreshPageXUI(infoFile);
 };
@@ -75,74 +79,7 @@ $xui.modePhone = () => {
     document.querySelector("#rootFrame").classList.toggle("iframe-phone");
 }
 
-/******************************************  LA GESTION DES ERREURS JS   ***********************************************/
-const observer = new ReportingObserver((reports, observer) => {
-    for (const report of reports) {
-        console.log("******************************************", report.type, report.url, report.body, observer);
-    }
-}, { buffered: true });
 
-console.log("***************start reporting ********************");
-observer.observe();
-
-window.onunhandledrejection = function (e) {
-    console.log("*************** onunhandledrejection", e);
-    alert('Error object: ' + e.reason.message + "\n" + e.reason.stack);
-}
-
-window.addEventListener('error', function (e) {
-
-    console.log("*************** error", e);
-
-})
-
-window.onerror = function (msg, url, lineNo, columnNo, error) {
-    console.log("***************error reporting OK ********************");
-    var string = msg.toLowerCase();
-    var substring = "script error";
-    if (string.indexOf(substring) > -1) {
-        alert('Script Error: See Browser Console for Detail');
-    } else {
-        var message = [
-            'XUI reporting Message: ' + msg,
-            'URL: ' + url,
-            'Line: ' + lineNo,
-            'Column: ' + columnNo,
-            'Error object: ' + JSON.stringify(error)
-        ].join(' - ');
-
-        alert(message);
-    }
-
-    return false;
-};
-
-function wrapErrors(fn) {
-    // don't wrap function more than once
-    if (!fn.__wrapped__) {
-        fn.__wrapped__ = function () {
-            try {
-                return fn.apply(this, arguments);
-            } catch (e) {
-                captureError(e); // report the error
-                throw e; // re-throw the error
-            }
-        };
-    }
-
-    return fn.__wrapped__;
-}
-
-function captureError(e) {
-    alert(e.message)
-    console.debug("------- send info error -------", e)
-}
-
-//    wrapErrors(function () {
-//    --------
-//    })();
-
-console.log("***************start reporting OK ********************");
 
 /************************************************* LES ACTIONS ***************************************************/
 
@@ -295,6 +232,26 @@ $xui.copyCmp = () => {
     }
 }
 
+$xui.copyCmpOnDrap = (data) => {
+    if ($xui.propertiesDesign.isSlot) {
+        console.debug("copyCmp slot impossible");
+        return false;
+    }
+    else {
+        $xui.setCurrentAction("copyCmp");
+        $xui.copyDesign($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
+        $xui.rootdata.pasteDisabled = false;
+
+        setTimeout(() => {
+            let infoFile = $xui.pageDesignManager.getInfoFile("template");
+            $xui.moveDesign(infoFile, null, data.xid_slot);
+        }, 100);
+
+
+        return true;
+    }
+}
+
 $xui.cutCmp = () => {
     if ($xui.propertiesDesign.isSlot) {
         console.debug("cutCmp slot impossible");
@@ -350,7 +307,7 @@ $xui.OpenPopupAction = (event) => {
 
     var hpopup = 16 + (40 * $xui.rootdata.listPopupAdd.length);
 
-    if (event.clientY + 100 + hpopup > window.innerHeight ) {
+    if (event.clientY + 100 + hpopup > window.innerHeight) {
         popupNode.style.top = (event.clientY - hpopup) + "px";  // ouverture en dessus
     }
 
@@ -373,7 +330,7 @@ $xui.doActionPopup = (actionId) => {
         return true;
     }
 
-    
+
     if (actionId.action == "incNbBefore") {
         $xui.setCurrentAction("addFlow");
         $xui.changeNbChildXUI(infoFile, actionId.xid, "prev");
@@ -393,8 +350,7 @@ $xui.doActionPopup = (actionId) => {
         return true;
     }
 
-    if (actionId.action=="surroundRight")
-    {
+    if (actionId.action == "surroundRight") {
         $xui.setCurrentAction("addFlow");
         let cmp = { xid: 'xui-flow' };
         const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
@@ -511,9 +467,12 @@ $xui.getNewXid = (xidParent, nameCmp) => {
 
 /***************************************************************************************************************/
 $xui.sendInTab = () => {
-    window.open('http://127.0.0.1:8080/loader.html?id=' + $xui.rootdata.frameName, '_blank');
+    window.open(window.location.origin + '/loaderPage.html?id=' + $xui.rootdata.frameName, '_blank');
 }
 
+$xui.deploy =() => {
+    $xui.refreshAction("export");
+}
 
 /***************************************************************************************************************/
 var pageIcon = null;

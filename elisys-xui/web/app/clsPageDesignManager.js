@@ -3,7 +3,7 @@ export class PageDesignManager {
     codeHtml = null;
     codeXUIdata= null;
     codeXUI= null;
-    db = null;
+    //db = null;
 
     getInfoFile(mode) {
         return { fileID: window.$xui.rootdata.frameName,  file: 'app/'+window.$xui.rootdata.frameName+'.html', xid: 'root', mode: mode };
@@ -66,7 +66,12 @@ export class PageDesignManager {
         this.codeXUIdata = param.xuidata;
         this.codeXUI = param.xuifile;
 
-        if (param.action!="reload" && param.action!="clear")
+        if (param.action=="export")
+        {
+            this.export();
+        }
+
+        if (param.action!="reload" && param.action!="clear" && param.action!="export")
             this.store(); // save un nouvelle version
 
         if ($xui.rootdata.activeTab == 1)  // si onglet 1 actif
@@ -76,6 +81,51 @@ export class PageDesignManager {
             this.loadCodeJson();
         }
 
+    }
+
+    async export()  {
+        var q = faunadb.query;
+        var client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
+    
+        // client.query(
+        // q.Get(q.Ref(q.Collection('Filexui'), '252953488011559426'))
+        // )
+        // .then((ret) => console.log(ret))
+    
+    
+        // client.query(
+        // q.Create(
+        //     q.Collection('Filexui'),
+        //     { data: { id: 2, html:"super" } },
+        // )
+        // )
+        // .then((ret) => console.log(ret))
+    
+        // client.query(
+        //     q.Get(
+        //         q.Match(q.Index('all_filexui'))
+        //     )
+        //     )
+        //     .then((ret) => console.log(ret))
+    
+        var ret = await client.query(
+            q.Get(
+                q.Match(q.Index('filexuiById'), $xui.rootdata.frameName)
+            )
+        )
+        console.log("ret=", ret);
+    
+        ret =  await client.query(
+            q.Update(
+                ret.ref,
+                { data: { html: $xui.pageDesignManager.codeHtml } },
+            )
+        )
+    
+        console.log("ret=", ret);
+        $xui.rootdata.snackbar_text = "deploy terminated";
+        $xui.rootdata.snackbar_timeout = 2000;
+        $xui.rootdata.snackbar = true;
     }
 
     store() {

@@ -25,9 +25,11 @@ class FileDesignInfo {
 @JS()
 @anonymous
 class ObjectAction {
-  external factory ObjectAction({String xid, String action, String icon, String title});
+  external factory ObjectAction({String xid, String action, String type, String icon, String title});
   external String get action;
   external set action(String action);
+  external String get type;
+  external set type(String type);
   external String get icon;
   external set icon(String icon);
   external String get title;
