@@ -46,7 +46,7 @@ main
 
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2020 v0.5.1 20/02/2021"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2020 v0.5.2 14/03/2021"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
@@ -346,6 +346,13 @@ main
         <xui-btn-small @click="$xui.refreshAction('final')">
             <v-icon>mdi-autorenew</v-icon>
         </xui-btn-small>
+
+        <span style="width:50px"></span>
+
+        <xui-btn-small @click="$xui.deploy()">
+            <v-icon>mdi-database-export-outline</v-icon>
+        </xui-btn-small>
+
         <v-spacer></v-spacer>
         <span>&amp;copy;&amp;nbsp;[[copyrightApp@0+]]</span>
     </xui-design>
@@ -368,45 +375,21 @@ main
 
     <xui-design xid="inject-after-body">
         <script defer src="app/vueHelper.js"></script>
+        <script defer src="app/frameDesignerError.js"></script>
+
         <script defer src="app/frameDesigner.js"></script>
+
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>
         <script defer src="https://unpkg.com/region2d@1.0.0/plain/region2d.min.js"></script>
         <script defer src="libxui.dart.js"></script>
+
         <script defer src="app/frameDesignerWatch.js"></script>
         <script defer src="app/frameDesignerData.js"></script>
+
         <script defer src="https://cdn.jsdelivr.net/npm/vue2-editor@2.6.6/dist/vue2-editor.min.js"></script>
 
-        <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
-        <script>
-                 setTimeout( ()=> {
-                    q = faunadb.query;
-                    var client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
-
-                    client.query(
-                    q.Get(q.Ref(q.Collection('Filexui'), '252953488011559426'))
-                    )
-                    .then((ret) => console.log(ret))
-
-
-                    client.query(
-                    q.Create(
-                        q.Collection('Filexui'),
-                        { data: { id: 2, html:"super" } },
-                    )
-                    )
-                    .then((ret) => console.log(ret))
-
-                    client.query(
-                        q.Get(
-                            q.Match(q.Index('all_filexui'))
-                        )
-                        )
-                        .then((ret) => console.log(ret))
-
-                 }, 2000)
- 
-        </script>
+        <script defer src="https://cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
     </xui-design>
 
 </xui-factory>

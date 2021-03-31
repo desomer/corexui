@@ -8,11 +8,11 @@ import 'package:js/js.dart';
 class FileDesignInfo {
   external String get action;
   external set action(String action);
-  external String get file; 
-  external set file(String file); 
+  external String get file;
+  external set file(String file);
 
-  external String get fileID; 
-  external set fileID(String fileID); 
+  external String get fileID;
+  external set fileID(String fileID);
 
   external String get mode;
   external set mode(String mode);
@@ -25,7 +25,8 @@ class FileDesignInfo {
 @JS()
 @anonymous
 class ObjectAction {
-  external factory ObjectAction({String xid, String action, String type, String icon, String title});
+  external factory ObjectAction(
+      {String xid, String action, String type, String icon, String title});
   external String get action;
   external set action(String action);
   external String get type;
@@ -50,6 +51,27 @@ class ObjectDesign {
 
 @JS()
 @anonymous
+class ObjectDesignProperties {
+  external String get xid;
+  external set xid(String xid);
+  external String get xidSlot;
+  external set xidSlot(String xid);
+  external bool get isSlot;
+  external set isSlot(bool xid);
+
+  external String get data;
+  external set data(String xid);
+
+  external String get template;
+  external set template(String xid);
+
+  external String get path;
+  external set path(String xid);
+}
+
+
+@JS()
+@anonymous
 class Options {
   external factory Options({String mode, dynamic html, dynamic xuidata});
   external String get action;
@@ -64,6 +86,17 @@ class Options {
   external set xuidata(String xuidata);
   external String get xuifile;
   external set xuifile(String xuifile);
+  external List get binding;
+  external set binding(List binding);
+}
+
+@JS()
+@anonymous
+class BindObj {
+  external String get attr;
+  external set attr(String attr);
+  external String get val;
+  external set val(String val);
 }
 
 @JS()

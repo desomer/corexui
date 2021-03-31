@@ -128,20 +128,35 @@ class XUIElementHTML extends XUIElement {
     XUIProperty prop = propertiesXUI == null ? null : propertiesXUI[tag];
 
     if (prop != null) {
-      if (parseInfo.mode == ParseInfoMode.ATTR &&
-          parseInfo.context == "class" &&
-          (prop.content == true || prop.content == "true")) {
-        return tag;
-      }
-
-      return prop.content;
+      return getValueXUIProperty(parseInfo, prop, tag);
     } else if (parent != null && (deep < 0 || deep > 0)) {
       return parent.searchPropertyXUI(tag, deep - 1, parseInfo);
     }
   }
 
+  // genere la valeur du la property (et affecte le binding vuej )
+  getValueXUIProperty(ParseInfo parseInfo, XUIProperty prop, String tag) {
+    // si v-model ou autre attribut
+    if (parseInfo.mode == ParseInfoMode.ATTR &&
+        parseInfo.context == "class" &&
+        (prop.content == true || prop.content == "true")) {
+      return tag;
+    }
+    
+    // si dans un contenu de tag <div>{{binding}}</div>
+    if (prop is XUIPropertyBinding) {
+      if (parseInfo.mode == ParseInfoMode.CONTENT) {
+          return "{{" + prop.binding + "}}";
+      }
+      return prop.binding;
+    }
+    
+    // sinon retour en directe
+    return prop.content;
+  }
+
   /// generation du contenu avec [[]] d'un balise <div>CONTENT<div>
-  dynamic processContent(XUIEngine engine, ParseInfo parseInfo) {
+  dynamic processContentPhase3(XUIEngine engine, ParseInfo parseInfo) {
     try {
       XUIProperty.parse(parseInfo, (String tag) {
         var ret = searchPropertyXUI(tag, -1, parseInfo);
@@ -176,7 +191,7 @@ class XUIElementHTML extends XUIElement {
         this.propertiesXUI.containsKey(ATTR_XUI_IF)) {
       ParseInfo parseInfo = ParseInfo(
           this.propertiesXUI[ATTR_XUI_IF].content, null, ParseInfoMode.ATTR);
-      var valIf = processContent(engine, parseInfo);
+      var valIf = processContentPhase3(engine, parseInfo);
       if (valIf == "" || valIf == "false") {
         return;
       }
@@ -198,7 +213,7 @@ class XUIElementHTML extends XUIElement {
         isReloader = true;
         var xid = this.originElemXUI.xid;
         ParseInfo parseInfo = ParseInfo(xid, null, ParseInfoMode.ATTR);
-        var xidCal = processContent(engine, parseInfo);
+        var xidCal = processContentPhase3(engine, parseInfo);
         var modeDisplay = "contents";
         if (this.propertiesXUI[ATTR_MODE_DISPLAY] != null) {
           modeDisplay =
@@ -226,7 +241,7 @@ class XUIElementHTML extends XUIElement {
       var c = f.value.content;
       ParseInfo parseInfo = ParseInfo(f.key, null, ParseInfoMode.KEY);
 
-      String keyAttr = processContent(engine, parseInfo);
+      String keyAttr = processContentPhase3(engine, parseInfo);
       var valProp = c;
 
       if (keyAttr != "" && c != null) {
@@ -238,7 +253,7 @@ class XUIElementHTML extends XUIElement {
             parseInfo = ParseInfo(c, keyAttr, ParseInfoMode.ATTR);
           }
 
-          valProp = processContent(engine, parseInfo);
+          valProp = processContentPhase3(engine, parseInfo);
           bool mustAdd = true;
           bool isBool = false;
 
@@ -295,18 +310,18 @@ class XUIElementHTML extends XUIElement {
 
     buffer.html.write('>');
 
-    bool hasChidren = this.children?.firstWhere(
+    bool hasChildren = this.children?.firstWhere(
             (c) => (c is! XUIElementHTMLText),
             orElse: () => null) !=
         null;
 
-    if (hasChidren) buffer.html.write('\n');
+    if (hasChildren) buffer.html.write('\n');
 
     buffer.tab(1);
     toChildrenPhase3(engine, buffer);
     buffer.tab(-1);
 
-    if (hasChidren) buffer.addTab();
+    if (hasChildren) buffer.addTab();
     buffer.html.write('</' + this.tag + '>\n');
 
     if (oldBuf != null) {
@@ -317,7 +332,9 @@ class XUIElementHTML extends XUIElement {
   void toChildrenPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
     this.children?.forEach((c) {
       if (c is XUIElementHTMLText) {
-        c.content.trim().isNotEmpty ? c.processPhase3(engine, buffer) : null;
+        c.content.toString().trim().isNotEmpty
+            ? c.processPhase3(engine, buffer)
+            : null;
       } else {
         (c as XUIElementHTML).processPhase3(engine, buffer);
       }
@@ -326,12 +343,12 @@ class XUIElementHTML extends XUIElement {
 }
 
 class XUIElementHTMLText extends XUIElementHTML {
-  String content;
+  StringBuffer content;
 
   @override
   void processPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
     ParseInfo parseInfo = ParseInfo(content, null, ParseInfoMode.CONTENT);
-    var cont = processContent(engine, parseInfo);
+    var cont = processContentPhase3(engine, parseInfo);
     engine.dataBindingInfo.parseContent(this, cont);
     buffer.html.write(cont);
   }
@@ -363,5 +380,5 @@ class XUIElementXUI extends XUIElement {
 ///
 ///  uniquement un text
 class XUIElementText extends XUIElementXUI {
-  String content;
+  StringBuffer content;
 }

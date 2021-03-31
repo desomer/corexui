@@ -177,7 +177,7 @@
 		shrink-on-scroll="[[shrink-on-scroll]]" collapse-on-scroll="[[HeaderCollapseonscroll]]"
 		hide-on-scroll="[[HeaderHideonscroll]]" scroll-threshold="[[scroll-threshold]]" color="[[colorApp@0+]]"
 		class="[[class]]" -style="[[style]]">
-		<v-app-bar-nav-icon xui-if=[[withLeftNavigation@0+]] @click.stop="navdrawer = !navdrawer"></v-app-bar-nav-icon>
+		<v-app-bar-nav-icon xui-if=[[withLeftNavigation@0+]] @click.stop="[[navDrawerBind@0+]] = ![[navDrawerBind@0+]]"></v-app-bar-nav-icon>
 		<v-toolbar-title>
 			<xui-slot xui-reloader=true xid="slot-toolbar-title" xui-slot-name="toolbar title"></xui-slot>
 		</v-toolbar-title>
@@ -214,7 +214,7 @@
 		<xui-prop id="desc">navigation drawer slot</xui-prop>
 	</xui-doc>
 
-	<v-navigation-drawer v-model="navdrawer" xid="vue-nav-drawer-1" 
+	<v-navigation-drawer v-model=[[navDrawerBind@0+]] xid="vue-nav-drawer-1" 
 		overlay-color="[[overlay-color]]" overlay-opacity="[[overlay-opacity]]" width="[[width]]" 
 		expand-on-hover="[[expand-on-hover]]"
 		src="[[src]]"
@@ -404,12 +404,12 @@
 		if (typeof $xui === 'undefined')
 			$xui = {};
 
-		$xui.rootdata = {
-			navdrawer: false
-		};
+		$xui.rootdata = {};
+		<xui-inject-text xui-path="data-binding"></xui-inject-text>
 
-		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler  
+		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler 
 	</script>
+ 
 
 	<!--------------------------------------------------------------------------------------->
 	<script type="module" xid="xui-init-vuetify">

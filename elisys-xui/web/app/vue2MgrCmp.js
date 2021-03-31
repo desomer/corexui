@@ -10,6 +10,7 @@ export class ComponentManager {
             return {
                 template: template.innerHTML,
                 data: () => { return $xui.rootdata; },
+                methods : $xui.storeAction,
                 computed: {
                     $xui: () => $xui,  // pour les @click="$xui.doXXX()"
                     ...computeDataBinding

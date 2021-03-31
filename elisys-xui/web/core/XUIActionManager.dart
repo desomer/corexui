@@ -360,7 +360,7 @@ class XUIActionManager {
       if (design.elemXUI.children != null) {
         for (var child in design.elemXUI.children) {
           if (child is XUIElementText && !hasText) {
-            hasText = child.content.trim().isNotEmpty;
+            hasText = child.content.toString().trim().isNotEmpty;
           } else if (child is XUIElementXUI) {
             nbChildNoText++;
             if (child.xid == xid) {

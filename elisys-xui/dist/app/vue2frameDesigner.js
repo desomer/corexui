@@ -33,7 +33,8 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
                                     return window.$xui;
                                 },
                                 ...$xui.storeDataBinding
-                            }
+                            },
+                            methods : $xui.storeAction
                         }
                         
                         );
@@ -99,7 +100,7 @@ document.addEventListener('drop', function (e) {
         var idCmp = e.dataTransfer.getData('text/plain');
         let targetAction = e.target.closest("[data-xid]");
         console.debug("drop ", idCmp, targetAction);
-        var message = { action: "drop", xid: targetAction.dataset.xid, xid_slot: targetAction.dataset.xidSlot };
+        var message = { action: "drop", ctrlKey : e.ctrlKey, xid: targetAction.dataset.xid, xid_slot: targetAction.dataset.xidSlot };
         window.parent.postMessage(message, "*");
     }
 });
@@ -185,13 +186,31 @@ window.addEventListener('message', function (e) {
 
             this.document.body.innerHTML = data.param.html; // change tous le body
             $xui.loadApplicationJS();
+            this.console.debug("+++++++++++>  post le reloader finish")
+            var message = {
+                action: "reloader finish"
+            };
+            window.parent.postMessage(message, "*");
         }
     }
-    if (data.action == "doChangeComponent") {
+    else if (data.action == "doChangeComponent") {
         //console.debug("load reloader", data.xid, data);
         if ($xui.listReloader[data.xid] == null)
             console.error("doChangeComponent on error", data, $xui.listReloader);
         $xui.listReloader[data.xid].doChangeComponent(data);
+    }
+    else if (data.action == "getInfoForSelector") {
+
+        var ret =$xui.getInfoForSelector(data.selector, data.parent);
+
+        var message = {
+            action: "return getInfoForSelector",
+            info : data,
+            ret: ret
+        };
+
+        //console.debug("getInfoForSelector --------------->", message);
+        window.parent.postMessage(message, "*");
     }
 });
 
@@ -227,8 +246,7 @@ $xui.updateDirectPropValue = (value, variable, xid) => {
     window.parent.postMessage(message, "*");
 }
 
-// TODO a changer window. par xui.
-window.getInfoForSelector = (selector, parent) => {
+$xui.getInfoForSelector = (selector, parent) => {
     var targetAction = document.querySelector(selector)
     if (targetAction == null) return null;
     if (parent)

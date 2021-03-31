@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'dart:io';
 
 import 'web/core/parser/HTMLReader.dart';
@@ -25,7 +25,7 @@ void main() async {
 
   var bufferHtml = XUIHtmlBuffer();
 
-  bool designer = false;
+  bool designer = true;
 
   if (designer) {
     var reader = HTMLReader('app/frameDesigner.html', provider);

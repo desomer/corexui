@@ -3,18 +3,20 @@ import 'dart:collection';
 import 'package:yamlicious/yamlicious.dart';
 
 import 'XUIFactory.dart';
+import 'XUIJSInterface.dart';
 import 'element/XUIElement.dart';
 import 'element/XUIParseJSDataBind.dart';
 import 'element/XUIProperty.dart';
 import 'native/register.dart';
 import 'parser/HTMLReader.dart';
+import 'parser/ObjectWriter.dart';
 
 const ATTR_XID = "xid";
-const ATTR_PARENT_XID = "parent-xid";
+const ATTR_PARENT_XID = "parent-xid";   // utiliser dans <xui-slot xid="[[parent-xid]]-content">
 
 const ATTR_SLOT_NAME = "slot-name";
 const ATTR_SLOT_FULL = "slot-full";
-const ATTR_XID_SLOT = "xid-slot";
+const ATTR_XID_SLOT = "xid-slot";    // utiliser dans les data-xid-slot
 
 // ne genere pas de engine.mapInfo et de data-xui-slot
 const ATTR_NO_DESIGN = "no-design";
@@ -23,17 +25,16 @@ const ATTR_DOC_ID = "doc-id";
 // choix du mode pour le design (MODE_FINAL, MODE_DESIGN, etc... )
 const ATTR_MODE = "mode";
 // n'ajoute pas de noeud dom
-const ATTR_NO_DOM = "no-dom";         
+const ATTR_NO_DOM = "no-dom";
 const ATTR_RELOADER = "reloader";
 // mode display des reloader.  par defaut display:content
-const ATTR_MODE_DISPLAY = "modedisplay";   
+const ATTR_MODE_DISPLAY = "modedisplay";
 
 const ATTR_CONVERT_JSON = "convert-json";
 const ATTR_XUI_IF = "if";
 
 const ATTR_STYLE_SLOT = "style-slot";
 // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
-
 
 const TAG_ESCAPE = "xui-escape-";
 const TAG_NO_DOM = "xui-no-dom";
@@ -43,8 +44,9 @@ const TAG_DOC = "xui-doc";
 const TAG_DESIGN = "xui-design";
 const TAG_FACTORY = "xui-factory";
 const TAG_IMPORT = "xui-import";
-const TAG_DIV_SLOT = "xui-div-slot";
 const TAG_PROP = "xui-prop";
+const TAG_SLOT = "xui-slot";
+const TAG_DIV_SLOT = "xui-div-slot";    // nom du composant (div) slot dans la class css xui-class-slot
 
 const XUI_COPYZONE_SLOT = "xui-copyzone-slot";
 const XUI_TEMPORARY_SLOT = "xui-temporary-slot";
@@ -116,7 +118,7 @@ abstract class XMLElemReader {
 
 class XMLElem {
   String tag;
-  String text;
+  StringBuffer text;
   LinkedHashMap<dynamic, String> attributs;
 }
 
@@ -125,6 +127,7 @@ class XUIResource extends XMLElemReader {
   var components = LinkedHashMap<String, DicoOrdered<XUIComponent>>();
   var designs = LinkedHashMap<String, DicoOrdered<XUIDesign>>();
   var documentation = LinkedHashMap<String, DicoOrdered<XUIModel>>();
+  var binding = LinkedHashMap<String, XUIBinding>();
 
   /// les imports
   List<XUIResource> listImport = [];
@@ -134,6 +137,17 @@ class XUIResource extends XMLElemReader {
 
   ///------------------------------------------------------------------
   XUIResource(this.reader, this.context);
+
+  List getBindingInfo() {
+    var bind = [];
+    binding.forEach((k, v) {
+      var des = BindObj();
+      des.attr = v.attr;
+      des.val = v.content;
+      bind.add(des);
+    });
+    return bind;
+  }
 
   void addObjectDesign(var aDesign) {
     var curDesign = designs[aDesign["xid"]];
@@ -155,12 +169,16 @@ class XUIResource extends XMLElemReader {
         // creer la propriete vide
         var variable = aProp["id"];
         var value = aProp["val"];
+        var binding = aProp["binding"];
+
         xuiDesign.elemXUI.propertiesXUI ??= HashMap<String, XUIProperty>();
-        if (xuiDesign.elemXUI.propertiesXUI[variable] == null) {
-          xuiDesign.elemXUI.propertiesXUI[variable] = XUIProperty(null);
-        }
+        // if (xuiDesign.elemXUI.propertiesXUI[variable] == null) {
+        xuiDesign.elemXUI.propertiesXUI[variable] = binding == null
+            ? XUIProperty(value)
+            : XUIPropertyBinding(value, binding);
+        // }
         // affecte la prop
-        xuiDesign.elemXUI.propertiesXUI[variable].content = value;
+        //  xuiDesign.elemXUI.propertiesXUI[variable].content = value;
       }
     }
 
@@ -180,69 +198,12 @@ class XUIResource extends XMLElemReader {
     }
   }
 
-  dynamic getObjects() {
-    var ret = {};
-    var import = [];
-
-    for (var anImport in listImport) {
-      import.add({"name": anImport.reader.id});
-    }
-
-    var design = [];
-    designs.forEach((k, v) {
-      for (XUIDesign item in v.list) {
-        var des = {};
-        des["xid"] = item.elemXUI.xid;
-
-        if (item.elemXUI.propertiesXUI != null) {
-          var prop = [];
-          item.elemXUI.propertiesXUI.forEach((k, v) {
-            prop.add({"id": k, "val": v.content.toString()});
-          });
-
-          des["props"] = prop;
-        }
-
-        if (item.elemXUI.children != null) {
-          var children = [];
-          for (XUIElementXUI aChild in item.elemXUI.children) {
-            if (aChild is! XUIElementText) {
-              children.add({"tag": aChild.tag, "xid": aChild.xid});
-            }
-          }
-          if (children.isNotEmpty) {
-            des["children"] = children;
-          }
-        }
-
-        design.add(des);
-      }
-    });
-
-    var compo = [];
-    components.forEach((k, v) {
-      for (XUIComponent item in v.list) {
-        if (item.elemXUI.idRessource != null) {
-          var des = {};
-          des["xid"] = item.elemXUI.xid;
-          des["tag"] = item.elemXUI.tag;
-          //des["mode"] = item.mode;
-          compo.add(des);
-        }
-      }
-    });
-
-    ret["import"] = import;
-    ret["design"] = design;
-    ret["component"] = compo;
-    return ret;
-  }
-
   Future parse() {
     NativeRegister(this);
     return this.reader.parseFile(this);
   }
 
+  //-------------------------------------------------------------------------------------------
   DicoOrdered<XUIComponent> searchComponent(String tag) {
     var cmp = components[tag];
     if (cmp == null) {
@@ -268,6 +229,7 @@ class XUIResource extends XMLElemReader {
     return listCmp;
   }
 
+  //-------------------------------------------------------------------------------------------
   void generateDocumentation(XUIEngine engine) {
     documentation.forEach((k, v) {
       XUIElementXUI doc = v.list.first.elemXUI;
@@ -291,15 +253,17 @@ class XUIResource extends XMLElemReader {
       if (prop.attributes["id"] != null) {
         String id = prop.attributes["id"]?.content;
         if (id == "componentAs") {
-          doc.componentAs = (prop.children.first as XUIElementText).content;
+          doc.componentAs =
+              (prop.children.first as XUIElementText).content.toString();
         } else if (id == "name") {
-          doc.name = (prop.children.first as XUIElementText).content;
+          doc.name = (prop.children.first as XUIElementText).content.toString();
         } else if (id == "icon") {
-          doc.icon = (prop.children.first as XUIElementText).content;
+          doc.icon = (prop.children.first as XUIElementText).content.toString();
         } else if (id == "desc") {
-          doc.desc = (prop.children.first as XUIElementText).content;
+          doc.desc = (prop.children.first as XUIElementText).content.toString();
         } else if (id == "add-remove") {
-          doc.addRemove = (prop.children.first as XUIElementText).content;
+          doc.addRemove =
+              (prop.children.first as XUIElementText).content.toString();
         }
       } else if (prop.attributes["var"] != null) {
         DocVariables propDoc = DocVariables();
@@ -309,7 +273,8 @@ class XUIResource extends XMLElemReader {
         propDoc.link = prop.attributes["link"]?.content;
         propDoc.list = prop.attributes["list"]?.content;
         propDoc.cat = prop.attributes["cat"]?.content;
-        propDoc.doc = (prop.children.first as XUIElementText).content;
+        propDoc.doc =
+            (prop.children.first as XUIElementText).content.toString();
         doc.variables.add(propDoc);
       }
     });
@@ -321,6 +286,7 @@ class XUIResource extends XMLElemReader {
     return (parent as XUIElementXUI).tag.toString().toLowerCase() != TAG_DOC;
   }
 
+  //-------------------------------------------------------------------------------------------
   ///
   ///   Convertie un XML element et XUI element est stocke celui ci en design, component et juste child
   ///
@@ -349,18 +315,25 @@ class XUIResource extends XMLElemReader {
         await subFile.parse();
         // subFile.reader.content = null;
         listImport.add(subFile);
-        return Future.value(null);
+        return Future.value();
       } else if (element.tag == TAG_PROP &&
           (parent as XUIElementXUI).tag.toString().toLowerCase() != TAG_DOC) {
         //***************   LES PROPERTIES EN ATTRIBUT SAUF SI DOCUMENTATION *****************************/
         XUIElementXUI p = parent;
         p.propertiesXUI ??= HashMap<String, XUIProperty>();
-        p.propertiesXUI[element.attributs["id"]] =
-            XUIProperty(element.attributs["val"]);
-        return Future.value(null);
+        var b = element.attributs["binding"];
+        if (b != null) {
+          var prop = XUIPropertyBinding(element.attributs["val"], b);
+          p.propertiesXUI[element.attributs["id"]] = prop;
+        } else {
+          var prop = XUIProperty(element.attributs["val"]);
+          p.propertiesXUI[element.attributs["id"]] = prop;
+        }
+
+        return Future.value();
       }
 
-      // cas d'un elem
+      // cas d'un elem HTML
       elemXui = XUIElementXUI();
       elemXui.idRessource = reader?.id;
 
@@ -372,7 +345,7 @@ class XUIResource extends XMLElemReader {
       elemXui.xid = element.attributs[ATTR_XID];
       element.attributs.remove(ATTR_XID);
 
-      processAttributs(element, elemXui);
+      _processAttributs(element, elemXui);
 
       String mode = MODE_ALL;
       if (elemXui.propertiesXUI != null) {
@@ -381,6 +354,7 @@ class XUIResource extends XMLElemReader {
       }
 
       if (element.tag.toString().toLowerCase() == TAG_DOC) {
+        //***************   LES DOCUMENTATION *****************************/
         isChild = false;
         documentation[elemXui.xid] ??= DicoOrdered();
         documentation[elemXui.xid].add(XUIModel(elemXui, mode));
@@ -415,7 +389,7 @@ class XUIResource extends XMLElemReader {
     return Future.value(elemXui);
   }
 
-  void processAttributs(XMLElem element, XUIElementXUI elemXui) {
+  void _processAttributs(XMLElem element, XUIElementXUI elemXui) {
     element.attributs.entries.forEach((f) {
       String keyAttr = f.key.toString();
       if (keyAttr.startsWith("-")) {
@@ -543,7 +517,7 @@ class XUIEngine {
 
     var listCmp = xuiFile.searchComponent(xid);
     if (listCmp == null) {
-      dynamic obj = xuiFile.getObjects();
+      dynamic obj = ObjectWriter().toObjects(xuiFile);
 
       final yamld = toYamlString(obj);
       print("xid inconnu $xid\n" + yamld.toString());
@@ -567,9 +541,31 @@ class XUIEngine {
     await root.processPhase1(this, htmlRoot);
     await root.processPhase2(this, htmlRoot, null);
 
+    processPhaseJS();
+
     if (writer != null) {
       return Future.sync(() => htmlRoot.processPhase3(this, writer));
     }
+  }
+
+  void processPhaseJS() {
+    StringBuffer buf = NativeInjectText.getcacheText('data-binding');
+
+    StringBuffer jsonBinding = StringBuffer();
+    this.xuiFile.binding.forEach((key, value) {
+      var isBool = false;
+      if ((value.content == "true" || value.content == "false")) {
+        isBool = true;
+      }
+      var v = isBool ? value.content : "'" + value.content + "'";
+      jsonBinding.write(',\n\t\t\t' + value.attr + ":" + v);
+    });
+
+    var str = '\$xui.rootdata = { ...\$xui.rootdata ' +
+        jsonBinding.toString() +
+        '\n\t\t};';
+    buf.clear();
+    buf.write(str);
   }
 }
 

@@ -36,7 +36,7 @@ class HTMLWriter {
         if (item.elemXUI.propertiesXUI != null) {
           item.elemXUI.propertiesXUI.forEach((k, v) {
              buf.addTab();
-             buf.html.writeln('<xui-prop id="${k}" val="${v.content.toString()}"></xui-prop>');
+             buf.html.writeln(v.toHTML(k));
           });
         }
 

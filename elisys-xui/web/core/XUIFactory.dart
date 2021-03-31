@@ -34,6 +34,13 @@ class XUIChild extends XUIModel {
   XUIChild(e, m) : super(e, m);
 }
 
+class XUIBinding {
+  String attr;
+  dynamic content;
+
+  XUIBinding(this.attr, this.content);
+}
+
 ///------------------------------------------------------------------
 ///
 /// gestion des designs ou des components
@@ -69,11 +76,11 @@ class XUIModel implements Comparable<XUIModel> {
     /*****************************************************************/
     if (tag != null) elemHtml.tag = tag;
 
-    // properties
-    _processAttributes(elemHtml);
+    // attribut
+    _processAttributesPhase1(elemHtml);
 
     // properties
-    _processProperties(elemHtml, engine.xuiFile);
+    _processPropertiesPhase1AndBind(elemHtml, engine.xuiFile);
 
     // lance les children
     await _processPhase1Children(elemHtml, engine);
@@ -140,7 +147,7 @@ class XUIModel implements Comparable<XUIModel> {
         varIdx = xuifor.content.toString();
 
         nb = int.parse(elemHtml.calculatePropertyXUI(
-            elemHtml.propertiesXUI["nb"]?.content?.toString() ?? "1" , null) );
+            elemHtml.propertiesXUI["nb"]?.content?.toString() ?? "1", null));
       }
     }
     /****************************************/
@@ -152,8 +159,6 @@ class XUIModel implements Comparable<XUIModel> {
             // affecte les proprties de la boucle FOR
             item.propertiesXUI ??= HashMap<String, XUIProperty>();
             item.propertiesXUI[varIdx] = XUIProperty(i.toString());
-            // item.propertiesXUI[ATTR_PARENT_XID] = XUIProperty(
-            //     elemHtml.calculatePropertyXUI(elemHtml.originElemXUI.xid));
           }
 
           await doChildPhase1(item, elemHtml, engine);
@@ -188,7 +193,7 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  void _processAttributes(XUIElementHTML elemHtml) {
+  void _processAttributesPhase1(XUIElementHTML elemHtml) {
     if (elemXUI.attributes != null) {
       elemHtml.attributes ??= HashMap<String, XUIProperty>();
       elemXUI.attributes.entries.forEach((f) {
@@ -197,11 +202,11 @@ class XUIModel implements Comparable<XUIModel> {
         if (f.key.toLowerCase() == "style") {
           // complete les styles
           XUIProperty style = elemHtml.attributes[f.key];
-          _completeAttribut(style, elemHtml, f, v, ";");
+          _completeAttributPhase1(style, elemHtml, f, v, ";");
         } else if (f.key.toLowerCase() == "class") {
           // complete les classes
           XUIProperty classe = elemHtml.attributes[f.key];
-          _completeAttribut(classe, elemHtml, f, v, " ");
+          _completeAttributPhase1(classe, elemHtml, f, v, " ");
         } else {
           elemHtml.attributes[f.key] = XUIProperty(v);
         }
@@ -209,7 +214,8 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  void _completeAttribut(XUIProperty style, XUIElementHTML elemHtml,
+  // gestion des [[xxx]] dans les style et class
+  void _completeAttributPhase1(XUIProperty style, XUIElementHTML elemHtml,
       MapEntry<String, XUIProperty> f, String v, String sep) {
     if (style == null) {
       elemHtml.attributes[f.key] = XUIProperty(v);
@@ -224,7 +230,7 @@ class XUIModel implements Comparable<XUIModel> {
     elemXUI.propertiesXUI[key] = XUIProperty(value);
   }
 
-  void _processProperties(XUIElementHTML elemHtml, XUIResource xuifile) {
+  void _processPropertiesPhase1AndBind(XUIElementHTML elemHtml, XUIResource xuifile) {
     if (elemXUI.propertiesXUI != null) {
       elemXUI.propertiesXUI.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
@@ -234,12 +240,21 @@ class XUIModel implements Comparable<XUIModel> {
         }
 
         if (prop.key.toLowerCase() != cst.ATTR_XID) {
-          // n'affecte pas le XID car gerer par attribut xid
-          elemHtml.propertiesXUI[prop.key] = prop.value;
+          // n'affecte pas le XID car gerer par attribut xid  => affecte tous les autres
+          XUIProperty p = prop.value;
+          if (p is XUIPropertyBinding) {
+            // affecte le binding pour la creation du JSON de binding
+            xuifile.binding[prop.key.toString()] = XUIBinding(p.binding, p.content);
+            elemHtml.propertiesXUI[prop.key] = p;
+          } else {
+            elemHtml.propertiesXUI[prop.key] = p;
+          }
         }
       });
     }
   }
+
+   //////////////////////////////////////////// PHASE 2 //////////////////////////////////////////
 
   Future processPhase2(
       XUIEngine engine, XUIElementHTML elemHtml, String parentXId) async {
@@ -296,11 +311,12 @@ class XUIModel implements Comparable<XUIModel> {
       slotInfo.docId = getDocumentationID(elemHtml);
 
       if (slotInfo.slotname != null) {
-        slotInfo.slotname = elemHtml.calculatePropertyXUI(slotInfo.slotname, null);
+        slotInfo.slotname =
+            elemHtml.calculatePropertyXUI(slotInfo.slotname, null);
       }
-      if (false) {
-        print("slot info phase 2 " + slotInfo.xid);
-      }
+      // if (false) {
+      //   print("slot info phase 2 " + slotInfo.xid);
+      // }
       engine.mapInfo[slotInfo.xid] = slotInfo;
     }
 
@@ -327,7 +343,8 @@ class XUIModel implements Comparable<XUIModel> {
       if (docIdProp != null) docId = docIdProp.content;
     }
 
-    if (implementId == "xui-slot" && docId==implementId) {
+    // si tag XUI-SLOT => cherche implement du parent
+    if (implementId ==  TAG_SLOT && docId == implementId) {
       docId = elemHtml.parent.tag;
       var parent = elemHtml.parent;
       while (parent != null) {

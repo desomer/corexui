@@ -5,7 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:html';
-import 'dart:js';
+//import 'dart:js';
 
 import 'package:js/js.dart';
 
@@ -16,14 +16,18 @@ import 'core/XUIJSInterface.dart';
 
 import 'core/element/XUIElement.dart';
 import 'core/parser/HTMLWriter.dart';
+import 'core/parser/ObjectWriter.dart';
 
 ///------------------------- methode XUI vers JS -----------------------------
 
 @JS()
-external void loadPageJS(obj);
+external void loadPageJS(obj, bind);
 
 @JS()
 external void changePageJS(obj);
+
+@JS()
+external void doPromiseJS(idPromise, ret);
 
 ///-------------------------- methode JS vers XUI ----------------------------
 @JS('initPageXUI')
@@ -89,7 +93,7 @@ Future initPageXUI(FileDesignInfo fileInfo) async {
 
   String str = await designManager.getHtml(ctx, fileInfo.file, fileInfo.xid);
 
-  loadPageJS(str);
+  loadPageJS(str, designManager.xuiEngine.xuiFile.getBindingInfo());
 }
 
 // recharge la page  (reload ou clear)
@@ -111,7 +115,7 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
     await designManager.initEngine(fileInfo.file, ctx);
   }
 
-  await _reload(fileInfo);
+  await _reloadTemplate(fileInfo);
   return Future.value();
 }
 
@@ -128,11 +132,12 @@ void setDesignProperties(FileDesignInfo fileInfo, dynamic listDesig) async {
   }
   fileInfo.mode = "template";
 
-  await _reload(fileInfo);
+  await _reloadTemplate(fileInfo);
 
   // appel la promise
-  var xidProp = (listDesign[0] as ObjectDesign).xid;
-  context["\$xui"].callMethod("doPromiseJS", ["setDesignProperties", xidProp]);
+  String xidProp = (listDesign[0] as ObjectDesign).xid;
+  //context["\$xui"].callMethod("doPromiseJS", ["setDesignProperties", xidProp]);
+  doPromiseJS("setDesignProperties", xidProp);
 }
 
 void getDesignProperties(
@@ -140,7 +145,7 @@ void getDesignProperties(
   var designInfo =
       await _getDesignManager(fileInfo).getJSDesignInfo(id, idslot);
 
-  var ret = {
+  var ret2 = {
     "xid": designInfo.xid,
     "xidSlot": designInfo.xidSlot,
     "isSlot": id.startsWith(SLOT_PREFIX),
@@ -149,9 +154,19 @@ void getDesignProperties(
     "path": designInfo.bufPath.toString()
   };
 
+  var ret = ObjectDesignProperties();
+  ret.xid = designInfo.xid;
+  ret.xidSlot = designInfo.xidSlot;
+  ret.isSlot = id.startsWith(SLOT_PREFIX);
+  ret.data = "[" + designInfo.bufData.toString() + "]";
+  ret.template = designInfo.bufTemplate.toString();
+  ret.path = designInfo.bufPath.toString();
+
   // appel la promise
-  context["\$xui"]
-      .callMethod("doPromiseJS", ["getDesignProperties", JsObject.jsify(ret)]);
+  // context["\$xui"]
+  //     .callMethod("doPromiseJS", ["getDesignProperties", JsObject.jsify(ret)]);
+
+  doPromiseJS("getDesignProperties", ret);
 }
 
 /// Retourne la liste des composants
@@ -207,7 +222,7 @@ void addDesignXUI(FileDesignInfo fileInfo, String id, String template,
     if (id != XUI_COPYZONE_SLOT) designMgr.listXidChanged.add(id);
     if (reload) {
       // voir removeDesign  : evite de faire 2 reload
-      await _reload(fileInfo);
+      await _reloadTemplate(fileInfo);
     }
   }
 }
@@ -220,7 +235,7 @@ void deleteDesign(FileDesignInfo fileInfo, String id) async {
   await designMgr.removeDesign(id, null);
   // lance le reload
   designMgr.listXidChanged.add(info.parentXid);
-  await _reload(fileInfo);
+  await _reloadTemplate(fileInfo);
 }
 
 void cutDesign(FileDesignInfo fileInfo, String id) async {
@@ -245,7 +260,7 @@ void cutDesign(FileDesignInfo fileInfo, String id) async {
 
   // lance le reload
   designMgr.listXidChanged.add(info.parentXid);
-  await _reload(fileInfo);
+  await _reloadTemplate(fileInfo);
 }
 
 void copyDesign(FileDesignInfo fileInfo, String id) async {
@@ -269,7 +284,7 @@ void copyDesign(FileDesignInfo fileInfo, String id) async {
 
   // lance le reload
   designMgr.listXidChanged.add(id);
-  await _reload(fileInfo);
+  await _reloadTemplate(fileInfo);
 }
 
 void surroundDesign(FileDesignInfo fileInfo, String id, String template,
@@ -292,7 +307,7 @@ void surroundDesign(FileDesignInfo fileInfo, String id, String template,
 
   // lance le reload
   designMgr.listXidChanged.add(xidParent);
-  await _reload(fileInfo);
+  await _reloadTemplate(fileInfo);
 }
 
 void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
@@ -304,7 +319,7 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
     designMgr.cloneDesign(id, idMoveTo, null);
     designMgr.listXidChanged.add(idMoveTo);
 
-    await _reload(fileInfo);
+    await _reloadTemplate(fileInfo);
   } else {
     // gestion du move (ex : drag)
     designMgr.addXUIDesignEmpty(idMoveTo);
@@ -312,7 +327,7 @@ void moveDesign(FileDesignInfo fileInfo, String id, String idMoveTo) async {
     designMgr.listXidChanged.add(id);
     designMgr.listXidChanged.add(idMoveTo);
 
-    await _reload(fileInfo);
+    await _reloadTemplate(fileInfo);
   }
 }
 
@@ -323,7 +338,6 @@ void changeNbChildXUI(
   SlotInfo infoSlot = designManager.xuiEngine.getSlotInfo(idSlot, idSlot);
   SlotInfo infoContainer = designManager.xuiEngine
       .getSlotInfo(infoSlot.parentXid, infoSlot.parentXid);
-
 
   var nbItem = int.parse(infoContainer.elementHTML.propertiesXUI["nb"].content);
 
@@ -377,7 +391,7 @@ void changeNbChildXUI(
   }
 
   designManager.listXidChanged.add(infoSlot.parentXid);
-  await _reload(fileInfo);
+  await _reloadTemplate(fileInfo);
 }
 
 Future _doMoveChildByIdx(String suffix, int i, int idst,
@@ -422,10 +436,11 @@ void getHtmlFromXUI(FileDesignInfo fileInfo, String idPromise) async {
     html = bufferHtml.html.toString();
   }
 
-  context["\$xui"].callMethod("doPromiseJS", [idPromise, html]);
+  doPromiseJS(idPromise, html);
+  //context["\$xui"].callMethod("doPromiseJS", [idPromise, html]);
 }
 
-void _reload(FileDesignInfo fileInfo) async {
+void _reloadTemplate(FileDesignInfo fileInfo) async {
   var designMgr = _getDesignManager(fileInfo);
 
   List listReloader = [];
@@ -453,12 +468,19 @@ void _reload(FileDesignInfo fileInfo) async {
     options.listReloader = listReloader;
   }
 
-  String dataXui = JsonEncoder.withIndent('   ') //null
-      .convert(designMgr.xuiEngine.xuiFile.getObjects());
+  String objXui = JsonEncoder.withIndent('   ') //null
+      .convert(ObjectWriter().toObjects(designMgr.xuiEngine.xuiFile));
 
-  options.xuidata = dataXui;
+  options.xuidata = objXui;
   options.xuifile = HTMLWriter().toHTMLString(designMgr.xuiEngine.xuiFile);
   options.action = fileInfo.action;
+
+  // String binding = JsonEncoder.withIndent(' ') //null
+  //     .convert(bind);
+
+  // print(binding);
+  options.binding = designMgr.xuiEngine.xuiFile.getBindingInfo();
+
   changePageJS(options);
 }
 

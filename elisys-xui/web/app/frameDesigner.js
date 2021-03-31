@@ -34,7 +34,8 @@ $xui.editorOpenId = null;
 /******************************************************************************** */
 
 // charge la page global
-$xui.loadPageJS = (html) => {
+$xui.loadPageJS = (html, binding) => {
+    console.debug("binding ---- ", binding);
     $xui.pageDesignManager.loadPage(html);
 };
 

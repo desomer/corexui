@@ -1,0 +1,61 @@
+<html style="height:100vh;">
+
+<meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+</meta>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<head>
+    <script defer src="//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
+</head>
+
+<body style="height:100vh; margin: 0px;">
+    <iframe id='rootFrame' frameborder="0" width="100%" height="100%" style='height: 100vh; width: 100vw;'>
+    </iframe>
+</body>
+
+<script>
+    if (typeof window.$xui === 'undefined')
+        window.$xui = {};
+
+    if (window.$xui.rootdata == null)
+        window.$xui.rootdata = {};
+</script>
+
+<script type="module">
+
+    const urlParams = new URLSearchParams(window.location.search);
+    window.$xui.rootdata.frameName = urlParams.get("id");
+
+    // lancer par le initPageXUI
+    $xui.loadPageJS = async (html) => {
+        let winFrame = document.querySelector("#rootFrame");
+        let q = faunadb.query;
+        var client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
+
+        var ret = await client.query(
+            q.Get(
+                q.Match(q.Index('filexuiById'), window.$xui.rootdata.frameName)
+            )
+        )
+        console.log("ret=", ret);
+
+        winFrame.srcdoc = ret.data.html;
+        setTimeout(() => {
+            console.debug(window.location.hash);
+            winFrame.contentWindow.location.hash = window.location.hash;
+        }, 100);
+    };
+
+    window.onhashchange = () => {
+        console.debug(window.location.hash);
+        let winFrame = document.querySelector("#rootFrame");
+        winFrame.contentWindow.location.hash = window.location.hash;
+    }
+
+    $xui.loadPageJS();
+
+</script>
+
+</html>

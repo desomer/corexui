@@ -65,3 +65,5 @@ Store
 https://medium.com/@jovanoskinenad/dynamic-reusable-vuex-store-31ddad8df776
 
 https://linuxfr.org/users/spacefox/journaux/8-mois-avec-javascript-es6-et-vue-js-mon-retour-d-experience-du-developpement-front-en-2018
+
+

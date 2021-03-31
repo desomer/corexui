@@ -33,7 +33,8 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
                                     return window.$xui;
                                 },
                                 ...$xui.storeDataBinding
-                            }
+                            },
+                            methods : $xui.storeAction
                         }
                         
                         );

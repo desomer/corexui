@@ -124,11 +124,11 @@
                 list='["left","right"]'>marge text left/right</xui-prop>
         <xui-prop var="position" editor="combo"
                 list='["block","absolute","fixed"]'>position</xui-prop>
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop> 
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-btn xid="xui-btn-icon-1" class="[[class]]" -style="[[style]]" [[btn-type]] disabled="[[disabled]]" [[size]] [[position]] color="[[color]]" dark="[[dark]]" light="[[light]]">
+    <v-btn xid="xui-btn-icon-1" [[event]] class="[[class]]" -style="[[style]]" [[btn-type]] disabled="[[disabled]]" [[size]] [[position]] color="[[color]]" dark="[[dark]]" light="[[light]]">
         <span xui-if=[[textleft@2]]>[[textleft@2]]</span><v-icon [[positionicon@1]]>[[icon@2]]</v-icon><span xui-if=[[textright@2]]>[[textright@2]]</span>
     </v-btn>
 

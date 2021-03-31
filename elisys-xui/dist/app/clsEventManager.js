@@ -90,7 +90,11 @@ export class EventManager {
                 }
                 if ($xui.dragMoveItem != null) {
                     // gestion de drag entre slot
-                    $xui.moveTo(data);
+                    if (data.ctrlKey)
+                     $xui.copyCmpOnDrap(data);
+                    else
+                     $xui.moveTo(data);
+                   
                 }
             }
             else if (data.action == "ctrlP") {
@@ -135,6 +139,12 @@ export class EventManager {
                 // this.console.debug("reloader finish");
                 $xui.doPromiseJS("changePageFinish");
             }
+            else if (data.action == "return getInfoForSelector") {
+                //console.debug("*******>", data);
+                $xui.doPromiseJS("getInfoForSelectorOnIFrame"+data.info.idx, data.ret);
+            }
+
+            
         });
     }
 }

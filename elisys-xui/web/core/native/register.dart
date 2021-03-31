@@ -22,7 +22,7 @@ class NativeSlot extends XUIElementNative {
   @override
   Future doProcessPhase2(XUIEngine engine, XUIElementHTML html) async {
     // recherche le nom du slot et si celui ci et un slot full
-    var slotName;
+    String slotName;
     bool isFull = false;
 
     html?.propertiesXUI?.entries?.forEach((f) {
@@ -53,7 +53,7 @@ class NativeSlot extends XUIElementNative {
     if (isModeDesign && html.children == null && isSlotButNotCopyzone) {
       var newChild = XUIElementXUI()..tag = TAG_DIV_SLOT;
       newChild.children = [];
-      newChild.children.add(XUIElementText()..content = slotName);
+      newChild.children.add(XUIElementText()..content = StringBuffer(slotName.toString()));
 
       newChild.attributes = HashMap<String, XUIProperty>();
       newChild.attributes["class"] = XUIProperty("text-truncate");  // trunc le texte si trop long
@@ -179,9 +179,42 @@ class NativeInjectFile extends XUIElementNative {
 }
 
 ///------------------------------------------------------------------
+class NativeInjectText extends XUIElementNative {
+  // dictionnaire de cache de fichier
+  static var cacheText = { 'data-binding':  StringBuffer() };
+
+  static StringBuffer getcacheText(idResource)
+  {
+      return cacheText[idResource];
+  }
+
+  NativeInjectText() {
+    this.xid = "xui-inject-text";
+  }
+
+  @override
+  Future<XUIModel> doProcessPhase1(
+      XUIEngine engine, XUIElementHTML html) async {
+    var root = XUIElementXUI();
+    root.tag = TAG_NO_DOM;
+
+    var aText = XUIElementText();
+    var idResource = html.originElemXUI.propertiesXUI["path"].content;
+
+    aText.content = cacheText[idResource];
+
+    root.children ??= []..add(aText);
+
+    Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));
+    return f;
+  }
+}
+
+///------------------------------------------------------------------
 class NativeRegister {
   NativeRegister(XUIResource reader) {
     NativeInjectFile().register(reader);
     NativeSlot().register(reader);
+    NativeInjectText().register(reader);
   }
 }

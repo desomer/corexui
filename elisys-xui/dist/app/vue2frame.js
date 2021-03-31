@@ -11,6 +11,18 @@ Vue.config.productionTip = false;
 Vue.use(Vuex);
 Vue.use(VueRouter);
 
+/*********************************************************************************/
+// $xui.createComponentFromTemplate = (idTemplate, computeDataBinding) => {
+// 	return {
+// 		template: document.querySelector("#" + idTemplate).innerHTML,
+// 		data: () => { return $xui.rootdata; },
+// 		computed: {
+// 			$xui: () => $xui,  // pour les @click="$xui.doXXX()"
+// 			...computeDataBinding
+// 		}
+// 	}
+// }
+
 /******************************* INIT DU vue2CmpMgr *******************************/
 window.vue2CmpMgr = vue2CmpMgr;
 
@@ -34,31 +46,52 @@ $xui.loadApplicationJS = () => {
 			count: 0
 		},
 		mutations: {
-			increment(state) {
-				state.count++
+			increment(state, info) {
+				console.debug("-------event info = ", info);
+				state.count+=info.amount;
+			}
+		},
+		actions: {
+			inc(context, payload) {
+				context.commit({
+					type: 'increment',
+					amount: payload
+				  })
+			},
+			say(context, event) {
+				console.debug("message say",context, event, this);
 			}
 		}
 	})
 
-	$xui.store.commit('increment');
-	$xui.store.commit('increment');
+	// $xui.store.commit('increment');
+	$xui.store.dispatch('inc', 1)
+
+	$xui.storeAction = Vuex.mapActions({
+		add: 'inc', // attacher `this.add()` à `this.$store.dispatch('increment')`
+		say: 'say'
+	});
+
+	var allState = Reflect.ownKeys($xui.store.state);
+	console.debug("allState ", allState)
 
 	// passer la valeur littérale 'count' revient à écrire `state => state.count`
 	var storeDataBinding = Vuex.mapState({ titre: 'count' });
-	$xui.storeDataBinding=storeDataBinding;
+	$xui.storeDataBinding = storeDataBinding;
+
 
 	/***********************************  ROUTER   **********************************/
 	//const defaut = { template: '<div>dddd</div>' }
-	const defaut = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-route-default", storeDataBinding)
-	const info = { template: '<div>info</div>' }
-	const Unknown = { template: '<div>unknown</div>' }
+	const defautRoute = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-route-default", storeDataBinding)
+	const infoRoute = { template: '<div>info</div>' }
+	const UnknownRoute = { template: '<div>unknown</div>' }
 
 	const routes = [
-		{ path: '/', component: defaut },
-		{ path: '/info', component: info },
-	//	vue2CmpMgr.ComponentManager.getRoute('/foo', 'app/frameDesigner.html', 'routeA'),
-	//	vue2CmpMgr.ComponentManager.getRoute('/bar', 'app/frameDesigner.html', 'routeB'),
-		{ path: '*', component: Unknown }
+		{ path: '/', component: defautRoute },
+		{ path: '/info', component: infoRoute },
+		//	vue2CmpMgr.ComponentManager.getRoute('/foo', 'app/frameDesigner.html', 'routeA'),
+		//	vue2CmpMgr.ComponentManager.getRoute('/bar', 'app/frameDesigner.html', 'routeB'),
+		{ path: '*', component: UnknownRoute }
 	]
 
 	$xui.router = new VueRouter({
@@ -89,6 +122,8 @@ $xui.loadApplicationJS = () => {
 
 	/*********************************** VUEJS ***********************************/
 	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-rootTemplate", storeDataBinding);
+	//$xui.rootdata.toto="4444";
+
 	$xui.vuejs = new Vue({
 		el: '#app',
 		store: $xui.store,
@@ -100,8 +135,21 @@ $xui.loadApplicationJS = () => {
 		vuetify: new Vuetify(configVuetify),
 		errorCaptured: function (err, component, details) {
 			console.error(err, component, details);
-			alert("vue errorCaptured " + err + " details " + details);
+			alert("vue errorCaptured <" + err + "> details <" + details + ">");
+			if (details == "render") {
+				var variab = ("" + err).split(' ')[1];
+				console.debug("renderer error ====>", variab);
+				//$xui.rootdata[variab]="wwsdsdsd";
+			}
 			throw err;
 		}
 	});
+	//$xui.rootdata.toto2="5555";
+	// setTimeout(() => {
+	// 	$xui.rootdata.toto2="5555";
+	// }, 10000);
+
+	//Vue.set($xui.vuejs, 'toto2');
+	//$xui.rootdata.toto="4444";
+	//console.debug("$xui.vuejs", $xui.vuejs.toto);
 }

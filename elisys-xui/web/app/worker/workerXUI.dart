@@ -3,7 +3,7 @@ library xuiapp;
 
 import 'dart:html';
 import 'package:js/js.dart';
-import 'dart:js';
+//import 'dart:js';
 
 import '../../core/XUIDesignManager.dart';
 import '../../core/XUIJSInterface.dart';
@@ -17,8 +17,8 @@ external set _doEvent(void Function(String) f);
 main() {
   _doEvent = allowInterop(doEvent);
   print("((((((((((((((object)))))))))))))))))");
-  context["\$xuiworker"]
-      .callMethod("doPromiseJS", ["setDesignProperties", "a"]);
+  // context["\$xuiworker"]
+  //     .callMethod("doPromiseJS", ["setDesignProperties", "a"]);
 }
 
 doEvent(String json) async {
