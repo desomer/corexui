@@ -136,7 +136,6 @@ void setDesignProperties(FileDesignInfo fileInfo, dynamic listDesig) async {
 
   // appel la promise
   String xidProp = (listDesign[0] as ObjectDesign).xid;
-  //context["\$xui"].callMethod("doPromiseJS", ["setDesignProperties", xidProp]);
   doPromiseJS("setDesignProperties", xidProp);
 }
 
@@ -145,15 +144,6 @@ void getDesignProperties(
   var designInfo =
       await _getDesignManager(fileInfo).getJSDesignInfo(id, idslot);
 
-  var ret2 = {
-    "xid": designInfo.xid,
-    "xidSlot": designInfo.xidSlot,
-    "isSlot": id.startsWith(SLOT_PREFIX),
-    "data": "[" + designInfo.bufData.toString() + "]",
-    "template": designInfo.bufTemplate.toString(),
-    "path": designInfo.bufPath.toString()
-  };
-
   var ret = ObjectDesignProperties();
   ret.xid = designInfo.xid;
   ret.xidSlot = designInfo.xidSlot;
@@ -161,10 +151,6 @@ void getDesignProperties(
   ret.data = "[" + designInfo.bufData.toString() + "]";
   ret.template = designInfo.bufTemplate.toString();
   ret.path = designInfo.bufPath.toString();
-
-  // appel la promise
-  // context["\$xui"]
-  //     .callMethod("doPromiseJS", ["getDesignProperties", JsObject.jsify(ret)]);
 
   doPromiseJS("getDesignProperties", ret);
 }
@@ -475,11 +461,8 @@ void _reloadTemplate(FileDesignInfo fileInfo) async {
   options.xuifile = HTMLWriter().toHTMLString(designMgr.xuiEngine.xuiFile);
   options.action = fileInfo.action;
 
-  // String binding = JsonEncoder.withIndent(' ') //null
-  //     .convert(bind);
-
-  // print(binding);
   options.binding = designMgr.xuiEngine.xuiFile.getBindingInfo();
+  options.treeSlot = designMgr.xuiEngine.getSlotTree();
 
   changePageJS(options);
 }

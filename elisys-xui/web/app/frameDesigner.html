@@ -39,6 +39,7 @@ main
     <div xid="routeA">routeDefault.........A</div>
     <div xid="routeB">root.........A</div>
 
+    <!--  composant small btn d'action  -->
     <v-btn xid="xui-btn-small" small class="xui-btn-action"></v-btn>
 
     <xui-design xid="root">
@@ -55,26 +56,8 @@ main
         <xui-prop id="navDrawerBind" val=false binding="navdrawer"></xui-prop>
     </xui-design>
 
-    <xui-design xid="maincontent">
-        <xui-snackbar-dialog></xui-snackbar-dialog>
-        <xui-popup-action></xui-popup-action>
-        <xui-class-editor></xui-class-editor>
-    </xui-design>
 
-    <xui-design xid="toolbar">
-        <xui-prop id="headerHeight" val="32"></xui-prop>
-        <xui-prop id="dark" val="true"></xui-prop>
-    </xui-design>
-
-    <xui-design xid="footer" style="padding-top: 1px;">
-        <xui-prop id="footerHeight" val="32"></xui-prop>
-        <xui-prop id="dark" val="true"></xui-prop>
-    </xui-design>
-
-    <xui-design xid="slot-toolbar-title">
-        <span class="xui-path-component">{{selectedxui}}</span>
-    </xui-design>
-
+    <!--  composant editor de class  -->
     <v-dialog xid="xui-class-editor" v-model="dialogClass" v-on:click:outside="$xui.closeClassEditor()"
         max-width="80vw">
         <v-card>
@@ -92,6 +75,7 @@ main
         </v-card>
     </v-dialog>
 
+    <!--  composant boite de dialog temporaire -->
     <v-snackbar xid="xui-snackbar-dialog" class="pt-0" elevation="12" v-model="snackbar" :timeout="snackbar_timeout" top app color="blue-grey">
         {{ snackbar_text }}
         <template v-slot:action="{ attrs }">
@@ -101,6 +85,7 @@ main
         </template>
     </v-snackbar>
 
+    <!--  composant popup action -->
     <div xid="xui-popup-action" id="xui-display-selector-popup" 
         class="xui-popup-class"
         style="position:absolute;top:100px;left: 100px;"> 
@@ -119,7 +104,28 @@ main
     </div>
 
     <!--------------------------------------------------------------------------->
-    <xui-design xid="main">
+    <xui-design xid="toolbar">
+        <xui-prop id="headerHeight" val="32"></xui-prop>
+        <xui-prop id="dark" val="true"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="footer" style="padding-top: 1px;">
+        <xui-prop id="footerHeight" val="32"></xui-prop>
+        <xui-prop id="dark" val="true"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="slot-toolbar-title">
+        <span class="xui-path-component">{{selectedxui}}</span>
+    </xui-design>
+
+    <!--------------------------------------------------------------------------->
+    <xui-design xid="appcontent">
+        <xui-snackbar-dialog></xui-snackbar-dialog>
+        <xui-popup-action></xui-popup-action>
+        <xui-class-editor></xui-class-editor>
+    </xui-design>
+
+    <xui-design xid="mainroot">
         <xui-tabs xid="main-tab" xui-nb="7" xui-vertical=true xui-tabs-dense=true xui-dark=true v-model="activeTab"  class="fill-height main-tab">
         </xui-tabs>
     </xui-design>
@@ -219,7 +225,7 @@ main
         <div>Data binding coming soon...</div>
     </xui-design>
     <xui-design xid="action-tab-tab-item-4">
-        <div>TreeView coming soon...</div>
+        <div class='barcustom xui-div-scroll-vertical'><v-treeview dense :items="listSlot"></v-treeview></div>
     </xui-design>
     <xui-design xid="action-tab-tab-item-5">
         <div>CLI coming soon...</div>

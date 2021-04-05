@@ -12,11 +12,12 @@ import 'parser/HTMLReader.dart';
 import 'parser/ObjectWriter.dart';
 
 const ATTR_XID = "xid";
-const ATTR_PARENT_XID = "parent-xid";   // utiliser dans <xui-slot xid="[[parent-xid]]-content">
+const ATTR_PARENT_XID =
+    "parent-xid"; // utiliser dans <xui-slot xid="[[parent-xid]]-content">
 
 const ATTR_SLOT_NAME = "slot-name";
 const ATTR_SLOT_FULL = "slot-full";
-const ATTR_XID_SLOT = "xid-slot";    // utiliser dans les data-xid-slot
+const ATTR_XID_SLOT = "xid-slot"; // utiliser dans les data-xid-slot
 
 // ne genere pas de engine.mapInfo et de data-xui-slot
 const ATTR_NO_DESIGN = "no-design";
@@ -33,6 +34,8 @@ const ATTR_MODE_DISPLAY = "modedisplay";
 const ATTR_CONVERT_JSON = "convert-json";
 const ATTR_XUI_IF = "if";
 
+const ATTR_XUI_FORVAR = "forvar";
+
 const ATTR_STYLE_SLOT = "style-slot";
 // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
 
@@ -46,7 +49,8 @@ const TAG_FACTORY = "xui-factory";
 const TAG_IMPORT = "xui-import";
 const TAG_PROP = "xui-prop";
 const TAG_SLOT = "xui-slot";
-const TAG_DIV_SLOT = "xui-div-slot";    // nom du composant (div) slot dans la class css xui-class-slot
+const TAG_DIV_SLOT =
+    "xui-div-slot"; // nom du composant (div) slot dans la class css xui-class-slot
 
 const XUI_COPYZONE_SLOT = "xui-copyzone-slot";
 const XUI_TEMPORARY_SLOT = "xui-temporary-slot";
@@ -413,11 +417,11 @@ class XUIResource extends XMLElemReader {
 
 class XUIEngine {
   XUIResource xuiFile;
-  var mapInfo = HashMap<String, SlotInfo>();
+  var mapSlotInfo = HashMap<String, SlotInfo>();
   var docInfo = HashMap<String, DocInfo>();
-  var dataBindingInfo = XUIParseJSDataBinding();
+  var dataBindingInfo = XUIParseJSDataBinding();    // plus forcement utiliser sauf text avec moustache {{}}
 
-  bool reloaderEnable = true;
+  bool reloaderEnable = true;  // configuration avec reloader
 
   Future initialize(HTMLReader reader, XUIContext ctx) async {
     xuiFile = XUIResource(reader, ctx);
@@ -435,8 +439,8 @@ class XUIEngine {
   }
 
   SlotInfo getSlotInfo(String id, String idslot) {
-    var info = mapInfo[id];
-    if (info == null) info = mapInfo[idslot];
+    var info = mapSlotInfo[id];
+    if (info == null) info = mapSlotInfo[idslot];
 
     return info;
   }
@@ -535,11 +539,22 @@ class XUIEngine {
     }
 
     if (isModeDesign()) {
-      mapInfo.clear();
+      mapSlotInfo.clear();  // vide le slot info contruit dans la Phase2
     }
 
     await root.processPhase1(this, htmlRoot);
     await root.processPhase2(this, htmlRoot, null);
+
+    print("-- mapSlotInfo "+mapSlotInfo.length.toString());
+    print("-- docInfo "+docInfo.length.toString());
+    print("-- components "+xuiFile.components.length.toString());
+    print("-- designs "+xuiFile.designs.length.toString());
+    print("-- documentation "+xuiFile.documentation.length.toString());
+    print("-- binding "+xuiFile.binding.length.toString());
+    print("-- listImport "+xuiFile.listImport.length.toString());
+
+    //processPhaseSlotTree();
+    
 
     processPhaseJS();
 
@@ -547,6 +562,95 @@ class XUIEngine {
       return Future.sync(() => htmlRoot.processPhase3(this, writer));
     }
   }
+
+  List getSlotTree() {
+
+    TreeSlotBuilder treeSlotBuilder =TreeSlotBuilder();
+
+    // init les childs
+    mapSlotInfo.forEach((key, SlotInfo child) {
+      child.children=null;
+    });
+
+    // reconstruit l'arborescence
+    SlotInfo rootSlot;
+    mapSlotInfo.forEach((key, SlotInfo child) {
+      var parentID = child.parentXid;
+      if (parentID != null) {
+        mapSlotInfo[parentID].children = mapSlotInfo[parentID].children ?? [];
+        mapSlotInfo[parentID].children.add(child);
+      } else {
+        rootSlot = child;
+      }
+    });
+    
+    if (rootSlot!=null) {
+       treeSlotBuilder.tree.add( displaySlot(treeSlotBuilder, rootSlot, 0) );
+    }
+
+    return treeSlotBuilder.tree;
+  }
+
+  TreeSlot displaySlot(TreeSlotBuilder treeSlotBuilder, SlotInfo slot, int tab)
+  {
+
+    var ts = TreeSlot();
+    ts.id = treeSlotBuilder.nb++;
+    ts.name = slot.xid+" <"+(slot.slotname??"")+">";
+    
+    String s = "";
+    for (var i = 0; i < tab; i++) {
+      s=s+"\t";
+    }
+
+    s=s+"# "+slot.xid+" <"+(slot.slotname??"")+">";
+    print(s);
+
+    bool verbose = false;
+
+    if (verbose) {
+        s="";
+        for (var i = 0; i < tab; i++) {
+          s=s+"\t";
+        }
+
+        String res = slot.idRessource;
+        if (res==null)
+            {res="?";}
+        else {
+
+            int i = res.lastIndexOf("/");
+            int j = res.lastIndexOf(".");
+            res=res.substring(i+1,j);
+        }
+
+        s=s+"  impl:["+res+":"+(slot.implement??"no impl")+"]\tdoc:<"+(slot.docId??"")+"> ";
+        print(s); 
+
+        s="";
+        for (var i = 0; i < tab; i++) {
+          s=s+"\t";
+        }
+        s=s+"  design "+slot.designInfo;
+        print(s); 
+    }
+
+    for (SlotInfo item in slot.children ?? []) {
+      if (!(item.elementHTML.hasPropXUIIF() &&
+          !item.elementHTML.isXUIIF(this))) {
+
+        if (ts.children==null)
+        {
+          ts.children=[];
+        }
+        ts.children.add(displaySlot(treeSlotBuilder, item, tab + 1));
+
+      }
+    }
+
+    return ts;
+  }
+  
 
   void processPhaseJS() {
     StringBuffer buf = NativeInjectText.getcacheText('data-binding');
@@ -577,7 +681,14 @@ class SlotInfo {
   String docId;
   String idRessource;
   String implement;
+  String designInfo;  // chaine caractere des info de design (NB + nom des fichier)
   XUIElementHTML elementHTML;
+  List<SlotInfo> children;
+}
+
+class TreeSlotBuilder {
+    List<TreeSlot> tree = [];
+    int nb=0;
 }
 
 class DocInfo {

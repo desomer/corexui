@@ -76,18 +76,20 @@ class Options {
   external factory Options({String mode, dynamic html, dynamic xuidata});
   external String get action;
   external set action(String action);
-  external String get html;
+  external String get html;                  //code Html
   external set html(String html);
   external List get listReloader;
   external set listReloader(List listReloader);
   external String get mode;
   external set mode(String mode);
-  external String get xuidata;
+  external String get xuidata;             //code JSON
   external set xuidata(String xuidata);
-  external String get xuifile;
+  external String get xuifile;              //code XML XUI
   external set xuifile(String xuifile);
   external List get binding;
   external set binding(List binding);
+  external List get treeSlot;
+  external set treeSlot(List tree);
 }
 
 @JS()
@@ -97,6 +99,17 @@ class BindObj {
   external set attr(String attr);
   external String get val;
   external set val(String val);
+}
+
+@JS()
+@anonymous
+class TreeSlot {
+  external int get id;
+  external set id(int id);
+  external String get name;
+  external set name(String name);
+  external List get children;
+  external set children(List name);
 }
 
 @JS()

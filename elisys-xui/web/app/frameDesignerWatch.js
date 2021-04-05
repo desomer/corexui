@@ -9,7 +9,7 @@ $xui.initVuejs = (instanceVue) => {
     console.debug('The activeTab name was changed from ' + oldValue + ' to ' + newValue + '!');
     if (newValue == 1) {
       // onglet code
-      $xui.refreshAction('final')   // affiche le code et le xui
+      $xui.refreshAction('showCode')   // affiche le code et le xui
     }
 
   }, { deep: true });

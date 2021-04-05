@@ -62,6 +62,10 @@ $xui.refreshAction = (mode) => {
         infoFile.mode = "final";
         infoFile.action = "export";   // pas de store
     }
+    if (mode == "showCode") {
+        infoFile.mode = "final";
+        infoFile.action = "showCode";   // pas de store
+    }
     $xui.refreshPageXUI(infoFile);
 };
 

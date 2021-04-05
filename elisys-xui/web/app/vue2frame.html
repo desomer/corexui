@@ -2,6 +2,7 @@
 
 	<xui-doc xid="page">
 		<xui-prop var="title" editor="text">titre</xui-prop>
+		<xui-prop var="nbroute" def="0" editor="int">nb route page</xui-prop>
 
 		<xui-prop var="colorApp" editor="text" link="https://materialdesignicons.com/">color nav global</xui-prop>
 		<xui-prop var="darkApp" editor="bool">dark theme</xui-prop>
@@ -43,13 +44,11 @@
 		<body xid="body-vuetify" xui-no-design style="height:100vh"></body>
 	</xui-slot>
 
-	<!--------------------------------------------------------------------------------------->
+	<!----------------------------------------HEAD HTML DE PAGE-------------------------------------->
 
 	<xui-design xid="header-vuetify">
 		<title>[[title@0+]]</title>
-		<viewport-no-zoom></viewport-no-zoom>
-		<meta name="mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-capable" content="yes">
+		<viewport-mobile></viewport-mobile>
 		
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" />
 		<link rel="stylesheet"
@@ -57,19 +56,23 @@
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" />
 		<script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+
 		<xui-slot xid="inject-other-header" xui-no-design></xui-slot>
 	</xui-design>
 
+	<div xid="viewport-mobile" xui-no-dom>
+		<meta name="viewport"
+			content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+		</meta>
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+	</div>
 
-	<meta xid="viewport-no-zoom" name="viewport"
-		content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
-	</meta>
-
+	<!------------------------------------- APP VUETIFY ---------------------------------------->
 	<xui-design xid="body-vuetify">
 		<template id="xui-rootTemplate" dark="[[darkApp@0+]]">
-			<v-app xid="maincontent" xui-no-design >
+			<v-app xid="appcontent">
 			</v-app>
-			<xui-copyzone></xui-copyzone>
 			<xui-slot xid="xui-temporary-slot" xui-no-design></xui-slot>
 		</template>
 
@@ -77,18 +80,29 @@
 			<vue-content-1 xid="contentpage"></vue-content-1>
 		</template>
 
+		<xui-route-template xid="xui-pagerouter" xui-forvar="nbroute@0+"></xui-route-template>
+
 		<div id="app"></div>
 	</xui-design>
 
-	<xui-design xid="maincontent">
+	<!------------------------------------- V-APP MAIN CONTENT ---------------------------------------->
+	<xui-doc xid="vue-rooter-1">
+		<xui-prop id="name">Rooter</xui-prop>
+		<xui-prop id="desc">Rooter de la page</xui-prop>
+		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">rooter content color</xui-prop>
+	</xui-doc>
+
+	<v-main xid="vue-rooter-1" class="fill-height" -style="background-color:[[colorBg]]">
+		<router-view>  <!-- ICI LA PAGE --> </router-view>
+	</v-main>
+
+	<xui-design xid="appcontent" xui-no-design>
 		<xui-slot xid="inject-design-ui" xui-no-design></xui-slot>
+		<xui-copyzone></xui-copyzone>
 		<vue-systembar-1 xid="systembar"  xui-if=[[withSysBar@0+]]></vue-systembar-1>
 		<vue-nav-drawer-1 xid="navdrawerleft" xui-if=[[withLeftNavigation@0+]]></vue-nav-drawer-1>
 		<vue-apptoolbar-1 xid="toolbar" xui-if=[[withAppBar@0+]]></vue-apptoolbar-1>
-		<v-main class="fill-height" -style="background:[[colorBg@0+]]">
-			<router-view></router-view>
-			<!--vue-content-1 xid="contentpage"></vue-content-1-->
-		</v-main>
+		<vue-rooter-1 xid="rooter"></vue-rooter-1>
 		<vue-footer-1 xid="footer" xui-if=[[withFooter@0+]]></vue-footer-1>
 		<vue-bottom-nav-1 xid="bottom-nav" xui-if=[[withBottomNavigation@0+]]></vue-bottom-nav-1>
 	</xui-design>
@@ -120,7 +134,7 @@
 		</xui-slot>
 	</v-system-bar>
 
-	<!------------------------------------- elevate-on-scroll--------------------------------------------------->
+	<!-------------------------------------HEADER TOOLBAR  elevate-on-scroll--------------------------------------------------->
 	<xui-doc xid="vue-apptoolbar-1">
 		<xui-prop id="name">Header</xui-prop>
 		<xui-prop id="desc">Entete</xui-prop>
@@ -224,30 +238,19 @@
 		</xui-slot>
 	</v-navigation-drawer>
 
-	<!------------------------------------------  MAIN ---------------------------------------------->
-
-	<xui-doc xid="vue-content-1">
-		<xui-prop id="name">Main content</xui-prop>
-		<xui-prop id="desc">Contenu de la page</xui-prop>
-		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">Page color</xui-prop>
-	</xui-doc>
-
-	<xui-doc xid="v-main:vue-content-1">
+	<!------------------------------------------   MAIN ---------------------------------------------->
+	<xui-doc xid="xui-no-dom:vue-content-1">
 		<xui-prop id="favorite">container</xui-prop>
 		<xui-prop id="exclude"></xui-prop>
 		<xui-prop id="include"></xui-prop>
 
-		<xui-prop id="name">Content slot</xui-prop>
+		<xui-prop id="name">Root slot</xui-prop>
 		<xui-prop id="desc">Contenu slot</xui-prop>
 	</xui-doc>
 
-	<!--v-main xid="vue-content-1" class="fill-height" -style="background:[[colorBg@0+]]">
-		<xui-slot xid="main" xui-reloader=true style-slot="height:100%;width:100%"  xui-slot-name="page content">
-		</xui-slot>
-	</v-main-->
 
-	<div xid="vue-content-1" xui-no-dom>
-		<xui-slot xid="main" xui-reloader=true style-slot="height:100%;width:100%"  xui-slot-name="page content">
+	<div xid="vue-content-1" xui-no-dom xui-no-design>
+		<xui-slot xid="mainroot" xui-reloader=true style-slot="height:100%;width:100%"  xui-slot-name="Root content">
 		</xui-slot>
 	</div>
 

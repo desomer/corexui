@@ -107,6 +107,7 @@
 
         <xui-prop var="btn-type" def="icon" editor="combo"
         list='["depressed","outlined","rounded","text","tile","icon","fab"]'>type depressed/outlined/...</xui-prop>
+        <xui-prop var="routeto" editor="text">route to</xui-prop>
 
         <xui-prop var="icon" def="mdi-plus" editor="icon">icon (mdi-xxx)</xui-prop>
         <xui-prop var="color" cat="style" editor="text">color</xui-prop>
@@ -128,7 +129,7 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-btn xid="xui-btn-icon-1" [[event]] class="[[class]]" -style="[[style]]" [[btn-type]] disabled="[[disabled]]" [[size]] [[position]] color="[[color]]" dark="[[dark]]" light="[[light]]">
+    <v-btn xid="xui-btn-icon-1" to="[[routeto]]" [[event]] class="[[class]]" -style="[[style]]" [[btn-type]] disabled="[[disabled]]" [[size]] [[position]] color="[[color]]" dark="[[dark]]" light="[[light]]">
         <span xui-if=[[textleft@2]]>[[textleft@2]]</span><v-icon [[positionicon@1]]>[[icon@2]]</v-icon><span xui-if=[[textright@2]]>[[textright@2]]</span>
     </v-btn>
 
