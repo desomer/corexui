@@ -39,7 +39,7 @@
                 q.Match(q.Index('filexuiById'), window.$xui.rootdata.frameName)
             )
         )
-        console.log("ret=", ret);
+        console.log("loadPageJS faunadb =", ret);
 
         winFrame.srcdoc = ret.data.html;
         setTimeout(() => {

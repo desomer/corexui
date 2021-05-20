@@ -39,6 +39,49 @@
         <xui-slot style-slot="height:100%" xid="[[parent-xid]]-block" xui-slot-name="Block"></xui-slot>
     </div>
 
+    <!--------------------------  XUI-FOR   ------------------------------->
+    <xui-doc xid="xui-for">
+        <xui-prop id="name">For</xui-prop>
+        <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
+        <xui-prop id="desc">Un block</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var=":varItems" editor="text" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var=":varName" editor="text" def="item" bind-type="item-array">item var name</xui-prop>
+    </xui-doc>
+
+    <template xid="xui-for" v-for="([[:varName]], [[:varName]]_index) in [[:varItems]]">
+        <xui-slot style-slot="height:100%" xid="[[parent-xid]]-for" xui-slot-name="For block"></xui-slot>
+    </template>
+    
+    <!--------------------------  XUI-IF-ELSE   ------------------------------->
+    <xui-doc xid="xui-if-else">
+        <xui-prop id="name">If elseIf else</xui-prop>
+        <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
+        <xui-prop id="desc">Un block</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var=":varItems" editor="text" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var=":varName" editor="text" def="item" bind-type="item-array">item var name</xui-prop>
+    </xui-doc>
+
+    <template xid="xui-if-else">
+        <template v2-if="">
+            <xui-slot style-slot="height:100%" xid="[[parent-xid]]-if" xui-slot-name="if block"></xui-slot>
+        </template>
+        <template v2-else-if="">
+            <xui-slot style-slot="height:100%" xid="[[parent-xid]]-else-if" xui-slot-name="elseif block"></xui-slot>
+        </template>
+        <template v2-else="">
+            <xui-slot style-slot="height:100%" xid="[[parent-xid]]-else" xui-slot-name="else block"></xui-slot>
+        </template>
+    </template>
+
+
     <!--------------------------  XUI-ROUTE-template ------------------------------->
     <xui-doc xid="template:xui-route-template">
         <xui-prop id="name">Route</xui-prop>
@@ -49,8 +92,8 @@
 
 
     <template xid="xui-route-template" xui-for="idxroute" xui-no-dom>
-        <template xui-doc-id="xui-route-template-item" id="[[parent-xid]]-route-[[idxroute@0+]]" xid="[[parent-xid]]-route-[[idxroute@0+]]">
-            <xui-slot xui-reloader=true xui-slot-full xid="[[parent-xid]]-content"  xui-slot-name="route [[idxroute@0+]]">
+        <template xui-doc-id="xui-route-template-item" id="[[parent-xid]]-[[idxroute@0+]]" xid="[[parent-xid]]-route-[[idxroute@0+]]">
+            <xui-slot xui-reloader=true xui-slot-full xid="[[parent-xid]]-content-[[idxroute@0+]]"  xui-slot-name="route [[idxroute@0+]]">
             </xui-slot>
         </template>
     </template>

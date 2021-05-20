@@ -16,10 +16,14 @@ class FileDesignInfo {
 
   external String get mode;
   external set mode(String mode);
-  external String get part;
-  external set part(String part);
+  external String get partXID;        
+  external set partXID(String part);
   external String get xid;
   external set xid(String xid);
+
+  external String get jsonBinding;
+  external set jsonBinding(String json);
+
 }
 
 @JS()
@@ -110,6 +114,8 @@ class TreeSlot {
   external set name(String name);
   external List get children;
   external set children(List name);
+  external bool get isSlot;
+  external set isSlot(bool iss);
 }
 
 @JS()

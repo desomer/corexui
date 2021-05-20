@@ -6,6 +6,10 @@
 if (typeof window.$xui === 'undefined')
     window.$xui = {};
 
+
+window.$xui.config={};
+window.$xui.config.traceDisplayPropertiesJS = false
+window.$xui.config.traceReselect = false
 /****************************  CHARGEMENT DE LA PAGE *************************************/
 
 import("./clsPageDesignManager.js").then((module) => {
@@ -16,8 +20,6 @@ import("./clsPageDesignManager.js").then((module) => {
         $xui.initPageXUI(infoFile);
     }, this);
 });
-
-
 /****************************************************************************************/
 import("./clsEventManager.js").then((module) => {
     new module.EventManager().init();
@@ -33,13 +35,13 @@ $xui.modeDisplaySelection = false;
 $xui.editorOpenId = null;
 /******************************************************************************** */
 
-// charge la page global
-$xui.loadPageJS = (html, binding) => {
-    console.debug("binding ---- ", binding);
-    $xui.pageDesignManager.loadPage(html);
+// charge la page global aprés le retour du XUIEngine
+$xui.loadPageJS = (html, options) => {
+    console.debug("loadPageJS binding ---- ", options);
+    $xui.pageDesignManager.loadPage(html, options);
 };
 
-// change une partie de la page
+// change une partie de la page aprés le retour du XUIEngine
 $xui.changePageJS = (param) => {
     $xui.pageDesignManager.changePageOnFrame(param);
     $xui.doPromiseJS("changePage");
@@ -50,9 +52,14 @@ $xui.changePageJS = (param) => {
 // gestion des button refresh et export de la page
 $xui.refreshAction = (mode) => {
     var infoFile = $xui.pageDesignManager.getInfoFile(mode);
+
     if (mode == "template:reload") {
         infoFile.mode = "template";
         infoFile.action = "reload";  // pas de store
+    }
+    if (mode == "template:reload-json") {
+        infoFile.mode = "template";
+        infoFile.action = "reload-json";  // pas de store
     }
     if (mode == "template:clearAll") {
         infoFile.mode = "design";
@@ -66,6 +73,7 @@ $xui.refreshAction = (mode) => {
         infoFile.mode = "final";
         infoFile.action = "showCode";   // pas de store
     }
+
     $xui.refreshPageXUI(infoFile);
 };
 
@@ -167,7 +175,9 @@ $xui.setCurrentAction = (actionName) => {
             //console.debug("changePageFinish ok", $xui.modeDisplaySelection);
             if ($xui.modeDisplaySelection) {
                 setTimeout(() => {   // attente prise en compte chargement des images
-                    console.debug("reselect after changePageFinish ", $xui.propertiesDesign);
+                    if (window.$xui.config.traceReselect) {
+                        console.debug("reselect after changePageFinish ", $xui.propertiesDesign);
+                    }
                     $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, true);
                 }, 50);
             }
@@ -525,6 +535,8 @@ $xui.closeClassEditor = () => {
 }
 
 /***************************************************************************************************************/
+
+
 $xui.displayPropertiesJS = (xid, xid_slot) => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
 
@@ -547,7 +559,10 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
         $xui.propertiesDesign.json = $xui.parseJson($xui.propertiesDesign.data);
 
-        console.debug("displayPropertiesJS", $xui.propertiesDesign);
+        if (window.$xui.config.traceDisplayPropertiesJS) {
+            console.debug("displayPropertiesJS", $xui.propertiesDesign);
+        }
+   
 
         $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
         var template = "<div id='AppPropertiesSetting' class='barcustom xui-div-scroll-vertical'>" + $xui.propertiesDesign.template + "</div>";

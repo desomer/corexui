@@ -128,7 +128,7 @@ export class EventManager {
             // gestion d'un hot load reloader
             else if (data.action == "get template reloader") {
                 var infoFileCmp = $xui.pageDesignManager.getInfoFile('template');
-                infoFileCmp.part = data.xid;
+                infoFileCmp.partXID = data.xid;
                 var prom = getPromise("getVueCmp")
                 $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp");
                 prom.then(template => {
@@ -136,7 +136,7 @@ export class EventManager {
                 })
             }
             else if (data.action == "reloader finish") {
-                // this.console.debug("reloader finish");
+                // lancer par les v-xui-reloader  ou aprés un rechargement global du body
                 $xui.doPromiseJS("changePageFinish");
             }
             else if (data.action == "return getInfoForSelector") {

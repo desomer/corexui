@@ -13,6 +13,8 @@
 		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
 
 		<xui-prop var="withLeftNavigation" editor="bool">Left Navigation Drawer</xui-prop>
+		<xui-prop var=":isNavdrawerOpen" editor="text" bind-type="text">var isNavdrawerOpen</xui-prop>
+		
 		<xui-prop var="navPermanent" editor="bool">Nav permanent</xui-prop>
 		<xui-prop var="navTemporary" editor="bool">Force temporary nav on Desktop</xui-prop>
 		<xui-prop var="clipped-left" editor="bool">App bar clipped left</xui-prop>
@@ -73,26 +75,26 @@
 		<template id="xui-rootTemplate" dark="[[darkApp@0+]]">
 			<v-app xid="appcontent">
 			</v-app>
-			<xui-slot xid="xui-temporary-slot" xui-no-design></xui-slot>
+			<xui-temporary xid="xui-temporary-slot" xui-no-design></xui-temporary>
 		</template>
 
 		<template id="xui-route-default">
 			<vue-content-1 xid="contentpage"></vue-content-1>
 		</template>
 
-		<xui-route-template xid="xui-pagerouter" xui-forvar="nbroute@0+"></xui-route-template>
+		<xui-route-template xid="xui-route" xui-forvar="nbroute@0+"></xui-route-template>
 
 		<div id="app"></div>
 	</xui-design>
 
 	<!------------------------------------- V-APP MAIN CONTENT ---------------------------------------->
-	<xui-doc xid="vue-rooter-1">
-		<xui-prop id="name">Rooter</xui-prop>
-		<xui-prop id="desc">Rooter de la page</xui-prop>
-		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">rooter content color</xui-prop>
+	<xui-doc xid="vue-router-1">
+		<xui-prop id="name">Router</xui-prop>
+		<xui-prop id="desc">Router de la page</xui-prop>
+		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">router content color</xui-prop>
 	</xui-doc>
 
-	<v-main xid="vue-rooter-1" class="fill-height" -style="background-color:[[colorBg]]">
+	<v-main xid="vue-router-1" class="fill-height" -style="background-color:[[colorBg]]">
 		<router-view>  <!-- ICI LA PAGE --> </router-view>
 	</v-main>
 
@@ -102,7 +104,7 @@
 		<vue-systembar-1 xid="systembar"  xui-if=[[withSysBar@0+]]></vue-systembar-1>
 		<vue-nav-drawer-1 xid="navdrawerleft" xui-if=[[withLeftNavigation@0+]]></vue-nav-drawer-1>
 		<vue-apptoolbar-1 xid="toolbar" xui-if=[[withAppBar@0+]]></vue-apptoolbar-1>
-		<vue-rooter-1 xid="rooter"></vue-rooter-1>
+		<vue-router-1 xid="rooter"></vue-router-1>
 		<vue-footer-1 xid="footer" xui-if=[[withFooter@0+]]></vue-footer-1>
 		<vue-bottom-nav-1 xid="bottom-nav" xui-if=[[withBottomNavigation@0+]]></vue-bottom-nav-1>
 	</xui-design>
@@ -191,7 +193,7 @@
 		shrink-on-scroll="[[shrink-on-scroll]]" collapse-on-scroll="[[HeaderCollapseonscroll]]"
 		hide-on-scroll="[[HeaderHideonscroll]]" scroll-threshold="[[scroll-threshold]]" color="[[colorApp@0+]]"
 		class="[[class]]" -style="[[style]]">
-		<v-app-bar-nav-icon xui-if=[[withLeftNavigation@0+]] @click.stop="[[navDrawerBind@0+]] = ![[navDrawerBind@0+]]"></v-app-bar-nav-icon>
+		<v-app-bar-nav-icon xui-if=[[withLeftNavigation@0+]] @click.stop="[[:isNavdrawerOpen@0+]] = ![[:isNavdrawerOpen@0+]]"></v-app-bar-nav-icon>
 		<v-toolbar-title>
 			<xui-slot xui-reloader=true xid="slot-toolbar-title" xui-slot-name="toolbar title"></xui-slot>
 		</v-toolbar-title>
@@ -228,7 +230,7 @@
 		<xui-prop id="desc">navigation drawer slot</xui-prop>
 	</xui-doc>
 
-	<v-navigation-drawer v-model=[[navDrawerBind@0+]] xid="vue-nav-drawer-1" 
+	<v-navigation-drawer v-model=[[:isNavdrawerOpen@0+]] xid="vue-nav-drawer-1" 
 		overlay-color="[[overlay-color]]" overlay-opacity="[[overlay-opacity]]" width="[[width]]" 
 		expand-on-hover="[[expand-on-hover]]"
 		src="[[src]]"
@@ -331,6 +333,9 @@
 		<xui-slot xid="xui-copyzone-slot"></xui-slot>
 	</div>
 	<xui-slot xid="xui-copyzone" xui-mode="final;preview"></xui-slot>
+
+	<!------------------------  COPY ZONE pour le surround -------------------->
+	<xui-slot xid="xui-temporary"></xui-slot>
 	<!------------------------------------------------------------------------->
 
 	<xui-design xui-mode="template;design" xid="inject-style">

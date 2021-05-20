@@ -39,6 +39,22 @@
         <xui-slot style-slot="height:100%" xid="[[parent-xid]]-block" xui-slot-name="Block"></xui-slot>
     </div>
 
+    <!--------------------------  XUI-ROUTE-template ------------------------------->
+    <xui-doc xid="template:xui-route-template">
+        <xui-prop id="name">Router</xui-prop>
+        <xui-prop id="icon">mdi-view-day</xui-prop>
+        <xui-prop id="desc">Une session</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+    </xui-doc>
+
+
+    <template xid="xui-route-template" xui-for="idxroute" xui-no-dom>
+        <template xui-doc-id="xui-route-template-item" id="[[parent-xid]]-route-[[idxroute@0+]]" xid="[[parent-xid]]-route-[[idxroute@0+]]">
+            <xui-slot xui-reloader=true xui-slot-full xid="[[parent-xid]]-content"  xui-slot-name="route [[idxroute@0+]]">
+            </xui-slot>
+        </template>
+    </template>
+
     <!--------------------------  XUI-SESSION   ------------------------------->
     <xui-doc xid="xui-session">
         <xui-prop id="name">Sessions</xui-prop>

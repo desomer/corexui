@@ -9,6 +9,7 @@ import './XUIJSInterface.dart';
 import './parser/HTMLReader.dart';
 import './parser/ProviderAjax.dart';
 import 'XUIActionManager.dart';
+import 'XUIConfigManager.dart';
 
 class XUIDesignManager {
   XUIEngine xuiEngine;
@@ -25,7 +26,7 @@ class XUIDesignManager {
       _designManager[fileInfo.file] = XUIDesignManager();
     }
 
-    return _designManager[fileInfo.file];
+    return  _designManager[fileInfo.file];
   }
 
   ///------------------------------------------------------------------------------------------
@@ -49,7 +50,7 @@ class XUIDesignManager {
   }
 
   ///------------------------------------------------------------------------------------------
-  /// generation de l'arbre XUIElementHTML sans text
+  /// generation de l'arbre XUIElementHTML sans buffer html
   void initHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
 
@@ -68,7 +69,7 @@ class XUIDesignManager {
         xuiEngine = XUIEngine();
         var provider = ProviderAjax();
         if (uri.endsWith(".html")) {
-          print("initialize file html : read ${uri}");
+          XUIConfigManager.printc("initEngine file html : read ${uri}");
           var reader = HTMLReader(uri, provider);
           await xuiEngine.initialize(reader, ctx);
         }
@@ -96,7 +97,6 @@ class XUIDesignManager {
   }
 
   Future changeProperty(String xid, String variable, dynamic value) async {
-    print("${xid} a changer l'attribut <${variable}> par <${value}>");
     return XUIActionManager(xuiEngine).changeProperty(xid, variable, value);
   }
 
@@ -147,7 +147,7 @@ class XUIDesignManager {
     fi.file = 'app/cmpDesignEditor.html';
 
     fi.mode = MODE_FINAL;
-    var ctx = XUIContext(fi.mode);
+    var ctx = XUIContext(fi.mode, null);
 
     int i = 0;
     // boucle sur l'ensemble des couches de widget
@@ -248,7 +248,7 @@ class XUIDesignManager {
       try {
         cmp = await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
       } catch (e, s) {
-        print("pb cmp ${fi.xid} $e $s");
+        XUIConfigManager.printc("pb cmp ${fi.xid} $e $s");
         rethrow;
       }
 
@@ -259,7 +259,9 @@ class XUIDesignManager {
       template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
 
       // insertion dans le cache
-      print("****add cacheTemplateEditor <" + keyCache + ">=>" + template);
+      if (XUIConfigManager.verboseEditor) {
+        XUIConfigManager.printc("getJSDesignVariableTemplate add cacheTemplateEditor <" + keyCache + ">=>" + template);
+      }
       cacheTemplateEditor[keyCache] = template;
     }
     template = template.replaceAll("##idx##", i.toString());
@@ -282,13 +284,16 @@ class XUIDesignManager {
       cmp.addProperties(
           "selectAction", "\$xui.displaySelectorByXid('##xid##', '##xid##')");
 
-      cmp.addProperties(
-          "selectActionClick", "\$xui.displayBindingByXid('##xid##', '##xid##')");
+      cmp.addProperties("selectActionClick",
+          "\$xui.displayBindingByXid('##xid##', '##xid##')");
 
       cmp.addProperties("title", "##title##");
-      
+
       template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
-      print("****<" + keyCache + ">=>" + template);
+
+      if (XUIConfigManager.verboseEditor) {
+          XUIConfigManager.printc("****<" + keyCache + ">=>" + template);
+      }
       cacheTemplateEditor[keyCache] = template;
     }
     titleCmp = titleCmp ?? ("xid = " + design.slotInfo.xid);
@@ -310,7 +315,10 @@ class XUIDesignManager {
       await lock.synchronized(() async {
         xuiEngine = XUIEngine();
         var provider = ProviderAjax();
-        print("initialize file for getXUIComponent : read ${uri}");
+        if (XUIConfigManager.verboseGetXUIComponent) {
+          XUIConfigManager.printc(
+              "initialize file for getXUIComponent : read ${uri}");
+        }
         var reader = HTMLReader(uri, provider);
         await xuiEngine.initialize(reader, ctx);
       });
@@ -342,7 +350,7 @@ class XUIDesignManager {
             ObjectAction act = ObjectAction(
                 xid: design.slotInfo.xid,
                 action: "addFlow",
-                type:"flow",
+                type: "flow",
                 icon: "mdi-table-row",
                 title: "Add flow");
             ret.add(act);
@@ -351,29 +359,28 @@ class XUIDesignManager {
               xid: design.slotInfo.xid,
               action: "incNbBefore",
               icon: "mdi-tab",
-              type:"tabs",
+              type: "tabs",
               title: "Add new Tab (before " + design.slotInfo.slotname + ")");
           ret.add(act);
           act = ObjectAction(
               xid: design.slotInfo.xid,
               action: "incNbAfter",
               icon: "mdi-tab",
-              type:"tabs",
+              type: "tabs",
               title: "Add new Tab (after " + design.slotInfo.slotname + ")");
           ret.add(act);
-
         } else if (design.docInfo.xid == "xui-no-dom:xui-flow") {
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid,
               action: "incNbBefore",
-              type:"flow",
+              type: "flow",
               icon: "mdi-transfer-left",
               title: "Add right (before " + design.slotInfo.slotname + ")");
           ret.add(act);
           act = ObjectAction(
               xid: design.slotInfo.xid,
               action: "incNbAfter",
-              type:"flow",
+              type: "flow",
               icon: "mdi-transfer-right",
               title: "Add right (after " + design.slotInfo.slotname + ")");
           ret.add(act);
@@ -382,7 +389,7 @@ class XUIDesignManager {
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid,
               action: "addFlow",
-              type:"flow",
+              type: "flow",
               icon: "mdi-table-row",
               title: "Add flow");
           ret.add(act);
@@ -391,7 +398,7 @@ class XUIDesignManager {
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid,
               action: "surroundRight",
-              type:"flow",
+              type: "flow",
               icon: "mdi-table-row",
               title: "Add right (surroundRight)");
           ret.add(act);
@@ -417,13 +424,15 @@ class XUIDesignManager {
     }
 
     List<ObjectAction> retFiltered = [];
-     
-    for(var i=0;i<ret.length;i++){
-        retFiltered.add(ret[i]);
-        if (i>0 && ret[i].action=="incNbBefore" && ret[i].type!="tabs" && retFiltered[i-1].action=="surroundRight")
-        {
-          retFiltered.removeAt(i-1);
-        }
+
+    for (var i = 0; i < ret.length; i++) {
+      retFiltered.add(ret[i]);
+      if (i > 0 &&
+          ret[i].action == "incNbBefore" &&
+          ret[i].type != "tabs" &&
+          retFiltered[i - 1].action == "surroundRight") {
+        retFiltered.removeAt(i - 1);
+      }
     }
 
     return retFiltered;

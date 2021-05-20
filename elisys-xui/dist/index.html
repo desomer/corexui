@@ -79,7 +79,7 @@
                   <v-icon>mdi-application-export</v-icon>
                </v-btn>
             </v-app-bar>
-            <v-main class="fill-height" style="background:white">
+            <v-main class="fill-height" style="background-color:">
                <router-view></router-view>
             </v-main>
             <v-footer style="padding-top: 1px;" app height="32" dark color="#ff5900">
@@ -121,7 +121,7 @@
                   <v-icon>mdi-database-export-outline</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2020 v0.5.2 14/03/2021</span>
+               <span>&copy;&nbsp;Elisys 2021 v0.6.0 07/04/2021</span>
             </v-footer>
          </v-app>
       </template>
@@ -175,7 +175,9 @@
                                  <v-icon>mdi-file-tree</v-icon>
                               </v-tab>
                               <v-tab-item :transition="false" :reverse-transition="false" eager>
-                                 <div>TreeView coming soon...</div>
+                                 <div class="barcustom xui-div-scroll-vertical">
+                                    <v-treeview dense :items="listSlot"></v-treeview>
+                                 </div>
                               </v-tab-item>
                               <v-tab>
                                  <v-icon>mdi-chevron-right-box</v-icon>
@@ -270,6 +272,8 @@
             </v-tab-item>
          </v-tabs>
       </template>
+      <template id="xui-pagerouter-route-0">
+      </template>
       <div id="app"></div>
    </body>
    <script>
@@ -277,10 +281,10 @@
 		if (typeof $xui === 'undefined')
 			$xui = {};
 
-		$xui.rootdata = {
-			navdrawer: false
+		$xui.rootdata = {};
+		$xui.rootdata = { ...$xui.rootdata ,
+			navdrawer:false
 		};
-		$xui.rootdata = { ...$xui.rootdata, textmain:"a555" };
 
 		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler 
 	

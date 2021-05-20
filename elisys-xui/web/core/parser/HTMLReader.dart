@@ -1,6 +1,7 @@
 
 import 'package:html/dom.dart';
 
+import '../XUIConfigManager.dart';
 import '../XUIEngine.dart';
 
 
@@ -55,7 +56,7 @@ class HTMLReader extends XUIReader {
     }
     else 
     {
-      print("******* erreur");
+      XUIConfigManager.printc("_parseElem ******* erreur");
     }
 
     xmlelem.attributs = elem.attributes;

@@ -9,6 +9,7 @@ import 'dart:html';
 
 import 'package:js/js.dart';
 
+import 'core/XUIConfigManager.dart';
 import 'core/XUIDesignManager.dart';
 import 'core/XUIEngine.dart';
 import 'core/XUIFactory.dart';
@@ -84,16 +85,20 @@ external set _setDesignProperties(dynamic Function(FileDesignInfo, dynamic) f);
 
 ///------------------------------------------------------------------
 Future initPageXUI(FileDesignInfo fileInfo) async {
-  print("-------------- start initPage xui ----------------");
+  XUIConfigManager.printc("-------------- start initPage xui ----------------");
 
-  var ctx = XUIContext(fileInfo.mode);
+  var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
   var designManager = _getDesignManager(fileInfo);
 
   await _initStoreVersion(designManager, fileInfo, ctx);
 
   String str = await designManager.getHtml(ctx, fileInfo.file, fileInfo.xid);
 
-  loadPageJS(str, designManager.xuiEngine.xuiFile.getBindingInfo());
+  var options = Options(mode: fileInfo.mode);
+  options.binding = designManager.xuiEngine.getBindingInfo();
+  options.treeSlot = designManager.xuiEngine.getSlotTree();
+
+  loadPageJS(str, options);
 }
 
 // recharge la page  (reload ou clear)
@@ -101,7 +106,7 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
   if (fileInfo.action == "reload") {
     print("reload all from storage");
     XUIDesignManager.removeDesignManager(fileInfo);
-    var ctx = XUIContext(MODE_TEMPLATE);
+    var ctx = XUIContext(MODE_TEMPLATE, fileInfo.jsonBinding);
     var designManager = _getDesignManager(fileInfo);
 
     await _initStoreVersion(designManager, fileInfo, ctx);
@@ -110,7 +115,7 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
   if (fileInfo.action == "clear") {
     print("clear all from storage");
     XUIDesignManager.removeDesignManager(fileInfo);
-    var ctx = XUIContext(MODE_TEMPLATE);
+    var ctx = XUIContext(MODE_TEMPLATE, fileInfo.jsonBinding);
     var designManager = _getDesignManager(fileInfo);
     await designManager.initEngine(fileInfo.file, ctx);
   }
@@ -202,7 +207,7 @@ void addDesignXUI(FileDesignInfo fileInfo, String id, String template,
   await designMgr.addDesign(id, template);
 
   if (!reload && init == true) {
-    var ctx = XUIContext(fileInfo.mode);
+    var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
     await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
   } else {
     if (id != XUI_COPYZONE_SLOT) designMgr.listXidChanged.add(id);
@@ -398,24 +403,24 @@ Future _doMoveChildByIdx(String suffix, int i, int idst,
     designManager.addXUIDesignEmpty(idSlotToDest);
     //String slot = "<xui-design xid=\"" + idSlotToDest + "\"></xui-design>";
     //await addDesign(fileInfo, idSlotToDest, slot, false, true);
-    var ctx = XUIContext(fileInfo.mode);
+    var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
     await designManager.initHtml(ctx, fileInfo.file, fileInfo.xid);
 
     designManager.moveDesign(id, null, idSlotToDest);
   }
 }
 
-/// retourne le code html d'un xui
+/// retourne le code html d'un xui (pour les reloader)
 void getHtmlFromXUI(FileDesignInfo fileInfo, String idPromise) async {
-  var ctx = XUIContext(fileInfo.mode);
+  var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
   var designMgr = _getDesignManager(fileInfo);
   var html;
 
-  if (fileInfo.part == null) {
+  if (fileInfo.partXID == null) {
     html = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
   } else {
     SlotInfo info =
-        designMgr.xuiEngine.getSlotInfo(fileInfo.part, fileInfo.part);
+        designMgr.xuiEngine.getSlotInfo(fileInfo.partXID, fileInfo.partXID);
     //print("part = " + info.elementHTML.tag);
     var bufferHtml = XUIHtmlBuffer();
     info.elementHTML.processPhase3(designMgr.xuiEngine, bufferHtml);
@@ -427,15 +432,23 @@ void getHtmlFromXUI(FileDesignInfo fileInfo, String idPromise) async {
 }
 
 void _reloadTemplate(FileDesignInfo fileInfo) async {
+
+  // if (fileInfo.jsonBinding!=null)
+  //   print("jsonBinding="+fileInfo.jsonBinding);
+
   var designMgr = _getDesignManager(fileInfo);
 
   List listReloader = [];
   designMgr.listXidChanged.forEach((key) {
     var reloaderId = designMgr.xuiEngine.getReloaderID(key);
-    print("****** reloader : changed xid  " +
-        key +
-        " => reloader id " +
-        (reloaderId ?? "?"));
+
+    if (XUIConfigManager.verboseReloader) {
+      XUIConfigManager.printc("****** reloader : changed xid  " +
+          key +
+          " => reloader id " +
+          (reloaderId ?? "?"));
+    }
+
     if (reloaderId != null) {
       listReloader.add(reloaderId);
     }
@@ -443,10 +456,12 @@ void _reloadTemplate(FileDesignInfo fileInfo) async {
 
   designMgr.listXidChanged.clear();
 
-  var ctx = XUIContext(fileInfo.mode);
+  var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
   var options = Options(mode: fileInfo.mode);
   if (listReloader.isEmpty) {
-    print("****** reloader : all " + ctx.mode);
+    if (XUIConfigManager.verboseReloader) {
+      XUIConfigManager.printc("****** reloader next: all " + ctx.mode);
+    }
     var str = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
     options.html = str;
   } else {
@@ -461,7 +476,7 @@ void _reloadTemplate(FileDesignInfo fileInfo) async {
   options.xuifile = HTMLWriter().toHTMLString(designMgr.xuiEngine.xuiFile);
   options.action = fileInfo.action;
 
-  options.binding = designMgr.xuiEngine.xuiFile.getBindingInfo();
+  options.binding = designMgr.xuiEngine.getBindingInfo();
   options.treeSlot = designMgr.xuiEngine.getSlotTree();
 
   changePageJS(options);
@@ -471,7 +486,7 @@ dynamic getActionsXUI(
     FileDesignInfo fileInfo, String id, String idSlot, String action) {
   print("-------------- getActionsXUI ----------------   " + action);
 
-  var ctx = XUIContext(MODE_DESIGN);
+  var ctx = XUIContext(MODE_DESIGN, fileInfo.jsonBinding);
   var designManager = _getDesignManager(fileInfo);
 
   return designManager.getActionsPopup(ctx, id, idSlot, action);
@@ -515,7 +530,9 @@ Future _initStoreVersion(XUIDesignManager designManager,
     if (v >= 0) {
       var db = window.localStorage['xui_data_' + name + '_' + v.toString()];
 
-      print("*********** window.localStorage ***********");
+      XUIConfigManager.printc(
+          "initEngine with localStorage " + name + " v" + v.toString());
+
       //print(db);
       var saveDb = json.decode(db); //loadYaml(db);
 

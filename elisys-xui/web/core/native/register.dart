@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import '../XUIConfigManager.dart';
 import '../XUIEngine.dart';
 import '../XUIFactory.dart';
 import '../element/XUIElement.dart';
@@ -8,7 +9,7 @@ import '../element/XUIProperty.dart';
 ///------------------------------------------------------------------
 class NativeSlot extends XUIElementNative {
   NativeSlot() {
-    this.xid = "xui-slot";
+    this.xid = TAG_SLOT;
   }
   @override
   Future<XUIModel> doProcessPhase1(
@@ -41,7 +42,7 @@ class NativeSlot extends XUIElementNative {
       }
     }
 
-    var isModeDesign = engine.isModeDesign();
+    var isModeDesign = engine.isModeDesign() || XUIConfigManager.forceSlotInfo;
     var xidCal;
     if (isModeDesign && html.originElemXUI != null) {
       xidCal = html.calculatePropertyXUI(html.originElemXUI.xid, null);

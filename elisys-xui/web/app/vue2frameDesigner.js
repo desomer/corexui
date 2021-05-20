@@ -159,14 +159,23 @@ window.addEventListener('resize', function (event) {
     window.parent.postMessage(message, "*");
 });
 
-//******************************************************************************* */
+//********************************** DISPACH DES EVENTS PROVENANT DU DESIGNER ******************************** */
 
 window.addEventListener('message', function (e) {
     var data = e.data;
     if (data.action == "changeTemplate") {
+
+         if (data.param.action == "reload-json") 
+         {  // change uniquement le json du template
+            Object.assign($xui.rootdata, data.param.jsonBinding);
+            console.debug("assign" + $xui.rootdata);
+            return;
+         }  
+
+
         if (data.param.listReloader != null) {
             var uniqReloader = [...new Set(data.param.listReloader)];
-            this.console.info("changeTemplate event reloader", data.param.listReloader);
+            this.console.info("+++++++++++> changeTemplate event reloader", data.param);
 
             for (const idReloader of uniqReloader) {
                 if ($xui.listReloader[idReloader] != null)
@@ -176,7 +185,7 @@ window.addEventListener('message', function (e) {
             }
         }
         else {
-            this.console.info("changeTemplate event all loadApplicationJS", data.param);
+            this.console.info("+++++++++++> changeTemplate event all loadApplicationJS", data.param);
             let styleXui = this.document.body.querySelector("#xui-style");   // retire tous le style
             if (styleXui != null) {
                 this.console.debug("+++++++++++>  move style to header")
@@ -186,12 +195,13 @@ window.addEventListener('message', function (e) {
 
             this.document.body.innerHTML = data.param.html; // change tous le body
             $xui.loadApplicationJS();
-            this.console.debug("+++++++++++>  post le reloader finish")
+            this.console.debug("+++++++++++>  post le reloader finish vers le designer")
             var message = {
                 action: "reloader finish"
             };
             window.parent.postMessage(message, "*");
         }
+
     }
     else if (data.action == "doChangeComponent") {
         //console.debug("load reloader", data.xid, data);
@@ -271,7 +281,7 @@ $xui.getInfoForSelector = (selector, parent) => {
     return ret;
 }
 
-//************************************************************************************************** */
+//*************************************** POST LES KEYEVENT AU PARENT  ********************************* */
 document.addEventListener("keydown", function (event) {
     var listShortCut = [
         { ctrl: true, keyCode: 80, action: "ctrlP" },  // preview

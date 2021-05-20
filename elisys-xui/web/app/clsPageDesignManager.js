@@ -6,7 +6,13 @@ export class PageDesignManager {
     //db = null;
 
     getInfoFile(mode) {
-        return { fileID: window.$xui.rootdata.frameName, file: 'app/' + window.$xui.rootdata.frameName + '.html', xid: 'root', mode: mode };
+        return {
+            fileID: window.$xui.rootdata.frameName,
+            file: 'app/' + window.$xui.rootdata.frameName + '.html',
+            xid: 'root',
+            mode: mode,
+            jsonBinding : JSON.stringify($xui.rootdata.jsonEditorData)
+        };
     }
 
 
@@ -14,11 +20,17 @@ export class PageDesignManager {
         return window.$xui.rootdata.frameName;
     }
 
-    loadPage(html) {
+    loadPage(html, param) {
         // console.debug("load", html);
         document.querySelector("#rootFrame").srcdoc = html;
 
         this.codeHtml = html;
+
+        if (param != null) {
+            $xui.rootdata.listSlot.length = 0;
+            $xui.rootdata.listSlot.push(...param.treeSlot);
+        }
+
         setTimeout(() => {
             $xui.displayComponents("", "");
             $xui.displayPropertiesJS("root", "root")
@@ -42,6 +54,8 @@ export class PageDesignManager {
         //console.debug("change page", param);
 
         $xui.unDisplaySelector();
+        
+        param.jsonBinding = $xui.rootdata.jsonEditorData;
 
         if (param.mode == "template") {
             // change uniquement template de la page aprés le demarrage en mode design et les reloader
@@ -72,10 +86,10 @@ export class PageDesignManager {
             this.export();
         }
 
-        if (param.action != "reload" && param.action != "clear" && param.action != "export")
+        if (param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")
             this.store(); // save un nouvelle version
 
-        if ($xui.rootdata.activeTab == 1)  // si onglet 1 actif
+        if ($xui.rootdata.activeTab == 2)  // si onglet 2 actif
         {
             this.loadCode();   // affiche le code du mode (template, preview, final )
             this.loadCodeXUI();

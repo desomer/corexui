@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import '../XUIConfigManager.dart';
 import '../XUIEngine.dart' as cst;
 import '../XUIEngine.dart';
 import '../XUIFactory.dart';
@@ -134,8 +135,12 @@ class XUIElementHTML extends XUIElement {
     }
   }
 
-  // genere la valeur du la property (et affecte le binding vuej )
-  _getValueXUIProperty(ParseInfo parseInfo, XUIProperty prop, String tag) {
+  /// genere la valeur du la property (et affecte le binding vuej )
+  /// tag : tag sans @0+          disabled="[[disabled]]"
+  ///                             @click.stop="[[navDrawerBind@0+]] = ![[navDrawerBind@0+]]"
+  /// 
+  dynamic _getValueXUIProperty(ParseInfo parseInfo, XUIProperty prop, String tag) {
+
     // si v-model ou autre attribut
     if (parseInfo.mode == ParseInfoMode.ATTR &&
         parseInfo.context == "class" &&
@@ -143,11 +148,14 @@ class XUIElementHTML extends XUIElement {
       return tag;
     }
 
-    // si dans un contenu de tag <div>{{binding}}</div>
+   
     if (prop is XUIPropertyBinding) {
+
       if (parseInfo.mode == ParseInfoMode.CONTENT) {
+        // si dans un contenu de tag <div>{{binding}}</div>
         return "{{" + prop.binding + "}}";
       }
+      parseInfo.prefix=":";
       return prop.binding;
     }
 
@@ -168,8 +176,8 @@ class XUIElementHTML extends XUIElement {
                 : ""));
       });
     } catch (e, s) {
-      print("pb parse $e $s");
-      print(parseInfo.parsebuilder.toString());
+      XUIConfigManager.printc("pb parse $e $s");
+      XUIConfigManager.printc(parseInfo.parsebuilder.toString());
       rethrow;
     }
 
@@ -200,7 +208,7 @@ class XUIElementHTML extends XUIElement {
           (this.propertiesXUI != null &&
               this.propertiesXUI.containsKey(ATTR_RELOADER));
 
-      if (!engine.reloaderEnable) {
+      if (!XUIConfigManager.reloaderEnable) {
         hasTagReloader = false;
       }
 
@@ -291,27 +299,28 @@ class XUIElementHTML extends XUIElement {
 
   void doAttributPhase3(cst.XUIEngine engine, XUIHtmlBuffer buffer) {
     this.attributes?.entries?.forEach((f) {
-      var c = f.value.content;
+      var contentAttr = f.value.content;
       ParseInfo parseInfo = ParseInfo(f.key, null, ParseInfoMode.KEY);
-
       String keyAttr = _processContentPhase3(engine, parseInfo);
-      var valProp = c;
 
-      if (keyAttr != "" && c != null) {
-        if (c is String) {
+      var valProp = contentAttr;
+
+      if (keyAttr != "" && contentAttr != null) {
+        if (contentAttr is String) {
           ParseInfo parseInfo;
-          if (keyAttr == "class") {
-            parseInfo = ParseInfo(c, keyAttr, ParseInfoMode.ATTR);
-          } else {
-            parseInfo = ParseInfo(c, keyAttr, ParseInfoMode.ATTR);
-          }
+          //if (keyAttr == "class") {
+            parseInfo = ParseInfo(contentAttr, keyAttr, ParseInfoMode.ATTR);
+          //} else {
+          //  parseInfo = ParseInfo(c, keyAttr, ParseInfoMode.ATTR);
+          //}
 
           valProp = _processContentPhase3(engine, parseInfo);
           bool mustAdd = true;
           bool isBool = false;
-
-          if (c != valProp) {
+          //-----------------------------------------------------------------------------------
+          if (contentAttr != valProp) {
             // si dynamique
+
             //supprime les balise class et style faussement non vide
             if (keyAttr == "class") {
               valProp = valProp.toString().trim();
@@ -328,15 +337,25 @@ class XUIElementHTML extends XUIElement {
             if (valProp == "" || valProp == "false") {
               mustAdd = false; // pas d'ajout si vide ou false
             }
+
+            if (parseInfo.prefix!=null)
+            {
+                // binding
+                if (!keyAttr.startsWith("@") && keyAttr!="v-model")
+                {
+                   keyAttr=":"+keyAttr;
+                }
+            }
           }
+          //-----------------------------------------------------------------------------------
           if (mustAdd) {
             // cas du :value="false"   =>  reste en chaine "" pour vuejs sinon en boolean
             if ((valProp == "true" || valProp == "false") &&
                 !(keyAttr.startsWith(":"))) {
               isBool = true;
             }
-            buffer.html.write(" ");
 
+            buffer.html.write(" ");
             buffer.html.write(keyAttr);
 
             if (!isBool) {
@@ -345,6 +364,7 @@ class XUIElementHTML extends XUIElement {
               buffer.html.write('"' + valProp + '"');
             }
 
+            // analyse des attribut avec du binding
             engine.dataBindingInfo.parseAttr(this, keyAttr, valProp.toString());
           }
         } else {
@@ -382,6 +402,8 @@ class XUIElementHTMLText extends XUIElementHTML {
   void processPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
     ParseInfo parseInfo = ParseInfo(content, null, ParseInfoMode.CONTENT);
     var cont = _processContentPhase3(engine, parseInfo);
+
+    // analyse des attribut avec du binding
     engine.dataBindingInfo.parseContent(this, cont);
     buffer.html.write(cont);
   }

@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:yamlicious/yamlicious.dart';
 
+import 'XUIConfigManager.dart';
 import 'XUIFactory.dart';
 import 'XUIJSInterface.dart';
 import 'element/XUIElement.dart';
@@ -52,8 +53,9 @@ const TAG_SLOT = "xui-slot";
 const TAG_DIV_SLOT =
     "xui-div-slot"; // nom du composant (div) slot dans la class css xui-class-slot
 
-const XUI_COPYZONE_SLOT = "xui-copyzone-slot";
-const XUI_TEMPORARY_SLOT = "xui-temporary-slot";
+const XUI_COPYZONE_SLOT =
+    "xui-copyzone-slot"; // pour la recopie (ctrl c , v , x)
+const XUI_TEMPORARY_SLOT = "xui-temporary-slot"; // pour le surround
 
 const MODE_ALL = "";
 const MODE_FINAL = "final";
@@ -70,7 +72,8 @@ abstract class Provider {
 
 class XUIContext {
   String mode;
-  XUIContext(this.mode);
+  String jsonBinding;
+  XUIContext(this.mode, this.jsonBinding);
 }
 
 class DicoOrdered<T extends XUIModel> {
@@ -131,7 +134,6 @@ class XUIResource extends XMLElemReader {
   var components = LinkedHashMap<String, DicoOrdered<XUIComponent>>();
   var designs = LinkedHashMap<String, DicoOrdered<XUIDesign>>();
   var documentation = LinkedHashMap<String, DicoOrdered<XUIModel>>();
-  var binding = LinkedHashMap<String, XUIBinding>();
 
   /// les imports
   List<XUIResource> listImport = [];
@@ -141,17 +143,6 @@ class XUIResource extends XMLElemReader {
 
   ///------------------------------------------------------------------
   XUIResource(this.reader, this.context);
-
-  List getBindingInfo() {
-    var bind = [];
-    binding.forEach((k, v) {
-      var des = BindObj();
-      des.attr = v.attr;
-      des.val = v.content;
-      bind.add(des);
-    });
-    return bind;
-  }
 
   void addObjectDesign(var aDesign) {
     var curDesign = designs[aDesign["xid"]];
@@ -202,7 +193,7 @@ class XUIResource extends XMLElemReader {
     }
   }
 
-  Future parse() {
+  Future parseXUIFile() {
     NativeRegister(this);
     return this.reader.parseFile(this);
   }
@@ -237,7 +228,7 @@ class XUIResource extends XMLElemReader {
   void generateDocumentation(XUIEngine engine) {
     documentation.forEach((k, v) {
       XUIElementXUI doc = v.list.first.elemXUI;
-      DocInfo docInfo = getDocInfo(doc);
+      DocInfo docInfo = createDocInfo(doc);
       engine.docInfo[k] = docInfo;
     });
 
@@ -248,7 +239,7 @@ class XUIResource extends XMLElemReader {
     }
   }
 
-  DocInfo getDocInfo(XUIElementXUI elem) {
+  DocInfo createDocInfo(XUIElementXUI elem) {
     DocInfo doc;
     doc = DocInfo();
 
@@ -277,6 +268,8 @@ class XUIResource extends XMLElemReader {
         propDoc.link = prop.attributes["link"]?.content;
         propDoc.list = prop.attributes["list"]?.content;
         propDoc.cat = prop.attributes["cat"]?.content;
+        propDoc.bindType = prop.attributes["bind-type"]?.content;
+
         propDoc.doc =
             (prop.children.first as XUIElementText).content.toString();
         doc.variables.add(propDoc);
@@ -316,7 +309,7 @@ class XUIResource extends XMLElemReader {
         var subReader =
             HTMLReader(element.attributs["xui-path"], reader.provider);
         XUIResource subFile = XUIResource(subReader, context);
-        await subFile.parse();
+        await subFile.parseXUIFile();
         // subFile.reader.content = null;
         listImport.add(subFile);
         return Future.value();
@@ -419,14 +412,15 @@ class XUIEngine {
   XUIResource xuiFile;
   var mapSlotInfo = HashMap<String, SlotInfo>();
   var docInfo = HashMap<String, DocInfo>();
-  var dataBindingInfo = XUIParseJSDataBinding();    // plus forcement utiliser sauf text avec moustache {{}}
+  // plus forcement utiliser sauf text avec moustache {{}}
 
-  bool reloaderEnable = true;  // configuration avec reloader
+  var dataBindingInfo = XUIParseJSDataBinding();
+  var binding = LinkedHashMap<String, XUIBinding>();
 
   Future initialize(HTMLReader reader, XUIContext ctx) async {
     xuiFile = XUIResource(reader, ctx);
 
-    await xuiFile.parse();
+    await xuiFile.parseXUIFile();
     xuiFile.generateDocumentation(this);
 
     //dynamic obj = xuiFile.getObject();
@@ -455,7 +449,7 @@ class XUIEngine {
 
   getReloaderID(f) {
     SlotInfo info = getSlotInfo(f, f);
-    if (info == null || !reloaderEnable) {
+    if (info == null || !XUIConfigManager.reloaderEnable) {
       return null;
     }
     var html = info.elementHTML;
@@ -487,7 +481,7 @@ class XUIEngine {
     List<DesignInfo> listDesignInfo = [];
     SlotInfo slotInfo = getSlotInfo(id, idslot);
     if (slotInfo == null) {
-      print("Erreur id inconnu " + id);
+      XUIConfigManager.printc("getDesignInfo Erreur id inconnu " + id);
       return listDesignInfo;
     }
     DocInfo doc = docInfo[slotInfo.docId];
@@ -514,9 +508,9 @@ class XUIEngine {
   toHTMLString(XUIHtmlBuffer writer, String xid, XUIContext ctx) async {
     xuiFile.context = ctx;
     if (writer == null) {
-      print("toHTMLString for only init XUI xid=" + xid);
+      XUIConfigManager.printc("toHTMLString for only init XUI xid=" + xid);
     } else {
-      print("toHTMLString for generate html xid=" + xid);
+      XUIConfigManager.printc("toHTMLString for generate html xid=" + xid);
     }
 
     var listCmp = xuiFile.searchComponent(xid);
@@ -524,7 +518,7 @@ class XUIEngine {
       dynamic obj = ObjectWriter().toObjects(xuiFile);
 
       final yamld = toYamlString(obj);
-      print("xid inconnu $xid\n" + yamld.toString());
+      XUIConfigManager.printc("xid inconnu $xid\n" + yamld.toString());
 
       throw "xid inconnu $xid";
     }
@@ -532,44 +526,59 @@ class XUIEngine {
     XUIComponent root = listCmp.sort(ctx).first;
 
     XUIElementHTML htmlRoot = XUIElementHTML();
-    if (isModeDesign()) {
+    if (isModeDesign() || XUIConfigManager.forceSlotInfo) {
       htmlRoot.attributes ??= HashMap<String, XUIProperty>();
       htmlRoot.attributes["data-" + ATTR_XID] = XUIProperty(xid);
       htmlRoot.originElemXUI = root.elemXUI;
     }
 
     if (isModeDesign()) {
-      mapSlotInfo.clear();  // vide le slot info contruit dans la Phase2
+      mapSlotInfo.clear(); // vide le slot info contruit dans la Phase2
+      binding.clear();
     }
 
     await root.processPhase1(this, htmlRoot);
     await root.processPhase2(this, htmlRoot, null);
 
-    print("-- mapSlotInfo "+mapSlotInfo.length.toString());
-    print("-- docInfo "+docInfo.length.toString());
-    print("-- components "+xuiFile.components.length.toString());
-    print("-- designs "+xuiFile.designs.length.toString());
-    print("-- documentation "+xuiFile.documentation.length.toString());
-    print("-- binding "+xuiFile.binding.length.toString());
-    print("-- listImport "+xuiFile.listImport.length.toString());
+    if (XUIConfigManager.verboseXUIEngine) {
+      XUIConfigManager.printc(
+          "-- mapSlotInfo " + mapSlotInfo.length.toString());
+      XUIConfigManager.printc("-- docInfo " + docInfo.length.toString());
+      XUIConfigManager.printc(
+          "-- components " + xuiFile.components.length.toString());
+      XUIConfigManager.printc(
+          "-- designs " + xuiFile.designs.length.toString());
+      XUIConfigManager.printc(
+          "-- documentation " + xuiFile.documentation.length.toString());
+      XUIConfigManager.printc("-- binding " + binding.length.toString());
+      XUIConfigManager.printc(
+          "-- listImport " + xuiFile.listImport.length.toString());
+    }
 
-    //processPhaseSlotTree();
-    
-
-    processPhaseJS();
+    processPhase2JS();
 
     if (writer != null) {
       return Future.sync(() => htmlRoot.processPhase3(this, writer));
     }
   }
 
-  List getSlotTree() {
+  List getBindingInfo() {
+    var bind = [];
+    binding.forEach((k, v) {
+      var des = BindObj();
+      des.attr = v.attr;
+      des.val = v.content;
+      bind.add(des);
+    });
+    return bind;
+  }
 
-    TreeSlotBuilder treeSlotBuilder =TreeSlotBuilder();
+  List getSlotTree() {
+    TreeSlotBuilder treeSlotBuilder = TreeSlotBuilder();
 
     // init les childs
     mapSlotInfo.forEach((key, SlotInfo child) {
-      child.children=null;
+      child.children = null;
     });
 
     // reconstruit l'arborescence
@@ -583,87 +592,168 @@ class XUIEngine {
         rootSlot = child;
       }
     });
-    
-    if (rootSlot!=null) {
-       treeSlotBuilder.tree.add( displaySlot(treeSlotBuilder, rootSlot, 0) );
+
+    if (rootSlot != null) {
+      treeSlotBuilder.tree.add(displaySlot(treeSlotBuilder, rootSlot, 0, null));
     }
 
     return treeSlotBuilder.tree;
   }
 
-  TreeSlot displaySlot(TreeSlotBuilder treeSlotBuilder, SlotInfo slot, int tab)
-  {
-
+  TreeSlot displaySlot(TreeSlotBuilder treeSlotBuilder, SlotInfo slot, int tab,
+      TreeSlot parent) {
     var ts = TreeSlot();
     ts.id = treeSlotBuilder.nb++;
-    ts.name = slot.xid+" <"+(slot.slotname??"")+">";
-    
-    String s = "";
-    for (var i = 0; i < tab; i++) {
-      s=s+"\t";
+
+    //ts.name = slot.xid+" <"+(slot.slotname??"")+">";
+    ts.name = slot.slotname ?? (slot.implement ?? slot.xid);
+    if (slot.docId != null) {
+      if (slot.slotname == null && docInfo[slot.docId] != null) {
+        ts.name = docInfo[slot.docId].name;
+      }
     }
 
-    s=s+"# "+slot.xid+" <"+(slot.slotname??"")+">";
-    print(s);
+    bool isSlot = slot.implement == TAG_SLOT;
+    bool isFlow = slot.implement == "xui-flow";
+    bool isNoDisplay = isSlot || isFlow;
 
-    bool verbose = false;
+    if (isSlot || isFlow) {
+      ts.name = "#" + ts.name;
+    }
 
-    if (verbose) {
-        s="";
-        for (var i = 0; i < tab; i++) {
-          s=s+"\t";
-        }
+    if (XUIConfigManager.verboseTree) {
+      String s = "";
+      for (var i = 0; i < tab; i++) {
+        s = s + "\t";
+      }
 
-        String res = slot.idRessource;
-        if (res==null)
-            {res="?";}
-        else {
+      s = s + "# " + slot.xid + " <" + (slot.slotname ?? "") + ">";
+      XUIConfigManager.printc(s);
+    }
 
-            int i = res.lastIndexOf("/");
-            int j = res.lastIndexOf(".");
-            res=res.substring(i+1,j);
-        }
+    if (XUIConfigManager.verboseTreeImpl) {
+      String s = "";
+      for (var i = 0; i < tab; i++) {
+        s = s + "\t";
+      }
 
-        s=s+"  impl:["+res+":"+(slot.implement??"no impl")+"]\tdoc:<"+(slot.docId??"")+"> ";
-        print(s); 
+      String res = slot.idRessource;
+      if (res == null) {
+        res = "?";
+      } else {
+        int i = res.lastIndexOf("/");
+        int j = res.lastIndexOf(".");
+        res = res.substring(i + 1, j);
+      }
 
-        s="";
-        for (var i = 0; i < tab; i++) {
-          s=s+"\t";
-        }
-        s=s+"  design "+slot.designInfo;
-        print(s); 
+      s = s +
+          "  impl:[" +
+          res +
+          ":" +
+          (slot.implement ?? "no impl") +
+          "]\tdoc:<" +
+          (slot.docId ?? "") +
+          "> ";
+      XUIConfigManager.printc(s);
+
+      s = "";
+      for (var i = 0; i < tab; i++) {
+        s = s + "\t";
+      }
+      s = s + "  design " + slot.designInfo;
+      XUIConfigManager.printc(s);
     }
 
     for (SlotInfo item in slot.children ?? []) {
       if (!(item.elementHTML.hasPropXUIIF() &&
           !item.elementHTML.isXUIIF(this))) {
+        var child = displaySlot(treeSlotBuilder, item, tab + 1, ts);
 
-        if (ts.children==null)
-        {
-          ts.children=[];
+        if (isNoDisplay) {
+          if (parent.children == null) {
+            parent.children = [];
+          }
+          child.name = child.name + " (" + ts.name + ")"; //isFlow  ts
+          if (!child.isSlot) {
+            parent.children.add(child);
+          } else {
+            parent.children.addAll(child.children ?? []);
+          }
+        } else {
+          if (ts.children == null) {
+            ts.children = [];
+          }
+          if (!child.isSlot) {
+            ts.children.add(child);
+          } else {
+            ts.children.addAll(child.children ?? []);
+          }
         }
-        ts.children.add(displaySlot(treeSlotBuilder, item, tab + 1));
-
       }
     }
+    ts.isSlot = isSlot;
 
     return ts;
   }
-  
 
-  void processPhaseJS() {
+  void processPhase2JS() {
+    //var docID = getDocumentationID(elemHtml);
+    // DocInfo doc = engine.docInfo[docID];
+    // if (doc!=null) {
+    //   XUIConfigManager.printc(p.binding +" --------------- bind info " + doc.name);
+    // }
+
     StringBuffer buf = NativeInjectText.getcacheText('data-binding');
 
     StringBuffer jsonBinding = StringBuffer();
-    this.xuiFile.binding.forEach((key, value) {
+    this.binding.forEach((key, bindInfo) {
+      var type = "?";
+
+      SlotInfo slotInfo = getSlotInfo(bindInfo.xid, bindInfo.xid);
+      if (slotInfo != null) {
+        DocInfo doc = docInfo[slotInfo.docId];
+        DocVariables varInfo;
+        for (DocVariables varCmp in doc.variables ?? const []) {
+          if (varCmp.id == bindInfo.propName) {
+            varInfo = varCmp;
+            break;
+          }
+        }
+
+        type = varInfo.bindType != null ? varInfo.bindType : "?";
+
+        XUIConfigManager.printc("/*/*/*/ xid=" +
+            bindInfo.xid +
+            " bind " +
+            bindInfo.attr +
+            " [" +
+            (varInfo.bindType != null ? varInfo.bindType : "?") +
+            "]"
+                " =>" +
+            slotInfo.docId +
+            "." +
+            bindInfo.propName);
+      }
+
       var isBool = false;
-      if ((value.content == "true" || value.content == "false")) {
+      if ((bindInfo.content == "true" || bindInfo.content == "false")) {
         isBool = true;
       }
-      var v = isBool ? value.content : "'" + value.content + "'";
-      jsonBinding.write(',\n\t\t\t' + value.attr + ":" + v);
+
+      var v = isBool ? bindInfo.content : "'" + bindInfo.content + "'";
+      if (type == "array") {
+        v = "[{ key:'a' }]";
+      }
+
+      if (type != "item-array" && !bindInfo.attr.contains(".")) {
+        jsonBinding.write(',\n\t\t\t' + bindInfo.attr + ": " + v);
+      }
     });
+
+    if (xuiFile.context.jsonBinding != null) {
+      jsonBinding.clear();
+      jsonBinding.write(",\n\t\t\t..."+xuiFile.context.jsonBinding);
+    }
 
     var str = '\$xui.rootdata = { ...\$xui.rootdata ' +
         jsonBinding.toString() +
@@ -681,14 +771,15 @@ class SlotInfo {
   String docId;
   String idRessource;
   String implement;
-  String designInfo;  // chaine caractere des info de design (NB + nom des fichier)
+  String
+      designInfo; // chaine caractere des info de design (NB + nom des fichier)
   XUIElementHTML elementHTML;
   List<SlotInfo> children;
 }
 
 class TreeSlotBuilder {
-    List<TreeSlot> tree = [];
-    int nb=0;
+  List<TreeSlot> tree = [];
+  int nb = 0;
 }
 
 class DocInfo {
@@ -703,12 +794,13 @@ class DocInfo {
 
 class DocVariables {
   String id;
-  String def;
+  String def; // valeur par defaut
   String editor;
-  String doc;
-  String link;
+  String doc; // description
+  String link; // lien vers la doc
   String list; // pour les combox
   String cat; // la categorie  layout/style
+  String bindType;
 }
 
 ///------------------------------------------------------------------

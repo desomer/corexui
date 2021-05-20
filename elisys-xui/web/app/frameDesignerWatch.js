@@ -7,9 +7,16 @@ $xui.initVuejs = (instanceVue) => {
 
   instanceVue.$watch('activeTab', function (newValue, oldValue) {
     console.debug('The activeTab name was changed from ' + oldValue + ' to ' + newValue + '!');
-    if (newValue == 1) {
+    $xui.unDisplaySelector();
+    
+    if (newValue == 2) {
       // onglet code
       $xui.refreshAction('showCode')   // affiche le code et le xui
+    }
+
+    if (newValue == 0 && oldValue==1) {
+      // onglet jsonEditor
+      $xui.refreshAction('template:reload-json')   // recharge le json
     }
 
   }, { deep: true });

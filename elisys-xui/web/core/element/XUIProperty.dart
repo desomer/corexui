@@ -69,7 +69,9 @@ class ParseInfo {
   StringBuffer parsebuilder;
   int nbTag = 0;
   ParseInfoMode mode;
-  String context; // nom de l'attibut
+  String context; // nom de l'attribut
+  String prefix;  //  ajoute un prefix à l'attribut   (ex : v-bind:)
+
 
   ParseInfo(content, String context, ParseInfoMode mode) {
     parsebuilder = StringBuffer(content.toString());

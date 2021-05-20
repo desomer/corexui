@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'XUIConfigManager.dart';
 import 'XUIEngine.dart';
 import 'XUIFactory.dart';
 import 'element/XUIElement.dart';
@@ -16,6 +17,11 @@ class XUIActionManager {
   ///------------------------------------------------------------------------------------
   /// change une property de design
   Future changeProperty(String xid, String variable, dynamic value) async {
+    if (XUIConfigManager.verboseChange) {
+      XUIConfigManager.printc(
+          "changeProperty ${xid} a changer l'attribut <${variable}> par <${value}>");
+    }
+
     var listDesign = engine.xuiFile.designs[xid];
     if (listDesign == null) {
       engine.addXUIDesignEmpty(xid);
@@ -30,16 +36,19 @@ class XUIActionManager {
       if (doc != null && doc.variables.isNotEmpty) {
         for (var aVariable in doc.variables) {
           if (aVariable.id == variable) {
-            print(
-                "variable xui <${doc.xid}> var <${aVariable.id}> def ${aVariable.def} editor ${aVariable.editor} ");
-
+            if (XUIConfigManager.verboseChange) {
+              XUIConfigManager.printc(
+                  "   changeProperty variable xui <${doc.xid}> var <${aVariable.id}> def ${aVariable.def} editor ${aVariable.editor} ");
+            }
             bool addValue = true;
             var elemXui = xuiDesign.elemXUI;
             // affecte les valeur par defaut
             if (aVariable.editor == "bool" && aVariable.def == null) {
               if (value == false && elemXui.propertiesXUI != null) {
                 // vide la valeur
-                print("retire la variable bool a false");
+                if (XUIConfigManager.verboseChange) {
+                  XUIConfigManager.printc("   changeProperty retire la variable bool a false");
+                }
                 elemXui.propertiesXUI.remove(variable);
                 addValue = false;
               }
@@ -52,7 +61,7 @@ class XUIActionManager {
                 value = aVariable.def; // affecte la valeur par defaut
               } else {
                 // vide la valeur
-                print("retire la variable value à null");
+                XUIConfigManager.printc("retire la variable value à null");
                 elemXui.propertiesXUI.remove(variable);
                 addValue = false;
               }
@@ -421,7 +430,7 @@ class XUIActionManager {
 
     if (designMove != null && elemToChange != null) {
       print("moveToDesign add <$xid> to <$moveToXid>");
-      designMove.elemXUI.children ??= List<XUIElement>();
+      designMove.elemXUI.children ??= [];
       designMove.elemXUI.children.add(elemToChange);
 
       // change le slotInfo

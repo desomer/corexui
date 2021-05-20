@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'XUIConfigManager.dart';
 import 'XUIEngine.dart' as cst;
 import 'XUIEngine.dart';
 import 'element/XUIElement.dart';
@@ -34,11 +35,14 @@ class XUIChild extends XUIModel {
   XUIChild(e, m) : super(e, m);
 }
 
+/// gestion du binding
 class XUIBinding {
+  String propName;
   String attr;
   dynamic content;
+  String xid;
 
-  XUIBinding(this.attr, this.content);
+  XUIBinding(this.propName, this.attr, this.content, this.xid);
 }
 
 ///------------------------------------------------------------------
@@ -81,7 +85,7 @@ class XUIModel implements Comparable<XUIModel> {
     _processAttributesPhase1(elemHtml);
 
     // properties
-    _processPropertiesPhase1AndBind(elemHtml, engine.xuiFile);
+    _processPropertiesPhase1AndBind(elemHtml, engine);
 
     // lance les children
     await _processPhase1Children(elemHtml, engine);
@@ -96,7 +100,7 @@ class XUIModel implements Comparable<XUIModel> {
     await _processPhase1Component(engine, elemHtml);
 
     // affecte les xid uniquement si child (pas design ni component)
-    if (elemXUI.xid != null && engine.xuiFile.context.mode != MODE_FINAL) {
+    if (elemXUI.xid != null &&  (engine.isModeDesign() || XUIConfigManager.forceSlotInfo)  /*&& engine.xuiFile.context.mode != MODE_FINAL*/) {
       elemHtml.attributes ??= HashMap<String, XUIProperty>();
       if (this is! XUIComponent && this is! XUIDesign) {
         elemHtml.attributes["data-" + ATTR_XID] = XUIProperty(xidCal);
@@ -143,13 +147,17 @@ class XUIModel implements Comparable<XUIModel> {
       if (xuifor != null) {
         varIdx = xuifor.content.toString();
 
-        var nbs = elemHtml.calculatePropertyXUI("[["+elemHtml.getForVar()+"]]", null) ;
-            //elemHtml.propertiesXUI["nb"]?.content?.toString() ?? "1")
+        var nbs = elemHtml.calculatePropertyXUI(
+            "[[" + elemHtml.getForVar() + "]]", null);
+        //elemHtml.propertiesXUI["nb"]?.content?.toString() ?? "1")
 
         try {
           nb = int.parse(nbs);
         } on Exception catch (e) {
-          print("************************* ret var for " + nbs );
+          XUIConfigManager.printc("************************* ret var for " +
+              nbs +
+              " " +
+              e.toString());
         }
       }
     }
@@ -234,7 +242,7 @@ class XUIModel implements Comparable<XUIModel> {
   }
 
   void _processPropertiesPhase1AndBind(
-      XUIElementHTML elemHtml, XUIResource xuifile) {
+      XUIElementHTML elemHtml, XUIEngine engine) {
     if (elemXUI.propertiesXUI != null) {
       elemXUI.propertiesXUI.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
@@ -246,17 +254,46 @@ class XUIModel implements Comparable<XUIModel> {
         if (prop.key.toLowerCase() != cst.ATTR_XID) {
           // n'affecte pas le XID car gerer par attribut xid  => affecte tous les autres
           XUIProperty p = prop.value;
-          if (p is XUIPropertyBinding) {
-            // affecte le binding pour la creation du JSON de binding
-            xuifile.binding[prop.key.toString()] =
-                XUIBinding(p.binding, p.content);
-            elemHtml.propertiesXUI[prop.key] = p;
-          } else {
-            elemHtml.propertiesXUI[prop.key] = p;
+
+          if (prop.key.startsWith(":")) {
+            // gestion du v-for    :items
+            var propB = XUIPropertyBinding("", prop.value.content);
+            var pme = MapEntry<String, XUIProperty>(prop.key, propB);
+            _addXUIBinding(pme, engine);
           }
+
+          if (prop.value.content is String && prop.value.content.startsWith("{{")==true) {
+            // gestion du {{value}}
+            var varName = prop.value.content.toString().substring(2);
+            varName=varName.substring(0, varName.length-2);
+            var propB = XUIPropertyBinding("", varName);
+            var pme = MapEntry<String, XUIProperty>(prop.key, propB);
+            _addXUIBinding(pme, engine);
+          }
+
+          if (p is XUIPropertyBinding) {
+            _addXUIBinding(prop, engine);
+          }
+
+          elemHtml.propertiesXUI[prop.key] = p;
         }
       });
     }
+  }
+
+  void _addXUIBinding(
+      MapEntry<String, XUIProperty> prop, cst.XUIEngine engine) {
+    XUIPropertyBinding p = prop.value;
+    XUIConfigManager.printc("////// Prop key " +
+        prop.key.toString() +
+        " on var binding " +
+        p.binding +
+        " xid=" +
+        this.elemXUI.xid.toString());
+
+    // affecte le binding pour la creation du JSON de binding
+    engine.binding[p.binding] =
+        XUIBinding(prop.key, p.binding, p.content, this.elemXUI.xid);
   }
 
   //////////////////////////////////////////// PHASE 2 //////////////////////////////////////////
@@ -284,8 +321,10 @@ class XUIModel implements Comparable<XUIModel> {
         if (elemHtml?.propertiesXUI != null &&
             elemHtml.propertiesXUI[ATTR_NO_DESIGN] != null) {
           addSlotInfo = false;
-          print("-- xui-no-design (no add slot info) ---> " +
-              slotInfo.xid);
+          if (XUIConfigManager.verboseSlotInfo) {
+            XUIConfigManager.printc(
+                "-- xui-no-design (no add slot info) ---> " + slotInfo.xid);
+          }
         }
         if (addSlotInfo && elemHtml?.propertiesXUI != null) {
           slotInfo.slotname = elemHtml.propertiesXUI[ATTR_SLOT_NAME]?.content;
@@ -309,7 +348,7 @@ class XUIModel implements Comparable<XUIModel> {
     }
 
     //genere les infos de design (info, doc, etc...)
-    if (addSlotInfo && engine.isModeDesign()) {
+    if (addSlotInfo && (XUIConfigManager.forceSlotInfo || engine.isModeDesign())) {
       slotInfo.parentXid = parentXId;
 
       slotInfo.idRessource = elemHtml.originElemXUI.idRessource;
@@ -317,12 +356,14 @@ class XUIModel implements Comparable<XUIModel> {
       slotInfo.implement = elemHtml.implementBy?.first?.elemXUI?.xid;
       slotInfo.docId = getDocumentationID(elemHtml);
       slotInfo.designInfo = "no design";
-      if (elemHtml.designBy!=null)
-      {
-        slotInfo.designInfo = "("+elemHtml.designBy.length.toString()+")";
-       for (XUIDesign item in elemHtml.designBy) {
-          slotInfo.designInfo=slotInfo.designInfo+"["+(item.elemXUI.idRessource??"?")+"]";
-       }
+      if (elemHtml.designBy != null) {
+        slotInfo.designInfo = "(" + elemHtml.designBy.length.toString() + ")";
+        for (XUIDesign item in elemHtml.designBy) {
+          slotInfo.designInfo = slotInfo.designInfo +
+              "[" +
+              (item.elemXUI.idRessource ?? "?") +
+              "]";
+        }
       }
 
       if (slotInfo.slotname != null) {

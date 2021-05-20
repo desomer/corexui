@@ -2,6 +2,13 @@
     --width-properties:300px;
 }
 
+/*********************************************************/
+.jsoneditor {
+    border: thin solid #000000!important;
+}
+.jsoneditor-menu {
+    background-color: #000000 !important;
+}
 /*********************barcustom  pour la zone d'action ************************/
 .barcustom::-webkit-scrollbar {
     width: 10px;
@@ -152,6 +159,14 @@ pre > code {
     font-size: 1rem;
 }
 
+/******************************************************************************/
+#treeCmp .v-treeview-node__level {
+    width: 12px;
+}
+
+#treeCmp .v-treeview--dense .v-treeview-node__root {
+    min-height: 25px;
+}
 
 /******************************************************************************/
 .xui-list-cmp .v-list-item__icon {

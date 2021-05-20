@@ -52,7 +52,7 @@ $xui.refreshAction = (mode) => {
     var infoFile = $xui.pageDesignManager.getInfoFile(mode);
     if (mode == "template:reload") {
         infoFile.mode = "template";
-        infoFile.action = "reload";    // recharge du localStorage
+        infoFile.action = "reload";  // pas de store
     }
     if (mode == "template:clearAll") {
         infoFile.mode = "design";
@@ -60,7 +60,11 @@ $xui.refreshAction = (mode) => {
     }
     if (mode == "export") {
         infoFile.mode = "final";
-        infoFile.action = "export";   // pour le retour
+        infoFile.action = "export";   // pas de store
+    }
+    if (mode == "showCode") {
+        infoFile.mode = "final";
+        infoFile.action = "showCode";   // pas de store
     }
     $xui.refreshPageXUI(infoFile);
 };

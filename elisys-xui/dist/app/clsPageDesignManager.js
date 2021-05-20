@@ -63,6 +63,10 @@ export class PageDesignManager {
         this.codeXUI = param.xuifile;
 
         console.debug("binding ---- ", param.binding);
+        console.debug("treeSlot ---- ", param.treeSlot);
+
+        $xui.rootdata.listSlot.length = 0;
+        $xui.rootdata.listSlot.push(...param.treeSlot);
 
         if (param.action == "export") {
             this.export();
