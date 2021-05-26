@@ -39,10 +39,10 @@ class XUIChild extends XUIModel {
 class XUIBinding {
   String propName;
   String attr;
-  dynamic content;
+  dynamic value;
   String xid;
 
-  XUIBinding(this.propName, this.attr, this.content, this.xid);
+  XUIBinding(this.propName, this.attr, this.value, this.xid);
 }
 
 ///------------------------------------------------------------------

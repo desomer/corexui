@@ -30,7 +30,7 @@ void main() async {
   if (designer) {
     var reader = HTMLReader('app/frameDesigner.html', provider);
     var xuiEngine = XUIEngine();
-    var ctx = XUIContext(cst.MODE_FINAL);
+    var ctx = XUIContext(cst.MODE_FINAL, null);
     await xuiEngine.initialize(reader, ctx);
     await xuiEngine.toHTMLString(bufferHtml, "root", ctx);
 
@@ -45,7 +45,7 @@ void main() async {
 
     var reader = HTMLReader('app/frame2.html', provider);
     var xuiEngine = XUIEngine();
-    var ctx = XUIContext(cst.MODE_FINAL);
+    var ctx = XUIContext(cst.MODE_FINAL, null);
     await xuiEngine.initialize(reader, ctx);
 
     // await xuiEngine.addDesign(

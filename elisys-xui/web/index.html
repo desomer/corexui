@@ -39,7 +39,7 @@
                   </v-list-item>
                </v-list>
             </div>
-            <v-dialog v-model="dialogClass" v-on:click:outside="$xui.closeClassEditor()" max-width="80vw">
+            <v-dialog v-model="dialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
                <v-card>
                   <div class="white--text elevation-6" style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
                      <v-card-title>Gestion class & style</v-card-title>
@@ -49,7 +49,7 @@
                   </div>
                   <v-card-actions class="elevation-6">
                      <v-btn text @click="dialogClass=false;">Cancel</v-btn>
-                     <v-btn text @click="$xui.closeClassEditor(); dialogClass=false;">Save</v-btn>
+                     <v-btn text @click="$xui.saveClassEditor(); dialogClass=false;">Save</v-btn>
                   </v-card-actions>
                </v-card>
             </v-dialog>

@@ -15,8 +15,13 @@ $xui.initVuejs = (instanceVue) => {
     }
 
     if (newValue == 0 && oldValue==1) {
-      // onglet jsonEditor
+      // retour de l'onglet jsonEditor
       $xui.refreshAction('template:reload-json')   // recharge le json
+    }
+
+    if (newValue == 1 )
+    {
+      $xui.vuejs.$refs.root.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
     }
 
   }, { deep: true });

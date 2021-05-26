@@ -155,7 +155,7 @@ class XUIElementHTML extends XUIElement {
         // si dans un contenu de tag <div>{{binding}}</div>
         return "{{" + prop.binding + "}}";
       }
-      parseInfo.prefix=":";
+      parseInfo.prefix="v-bind:";
       return prop.binding;
     }
 
@@ -343,7 +343,7 @@ class XUIElementHTML extends XUIElement {
                 // binding
                 if (!keyAttr.startsWith("@") && keyAttr!="v-model")
                 {
-                   keyAttr=":"+keyAttr;
+                   keyAttr=parseInfo.prefix+keyAttr;
                 }
             }
           }

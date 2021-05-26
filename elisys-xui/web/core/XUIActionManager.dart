@@ -14,12 +14,14 @@ class XUIActionManager {
 
   XUIActionManager(this.engine);
 
+
   ///------------------------------------------------------------------------------------
   /// change une property de design
-  Future changeProperty(String xid, String variable, dynamic value) async {
+  Future changeProperty(
+      String xid, String variable, dynamic value, String bind) async {
     if (XUIConfigManager.verboseChange) {
       XUIConfigManager.printc(
-          "changeProperty ${xid} a changer l'attribut <${variable}> par <${value}>");
+          "changeProperty ${xid} a changer l'attribut <${variable}> par <${value}>  bind ${bind}");
     }
 
     var listDesign = engine.xuiFile.designs[xid];
@@ -38,43 +40,73 @@ class XUIActionManager {
           if (aVariable.id == variable) {
             if (XUIConfigManager.verboseChange) {
               XUIConfigManager.printc(
-                  "   changeProperty variable xui <${doc.xid}> var <${aVariable.id}> def ${aVariable.def} editor ${aVariable.editor} ");
+                  "changeProperty variable xui <${doc.xid}> var <${aVariable.id}> def ${aVariable.def} editor ${aVariable.editor} ");
             }
+
             bool addValue = true;
+            bool removeValue = false;
+            bool withBinding = false;
             var elemXui = xuiDesign.elemXUI;
-            // affecte les valeur par defaut
+
+            // test les bool
             if (aVariable.editor == "bool" && aVariable.def == null) {
               if (value == false && elemXui.propertiesXUI != null) {
                 // vide la valeur
-                if (XUIConfigManager.verboseChange) {
-                  XUIConfigManager.printc("   changeProperty retire la variable bool a false");
-                }
-                elemXui.propertiesXUI.remove(variable);
+                removeValue = true;
                 addValue = false;
               }
             }
 
-            // teste si champs vider par la croix
-            if (addValue && value == null && elemXui.propertiesXUI != null) {
+            // teste si champs vider par la croix (null) ou value=""
+            if (addValue &&
+                (value == null || value == "") &&
+                elemXui.propertiesXUI != null) {
               if ((aVariable.editor == "text" || aVariable.editor == "int") &&
                   aVariable.def != null) {
                 value = aVariable.def; // affecte la valeur par defaut
               } else {
-                // vide la valeur
-                XUIConfigManager.printc("retire la variable value à null");
-                elemXui.propertiesXUI.remove(variable);
+                removeValue = true;
                 addValue = false;
               }
+            }
+
+            if (bind != null && bind != "") {
+              withBinding = true;
+              addValue = true;
+            }
+
+            if (removeValue) {
+              if (XUIConfigManager.verboseChange) {
+                XUIConfigManager.printc("changeProperty : retire la property");
+              }
+              elemXui.propertiesXUI.remove(variable);
             }
 
             if (addValue) {
               // creer la propriete vide
               elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
-              if (elemXui.propertiesXUI[variable] == null) {
+              if (elemXui.propertiesXUI[variable] == null && !withBinding) {
+                elemXui.propertiesXUI[variable] = XUIProperty(null);
+              }
+              if (elemXui.propertiesXUI[variable] == null && withBinding) {
+                elemXui.propertiesXUI[variable] =
+                    XUIPropertyBinding(null, null);
+              }
+              if (!(elemXui.propertiesXUI[variable] is XUIPropertyBinding) &&
+                  withBinding) {
+                elemXui.propertiesXUI[variable] =
+                    XUIPropertyBinding(null, null);
+              }
+              if (elemXui.propertiesXUI[variable] is XUIPropertyBinding &&
+                  !withBinding) {
                 elemXui.propertiesXUI[variable] = XUIProperty(null);
               }
               // affecte la prop
               elemXui.propertiesXUI[variable].content = value;
+              if (withBinding) {
+                (elemXui.propertiesXUI[variable] as XUIPropertyBinding)
+                    .binding = bind;
+              }
             }
           }
         }

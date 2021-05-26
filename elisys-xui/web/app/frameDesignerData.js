@@ -19,13 +19,7 @@ var json = {
     snackbar_timeout: 3000,
 
     listSlot : [],
-    jsonEditorData : {
-			test: 'Empty',
-			isNavdrawerOpen: false,
-			titre: 'un titre 222',
-			isBtn1Disable: false,
-			items: [{ key:'a' }]
-		},
+    jsonEditorData : {},
     jsonEditorOptions : { mode: 'code' }
 };
 

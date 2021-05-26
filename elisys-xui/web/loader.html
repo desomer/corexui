@@ -27,7 +27,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     window.$xui.rootdata.frameName = urlParams.get("id");
 
-    import("./app/clsEventManager.js").then((module) => {
+    import("./app/clsEventDesignManager.js").then((module) => {
         new module.EventManager().initBuild();
     });
 

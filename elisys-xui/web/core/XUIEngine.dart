@@ -1,7 +1,7 @@
 import 'dart:collection';
-
 import 'package:yamlicious/yamlicious.dart';
-
+import '../libxui.dart';
+import 'XUIActionManager.dart';
 import 'XUIConfigManager.dart';
 import 'XUIFactory.dart';
 import 'XUIJSInterface.dart';
@@ -432,6 +432,35 @@ class XUIEngine {
     return Future.value();
   }
 
+  ///------------------------------------------------------------------------------------
+  /// change une property de design
+  XUIProperty getXUIProperty(String xid, String variable) {
+    var listDesign = xuiFile.designs[xid];
+    if (listDesign == null) {
+      return null;
+    }
+
+    var xuiDesign = listDesign.sort(xuiFile.context).first;
+    return xuiDesign.elemXUI.propertiesXUI[variable];
+
+    // List<DesignInfo> designs = getDesignInfo(xid, xid, false);
+    // for (var design in designs) {
+    //   DocInfo doc = design.docInfo;
+    //   if (doc != null && doc.variables.isNotEmpty) {
+    //     for (var aVariable in doc.variables) {
+    //       if (aVariable.id == variable) {
+    //         var prop = xuiDesign.elemXUI.propertiesXUI[variable];
+    //         if (prop != null) {
+    //           return prop;
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+
+    // return null;
+  }
+
   SlotInfo getSlotInfo(String id, String idslot) {
     var info = mapSlotInfo[id];
     if (info == null) info = mapSlotInfo[idslot];
@@ -567,7 +596,7 @@ class XUIEngine {
     binding.forEach((k, v) {
       var des = BindObj();
       des.attr = v.attr;
-      des.val = v.content;
+      des.val = v.value;
       bind.add(des);
     });
     return bind;
@@ -736,28 +765,49 @@ class XUIEngine {
       }
 
       var isBool = false;
-      if ((bindInfo.content == "true" || bindInfo.content == "false")) {
+      if (bindInfo.value is bool ||
+          (bindInfo.value == "true" || bindInfo.value == "false")) {
         isBool = true;
       }
 
-      var v = isBool ? bindInfo.content : "'" + bindInfo.content + "'";
+      var v = isBool ? bindInfo.value : '"' + bindInfo.value + '"';
       if (type == "array") {
-        v = "[{ key:'a' }]";
+        v = '[{ key:"a" }]';
       }
 
       if (type != "item-array" && !bindInfo.attr.contains(".")) {
-        jsonBinding.write(',\n\t\t\t' + bindInfo.attr + ": " + v);
+        jsonBinding.write(',"' + bindInfo.attr + '": ' + v.toString());
       }
     });
 
-    if (xuiFile.context.jsonBinding != null) {
-      jsonBinding.clear();
-      jsonBinding.write(",\n\t\t\t..."+xuiFile.context.jsonBinding);
+    // if (xuiFile.context.jsonBinding != null) {
+    //   jsonBinding.clear();
+    //   jsonBinding.write(",\n\t\t\t..."+xuiFile.context.jsonBinding);
+    // }
+
+    //String userBinding = xuiFile.context.jsonBinding;
+    XUIProperty propBinding = getXUIProperty("root", "binding");
+    String lastBinding = "";
+    if (propBinding != null) {
+      lastBinding = propBinding.content.toString();
+    }
+    String templateBinding = "";
+    if (jsonBinding.isNotEmpty) {
+      templateBinding = jsonBinding.toString().substring(1);
     }
 
-    var str = '\$xui.rootdata = { ...\$xui.rootdata ' +
-        jsonBinding.toString() +
-        '\n\t\t};';
+     var newBinding = templateBinding;
+     if (lastBinding!="") {
+        newBinding = generateApplicationStateJS(templateBinding, lastBinding);
+    }
+
+    if (newBinding != lastBinding) {
+      print(" SAVE *********************----------------*********** " + newBinding);
+      XUIActionManager(this).changeProperty("root", "binding", newBinding, "");
+    }
+
+    var str =
+        '\$xui.rootdata = { ...\$xui.rootdata ,' + newBinding + '\n\t\t};';
     buf.clear();
     buf.write(str);
   }

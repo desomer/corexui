@@ -10,6 +10,7 @@ import './parser/HTMLReader.dart';
 import './parser/ProviderAjax.dart';
 import 'XUIActionManager.dart';
 import 'XUIConfigManager.dart';
+import 'element/XUIProperty.dart';
 
 class XUIDesignManager {
   XUIEngine xuiEngine;
@@ -26,7 +27,7 @@ class XUIDesignManager {
       _designManager[fileInfo.file] = XUIDesignManager();
     }
 
-    return  _designManager[fileInfo.file];
+    return _designManager[fileInfo.file];
   }
 
   ///------------------------------------------------------------------------------------------
@@ -96,8 +97,8 @@ class XUIDesignManager {
     return id;
   }
 
-  Future changeProperty(String xid, String variable, dynamic value) async {
-    return XUIActionManager(xuiEngine).changeProperty(xid, variable, value);
+  Future changeProperty(String xid, String variable, dynamic value, String bind) async {
+    return XUIActionManager(xuiEngine).changeProperty(xid, variable, value, bind);
   }
 
   void addXUIDesignEmpty(String xid) {
@@ -144,7 +145,7 @@ class XUIDesignManager {
     ret.xidSlot = idslot;
 
     FileDesignInfo fi = FileDesignInfo();
-    fi.file = 'app/cmpDesignEditor.html';
+    fi.file = 'app/cmpDesignPropEditor.html';
 
     fi.mode = MODE_FINAL;
     var ctx = XUIContext(fi.mode, null);
@@ -169,6 +170,7 @@ class XUIDesignManager {
       ret.bufTemplate.write("</div>");
     }
 
+    // calcul du path pour le fil d'ariane
     designs.reversed.forEach((design) {
       if (ret.bufPath.length > 0) ret.bufPath.write(" > ");
       ret.bufPath.write(design.docInfo?.name ?? design.slotInfo.docId);
@@ -186,21 +188,32 @@ class XUIDesignManager {
 
     // gestion des valeurs
     var value;
+    var BindOfCmp = "";
     if (design.slotInfo.elementHTML?.propertiesXUI != null) {
       var valInCmp =
           (design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]?.content);
+
+      if (design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]
+          is XUIPropertyBinding) {
+        BindOfCmp = ((design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]
+                as XUIPropertyBinding)
+            ?.binding);
+      }
+
       if (valInCmp != null && varCmp.editor == "bool") {
         value = valInCmp;
       } else if (valInCmp != null) value = jsonEncode(valInCmp.toString());
     }
 
     bool exist = value != null;
+    //-------  gestion valeur par defaut ----------------
     if (value == null && varCmp.editor == "bool") {
       value = (varCmp.def ?? "false");
     }
     if (value == null) {
       value = "\"" + (varCmp.def ?? "") + "\"";
     }
+    //--------------------------------------------------
 
     if (i > 0) {
       ret.bufData.write(",");
@@ -218,10 +231,14 @@ class XUIDesignManager {
         varCmp.editor +
         "\", \"value\":" +
         value.toString() +
-        ", \"value_orig\":" +
+        ", \"bind\":\"" +
+        BindOfCmp.toString() +
+        "\", \"value_orig\":" +
         value.toString() +
-        ", \"exist\":" +
-        exist.toString() +
+        ", \"bind_orig\":\"" +
+        BindOfCmp.toString() +
+        "\", \"exist\":" +
+        exist.toString() + 
         extend +
         "}");
   }
@@ -255,17 +272,23 @@ class XUIDesignManager {
       cmp.addProperties("value", "data[##idx##].value");
       cmp.addProperties("label", "data[##idx##].label");
       cmp.addProperties("id", "data[##idx##].xid");
+      cmp.addProperties("bind", "data[##idx##].bind");
+      cmp.addProperties("variable", "data[##idx##].variable");
       // recupere le code html
       template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
 
       // insertion dans le cache
       if (XUIConfigManager.verboseEditor) {
-        XUIConfigManager.printc("getJSDesignVariableTemplate add cacheTemplateEditor <" + keyCache + ">=>" + template);
+        XUIConfigManager.printc(
+            "getJSDesignVariableTemplate add cacheTemplateEditor <" +
+                keyCache +
+                ">=>" +
+                template);
       }
       cacheTemplateEditor[keyCache] = template;
     }
+
     template = template.replaceAll("##idx##", i.toString());
-    // template = template.replaceAll("##id##",   design.slotInfo.xid);
 
     return template;
   }
@@ -292,7 +315,7 @@ class XUIDesignManager {
       template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
 
       if (XUIConfigManager.verboseEditor) {
-          XUIConfigManager.printc("****<" + keyCache + ">=>" + template);
+        XUIConfigManager.printc("****<" + keyCache + ">=>" + template);
       }
       cacheTemplateEditor[keyCache] = template;
     }

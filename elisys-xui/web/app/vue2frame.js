@@ -68,8 +68,8 @@ $xui.loadApplicationJS = () => {
 		}
 	})
 
-	$xui.store.commit('increment', {amount:1});   // appel une mutation
-	$xui.store.dispatch('inc', 1);    // appel une action
+	//  $xui.store.commit('increment', {amount:1});   // appel une mutation
+	//  $xui.store.dispatch('inc', 1);    // appel une action
 
 	$xui.storeAction = Vuex.mapActions({
 		add: 'inc', // attacher `this.add()` à `this.$store.dispatch('increment')`
@@ -148,6 +148,13 @@ $xui.loadApplicationJS = () => {
 	console.debug("vue routes", routes);
 
 
+	$xui.router.afterEach((to, from) => {
+		console.log("router going to " + to.fullPath)
+		console.log(to);
+	  
+		// console.log("all ref", $xui.router );
+	  })
+
 	/*************************************************************************** */
 	$xui.vuejs = new Vue({
 		el: '#app',
@@ -155,7 +162,7 @@ $xui.loadApplicationJS = () => {
 		router: $xui.router,
 		data: $xui.rootdata,
 		components: { RootComponent },
-		computed: $xui.storeDataBinding,
+		computed: { ...$xui.storeDataBinding },
 		template: "<RootComponent ref='root'></RootComponent>",
 		vuetify: new Vuetify(configVuetify),
 		errorCaptured: function (err, component, details) {

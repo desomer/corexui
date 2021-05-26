@@ -7,7 +7,7 @@ if (typeof window.$xui === 'undefined')
     window.$xui = {};
 
 
-window.$xui.config={};
+window.$xui.config = {};
 window.$xui.config.traceDisplayPropertiesJS = false
 window.$xui.config.traceReselect = false
 /****************************  CHARGEMENT DE LA PAGE *************************************/
@@ -21,7 +21,7 @@ import("./clsPageDesignManager.js").then((module) => {
     }, this);
 });
 /****************************************************************************************/
-import("./clsEventManager.js").then((module) => {
+import("./clsEventDesignManager.js").then((module) => {
     new module.EventManager().init();
 });
 
@@ -32,7 +32,6 @@ import("./clsSelectorManager.js").then((module) => {
 /****************************************************************************************/
 $xui.isModePreview = false;
 $xui.modeDisplaySelection = false;
-$xui.editorOpenId = null;
 /******************************************************************************** */
 
 // charge la page global aprés le retour du XUIEngine
@@ -47,6 +46,17 @@ $xui.changePageJS = (param) => {
     $xui.doPromiseJS("changePage");
 };
 
+
+$xui.generateApplicationStateJS = (template, last) => {
+    var template = JSON.parse("{" + template + "}");
+    var last = JSON.parse("{" + last + "}");
+    var ret = Object.assign(template, last);
+    ret = Object.assign(ret, $xui.rootdata.jsonEditorData);
+    $xui.rootdata.jsonEditorData = ret;
+    // console.debug("App State", ret, current , $xui.rootdata.jsonEditorData);
+    var ret = JSON.stringify(ret);
+    return ret.substring(1, ret.length-1);
+};
 
 /******************************************************************************** */
 // gestion des button refresh et export de la page
@@ -297,6 +307,8 @@ $xui.moveTo = (data) => {
     $xui.moveDesign(infoFile, info.xid, data.xid_slot);
 }
 
+/**************************************************************************************** */
+
 $xui.closePopup = (event) => {
     var popupNode = document.getElementById("xui-display-selector-popup");
     if (popupNode.style.display == "block") {
@@ -313,7 +325,6 @@ $xui.OpenPopupAction = (event) => {
     console.debug(ret);
 
     $xui.rootdata.listPopupAdd.length = 0;
-    // $xui.rootdata.listPopupAdd.push( { icon: "mdi-tab", title: "add Tab", action: "incNb", xid: xid } );
     $xui.rootdata.listPopupAdd.push(...ret);
 
     var popupNode = document.getElementById("xui-display-selector-popup");
@@ -375,45 +386,6 @@ $xui.doActionPopup = (actionId) => {
         return true;
     }
 
-    // if ($xui.propertiesDesign.isSlot || info.addRemoveAction != null) {
-    //     // ajout dans un slot ou avec un addRemoveAction
-    //     if (info.docId == "xui-no-dom:xui-flow"
-    //         || info.docId == "v-col:xui-row-grid-responsive"
-    //         || info.docId == "v-col:xui-row-1"
-    //         || info.docId == "v-col:xui-form-row-1"
-    //     ) {
-    //         addSlotByVariable(infoFile, info);
-    //         return true
-    //     }
-    //     else {
-    //         console.debug("addAction sur slot " + info.docId + " => " + info.addRemoveAction);
-    //         if (info.addRemoveAction == "addFlow") {
-    //             addCmpXID($xui.propertiesDesign.xidSlot, "xui-flow");
-    //             return true;
-    //         } else if (info.addRemoveAction == "incNb") {
-    //             $xui.changeNbChildXUI(infoFile, info.xid, "after");
-    //             return true
-    //         }
-
-    //         return false;
-    //     }
-    // }
-    // else {
-    //     if (infoParent.docId == "xui-no-dom:xui-flow") {
-    //         addSlotByVariable(infoFile, infoParent);
-    //         return true
-    //     }
-    //     else {
-    //         // ajoute un surround de type xui-flow
-    //         $xui.setCurrentAction("OpenPopupAction");
-    //         let cmp = { xid: 'xui-flow' };
-    //         const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
-    //         const currentXid = info.parentXid;
-    //         const template = "<xui-design xid=\"" + currentXid + "\"><" + cmp.xid + " xid=\"" + newXid + "\"></" + cmp.xid + "></xui-design>";
-    //         $xui.surroundDesign(infoFile, $xui.propertiesDesign.xid, template, newXid);
-    //         return true;
-    //     }
-    // }
 }
 
 
@@ -425,6 +397,16 @@ function addCmpXID(xidDest, idCmp) {
     $xui.addDesignXUI(infoFile, xidDest, template, true, false);
 }
 
+///---------------------------------------------------------------------------------------
+$xui.getNewXid = (xidParent, nameCmp) => {
+    var d = new Date().getTime();
+    d += (parseInt(Math.random() * 100)).toString();
+
+    var idxUUID = xidParent.indexOf("_");
+    var pxid = idxUUID == -1 ? xidParent : (xidParent.substring(0, idxUUID));
+    var ret = pxid + "-" + nameCmp.replace("xui-", "") + "_" + d;
+    return ret;
+}
 
 /// incremente le nb du composant
 function addSlotByVariable(infoFile, infoParent) {
@@ -437,11 +419,11 @@ function addSlotByVariable(infoFile, infoParent) {
     }
     // save properties
     $xui.hasPropertiesChanged = false;
-    $xui.setDesignProperties($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.json);
+    $xui.saveDesignPropertiesXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.json);
 }
 
 
-//-------------------------------------------------------------------
+/**************************************************************************************************** */
 $xui.undo = () => {
     $xui.setCurrentAction("undo");
     $xui.pageDesignManager.undo();
@@ -457,9 +439,10 @@ $xui.saveProperties = () => {
     console.debug("saveProperties", $xui.propertiesDesign.json);
 
     $xui.hasPropertiesChanged = false;
-    $xui.setDesignProperties($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.json);
+    $xui.saveDesignPropertiesXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.json);
 }
 
+//--------------------------------------------------------------------------------------------------------
 $xui.updateDirectProperty = (value, variable, xid) => {
     console.debug("updateDirectProperty", value, variable, xid, $xui.rootDataProperties);
     for (const aProp of $xui.rootDataProperties.data) {
@@ -469,23 +452,13 @@ $xui.updateDirectProperty = (value, variable, xid) => {
     }
 }
 
-/***************************************************************************************************************/
-$xui.getNewXid = (xidParent, nameCmp) => {
-    var d = new Date().getTime();
-    d += (parseInt(Math.random() * 100)).toString();
-
-    var idxUUID = xidParent.indexOf("_");
-    var pxid = idxUUID == -1 ? xidParent : (xidParent.substring(0, idxUUID));
-    var ret = pxid + "-" + nameCmp.replace("xui-", "") + "_" + d;
-    return ret;
-}
 
 /***************************************************************************************************************/
 $xui.sendInTab = () => {
     window.open(window.location.origin + '/loaderPage.html?id=' + $xui.rootdata.frameName, '_blank');
 }
 
-$xui.deploy =() => {
+$xui.deploy = () => {
     $xui.refreshAction("export");
 }
 
@@ -506,39 +479,13 @@ $xui.openTabUrl = (url) => {
     }
 };
 
-$xui.openClassEditor = (id) => {
-    $xui.editorOpenId = id;
-
-    $xui.modeDisplaySelection = false;
-    $xui.rootdata.dialogClass = true;
-
-    // setTimeout(() => { $xui.unDisplaySelector(); }, 100);
-
-    for (const aProperty of $xui.propertiesDesign.json) {
-        if (aProperty.cat == "class" && (aProperty.xid == $xui.editorOpenId || aProperty.xid == $xui.editorOpenId)) {
-            console.debug("load class", aProperty);
-            new DesignClassManager().initClassSelector(aProperty.value, $xui.rootdata.listCatClass);
-        }
-    }
-}
-
-$xui.closeClassEditor = () => {
-
-    for (const aProperty of $xui.propertiesDesign.json) {
-        if (aProperty.cat == "class" && (aProperty.xid == $xui.editorOpenId || aProperty.xid == $xui.editorOpenId)) {
-            console.debug("save class", aProperty);
-            aProperty.value = new DesignClassManager().getClassTextFromSeletor(aProperty.value, $xui.rootdata.listCatClass);
-            $xui.hasPropertiesChanged = true;
-            $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
-        }
-    }
-}
-
 /***************************************************************************************************************/
 
 
 $xui.displayPropertiesJS = (xid, xid_slot) => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
+
+    //AppPropertiesBindingSetting
 
     let posScroll = -1;
     if ($xui.propertiesDesign != null && xid == $xui.propertiesDesign.xid) {
@@ -562,7 +509,6 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         if (window.$xui.config.traceDisplayPropertiesJS) {
             console.debug("displayPropertiesJS", $xui.propertiesDesign);
         }
-   
 
         $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
         var template = "<div id='AppPropertiesSetting' class='barcustom xui-div-scroll-vertical'>" + $xui.propertiesDesign.template + "</div>";
@@ -664,7 +610,7 @@ $xui.displayComponents = (xid, xid_slot) => {
 var cacheHtmlAction = null;
 $xui.displayAction = (xid, xid_slot) => {
     if (cacheHtmlAction == null) {
-        var infoFile = { file: 'app/cmpDesignEditor.html', xid: 'bottom-editor', mode: 'final' };
+        var infoFile = { file: 'app/cmpDesignPropEditor.html', xid: 'bottom-editor', mode: 'final' };
         var prom = getPromise("displayActionPromise");
         $xui.getHtmlFromXUI(infoFile, "displayActionPromise");
         prom.then(html => {
@@ -688,7 +634,6 @@ $xui.displayAction = (xid, xid_slot) => {
     }
 
 }
-
 /***************************************************************************************************************/
 
 

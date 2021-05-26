@@ -496,6 +496,7 @@ $xui.openTabUrl = (url) => {
     }
 };
 
+/************************************************************** */
 $xui.openClassEditor = (id) => {
     $xui.editorOpenId = id;
 

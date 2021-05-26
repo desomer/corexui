@@ -45,12 +45,14 @@ class ObjectAction {
 
 @JS()
 @anonymous
-class ObjectDesign {
+class PropInfo {
   external bool get exist;
   external String get value;
   external String get value_orig;
   external String get variable;
   external String get xid;
+  external String get bind;
+  external String get bind_orig;
 }
 
 @JS()
@@ -94,6 +96,8 @@ class Options {
   external set binding(List binding);
   external List get treeSlot;
   external set treeSlot(List tree);
+  external String get dataState;
+  external set dataState(String data);
 }
 
 @JS()
@@ -101,8 +105,8 @@ class Options {
 class BindObj {
   external String get attr;
   external set attr(String attr);
-  external String get val;
-  external set val(String val);
+  external dynamic get val;
+  external set val(dynamic val);
 }
 
 @JS()

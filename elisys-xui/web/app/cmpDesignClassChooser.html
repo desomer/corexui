@@ -14,7 +14,8 @@
                         { sel: false, type: 'check', text: 'overflow scroll', value: 'xui-overflow' },
                         { sel: false, type: 'divider' },
                         { sel: false, text: 'elevation', value: 'elevation', type: 'list', vl: '1', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'] },
-                        { sel: false, text: 'backgound color', value: '', type: 'list', vl: '1', list: [
+                        {
+                            sel: false, text: 'backgound color', value: '', type: 'list', vl: '1', list: [
                                 "red",
                                 "pink",
                                 "purple",
@@ -33,7 +34,7 @@
                                 "deep-orange",
                                 "brown",
                                 "blue-grey",
-                                "grey","black","white","transparent"]
+                                "grey", "black", "white", "transparent"]
                         },
                         {
                             sel: false, text: 'color variant', value: '', type: 'list', vl: '1', list:
@@ -64,13 +65,13 @@
                     open: false,
                     nb: "0",
                     listClass: [
-                        { sel: false, text: 'all', value: 'pa', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'x', value: 'px', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'y', value: 'py', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'top', value: 'pt', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'bottom', value: 'pb', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'left', value: 'pl', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
-                        { sel: false, text: 'right', value: 'pr', type: 'list', vl: '1', list: ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'all', value: 'pa', type: 'list', vl: '1', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'x', value: 'px', type: 'list', vl: '1', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'y', value: 'py', type: 'list', vl: '1', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'top', value: 'pt', type: 'list', vl: '1', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'bottom', value: 'pb', type: 'list', vl: '1', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'left', value: 'pl', type: 'list', vl: '1', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
+                        { sel: false, text: 'right', value: 'pr', type: 'list', vl: '1', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] },
                     ],
                 },
                 {
@@ -100,7 +101,7 @@
                                 "brown--text",
                                 "blue-grey--text",
                                 "grey--text",
-                                "black--text","white--text",]
+                                "black--text", "white--text",]
                         },
                         {
                             sel: false, text: 'color variant', value: 'text-', type: 'list', vl: '1', list:
@@ -152,6 +153,33 @@
                 new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
             }
             );
+
+            /***************************************************************************************************************/
+            $xui.openClassEditor = (id) => {
+                $xui.editorOpenId = id;
+
+                $xui.modeDisplaySelection = false;
+                $xui.rootdata.dialogClass = true;
+
+                for (const aProperty of $xui.propertiesDesign.json) {
+                    if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
+                        console.debug("load class", aProperty);
+                        new DesignClassManager().initClassSelector(aProperty.value, $xui.rootdata.listCatClass);
+                    }
+                }
+            }
+
+            $xui.saveClassEditor = () => {
+
+                for (const aProperty of $xui.propertiesDesign.json) {
+                    if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
+                        console.debug("save class", aProperty);
+                        aProperty.value = new DesignClassManager().getClassTextFromSeletor(aProperty.value, $xui.rootdata.listCatClass);
+                        $xui.hasPropertiesChanged = true;
+                        $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+                    }
+                }
+            }
         </script>
     </xui-design>
 

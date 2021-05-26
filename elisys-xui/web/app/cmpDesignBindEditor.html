@@ -1,0 +1,66 @@
+<xui-factory version="1.0">
+
+    <xui-design xid="xui-script-data">
+        <script xui-no-dom>
+            var json = {
+                dialogBinding: false,
+                nameBinding : "name",
+                variableBinding: "var"
+            };
+            $xui.rootdata = { ...$xui.rootdata, ...json };
+
+            $xui.initComponentVuejs.push(() => {
+                new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-bind-editor", 'app/cmpDesignBindEditor.html', "xui-bind-editor");
+            }
+            );
+
+            /********************************************************* */
+            $xui.openBindingEditor = (xid, propId) => {
+                $xui.editorOpenId = xid;
+                $xui.editorPropId = propId;
+
+                $xui.modeDisplaySelection = false;
+                $xui.rootdata.dialogBinding = true;
+                console.debug("open Binding Editor", xid, propId);
+
+                for (const aProperty of $xui.propertiesDesign.json) {
+                    if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
+                        console.debug("load binding", aProperty);
+                        $xui.rootdata.nameBinding=aProperty.label;
+                        $xui.rootdata.variableBinding=aProperty.bind;
+                    }
+                }
+            }
+
+            $xui.saveBindingEditor = () => {
+                console.debug("save binding", $xui.editorOpenId, $xui.editorPropId);
+
+                for (const aProperty of $xui.propertiesDesign.json) {
+                    if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
+                        aProperty.bind=$xui.rootdata.variableBinding;
+                        $xui.hasPropertiesChanged = true;
+                        console.debug("save binding ok", aProperty, $xui.rootdata);
+                    }
+                }
+            }
+        </script>
+    </xui-design>
+
+    <script xid="xui-bind-editor" xui-no-dom>
+        export default {
+            template: <vue-xui-bind-editor xui-convert-json></vue-xui-bind-editor>,
+            watch: {}
+        }
+    </script>
+
+    <div xid="vue-xui-bind-editor">
+        <v-text-field class="ma-6"
+            :label="nameBinding"
+            v-model="variableBinding"
+            hint="Bind variable name"
+            outlined clearable persistent-hint
+          ></v-text-field>
+          <v-jsoneditor ref="editor" v-model="jsonEditorData" :options="jsonEditorOptions" :plus="false" height="100%"></v-jsoneditor>
+    </div>
+
+</xui-factory>

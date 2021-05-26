@@ -19,9 +19,10 @@
 		<xui-prop var="navTemporary" editor="bool">Force temporary nav on Desktop</xui-prop>
 		<xui-prop var="clipped-left" editor="bool">App bar clipped left</xui-prop>
 		<xui-prop var="inset-left" editor="bool">Footer bar inset (if Nav Drawer)</xui-prop>
+		<xui-prop var="binding" editor="text">Data Binding</xui-prop>
 
-		<xui-prop id="name">Page</xui-prop>
-		<xui-prop id="desc">La page</xui-prop>
+		<xui-prop id="name">Application</xui-prop>
+		<xui-prop id="desc">L'application</xui-prop>
 	</xui-doc>
 
 	<!---------------------------------------------------------------------------------------->
@@ -95,11 +96,10 @@
 	</xui-doc>
 
 	<v-main xid="vue-router-1" class="fill-height" -style="background-color:[[colorBg]]">
-		<router-view>  <!-- ICI LA PAGE --> </router-view>
+		<router-view ref="routerview">  <!-- ICI LA PAGE --> </router-view>
 	</v-main>
 
 	<xui-design xid="appcontent" xui-no-design>
-		<xui-slot xid="inject-design-ui" xui-no-design></xui-slot>
 		<xui-copyzone></xui-copyzone>
 		<vue-systembar-1 xid="systembar"  xui-if=[[withSysBar@0+]]></vue-systembar-1>
 		<vue-nav-drawer-1 xid="navdrawerleft" xui-if=[[withLeftNavigation@0+]]></vue-nav-drawer-1>
@@ -413,7 +413,9 @@
 			$xui = {};
 
 		$xui.rootdata = {};
+		// ------ ici le data binding dynamique ---------
 		<xui-inject-text xui-path="data-binding"></xui-inject-text>
+		// ----------------------------------------------
 
 		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler 
 	</script>

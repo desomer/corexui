@@ -84,6 +84,56 @@ pre > code {
     margin: 7px 0px 0px 0px;
 }
 
+.xui-editor-binding-btn
+{
+    min-width: 12px !important;
+    width: 12px !important;
+    margin: 6px 6px 0px 2px !important;
+    padding : 0px !important;
+    height : 24px !important;
+}
+
+.xui-with-bind {
+    background-color: #ffae82fc !important;
+}
+  
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1000;
+    top: -10px;
+    left: 30px;
+    text-transform: none !important;
+
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    right: 100%; /* To the left of the tooltip */
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent black transparent transparent;
+}
+
+
 /****************************   Le bouton heade et footer *************************/
 .xui-btn-action {min-width:30px !important ;padding:0px !important;background-color: #ffffff00 !important;}
 
@@ -92,7 +142,7 @@ pre > code {
 .xui-style-selector { 
     position: absolute; 
     padding: 5px;  
-    z-index: 1000;
+    z-index: 100;
  /*  background: rgba(204, 205, 255, 0.40);*/
     transition: background .5s ease-in;
     border: 1px solid rgb(64, 37, 226);
@@ -109,7 +159,7 @@ pre > code {
 .xui-style-selector-margin
 { 
     position: absolute; 
-    z-index: 999;
+    z-index: 99;
     border: 1px dashed rgb(255, 115, 0); 
 }
 

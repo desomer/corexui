@@ -31,6 +31,10 @@ export class PageDesignManager {
             $xui.rootdata.listSlot.push(...param.treeSlot);
         }
 
+        console.debug(param.dataState);
+        $xui.rootdata.jsonEditorData = JSON.parse(param.dataState);
+        $xui.vuejs.$refs.root.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
+
         setTimeout(() => {
             $xui.displayComponents("", "");
             $xui.displayPropertiesJS("root", "root")

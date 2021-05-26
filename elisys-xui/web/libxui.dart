@@ -16,6 +16,7 @@ import 'core/XUIFactory.dart';
 import 'core/XUIJSInterface.dart';
 
 import 'core/element/XUIElement.dart';
+import 'core/element/XUIProperty.dart';
 import 'core/parser/HTMLWriter.dart';
 import 'core/parser/ObjectWriter.dart';
 
@@ -29,6 +30,9 @@ external void changePageJS(obj);
 
 @JS()
 external void doPromiseJS(idPromise, ret);
+
+@JS()
+external String generateApplicationStateJS(template, last);
 
 ///-------------------------- methode JS vers XUI ----------------------------
 @JS('initPageXUI')
@@ -80,8 +84,10 @@ external set _getDesignProperties(
     void Function(FileDesignInfo, String, String) f);
 
 /// change les properties
-@JS('setDesignProperties')
-external set _setDesignProperties(dynamic Function(FileDesignInfo, dynamic) f);
+@JS('saveDesignPropertiesXUI')
+external set _saveDesignPropertiesXUI(
+    dynamic Function(FileDesignInfo, dynamic) f);
+
 
 ///------------------------------------------------------------------
 Future initPageXUI(FileDesignInfo fileInfo) async {
@@ -95,8 +101,13 @@ Future initPageXUI(FileDesignInfo fileInfo) async {
   String str = await designManager.getHtml(ctx, fileInfo.file, fileInfo.xid);
 
   var options = Options(mode: fileInfo.mode);
+  XUIProperty propBinding =
+      designManager.xuiEngine.getXUIProperty("root", "binding");
+  String lastBinding = propBinding?.content;
+
   options.binding = designManager.xuiEngine.getBindingInfo();
   options.treeSlot = designManager.xuiEngine.getSlotTree();
+  options.dataState = "{" + (lastBinding ?? "")+ "}";
 
   loadPageJS(str, options);
 }
@@ -125,23 +136,24 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
 }
 
 /// change les properties
-void setDesignProperties(FileDesignInfo fileInfo, dynamic listDesig) async {
+void saveDesignPropertiesXUI(FileDesignInfo fileInfo, dynamic listDesig) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
   List listDesign = listDesig;
 
-  for (ObjectDesign item in listDesign) {
-    if (item.value != item.value_orig) {
+  for (PropInfo item in listDesign) {
+    if (item.value != item.value_orig || item.bind != item.bind_orig) {
       designMgr.listXidChanged.add(item.xid);
-      await designMgr.changeProperty(item.xid, item.variable, item.value);
+      await designMgr.changeProperty(
+          item.xid, item.variable, item.value, item.bind);
     }
   }
   fileInfo.mode = "template";
 
   await _reloadTemplate(fileInfo);
 
-  // appel la promise
-  String xidProp = (listDesign[0] as ObjectDesign).xid;
-  doPromiseJS("setDesignProperties", xidProp);
+  // // appel la promise
+  // String xidProp = (listDesign[0] as PropInfo).xid;
+  // doPromiseJS("setDesignProperties", xidProp);
 }
 
 void getDesignProperties(
@@ -338,7 +350,7 @@ void changeNbChildXUI(
   if (action != "delete") {
     // ajoute un slot en incrementant le nb
     await designManager.changeProperty(
-        infoSlot.parentXid, "nb", (nbItem + 1).toString());
+        infoSlot.parentXid, "nb", (nbItem + 1).toString(), null);
   }
 
   var idx = idSlot.lastIndexOf("-") + 1;
@@ -378,7 +390,7 @@ void changeNbChildXUI(
 
     // retire un slot
     await designManager.changeProperty(
-        infoSlot.parentXid, "nb", (nbItem - 1).toString());
+        infoSlot.parentXid, "nb", (nbItem - 1).toString(), null);
   }
 
   designManager.listXidChanged.add(infoSlot.parentXid);
@@ -432,7 +444,6 @@ void getHtmlFromXUI(FileDesignInfo fileInfo, String idPromise) async {
 }
 
 void _reloadTemplate(FileDesignInfo fileInfo) async {
-
   // if (fileInfo.jsonBinding!=null)
   //   print("jsonBinding="+fileInfo.jsonBinding);
 
@@ -478,7 +489,7 @@ void _reloadTemplate(FileDesignInfo fileInfo) async {
 
   options.binding = designMgr.xuiEngine.getBindingInfo();
   options.treeSlot = designMgr.xuiEngine.getSlotTree();
-
+  
   changePageJS(options);
 }
 
@@ -502,7 +513,7 @@ void main() async {
   _changeNbChildXUI = allowInterop(changeNbChildXUI);
   _getInfoXUI = allowInterop(getInfoXUI);
   _getDesignProperties = allowInterop(getDesignProperties);
-  _setDesignProperties = allowInterop(setDesignProperties);
+  _saveDesignPropertiesXUI = allowInterop(saveDesignPropertiesXUI);
   _getComponentsXUI = allowInterop(getComponentsXUI);
   _getHtmlFromXUI = allowInterop(getHtmlFromXUI);
   _deleteDesign = allowInterop(deleteDesign);
