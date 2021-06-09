@@ -63,7 +63,7 @@ $xui.loadApplicationJS = () => {
 			},
 			say(context, event) {
 				console.debug("message say",context, event, this);
-				$xui.rootdata.items.push({ key:"c"});
+				$xui.rootdata.items.push({ "key":"c"});
 			}
 		}
 	})

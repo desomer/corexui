@@ -13,9 +13,9 @@ import 'XUIConfigManager.dart';
 import 'element/XUIProperty.dart';
 
 class XUIDesignManager {
-  XUIEngine xuiEngine;
+  XUIEngine? xuiEngine;
   static final lock = Lock(); // gestion du lock car multiple iFrame
-  static final _designManager = HashMap<String, XUIDesignManager>();
+  static final _designManager = HashMap<String, XUIDesignManager?>();
   static var cacheTemplateEditor = HashMap<String, String>();
 
   var listXidChanged = [];
@@ -27,7 +27,7 @@ class XUIDesignManager {
       _designManager[fileInfo.file] = XUIDesignManager();
     }
 
-    return _designManager[fileInfo.file];
+    return _designManager[fileInfo.file]!;
   }
 
   ///------------------------------------------------------------------------------------------
@@ -37,29 +37,35 @@ class XUIDesignManager {
     }
   }
 
+  XUIEngine getXUIEngine()
+  {
+    return xuiEngine!;
+  }
+
   ///------------------------------------------------------------------------------------------
   /// generation de l'arbre XUIElementHTML avec bufferHtml
-  Future<String> getHtml(XUIContext ctx, String uri, String xid) async {
+  Future<String?> getHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
 
-    if (xid == null) {
-      return null;
-    }
+     if (xid == null) {
+       return null;
+     }
+    
     var bufferHtml = XUIHtmlBuffer();
-    await xuiEngine.toHTMLString(bufferHtml, xid, ctx);
+    await getXUIEngine().toHTMLString(bufferHtml, xid, ctx);
     return Future.value(bufferHtml.html.toString());
   }
 
   ///------------------------------------------------------------------------------------------
   /// generation de l'arbre XUIElementHTML sans buffer html
-  void initHtml(XUIContext ctx, String uri, String xid) async {
+  Future initHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
 
-    if (xid == null) {
-      return;
-    }
+    // if (xid == null) {
+    //   return;
+    // }
 
-    await xuiEngine.toHTMLString(null, xid, ctx);
+    await getXUIEngine().toHTMLString(null, xid, ctx);
   }
 
   ///------------------------------------------------------------------------------------------
@@ -72,7 +78,7 @@ class XUIDesignManager {
         if (uri.endsWith(".html")) {
           XUIConfigManager.printc("initEngine file html : read ${uri}");
           var reader = HTMLReader(uri, provider);
-          await xuiEngine.initialize(reader, ctx);
+          await getXUIEngine().initialize(reader, ctx);
         }
       });
     }
@@ -80,29 +86,29 @@ class XUIDesignManager {
 
   ///------------------------------------------------------------------------------------------
   Future addDesign(String id, String template) async {
-    return XUIActionManager(xuiEngine).addDesign(id, template);
+    return XUIActionManager(getXUIEngine()).addDesign(id, template);
   }
 
-  void removeDesign(String id, String modeDelete) async {
-    XUIActionManager(xuiEngine).removeDesign(id, modeDelete);
+  Future removeDesign(String id, String? modeDelete) async {
+    XUIActionManager(getXUIEngine()).removeDesign(id, modeDelete);
   }
 
-  void moveDesign(String id, String mode, String moveTo) {
-    XUIActionManager(xuiEngine).moveDesign(id, mode, moveTo);
+  void moveDesign(String id, String? mode, String moveTo) {
+    XUIActionManager(getXUIEngine()).moveDesign(id, mode, moveTo);
   }
 
-  String cloneDesign(String id, String idMove, String mode) {
+  String cloneDesign(String id, String idMove, String? mode) {
     var cloneInfo = XUICloneDicoItem(id, idMove, null);
-    XUIActionManager(xuiEngine).cloneDesign(cloneInfo, mode);
+    XUIActionManager(getXUIEngine()).cloneDesign(cloneInfo, mode);
     return id;
   }
 
-  Future changeProperty(String xid, String variable, dynamic value, String bind) async {
-    return XUIActionManager(xuiEngine).changeProperty(xid, variable, value, bind);
+  Future changeProperty(String xid, String variable, dynamic value, String? bind) async {
+    return XUIActionManager(getXUIEngine()).changeProperty(xid, variable, value, bind);
   }
 
   void addXUIDesignEmpty(String xid) {
-    xuiEngine.addXUIDesignEmpty(xid);
+    getXUIEngine().addXUIDesignEmpty(xid);
   }
 
   ///------------------------------------------------------------------------------------------
@@ -122,7 +128,7 @@ class XUIDesignManager {
     ret.bufTemplate.write(cmp);
     ret.bufTemplate.write("</v-list-item-group></v-list>");
 
-    var listCmp = xuiEngine.getComponentsFor(id, idslot);
+    var listCmp = getXUIEngine().getComponentsFor(id, idslot);
     var i = 0;
     for (var item in listCmp) {
       if (i > 0) ret.bufData.write(",");
@@ -140,7 +146,7 @@ class XUIDesignManager {
   ///------------------------------------------------------------------------------------------
   Future<JSDesignInfo> getJSDesignInfo(String id, String idslot) async {
     var ret = JSDesignInfo();
-    var designs = xuiEngine.getDesignInfo(id, idslot, true);
+    var designs = getXUIEngine().getDesignInfo(id, idslot, true);
     ret.xid = id;
     ret.xidSlot = idslot;
 
@@ -158,7 +164,7 @@ class XUIDesignManager {
       await _getJSDesignHeader(fi, design, ctx, ret);
       //------------------------------------------------------------------
       // gestion des variable du composant du widget
-      for (DocVariables varCmp in design?.docInfo?.variables ?? const []) {
+      for (DocVariables varCmp in design.docInfo?.variables ?? const []) {
         String template =
             await _getJSDesignVariableTemplate(varCmp, fi, ctx, i, design);
         ret.bufTemplate.write(template);
@@ -183,7 +189,7 @@ class XUIDesignManager {
       DocVariables varCmp, DesignInfo design, JSDesignInfo ret, int i) {
     String extend = "";
     if (varCmp.editor == "combo") {
-      extend = ", \"items\":" + varCmp.list;
+      extend = ", \"items\":" + varCmp.list!;
     }
 
     // gestion des valeurs
@@ -191,13 +197,12 @@ class XUIDesignManager {
     var BindOfCmp = "";
     if (design.slotInfo.elementHTML?.propertiesXUI != null) {
       var valInCmp =
-          (design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]?.content);
+          (design.slotInfo.elementHTML?.propertiesXUI![varCmp.id]?.content);
 
-      if (design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]
+      if (design.slotInfo.elementHTML?.propertiesXUI![varCmp.id]
           is XUIPropertyBinding) {
-        BindOfCmp = ((design.slotInfo.elementHTML?.propertiesXUI[varCmp.id]
-                as XUIPropertyBinding)
-            ?.binding);
+        BindOfCmp = ((design.slotInfo.elementHTML?.propertiesXUI![varCmp.id]
+                as XUIPropertyBinding).binding!);
       }
 
       if (valInCmp != null && varCmp.editor == "bool") {
@@ -220,15 +225,15 @@ class XUIDesignManager {
     }
 
     ret.bufData.write("{\"xid\":\"" +
-        design.slotInfo.xid +
+        design.slotInfo.xid! +
         "\",\"variable\":\"" +
         varCmp.id +
         "\",\"label\":\"" +
-        varCmp.doc +
+        varCmp.doc! +
         "\",\"cat\":\"" +
         (varCmp.cat ?? "layout") +
         "\",\"editor\":\"" +
-        varCmp.editor +
+        varCmp.editor! +
         "\", \"value\":" +
         value.toString() +
         ", \"bind\":\"" +
@@ -258,7 +263,7 @@ class XUIDesignManager {
       } else if (varCmp.editor == "style") {
         fi.xid = 'editor-text';
       } else {
-        fi.xid = 'editor-' + varCmp.editor;
+        fi.xid = 'editor-' + varCmp.editor!;
       }
 
       XUIComponent cmp;
@@ -281,11 +286,11 @@ class XUIDesignManager {
       if (XUIConfigManager.verboseEditor) {
         XUIConfigManager.printc(
             "getJSDesignVariableTemplate add cacheTemplateEditor <" +
-                keyCache +
+                keyCache! +
                 ">=>" +
-                template);
+                template!);
       }
-      cacheTemplateEditor[keyCache] = template;
+      cacheTemplateEditor[keyCache!] = template!;
     }
 
     template = template.replaceAll("##idx##", i.toString());
@@ -298,7 +303,7 @@ class XUIDesignManager {
     var keyCache = 'editor-header';
     var template = cacheTemplateEditor[keyCache];
     // titre du widget
-    var titleCmp = design?.docInfo?.name ?? design.slotInfo.docId;
+    String? titleCmp = design.docInfo?.name ?? design.slotInfo.docId;
     if (template == null) {
       fi.xid = 'editor-header';
 
@@ -315,16 +320,16 @@ class XUIDesignManager {
       template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
 
       if (XUIConfigManager.verboseEditor) {
-        XUIConfigManager.printc("****<" + keyCache + ">=>" + template);
+        XUIConfigManager.printc("****<" + keyCache + ">=>" + template!);
       }
-      cacheTemplateEditor[keyCache] = template;
+      cacheTemplateEditor[keyCache] = template!;
     }
-    titleCmp = titleCmp ?? ("xid = " + design.slotInfo.xid);
+    titleCmp = titleCmp ?? ("xid = " + design.slotInfo.xid!);
     if (design.slotInfo.slotname != null) {
-      titleCmp = titleCmp + " (" + design.slotInfo.slotname + ")";
+      titleCmp = titleCmp + " (" + design.slotInfo.slotname! + ")";
     }
 
-    template = template.replaceAll("##xid##", design.slotInfo.xid);
+    template = template.replaceAll("##xid##", design.slotInfo.xid!);
     template = template.replaceAll("##title##", titleCmp);
 
     ret.bufTemplate
@@ -343,11 +348,11 @@ class XUIDesignManager {
               "initialize file for getXUIComponent : read ${uri}");
         }
         var reader = HTMLReader(uri, provider);
-        await xuiEngine.initialize(reader, ctx);
+        await getXUIEngine().initialize(reader, ctx);
       });
     }
 
-    XUIComponent cmp = xuiEngine.xuiFile.components[idCmp].sort(ctx).first;
+    XUIComponent cmp = getXUIEngine().xuiFile.components[idCmp]!.sort(ctx).first;
     return cmp;
   }
 
@@ -357,7 +362,7 @@ class XUIDesignManager {
       XUIContext ctx, String id, String idslot, String action) {
     List<ObjectAction> ret = [];
 
-    var designs = xuiEngine.getDesignInfo(id, idslot, true);
+    var designs = getXUIEngine().getDesignInfo(id, idslot, true);
     var idx = 0;
     for (var design in designs) {
       idx++;
@@ -367,11 +372,11 @@ class XUIDesignManager {
       bool isSlot = id.startsWith(SLOT_PREFIX);
       /*********************************** */
       if (design.docInfo != null) {
-        if (design.docInfo.xid == "v-tab:xui-tabs") {
+        if (design.docInfo!.xid == "v-tab:xui-tabs") {
           if (idx == 1) {
             // ajout un flow
             ObjectAction act = ObjectAction(
-                xid: design.slotInfo.xid,
+                xid: design.slotInfo.xid!,
                 action: "addFlow",
                 type: "flow",
                 icon: "mdi-table-row",
@@ -379,38 +384,38 @@ class XUIDesignManager {
             ret.add(act);
           }
           ObjectAction act = ObjectAction(
-              xid: design.slotInfo.xid,
+              xid: design.slotInfo.xid!,
               action: "incNbBefore",
               icon: "mdi-tab",
               type: "tabs",
-              title: "Add new Tab (before " + design.slotInfo.slotname + ")");
+              title: "Add new Tab (before " + design.slotInfo.slotname! + ")");
           ret.add(act);
           act = ObjectAction(
-              xid: design.slotInfo.xid,
+              xid: design.slotInfo.xid!,
               action: "incNbAfter",
               icon: "mdi-tab",
               type: "tabs",
-              title: "Add new Tab (after " + design.slotInfo.slotname + ")");
+              title: "Add new Tab (after " + design.slotInfo.slotname!+ ")");
           ret.add(act);
-        } else if (design.docInfo.xid == "xui-no-dom:xui-flow") {
+        } else if (design.docInfo!.xid == "xui-no-dom:xui-flow") {
           ObjectAction act = ObjectAction(
-              xid: design.slotInfo.xid,
+              xid: design.slotInfo.xid!,
               action: "incNbBefore",
               type: "flow",
               icon: "mdi-transfer-left",
-              title: "Add right (before " + design.slotInfo.slotname + ")");
+              title: "Add right (before " + design.slotInfo.slotname! + ")");
           ret.add(act);
           act = ObjectAction(
-              xid: design.slotInfo.xid,
+              xid: design.slotInfo.xid!,
               action: "incNbAfter",
               type: "flow",
               icon: "mdi-transfer-right",
-              title: "Add right (after " + design.slotInfo.slotname + ")");
+              title: "Add right (after " + design.slotInfo.slotname! + ")");
           ret.add(act);
         } else if (idx == 1 && isSlot) {
           // ajoute un slot
           ObjectAction act = ObjectAction(
-              xid: design.slotInfo.xid,
+              xid: design.slotInfo.xid!,
               action: "addFlow",
               type: "flow",
               icon: "mdi-table-row",
@@ -419,7 +424,7 @@ class XUIDesignManager {
         } else if (idx == 1 && !isSlot) {
           // ajoute un slot
           ObjectAction act = ObjectAction(
-              xid: design.slotInfo.xid,
+              xid: design.slotInfo.xid!,
               action: "surroundRight",
               type: "flow",
               icon: "mdi-table-row",
@@ -464,8 +469,8 @@ class XUIDesignManager {
 
 ///------------------------------------------------------------------------------------------
 class JSDesignInfo {
-  String xid;
-  String xidSlot;
+  late String xid;
+  late String xidSlot;
   var bufPath = StringBuffer();
   var bufData = StringBuffer();
   var bufTemplate = StringBuffer();

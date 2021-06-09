@@ -12,12 +12,13 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <span xid="xui-title-1" class="[[class]]" -style="[[style]]" xui-mode="final;preview">[[text@1]]</span>
-    <span xid="xui-title-1" class="[[class]]" -style="[[style]]" contenteditable="true"
+    <span xid="xui-title-1" class="[[class]]" -style="[[style]]">[[text@1]]</span>
+    <!--span xid="xui-title-1" class="[[class]]" -style="[[style]]" xui-mode="final;preview">[[text@1]]</span>
+    <span xid="xui-title-1" class="[[class]]" -style="[[style]]" xui-mode="design;template" contenteditable="true"
         @blur="$xui.updateDirectPropBlur()"
         @focus="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]', true)"
-        @input="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]')" xui-mode="design;template"
-        >[[text@1]]</span>
+        @input="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]')" 
+        >[[text@1]]</span-->
 
     <!--------------------------  XUI-TEXT   ---------------------------->
     <xui-doc xid="xui-text-1">

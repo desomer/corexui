@@ -13,13 +13,16 @@
 		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
 
 		<xui-prop var="withLeftNavigation" editor="bool">Left Navigation Drawer</xui-prop>
+		<xui-prop var=":isNavdrawerOpen" editor="text" bind-type="text" bind-type="bool">var isNavdrawerOpen</xui-prop>
+		
 		<xui-prop var="navPermanent" editor="bool">Nav permanent</xui-prop>
 		<xui-prop var="navTemporary" editor="bool">Force temporary nav on Desktop</xui-prop>
 		<xui-prop var="clipped-left" editor="bool">App bar clipped left</xui-prop>
 		<xui-prop var="inset-left" editor="bool">Footer bar inset (if Nav Drawer)</xui-prop>
+		<xui-prop var="binding" editor="text">Data Binding</xui-prop>
 
-		<xui-prop id="name">Page</xui-prop>
-		<xui-prop id="desc">La page</xui-prop>
+		<xui-prop id="name">Application</xui-prop>
+		<xui-prop id="desc">L'application</xui-prop>
 	</xui-doc>
 
 	<!---------------------------------------------------------------------------------------->
@@ -32,7 +35,7 @@
 
 		<xui-script-data></xui-script-data>
 		<style id="xui-style" xid="inject-style" xui-no-design></style>
-		<xui-slot xid="inject-after-body" xui-no-design></xui-slot>
+		<xui-no-dom xid="inject-after-body" xui-no-design></xui-no-dom>
 
 		<xui-init-designer-js></xui-init-designer-js>
 		<xui-init-vuetify></xui-init-vuetify>
@@ -49,11 +52,16 @@
 	<xui-design xid="header-vuetify">
 		<title>[[title@0+]]</title>
 		<viewport-mobile></viewport-mobile>
-		
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" />
-		<link rel="stylesheet"
-			href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" />
-		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" />
+		<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+		<link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+		<link rel="preconnect" href="fonts.googleapis.com" />
+		<link rel="dns-prefetch" href="fonts.googleapis.com" />
+		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/spinkit@2.0.1/spinkit.min.css" />
+
+		<link rel="preload" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+		<link rel="preload" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" as="style" onload="this.onload=null;this.rel='stylesheet'">
+		<link rel="preload" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+
 		<script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
 
@@ -70,39 +78,42 @@
 
 	<!------------------------------------- APP VUETIFY ---------------------------------------->
 	<xui-design xid="body-vuetify">
+
+		<div id="app">
+			<div class="sk-plane" style="margin: 40vh auto"></div>
+		</div>
+
 		<template id="xui-rootTemplate" dark="[[darkApp@0+]]">
 			<v-app xid="appcontent">
 			</v-app>
-			<xui-slot xid="xui-temporary-slot" xui-no-design></xui-slot>
+			<xui-temporary xid="xui-temporary-slot" xui-no-design></xui-temporary>
 		</template>
 
 		<template id="xui-route-default">
 			<vue-content-1 xid="contentpage"></vue-content-1>
 		</template>
 
-		<xui-route-template xid="xui-pagerouter" xui-forvar="nbroute@0+"></xui-route-template>
+		<xui-route-template xid="xui-route" xui-forvar="nbroute@0+"></xui-route-template>
 
-		<div id="app"></div>
 	</xui-design>
 
 	<!------------------------------------- V-APP MAIN CONTENT ---------------------------------------->
-	<xui-doc xid="vue-rooter-1">
-		<xui-prop id="name">Rooter</xui-prop>
-		<xui-prop id="desc">Rooter de la page</xui-prop>
-		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">rooter content color</xui-prop>
+	<xui-doc xid="vue-router-1">
+		<xui-prop id="name">Router</xui-prop>
+		<xui-prop id="desc">Router de la page</xui-prop>
+		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">router content color</xui-prop>
 	</xui-doc>
 
-	<v-main xid="vue-rooter-1" class="fill-height" -style="background-color:[[colorBg]]">
-		<router-view>  <!-- ICI LA PAGE --> </router-view>
+	<v-main xid="vue-router-1" class="fill-height" -style="background-color:[[colorBg]]">
+		<router-view ref="routerview">  <!-- ICI LA PAGE --> </router-view>
 	</v-main>
 
 	<xui-design xid="appcontent" xui-no-design>
-		<xui-slot xid="inject-design-ui" xui-no-design></xui-slot>
 		<xui-copyzone></xui-copyzone>
 		<vue-systembar-1 xid="systembar"  xui-if=[[withSysBar@0+]]></vue-systembar-1>
 		<vue-nav-drawer-1 xid="navdrawerleft" xui-if=[[withLeftNavigation@0+]]></vue-nav-drawer-1>
 		<vue-apptoolbar-1 xid="toolbar" xui-if=[[withAppBar@0+]]></vue-apptoolbar-1>
-		<vue-rooter-1 xid="rooter"></vue-rooter-1>
+		<vue-router-1 xid="rooter"></vue-router-1>
 		<vue-footer-1 xid="footer" xui-if=[[withFooter@0+]]></vue-footer-1>
 		<vue-bottom-nav-1 xid="bottom-nav" xui-if=[[withBottomNavigation@0+]]></vue-bottom-nav-1>
 	</xui-design>
@@ -191,7 +202,7 @@
 		shrink-on-scroll="[[shrink-on-scroll]]" collapse-on-scroll="[[HeaderCollapseonscroll]]"
 		hide-on-scroll="[[HeaderHideonscroll]]" scroll-threshold="[[scroll-threshold]]" color="[[colorApp@0+]]"
 		class="[[class]]" -style="[[style]]">
-		<v-app-bar-nav-icon xui-if=[[withLeftNavigation@0+]] @click.stop="[[navDrawerBind@0+]] = ![[navDrawerBind@0+]]"></v-app-bar-nav-icon>
+		<v-app-bar-nav-icon xui-if=[[withLeftNavigation@0+]] @click.stop="[[:isNavdrawerOpen@0+]] = ![[:isNavdrawerOpen@0+]]"></v-app-bar-nav-icon>
 		<v-toolbar-title>
 			<xui-slot xui-reloader=true xid="slot-toolbar-title" xui-slot-name="toolbar title"></xui-slot>
 		</v-toolbar-title>
@@ -228,7 +239,7 @@
 		<xui-prop id="desc">navigation drawer slot</xui-prop>
 	</xui-doc>
 
-	<v-navigation-drawer v-model=[[navDrawerBind@0+]] xid="vue-nav-drawer-1" 
+	<v-navigation-drawer v-model=[[:isNavdrawerOpen@0+]] xid="vue-nav-drawer-1" 
 		overlay-color="[[overlay-color]]" overlay-opacity="[[overlay-opacity]]" width="[[width]]" 
 		expand-on-hover="[[expand-on-hover]]"
 		src="[[src]]"
@@ -331,6 +342,9 @@
 		<xui-slot xid="xui-copyzone-slot"></xui-slot>
 	</div>
 	<xui-slot xid="xui-copyzone" xui-mode="final;preview"></xui-slot>
+
+	<!------------------------  COPY ZONE pour le surround -------------------->
+	<xui-slot xid="xui-temporary"></xui-slot>
 	<!------------------------------------------------------------------------->
 
 	<xui-design xui-mode="template;design" xid="inject-style">
@@ -403,14 +417,13 @@
 	</xui-design>
 
 	<!------------------------------------------------------------------------->
-	<script xid="xui-script-data">
-		if (typeof $xui === 'undefined')
-			$xui = {};
-
+	<script xid="xui-script-data">		
+		$xui = {};
 		$xui.rootdata = {};
+		// ------ ici le data binding dynamique ---------;
 		<xui-inject-text xui-path="data-binding"></xui-inject-text>
-
-		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler 
+		// ----------------------------------------------
+		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler
 	</script>
  
 
@@ -421,7 +434,7 @@
 	</script>
 
 	<!--------------------------- PAS IMPLEMENTATION EN MODE FINAL ------------>
-	<xui-slot xid="xui-init-designer" xui-mode="final;design"></xui-slot>
+	<xui-no-dom xid="xui-init-designer" xui-mode="final;design"></xui-no-dom>
 	<xui-slot xid="xui-init-designer-js" xui-mode="final"></xui-slot>
 
 	<script type="module"  xid="xui-init-designer-js" xui-mode="design">

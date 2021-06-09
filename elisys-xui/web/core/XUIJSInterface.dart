@@ -16,8 +16,8 @@ class FileDesignInfo {
 
   external String get mode;
   external set mode(String mode);
-  external String get partXID;        
-  external set partXID(String part);
+  external String? get partXID;        
+  external set partXID(String? part);
   external String get xid;
   external set xid(String xid);
 
@@ -116,8 +116,8 @@ class TreeSlot {
   external set id(int id);
   external String get name;
   external set name(String name);
-  external List get children;
-  external set children(List name);
+  external List? get children;
+  external set children(List? name);
   external bool get isSlot;
   external set isSlot(bool iss);
 }
@@ -125,16 +125,16 @@ class TreeSlot {
 @JS()
 @anonymous
 class SlotInfoJS {
-  external String get addRemoveAction;
-  external set addRemoveAction(String addRemoveAction);
+  external String? get addRemoveAction;
+  external set addRemoveAction(String? addRemoveAction);
   external String get docId;
   external set docId(String docId);
-  external String get idRessource;
-  external set idRessource(String idRessource);
+  external String? get idRessource;
+  external set idRessource(String? idRessource);
   external String get parentXid;
   external set parentXid(String parentXid);
-  external String get slotname;
-  external set slotname(String slotname);
+  external String? get slotname;
+  external set slotname(String? slotname);
   external String get xid;
   external set xid(String xid);
 }

@@ -13,7 +13,7 @@
 		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
 
 		<xui-prop var="withLeftNavigation" editor="bool">Left Navigation Drawer</xui-prop>
-		<xui-prop var=":isNavdrawerOpen" editor="text" bind-type="text">var isNavdrawerOpen</xui-prop>
+		<xui-prop var=":isNavdrawerOpen" editor="text" bind-type="text" bind-type="bool">var isNavdrawerOpen</xui-prop>
 		
 		<xui-prop var="navPermanent" editor="bool">Nav permanent</xui-prop>
 		<xui-prop var="navTemporary" editor="bool">Force temporary nav on Desktop</xui-prop>
@@ -35,7 +35,7 @@
 
 		<xui-script-data></xui-script-data>
 		<style id="xui-style" xid="inject-style" xui-no-design></style>
-		<xui-slot xid="inject-after-body" xui-no-design></xui-slot>
+		<xui-no-dom xid="inject-after-body" xui-no-design></xui-no-dom>
 
 		<xui-init-designer-js></xui-init-designer-js>
 		<xui-init-vuetify></xui-init-vuetify>
@@ -52,11 +52,16 @@
 	<xui-design xid="header-vuetify">
 		<title>[[title@0+]]</title>
 		<viewport-mobile></viewport-mobile>
-		
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" />
-		<link rel="stylesheet"
-			href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" />
-		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" />
+		<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+		<link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+		<link rel="preconnect" href="fonts.googleapis.com" />
+		<link rel="dns-prefetch" href="fonts.googleapis.com" />
+		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/spinkit@2.0.1/spinkit.min.css" />
+
+		<link rel="preload" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+		<link rel="preload" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" as="style" onload="this.onload=null;this.rel='stylesheet'">
+		<link rel="preload" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+
 		<script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
 
@@ -73,6 +78,11 @@
 
 	<!------------------------------------- APP VUETIFY ---------------------------------------->
 	<xui-design xid="body-vuetify">
+
+		<div id="app">
+			<div class="sk-plane" style="margin: 40vh auto"></div>
+		</div>
+
 		<template id="xui-rootTemplate" dark="[[darkApp@0+]]">
 			<v-app xid="appcontent">
 			</v-app>
@@ -85,7 +95,6 @@
 
 		<xui-route-template xid="xui-route" xui-forvar="nbroute@0+"></xui-route-template>
 
-		<div id="app"></div>
 	</xui-design>
 
 	<!------------------------------------- V-APP MAIN CONTENT ---------------------------------------->
@@ -408,16 +417,13 @@
 	</xui-design>
 
 	<!------------------------------------------------------------------------->
-	<script xid="xui-script-data">
-		if (typeof $xui === 'undefined')
-			$xui = {};
-
+	<script xid="xui-script-data">		
+		$xui = {};
 		$xui.rootdata = {};
-		// ------ ici le data binding dynamique ---------
+		// ------ ici le data binding dynamique ---------;
 		<xui-inject-text xui-path="data-binding"></xui-inject-text>
 		// ----------------------------------------------
-
-		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler 
+		$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler
 	</script>
  
 
@@ -428,7 +434,7 @@
 	</script>
 
 	<!--------------------------- PAS IMPLEMENTATION EN MODE FINAL ------------>
-	<xui-slot xid="xui-init-designer" xui-mode="final;design"></xui-slot>
+	<xui-no-dom xid="xui-init-designer" xui-mode="final;design"></xui-no-dom>
 	<xui-slot xid="xui-init-designer-js" xui-mode="final"></xui-slot>
 
 	<script type="module"  xid="xui-init-designer-js" xui-mode="design">

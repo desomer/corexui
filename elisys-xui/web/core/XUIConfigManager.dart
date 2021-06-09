@@ -1,6 +1,6 @@
 class XUIConfigManager {
 
-    static bool reloaderEnable = false; // configuration avec reloader
+    static bool reloaderEnable = true; // configuration avec reloader
 
     static bool verboseXUIEngine = false;
     static bool verboseTree = false;
@@ -14,6 +14,6 @@ class XUIConfigManager {
 
     static printc(Object object)
     {
-        print("==>> "+object);
+        print("==>> "+ object.toString());
     }
 }

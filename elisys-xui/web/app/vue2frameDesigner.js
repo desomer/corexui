@@ -165,10 +165,14 @@ window.addEventListener('message', function (e) {
     var data = e.data;
     if (data.action == "changeTemplate") {
 
+        if (data.param.jsonBinding!=null) 
+        {  // change uniquement le json du template
+           Object.assign($xui.rootdata, data.param.jsonBinding);
+           console.debug("****************************  assign data state ", data.param.jsonBinding,  $xui.rootdata);
+        } 
+
          if (data.param.action == "reload-json") 
          {  // change uniquement le json du template
-            Object.assign($xui.rootdata, data.param.jsonBinding);
-            console.debug("assign" + $xui.rootdata);
             return;
          }  
 

@@ -3,7 +3,7 @@ import 'dart:html';
 import '../XUIEngine.dart';
 
 class ProviderAjax extends Provider {
-  String path;
+  late String path;
 
   ProviderAjax();
 

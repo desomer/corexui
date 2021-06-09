@@ -40,10 +40,10 @@ $xui.loadApplicationJS = () => {
 		}
 	}
 
-	/*********************************** STORE   *********************************/
+	/*********************************** STORE CQRS  *********************************/
 	$xui.store = new Vuex.Store({
 		state: {
-			count: 0
+			count: 0    // private
 		},
 		mutations: {
 			increment(state, info) {
@@ -63,27 +63,25 @@ $xui.loadApplicationJS = () => {
 			},
 			say(context, event) {
 				console.debug("message say",context, event, this);
+				$xui.rootdata.items.push({ "key":"c"});
 			}
 		}
 	})
 
-	// $xui.store.commit('increment');
-	$xui.store.dispatch('inc', 1)
+	//  $xui.store.commit('increment', {amount:1});   // appel une mutation
+	//  $xui.store.dispatch('inc', 1);    // appel une action
 
 	$xui.storeAction = Vuex.mapActions({
 		add: 'inc', // attacher `this.add()` à `this.$store.dispatch('increment')`
 		say: 'say'
 	});
 
-	var allState = Reflect.ownKeys($xui.store.state);
-	console.debug("allState ", allState)
 
 	// passer la valeur littérale 'count' revient à écrire `state => state.count`
-	var storeDataBinding = Vuex.mapState({ titre2: 'count' });
-	$xui.storeDataBinding = storeDataBinding;
+	$xui.storeDataBinding = Vuex.mapState({ titre2: 'count' });   // titre2 mount l'attribut private 'count' du state
 
 	/***********************************  ROUTER   **********************************/
-	const defautRoute = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-route-default", storeDataBinding);
+	const defautRoute = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-route-default", $xui.storeDataBinding);
 	const routes = [
 		{ path: '/', component: defautRoute },
 		//	vue2CmpMgr.ComponentManager.getRoute('/foo', 'app/frameDesigner.html', 'routeA'),
@@ -92,19 +90,17 @@ $xui.loadApplicationJS = () => {
 
 	var i = 0;
 	while (true) {
-		var idTemplate = "xui-pagerouter-route-"+i;
-		console.info("create route " + idTemplate);
+		var idTemplate = "xui-route-"+i;
+		console.info("create route <" + idTemplate +"> uri='/route"+i+"'");
 		const template = document.querySelector("#" + idTemplate);
 		if (template==null) break;
-		const infoRoute = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-pagerouter-route-"+i, storeDataBinding);
+		const infoRoute = vue2CmpMgr.ComponentManager.getComponentFromTemplate(idTemplate, $xui.storeDataBinding);
 		routes.push({ path: '/route'+i, component: infoRoute });
 		i++;
 	}
 
 	const UnknownRoute = { template: '<div>unknown</div>' };
 	routes.push({ path: '*', component: UnknownRoute });
-
-	console.debug("---> routes", routes);
 
 	$xui.router = new VueRouter({
 		routes // short for `routes: routes`
@@ -133,9 +129,33 @@ $xui.loadApplicationJS = () => {
 	};
 
 	/*********************************** VUEJS ***********************************/
-	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-rootTemplate", storeDataBinding);
+	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-rootTemplate", $xui.storeDataBinding);
+	
+	
+	/*************************************************************************** */
 	//$xui.rootdata.toto="4444";
+	// var json = { items:[{ key:"a" }, { key:"b"}]}
+	// $xui.rootdata = { ...$xui.rootdata, ...json };
 
+
+	var allState = Reflect.ownKeys($xui.store.state);
+	console.debug("vue store allState ", allState)
+
+	console.debug("vue store compute state ", $xui.storeDataBinding)
+	console.debug("vue inner state", $xui.store.state)
+	console.debug("vue static data", $xui.rootdata)
+	console.debug("vue store", $xui.store);
+	console.debug("vue routes", routes);
+
+
+	$xui.router.afterEach((to, from) => {
+		console.log("router going to " + to.fullPath)
+		console.log(to);
+	  
+		// console.log("all ref", $xui.router );
+	  })
+
+	/*************************************************************************** */
 	$xui.vuejs = new Vue({
 		el: '#app',
 		store: $xui.store,

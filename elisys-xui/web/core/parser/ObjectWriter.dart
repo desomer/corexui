@@ -1,13 +1,9 @@
-
-
 import '../XUIEngine.dart';
 import '../XUIFactory.dart';
 import '../element/XUIElement.dart';
 import '../element/XUIProperty.dart';
 
-class ObjectWriter
-{
-
+class ObjectWriter {
   dynamic toObjects(XUIResource xuiFile) {
     var ret = {};
     var import = [];
@@ -24,9 +20,13 @@ class ObjectWriter
 
         if (item.elemXUI.propertiesXUI != null) {
           var prop = [];
-          item.elemXUI.propertiesXUI.forEach((k, v) {
+          item.elemXUI.propertiesXUI!.forEach((k, v) {
             if (v is XUIPropertyBinding) {
-              prop.add({"id": k, "val": v.content.toString(), "binding": v.binding.trim()});
+              prop.add({
+                "id": k,
+                "val": v.content.toString(),
+                "binding": v.binding!.trim()
+              });
             } else {
               prop.add({"id": k, "val": v.content.toString()});
             }
@@ -35,15 +35,20 @@ class ObjectWriter
           des["props"] = prop;
         }
 
-        if (item.elemXUI.children != null) {
-          var children = [];
-          for (XUIElementXUI aChild in item.elemXUI.children) {
-            if (aChild is! XUIElementText) {
-              children.add({"tag": aChild.tag, "xid": aChild.xid});
+        var children = item.elemXUI.children;
+
+        if (children != null) {
+          var childrenObj = [];
+          children.forEach((elem) {
+            XUIElementXUI aChild = elem as XUIElementXUI;
+            bool isText = aChild is XUIElementText;
+            if (!isText) {
+              childrenObj.add({"tag": aChild.tag, "xid": aChild.xid});
             }
-          }
-          if (children.isNotEmpty) {
-            des["children"] = children;
+          });
+
+          if (childrenObj.isNotEmpty) {
+            des["children"] = childrenObj;
           }
         }
 
@@ -69,5 +74,4 @@ class ObjectWriter
     ret["component"] = compo;
     return ret;
   }
-
 }

@@ -8,19 +8,24 @@ $xui.initVuejs = (instanceVue) => {
   instanceVue.$watch('activeTab', function (newValue, oldValue) {
     console.debug('The activeTab name was changed from ' + oldValue + ' to ' + newValue + '!');
     $xui.unDisplaySelector();
-    
+
     if (newValue == 2) {
       // onglet code
       $xui.refreshAction('showCode')   // affiche le code et le xui
     }
 
-    if (newValue == 0 && oldValue==1) {
+    if (oldValue == 1) {
       // retour de l'onglet jsonEditor
-      $xui.refreshAction('template:reload-json')   // recharge le json
+      if ($xui.lastEditorAppStateValue != JSON.stringify($xui.rootdata.jsonEditorData)) {
+        $xui.refreshAction('template:reload-json')   // recharge le json
+        $xui.doStoreOnNextReload = true;
+      }
+
     }
 
-    if (newValue == 1 )
-    {
+    if (newValue == 1) {
+      console.debug("******* set app state in editor", $xui.rootdata.jsonEditorData)
+      $xui.lastEditorAppStateValue = JSON.stringify($xui.rootdata.jsonEditorData);
       $xui.vuejs.$refs.root.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
     }
 
@@ -68,7 +73,7 @@ class DesignClassManager {
         }
         else if (classDesc.type == "list" && classDesc.sel) {
           classDesc.sel = true;
-          text = text + classDesc.value + (classDesc.value!=""?"-":"") + classDesc.vl + " "
+          text = text + classDesc.value + (classDesc.value != "" ? "-" : "") + classDesc.vl + " "
         }
       }
     }
@@ -106,12 +111,12 @@ class DesignClassManager {
           else if (classDesc.type == "list" && tag.startsWith(classDesc.value + "-")) {
             classDesc.sel = true;
             var lenTag = classDesc.value.length;
-            classDesc.vl =  tag.substring(lenTag+1);
+            classDesc.vl = tag.substring(lenTag + 1);
             catDesc.open = true;
             catDesc.nbint++;
             break a;
           }
-          else if (classDesc.type == "list" && classDesc.value=="" && classDesc.list.indexOf(tag)>=0) {
+          else if (classDesc.type == "list" && classDesc.value == "" && classDesc.list.indexOf(tag) >= 0) {
             classDesc.sel = true;
             classDesc.vl = tag;
             catDesc.open = true;
@@ -123,7 +128,7 @@ class DesignClassManager {
     });
 
     for (const catDesc of listDesignClass) {
-      catDesc.nb = ""+catDesc.nbint;
+      catDesc.nb = "" + catDesc.nbint;
     }
 
   }

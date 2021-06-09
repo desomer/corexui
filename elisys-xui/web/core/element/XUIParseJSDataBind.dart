@@ -4,7 +4,7 @@ import 'XUIElement.dart';
 
 class XUIParseJSDataBinding {
 
-    HashMap<String, JSDataBindingProp> dataBindProperties;
+    late HashMap<String, JSDataBindingProp> dataBindProperties;
 
     void parseAttr(XUIElementHTML elem ,String key, String value)
     {
@@ -35,6 +35,6 @@ class XUIParseJSDataBinding {
 }
 
 class JSDataBindingProp {
-    String path;
-    String value;
+    late String path;
+    late String value;
 }

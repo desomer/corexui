@@ -14,31 +14,32 @@ import 'XUIProperty.dart';
 abstract class XUIElement {
   // identifie l'implementation HTML ex: type panel (div, h1, span) input (label +
   // combo + action + desc + flag)
-  String tag;
+  String? tag;
 
   // les attribut XHTML
-  HashMap<String, XUIProperty> attributes;
+  HashMap<String, XUIProperty>? attributes;
 
   // les enfants
-  List<XUIElement> children;
+  List<XUIElement>? children;
 
   // les prop xui
-  HashMap<String, XUIProperty> propertiesXUI;
+  HashMap<String, XUIProperty>? propertiesXUI;
 
   bool isEmpty() {
-    return (attributes == null || attributes.isEmpty) &&
-        (children == null || children.isEmpty) &&
-        (propertiesXUI == null || propertiesXUI.isEmpty);
+    return (attributes == null || attributes?.isEmpty == true) &&
+        (children == null || children?.isEmpty == true) &&
+        (propertiesXUI == null || propertiesXUI?.isEmpty == true);
   }
 }
 
 ///***************************************************************
 class XUIElementHTML extends XUIElement {
-  XUIElementHTML parent;
+  static XUIElement notElem = XUIElementHTML();
+  XUIElementHTML? parent;
 
-  XUIElementXUI originElemXUI;
-  List<XUIComponent> implementBy;
-  List<XUIDesign> designBy;
+  XUIElementXUI? originElemXUI;
+  List<XUIComponent>? implementBy;
+  List<XUIDesign>? designBy;
 
   int getNbChildNoText() {
     int nb = 0;
@@ -50,11 +51,11 @@ class XUIElementHTML extends XUIElement {
     return nb;
   }
 
-  XUIElementHTML firstChildNoText() {
+  XUIElementHTML? firstChildNoText() {
     if (children != null) {
-      for (var item in children) {
+      for (var item in children!) {
         if (item is! XUIElementHTMLText) {
-          return item;
+          return item as XUIElementHTML;
         }
       }
     }
@@ -62,7 +63,7 @@ class XUIElementHTML extends XUIElement {
   }
 
   ///calcule des propertiesXUI [[Prop]]
-  String calculatePropertyXUI(String prop, ParseInfo parseInfoOptional) {
+  String? calculatePropertyXUI(String? prop, ParseInfo? parseInfoOptional) {
     if (prop != null) {
       ParseInfo parseInf;
       if (parseInfoOptional != null) {
@@ -94,18 +95,19 @@ class XUIElementHTML extends XUIElement {
   dynamic searchPropertyXUI(String tag, int deep, ParseInfo parseInfo) {
     if (tag == cst.ATTR_XID) {
       // ne cherche pas sur les parent
-      return calculatePropertyXUI(this.originElemXUI.xid, parseInfo);
+      return calculatePropertyXUI(this.originElemXUI!.xid, parseInfo);
     } else if (tag == cst.ATTR_PARENT_XID) {
       // cas du parent XID
-      XUIElementHTML p = this.parent;
+      XUIElementHTML p = this.parent as XUIElementHTML;
+      // ignore: unnecessary_null_comparison
       while (p != null) {
-        if (p.originElemXUI != null && p.originElemXUI.xid != null) {
+        if (p.originElemXUI != null && p.originElemXUI!.xid != null) {
           break;
         }
-        p = p.parent;
+        p = p.parent!;
       }
 
-      return p.calculatePropertyXUI(p.originElemXUI.xid, parseInfo);
+      return p.calculatePropertyXUI(p.originElemXUI!.xid, parseInfo);
     }
 
     // gestion de la recherche sur des enfant (@-1) ou les parents (@0+)
@@ -114,7 +116,7 @@ class XUIElementHTML extends XUIElement {
       tag = atTag[0];
       var atScope = atTag[1];
       if (atScope == "-1") {
-        return firstChildNoText().searchPropertyXUI(tag, 0, parseInfo);
+        return firstChildNoText()!.searchPropertyXUI(tag, 0, parseInfo);
       }
       if (atScope == "0+") {
         return searchPropertyXUI(tag, -2, parseInfo);
@@ -126,21 +128,21 @@ class XUIElementHTML extends XUIElement {
       deep = 0;
     }
 
-    XUIProperty prop = propertiesXUI == null ? null : propertiesXUI[tag];
+    XUIProperty? prop = propertiesXUI == null ? null : propertiesXUI![tag];
 
     if (prop != null) {
       return _getValueXUIProperty(parseInfo, prop, tag);
     } else if (parent != null && (deep < 0 || deep > 0)) {
-      return parent.searchPropertyXUI(tag, deep - 1, parseInfo);
+      return parent!.searchPropertyXUI(tag, deep - 1, parseInfo);
     }
   }
 
   /// genere la valeur du la property (et affecte le binding vuej )
   /// tag : tag sans @0+          disabled="[[disabled]]"
   ///                             @click.stop="[[navDrawerBind@0+]] = ![[navDrawerBind@0+]]"
-  /// 
-  dynamic _getValueXUIProperty(ParseInfo parseInfo, XUIProperty prop, String tag) {
-
+  ///
+  dynamic _getValueXUIProperty(
+      ParseInfo parseInfo, XUIProperty prop, String tag) {
     // si v-model ou autre attribut
     if (parseInfo.mode == ParseInfoMode.ATTR &&
         parseInfo.context == "class" &&
@@ -148,14 +150,12 @@ class XUIElementHTML extends XUIElement {
       return tag;
     }
 
-   
     if (prop is XUIPropertyBinding) {
-
       if (parseInfo.mode == ParseInfoMode.CONTENT) {
         // si dans un contenu de tag <div>{{binding}}</div>
-        return "{{" + prop.binding + "}}";
+        return "{{" + prop.binding! + "}}";
       }
-      parseInfo.prefix="v-bind:";
+      parseInfo.prefix = "v-bind:";
       return prop.binding;
     }
 
@@ -206,7 +206,7 @@ class XUIElementHTML extends XUIElement {
       bool isRoot = buffer.html.isEmpty;
       bool hasTagReloader = (tag == TAG_RELOADER) ||
           (this.propertiesXUI != null &&
-              this.propertiesXUI.containsKey(ATTR_RELOADER));
+              this.propertiesXUI!.containsKey(ATTR_RELOADER));
 
       if (!XUIConfigManager.reloaderEnable) {
         hasTagReloader = false;
@@ -217,8 +217,12 @@ class XUIElementHTML extends XUIElement {
         doAddReloaderPhase3(engine, buffer);
       }
 
+      buffer.trim = (this.propertiesXUI != null &&
+          this.propertiesXUI!.containsKey(ATTR_TRIM_CONTENT));
+
       if (!isReloader) {
         // gestion des no-dom
+
         doChildrenPhase3(engine, buffer);
       }
       // pas de tag hmtl ajouté dans la page
@@ -226,26 +230,43 @@ class XUIElementHTML extends XUIElement {
     }
 
     buffer.addTab();
-    buffer.html.write('<' + this.tag);
+    buffer.html.write('<' + this.tag!);
 
     // gestion des attributs
     doAttributPhase3(engine, buffer);
 
     buffer.html.write('>');
 
-    bool hasChildren = this.children?.firstWhere(
-            (c) => (c is! XUIElementHTMLText),
-            orElse: () => null) !=
-        null;
+    XUIElement? hc = children?.firstWhere((c) => (c is! XUIElementHTMLText),
+        orElse: () => notElem);
 
-    if (hasChildren) buffer.html.write('\n');
+    bool hasChildrenNoText = hc != null && hc != notElem;
+
+    if (hasChildrenNoText) buffer.html.write('\n');
 
     buffer.tab(1);
     doChildrenPhase3(engine, buffer);
     buffer.tab(-1);
 
-    if (hasChildren) buffer.addTab();
-    buffer.html.write('</' + this.tag + '>\n');
+    // if (this.tag=="script")
+    // {
+    //   print("script************************");
+    // }
+
+    // var b = buffer.html.toString();
+
+    // if (true || (hasChildren && b.lastIndexOf("   ")>0))
+    // {
+    //   print("tab "+buffer.idxTab.toString());
+    //   buffer.tab(-2);
+    //  // buffer.addTab();
+    //   buffer.tab(2);
+    // }
+
+    if (hasChildrenNoText) {
+      buffer.addTab();
+    }
+    buffer.html.write('</' + this.tag! + '>\n');
 
     if (oldBuf != null) {
       oldBuf.html.write(json.encode(buffer.html.toString()));
@@ -253,7 +274,7 @@ class XUIElementHTML extends XUIElement {
   }
 
   bool isXUIIF(cst.XUIEngine engine) {
-    var ifContent = this.propertiesXUI[ATTR_XUI_IF].content;
+    var ifContent = this.propertiesXUI![ATTR_XUI_IF]!.content;
     ParseInfo parseInfo = ParseInfo(ifContent, null, ParseInfoMode.ATTR);
     var valIf = _processContentPhase3(engine, parseInfo);
     if (valIf == "" || valIf == "false") {
@@ -265,30 +286,30 @@ class XUIElementHTML extends XUIElement {
 
   bool hasPropXUIIF() {
     return this.propertiesXUI != null &&
-        this.propertiesXUI.containsKey(ATTR_XUI_IF);
+        this.propertiesXUI!.containsKey(ATTR_XUI_IF);
   }
 
   bool _hasPropConvertJSON() {
     return this.propertiesXUI != null &&
-        this.propertiesXUI.containsKey(ATTR_CONVERT_JSON);
+        this.propertiesXUI!.containsKey(ATTR_CONVERT_JSON);
   }
 
   String getForVar() {
     if (this.propertiesXUI != null &&
-        this.propertiesXUI.containsKey(ATTR_XUI_FORVAR)) {
-      return this.propertiesXUI[ATTR_XUI_FORVAR].content;
+        this.propertiesXUI!.containsKey(ATTR_XUI_FORVAR)) {
+      return this.propertiesXUI![ATTR_XUI_FORVAR]!.content;
     } else {
       return "nb";
     }
   }
 
   void doAddReloaderPhase3(cst.XUIEngine engine, XUIHtmlBuffer buffer) {
-    var xid = this.originElemXUI.xid;
+    var xid = this.originElemXUI!.xid;
     ParseInfo parseInfo = ParseInfo(xid, null, ParseInfoMode.ATTR);
     var xidCal = _processContentPhase3(engine, parseInfo);
     var modeDisplay = "contents";
-    if (this.propertiesXUI[ATTR_MODE_DISPLAY] != null) {
-      modeDisplay = this.propertiesXUI[ATTR_MODE_DISPLAY]?.content.toString();
+    if (this.propertiesXUI![ATTR_MODE_DISPLAY] != null) {
+      modeDisplay = this.propertiesXUI![ATTR_MODE_DISPLAY]!.content.toString();
     }
     buffer.html.write("<v-xui-reloader modedisplay=\"" +
         modeDisplay +
@@ -298,7 +319,7 @@ class XUIElementHTML extends XUIElement {
   }
 
   void doAttributPhase3(cst.XUIEngine engine, XUIHtmlBuffer buffer) {
-    this.attributes?.entries?.forEach((f) {
+    this.attributes?.entries.forEach((f) {
       var contentAttr = f.value.content;
       ParseInfo parseInfo = ParseInfo(f.key, null, ParseInfoMode.KEY);
       String keyAttr = _processContentPhase3(engine, parseInfo);
@@ -309,7 +330,7 @@ class XUIElementHTML extends XUIElement {
         if (contentAttr is String) {
           ParseInfo parseInfo;
           //if (keyAttr == "class") {
-            parseInfo = ParseInfo(contentAttr, keyAttr, ParseInfoMode.ATTR);
+          parseInfo = ParseInfo(contentAttr, keyAttr, ParseInfoMode.ATTR);
           //} else {
           //  parseInfo = ParseInfo(c, keyAttr, ParseInfoMode.ATTR);
           //}
@@ -338,13 +359,11 @@ class XUIElementHTML extends XUIElement {
               mustAdd = false; // pas d'ajout si vide ou false
             }
 
-            if (parseInfo.prefix!=null)
-            {
-                // binding
-                if (!keyAttr.startsWith("@") && keyAttr!="v-model")
-                {
-                   keyAttr=parseInfo.prefix+keyAttr;
-                }
+            if (parseInfo.prefix != null) {
+              // binding
+              if (!keyAttr.startsWith("@") && keyAttr != "v-model") {
+                keyAttr = parseInfo.prefix! + keyAttr;
+              }
             }
           }
           //-----------------------------------------------------------------------------------
@@ -384,27 +403,49 @@ class XUIElementHTML extends XUIElement {
 
   void doChildrenPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
     this.children?.forEach((c) {
-      if (c is XUIElementHTMLText) {
-        c.content.toString().trim().isNotEmpty
-            ? c.processPhase3(engine, buffer)
-            : null;
-      } else {
-        (c as XUIElementHTML).processPhase3(engine, buffer);
-      }
+      (c as XUIElementHTML).processPhase3(engine, buffer);
+
+      // if (c is XUIElementHTMLText) {
+      //       c.processPhase3(engine, buffer);
+      // } else {
+      //   (c as XUIElementHTML).processPhase3(engine, buffer);
+      // }
     });
   }
 }
 
 class XUIElementHTMLText extends XUIElementHTML {
-  StringBuffer content;
+  StringBuffer? content;
 
   @override
   void processPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
     ParseInfo parseInfo = ParseInfo(content, null, ParseInfoMode.CONTENT);
+
+    if (this.content == null) {
+      return;
+    }
+    var c = this.content.toString();
+    var cTrim = c.trimRight();
+    if (cTrim.isEmpty) {
+      return;
+    }
+
     var cont = _processContentPhase3(engine, parseInfo);
 
     // analyse des attribut avec du binding
     engine.dataBindingInfo.parseContent(this, cont);
+
+    if (buffer.trim) {
+      buffer.trim = false;
+      cont = cTrim;
+      // print("trim <"+cont+">");
+      // cont= cont.toString().trimRight();
+      if (cTrim.endsWith(";"))
+      {
+         cont=cTrim+"\n";
+      }
+      // print("result <"+cont+">");
+    }
     buffer.html.write(cont);
   }
 }
@@ -421,19 +462,20 @@ abstract class XUIElementNative extends XUIElementXUI {
   }
 
   void register(XUIResource reader) {
-    reader.components[xid] ??= DicoOrdered()..add(XUIComponent(this, MODE_ALL));
+    reader.components[xid!] ??= DicoOrdered()
+      ..add(XUIComponent(this, MODE_ALL));
   }
 }
 
 ///***************************************************************
 ///   provient d'un provider fichier XUI
 class XUIElementXUI extends XUIElement {
-  String xid;
-  String idRessource;
+  String? xid;
+  String? idRessource;
 }
 
 ///
 ///  uniquement un text
 class XUIElementText extends XUIElementXUI {
-  StringBuffer content;
+  late StringBuffer content;
 }

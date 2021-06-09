@@ -174,7 +174,7 @@
     <v-row xid="xui-column-responsive-1" class="xui-column [[fill-height]] [[class]]" xui-for="idxc"
                 -style="flex-direction: column;[[style]]"
                 no-gutters
-                align="[[align]]"
+                -align="[[align]]"
                 align-content="[[align-content]]"
                 justify="[[justify]]">
             <v-col  class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]">
@@ -288,7 +288,7 @@
                -style="[[style@-1]]"
                no-gutters="[[no-gutters@1]]"
                dense="[[dense@1]]"
-               align="[[align@-1]]"
+               -align="[[align@-1]]"
                align-content="[[align-content@-1]]"
                justify="[[justify@-1]]">
             <xui-row-grid-responsive xid="[[parent-xid]]-row-[[idxr@2]]" xui-nb="2" xui-slot-name="row [[idxr@2]]"></xui-row-grid-responsive>
@@ -433,7 +433,8 @@
         <v-tab>
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-[[idx@0+]]" xui-slot-name="tab [[idx@0+]]"></xui-slot>
         </v-tab>
-        <v-tab-item :transition="false" :reverse-transition="false" eager>
+        <!--v-tab-item :transition="false" :reverse-transition="false" eager-->
+        <v-tab-item eager>
             <!-- eager  desactive le lazyloading -->
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-item-[[idx@0+]]" style-slot="height:100%" xui-slot-name="tab content [[idx@0+]]">
             </xui-slot>

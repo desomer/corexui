@@ -14,11 +14,10 @@ class XUIActionManager {
 
   XUIActionManager(this.engine);
 
-
   ///------------------------------------------------------------------------------------
   /// change une property de design
   Future changeProperty(
-      String xid, String variable, dynamic value, String bind) async {
+      String xid, String variable, dynamic value, String? bind) async {
     if (XUIConfigManager.verboseChange) {
       XUIConfigManager.printc(
           "changeProperty ${xid} a changer l'attribut <${variable}> par <${value}>  bind ${bind}");
@@ -30,11 +29,11 @@ class XUIActionManager {
       listDesign = engine.xuiFile.designs[xid];
     }
 
-    var xuiDesign = listDesign.sort(engine.xuiFile.context).first;
+    var xuiDesign = listDesign!.sort(engine.xuiFile.context).first;
 
     List<DesignInfo> designs = engine.getDesignInfo(xid, xid, false);
     for (var design in designs) {
-      DocInfo doc = design.docInfo;
+      DocInfo? doc = design.docInfo;
       if (doc != null && doc.variables.isNotEmpty) {
         for (var aVariable in doc.variables) {
           if (aVariable.id == variable) {
@@ -79,33 +78,34 @@ class XUIActionManager {
               if (XUIConfigManager.verboseChange) {
                 XUIConfigManager.printc("changeProperty : retire la property");
               }
-              elemXui.propertiesXUI.remove(variable);
+              elemXui.propertiesXUI!.remove(variable);
             }
 
             if (addValue) {
               // creer la propriete vide
               elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
-              if (elemXui.propertiesXUI[variable] == null && !withBinding) {
-                elemXui.propertiesXUI[variable] = XUIProperty(null);
+              if (elemXui.propertiesXUI![variable] == null && !withBinding) {
+                elemXui.propertiesXUI![variable] = XUIProperty(null);
               }
-              if (elemXui.propertiesXUI[variable] == null && withBinding) {
-                elemXui.propertiesXUI[variable] =
+              if (elemXui.propertiesXUI![variable] == null && withBinding) {
+                elemXui.propertiesXUI![variable] =
                     XUIPropertyBinding(null, null);
               }
-              if (!(elemXui.propertiesXUI[variable] is XUIPropertyBinding) &&
+              
+              if (!(elemXui.propertiesXUI![variable] is XUIPropertyBinding) &&
                   withBinding) {
-                elemXui.propertiesXUI[variable] =
+                elemXui.propertiesXUI![variable] =
                     XUIPropertyBinding(null, null);
               }
-              if (elemXui.propertiesXUI[variable] is XUIPropertyBinding &&
+              if (elemXui.propertiesXUI![variable] is XUIPropertyBinding &&
                   !withBinding) {
-                elemXui.propertiesXUI[variable] = XUIProperty(null);
+                elemXui.propertiesXUI![variable] = XUIProperty(null);
               }
               // affecte la prop
-              elemXui.propertiesXUI[variable].content = value;
+              elemXui.propertiesXUI![variable]!.content = value;
               if (withBinding) {
-                (elemXui.propertiesXUI[variable] as XUIPropertyBinding)
-                    .binding = bind;
+                (elemXui.propertiesXUI![variable] as XUIPropertyBinding)
+                    .binding = bind!;
               }
             }
           }
@@ -124,22 +124,22 @@ class XUIActionManager {
   ///------------------------------------------------------------------------------------
   /// ajoute un nouveau composant  (html)
   ///     affecte les valeurs par defaut
-  Future<XUIElementXUI> addDesign(String xid, String html) async {
-    XUIResource res = XUIResource(null, engine.xuiFile.context);
+  Future<XUIElementXUI> addDesign(String? xid, String html) async {
+    var reader =
+        HTMLReader(engine.xuiFile.reader.id, engine.xuiFile.reader.provider);
+    XUIResource res = XUIResource(reader, engine.xuiFile.context);
 
-    XUIElementXUI xuidesign = await HTMLReader(
-            engine.xuiFile.reader.id, engine.xuiFile.reader.provider)
-        .parseString(html, res);
+    XUIElementXUI xuidesign = await reader.parseString(html, res);
 
     if (xid != null) {
       xuidesign.xid = xid;
       engine.xuiFile.designs[xid] ??= DicoOrdered();
-      engine.xuiFile.designs[xid].add(XUIDesign(xuidesign, MODE_ALL));
+      engine.xuiFile.designs[xid]!.add(XUIDesign(xuidesign, MODE_ALL));
     }
 
     if (xuidesign.children != null) {
-      XUIElementXUI xuiCmp = xuidesign.children.first;
-      DocInfo doc = engine.docInfo[xuiCmp.tag];
+      XUIElementXUI xuiCmp = xuidesign.children!.first as XUIElementXUI;
+      DocInfo? doc = engine.docInfo[xuiCmp.tag];
       if (doc != null && doc.variables.isNotEmpty) {
         // creation du design par defaut des info
         var elemXuiChild = XUIElementXUI();
@@ -148,15 +148,16 @@ class XUIActionManager {
           // affecte les valeur par defaut
           if (variable.def != null) {
             elemXuiChild.propertiesXUI ??= HashMap<String, XUIProperty>();
-            elemXuiChild.propertiesXUI[variable.id] = XUIProperty(variable.def);
+            elemXuiChild.propertiesXUI![variable.id] =
+                XUIProperty(variable.def);
             addDesignDefaut = true;
           }
         }
         if (addDesignDefaut) {
           elemXuiChild.xid = xuiCmp.xid;
-          elemXuiChild.idRessource = engine.xuiFile.reader?.id;
+          elemXuiChild.idRessource = engine.xuiFile.reader.id;
           DicoOrdered<XUIDesign> curDesign = DicoOrdered();
-          engine.xuiFile.designs[xuiCmp.xid] = curDesign;
+          engine.xuiFile.designs[xuiCmp.xid!] = curDesign;
           curDesign.add(XUIDesign(elemXuiChild, MODE_ALL));
         }
       }
@@ -165,8 +166,8 @@ class XUIActionManager {
     return Future.value(xuidesign);
   }
 
-  XUIDesign _getXUIDesignParent(SlotInfo info, String mode) {
-    var addIn = info.elementHTML?.parent?.designBy;
+  XUIDesign? _getXUIDesignParent(SlotInfo info, String? mode) {
+    var addIn = info.elementHTML!.parent?.designBy;
     if (addIn != null) {
       for (var design in addIn) {
         if (mode == null || design.mode == mode) {
@@ -177,8 +178,8 @@ class XUIActionManager {
     return null;
   }
 
-  XUIDesign _getXUIDesign(SlotInfo info, String mode) {
-    var addIn = info.elementHTML?.designBy;
+  XUIDesign? _getXUIDesign(SlotInfo info, String? mode) {
+    var addIn = info.elementHTML!.designBy;
     if (addIn != null) {
       for (var design in addIn) {
         if (mode == null || design.mode == mode) {
@@ -199,74 +200,75 @@ class XUIActionManager {
     return ret;
   }
 
-  UndoAction cloneDesign(XUICloneDicoItem cloneInfo, String mode) {
-    SlotInfo infoSrc = engine.getSlotInfo(cloneInfo.xidSrc, cloneInfo.xidSrc);
+  UndoAction? cloneDesign(XUICloneDicoItem cloneInfo, String? mode) {
+    SlotInfo? infoSrc = engine.getSlotInfo(cloneInfo.xidSrc, cloneInfo.xidSrc);
     if (infoSrc != null) {
-      cloneInfo.xidNew = _getNewXid(cloneInfo.xidDest, infoSrc.implement);
+      cloneInfo.xidNew = _getNewXid(cloneInfo.xidDest!, infoSrc.implement!);
 
       print("**** start clone " +
           cloneInfo.xidSrc +
           " => " +
-          cloneInfo.xidNew +
+          cloneInfo.xidNew! +
           " to " +
-          cloneInfo.xidDest);
+          cloneInfo.xidDest!);
       _addClone(infoSrc, cloneInfo, mode);
 
       // gestion des enfant
       XUICloneDico cloneDico = XUICloneDico();
       cloneDico.add(cloneInfo);
-      _cloneChildHtml(cloneDico, infoSrc.elementHTML, mode);
+      _cloneChildHtml(cloneDico, infoSrc.elementHTML!, mode);
     }
     return null;
   }
 
-  void _addClone(SlotInfo infoSrc, XUICloneDicoItem cloneInfo, String mode) {
+  void _addClone(SlotInfo infoSrc, XUICloneDicoItem cloneInfo, String? mode) {
     var tag = infoSrc.implement;
 
     // ajoute un xuidesign sur le parent pour ajouter le child
     XUIElementXUI xuiElem = XUIElementXUI();
-    xuiElem.xid = cloneInfo.xidDest;
+    xuiElem.xid = cloneInfo.xidDest!;
     xuiElem.idRessource = engine.xuiFile.reader.id;
     XUIElementXUI child = XUIElementXUI();
     child.idRessource = engine.xuiFile.reader.id;
-    child.xid = cloneInfo.xidNew;
+    child.xid = cloneInfo.xidNew!;
     child.tag = tag;
     xuiElem.children ??= [];
-    xuiElem.children.add(child);
-    engine.xuiFile.designs[cloneInfo.xidDest] ??= DicoOrdered();
-    engine.xuiFile.designs[cloneInfo.xidDest].add(XUIDesign(xuiElem, MODE_ALL));
+    xuiElem.children!.add(child);
+    engine.xuiFile.designs[cloneInfo.xidDest!] ??= DicoOrdered();
+    engine.xuiFile.designs[cloneInfo.xidDest]!
+        .add(XUIDesign(xuiElem, MODE_ALL));
 
     //clone du design (les propertiesXUI)  en ajoutant un xuidesign sur le child
-    XUIDesign design = _getXUIDesign(infoSrc, mode);
+    XUIDesign? design = _getXUIDesign(infoSrc, mode);
     if (design != null) {
       if (design.elemXUI.propertiesXUI != null) {
         XUIElementXUI xuiElem = XUIElementXUI();
-        xuiElem.xid = cloneInfo.xidNew;
+        xuiElem.xid = cloneInfo.xidNew!;
         xuiElem.idRessource = engine.xuiFile.reader.id;
-        engine.xuiFile.designs[cloneInfo.xidNew] ??= DicoOrdered();
-        engine.xuiFile.designs[cloneInfo.xidNew]
+        engine.xuiFile.designs[cloneInfo.xidNew!] ??= DicoOrdered();
+        engine.xuiFile.designs[cloneInfo.xidNew]!
             .add(XUIDesign(xuiElem, MODE_ALL));
 
         xuiElem.propertiesXUI = HashMap();
-        design.elemXUI.propertiesXUI.forEach((k, v) {
+        design.elemXUI.propertiesXUI!.forEach((k, v) {
           XUIProperty cloneProp = XUIProperty(v.content);
-          xuiElem.propertiesXUI[k] = cloneProp;
+          xuiElem.propertiesXUI![k] = cloneProp;
         });
       }
     }
   }
 
-  void _cloneChildHtml(XUICloneDico dico, XUIElementHTML elem, String mode) {
+  void _cloneChildHtml(XUICloneDico dico, XUIElementHTML elem, String? mode) {
     if (elem.children != null) {
-      for (var childHtml in elem.children) {
+      for (var childHtml in elem.children!) {
         if (childHtml is XUIElementHTML) {
           //pas les commentaire
           if (childHtml.designBy != null) {
-            for (var design in childHtml.designBy) {
+            for (var design in childHtml.designBy!) {
               if (mode == null || design.mode == mode) {
                 // clone all children ajouter par des xuidesign
                 if (design.elemXUI.children != null) {
-                  for (var childDesign in design.elemXUI.children) {
+                  for (var childDesign in design.elemXUI.children!) {
                     if (childDesign is XUIElementXUI &&
                         childDesign.xid != null) {
                       _doClone(dico, design.elemXUI, childDesign, mode);
@@ -274,7 +276,7 @@ class XUIActionManager {
                   }
                 } else {
                   // cas des enfants (designable) ajouter par les parent sans design (ex: xui-title-1 dans xui-list-item-1)
-                  print("****** test doCloneOnlyDesign " + design.elemXUI.xid);
+                  print("****** test doCloneOnlyDesign " + design.elemXUI.xid!);
                   //SlotInfo info = engine.getSlotInfo(design.elemXUI.xid, design.elemXUI.xid);
                   //SlotInfo infoParent = engine.getSlotInfo(info.parentXid, info.parentXid);
                   _doCloneOnlyDesign(dico, design.elemXUI, mode);
@@ -289,72 +291,73 @@ class XUIActionManager {
   }
 
   void _doCloneOnlyDesign(
-      XUICloneDico dico, XUIElementXUI parent, String mode) {
-    var idxParentStartNum = parent.xid.indexOf("_");
-    var idxParentEndNum = parent.xid.indexOf("-", idxParentStartNum);
+      XUICloneDico dico, XUIElementXUI parent, String? mode) {
+    var idxParentStartNum = parent.xid!.indexOf("_");
+    var idxParentEndNum = parent.xid!.indexOf("-", idxParentStartNum);
 
     if (idxParentEndNum == -1) {
       // ne provient pas d'un slot
       return;
     }
 
-    var xidSrc = parent.xid.substring(0, idxParentEndNum);
-    var slotNameSuffix = parent.xid.substring(xidSrc.length);
-    var newIDSlot = dico.dico[xidSrc].xidNew + slotNameSuffix;
+    var xidSrc = parent.xid!.substring(0, idxParentEndNum);
+    var slotNameSuffix = parent.xid!.substring(xidSrc.length);
+    var newIDSlot = dico.dico[xidSrc]!.xidNew! + slotNameSuffix;
     var xidClone = parent.xid;
 
     print("****** doCloneOnlydesign  xidSrc=<" +
-        xidClone +
+        xidClone! +
         "> xidNew=<" +
         newIDSlot +
         "> " +
         slotNameSuffix);
+
     XUICloneDicoItem cloneInfo = XUICloneDicoItem(xidClone, null, newIDSlot);
     dico.add(cloneInfo);
 
-    SlotInfo infoSrc = engine.getSlotInfo(cloneInfo.xidSrc, cloneInfo.xidSrc);
+    SlotInfo infoSrc = engine.getSlotInfo(cloneInfo.xidSrc, cloneInfo.xidSrc)!;
     //clone du design (les propertiesXUI)  en ajoutant un xuidesign
-    XUIDesign design = _getXUIDesign(infoSrc, mode);
+    XUIDesign? design = _getXUIDesign(infoSrc, mode);
     if (design != null) {
       if (design.elemXUI.propertiesXUI != null) {
         XUIElementXUI xuiElem = XUIElementXUI();
-        xuiElem.xid = cloneInfo.xidNew;
+        xuiElem.xid = cloneInfo.xidNew!;
         xuiElem.idRessource = engine.xuiFile.reader.id;
-        engine.xuiFile.designs[cloneInfo.xidNew] ??= DicoOrdered();
-        engine.xuiFile.designs[cloneInfo.xidNew]
+        engine.xuiFile.designs[cloneInfo.xidNew!] ??= DicoOrdered();
+        engine.xuiFile.designs[cloneInfo.xidNew]!
             .add(XUIDesign(xuiElem, MODE_ALL));
 
         xuiElem.propertiesXUI = HashMap();
-        design.elemXUI.propertiesXUI.forEach((k, v) {
+        design.elemXUI.propertiesXUI!.forEach((k, v) {
           XUIProperty cloneProp = XUIProperty(v.content);
-          xuiElem.propertiesXUI[k] = cloneProp;
+          xuiElem.propertiesXUI![k] = cloneProp;
         });
       }
     }
   }
 
   void _doClone(XUICloneDico dico, XUIElementXUI parent, XUIElementXUI srcElem,
-      String mode) {
+      String? mode) {
     //SlotInfo info = engine.getSlotInfo(childDesign.xid, childDesign.xid);
     // var design = _getXUIDesignParent(info, mode);
 
     //********** calcul du slotName a partir du parent *************
     var idxParentStartNum =
-        parent.xid.indexOf("_"); // ex : parent_1321132132-slot
-    var idxParentEndNum = parent.xid.indexOf("-", idxParentStartNum);
+        parent.xid!.indexOf("_"); // ex : parent_1321132132-slot
+    var idxParentEndNum = parent.xid!.indexOf("-", idxParentStartNum);
 
     var xidParentSansSlot =
-        parent.xid.substring(0, idxParentEndNum); // parent_1321132132
+        parent.xid!.substring(0, idxParentEndNum); // parent_1321132132
     var slotNameSuffix =
-        parent.xid.substring(xidParentSansSlot.length); // -slot
+        parent.xid!.substring(xidParentSansSlot.length); // -slot
 
     /***************************************************************/
 
-    var newIDSlot = dico.dico[xidParentSansSlot].xidNew + slotNameSuffix;
+    var newIDSlot = dico.dico[xidParentSansSlot]!.xidNew! + slotNameSuffix;
     var xidClone = srcElem.xid;
-    var tagClone = srcElem.tag;
+    var tagClone = srcElem.tag!;
 
-    XUICloneDicoItem cloneInfo = XUICloneDicoItem(xidClone, newIDSlot, null);
+    XUICloneDicoItem cloneInfo = XUICloneDicoItem(xidClone!, newIDSlot, null);
     cloneInfo.xidNew = _getNewXid(newIDSlot, tagClone);
     dico.add(cloneInfo);
 
@@ -363,24 +366,26 @@ class XUIActionManager {
         "> xidDesc=<" +
         newIDSlot +
         "> xidNew=" +
-        cloneInfo.xidNew +
+        cloneInfo.xidNew! +
         "(" +
         tagClone +
         ")");
 
-    SlotInfo infoSrc = engine.getSlotInfo(cloneInfo.xidSrc, cloneInfo.xidSrc);
-    _addClone(infoSrc, cloneInfo, mode);
+    SlotInfo? infoSrc = engine.getSlotInfo(cloneInfo.xidSrc, cloneInfo.xidSrc);
+    if (infoSrc!=null) {
+      _addClone(infoSrc, cloneInfo, mode);
+    }
   }
 
   ///------------------------------------------------------------------------------------
-  UndoAction removeDesign(String xid, String mode, [bool withChild = true]) {
+  UndoAction removeDesign(String xid, String? mode, [bool withChild = true]) {
     return moveDesign(xid, mode, null, withChild);
   }
 
   ///------------------------------------------------------------------------------------
-  UndoAction moveDesign(String xid, String mode, String moveToXid,
+  UndoAction moveDesign(String xid, String? mode, String? moveToXid,
       [bool withChild = true]) {
-    SlotInfo info = engine.getSlotInfo(xid, xid);
+    SlotInfo? info = engine.getSlotInfo(xid, xid);
 
     if (info == null) {
       throw "xid inconnu $xid";
@@ -399,7 +404,7 @@ class XUIActionManager {
 
       // recherche du child ayant le xid
       if (design.elemXUI.children != null) {
-        for (var child in design.elemXUI.children) {
+        for (var child in design.elemXUI.children!) {
           if (child is XUIElementText && !hasText) {
             hasText = child.content.toString().trim().isNotEmpty;
           } else if (child is XUIElementXUI) {
@@ -413,12 +418,12 @@ class XUIActionManager {
 
         // retire le child
         if (nbChildNoText == 1 && idxToDelete >= 0 && !hasText) {
-          elemToChange = design.elemXUI.children.removeAt(idxToDelete);
+          elemToChange = design.elemXUI.children!.removeAt(idxToDelete);
           design.elemXUI.children = null;
           print("remove all <$xid> on parent <$xidParent>");
         } else if (nbChildNoText >= 0) {
           print("*****  remove only <$xid> on parent <$xidParent>");
-          elemToChange = design.elemXUI.children.removeAt(nbChildNoText);
+          elemToChange = design.elemXUI.children!.removeAt(nbChildNoText);
         }
       }
 
@@ -438,22 +443,22 @@ class XUIActionManager {
 
     // supprime les enfants
     if (withChild && moveToXid == null) {
-      _removeChild(info.elementHTML, mode);
+      _removeChild(info.elementHTML!, mode);
     }
 
     return UndoAction();
   }
 
   void _moveToDesign(SlotInfo infoSrc, String xid, String moveToXid,
-      String mode, elemToChange) {
-    SlotInfo infoDest = engine.getSlotInfo(moveToXid, moveToXid);
-    XUIDesign designMove;
+      String? mode, elemToChange) {
+    SlotInfo? infoDest = engine.getSlotInfo(moveToXid, moveToXid);
+    XUIDesign? designMove;
     if (infoDest != null) {
       designMove = _getXUIDesign(infoDest, mode);
     }
 
     if (designMove == null) {
-      for (XUIDesign aDesign in engine.xuiFile.designs[moveToXid].list) {
+      for (XUIDesign aDesign in engine.xuiFile.designs[moveToXid]!.list) {
         if (mode == null || aDesign.mode == mode) {
           designMove = aDesign;
         }
@@ -463,7 +468,7 @@ class XUIActionManager {
     if (designMove != null && elemToChange != null) {
       print("moveToDesign add <$xid> to <$moveToXid>");
       designMove.elemXUI.children ??= [];
-      designMove.elemXUI.children.add(elemToChange);
+      designMove.elemXUI.children?.add(elemToChange);
 
       // change le slotInfo
       // infoSrc.parentXid=moveToXid;
@@ -475,23 +480,23 @@ class XUIActionManager {
     }
   }
 
-  void _removeChild(XUIElementHTML elem, String mode) {
+  void _removeChild(XUIElementHTML elem, String? mode) {
     if (elem.children != null) {
-      for (var childHtml in elem.children) {
+      for (var childHtml in elem.children!) {
         if (childHtml is XUIElementHTML) {
           if (childHtml.designBy != null) {
-            for (var design in childHtml.designBy) {
+            for (var design in childHtml.designBy!) {
               if (mode == null || design.mode == mode) {
                 // remode all children
                 if (design.elemXUI.children != null) {
-                  for (var childDesign in design.elemXUI.children) {
+                  for (var childDesign in design.elemXUI.children!) {
                     if (childDesign is XUIElementXUI &&
                         childDesign.xid != null) {
-                      removeDesign(childDesign.xid, mode, false);
+                      removeDesign(childDesign.xid!, mode, false);
                     }
                   }
                 } else {
-                  print("removeChild design " + design.elemXUI.xid);
+                  print("removeChild design " + design.elemXUI.xid!);
                   engine.xuiFile.designs.remove(design.elemXUI.xid);
                 }
               }
@@ -517,8 +522,8 @@ class XUICloneDico {
 
 class XUICloneDicoItem {
   String xidSrc;
-  String xidDest;
-  String xidNew;
+  String? xidDest;
+  String? xidNew;
 
   XUICloneDicoItem(this.xidSrc, this.xidDest, this.xidNew);
 }

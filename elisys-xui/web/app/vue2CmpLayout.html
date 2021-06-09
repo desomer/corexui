@@ -177,7 +177,7 @@
     </xui-design>
     
     <xui-design xid="xui-script-data">
-        <script xui-no-dom>
+        <script xui-no-dom xui-trim-content>
             $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
                 new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
                     "vue-xui-split");

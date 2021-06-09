@@ -2,6 +2,13 @@
     --width-properties:300px;
 }
 
+/* #app .sk-plane,
+[v-cloak] > * { display:none }
+
+#app[v-cloak] .sk-plane {
+	display:block;
+} */
+
 /*********************************************************/
 .jsoneditor {
     border: thin solid #000000!important;

@@ -1,5 +1,5 @@
 import 'dart:collection';
-import 'package:yamlicious/yamlicious.dart';
+//import 'package:yamlicious/yamlicious.dart';
 import '../libxui.dart';
 import 'XUIActionManager.dart';
 import 'XUIConfigManager.dart';
@@ -29,6 +29,7 @@ const ATTR_MODE = "mode";
 // n'ajoute pas de noeud dom
 const ATTR_NO_DOM = "no-dom";
 const ATTR_RELOADER = "reloader";
+const ATTR_TRIM_CONTENT = "trim-content";
 // mode display des reloader.  par defaut display:content
 const ATTR_MODE_DISPLAY = "modedisplay";
 
@@ -72,7 +73,7 @@ abstract class Provider {
 
 class XUIContext {
   String mode;
-  String jsonBinding;
+  String? jsonBinding;
   XUIContext(this.mode, this.jsonBinding);
 }
 
@@ -97,8 +98,8 @@ class DicoOrdered<T extends XUIModel> {
       ret = [];
       listByMode[ctx.mode] = ret;
       for (XUIModel item in list) {
-        if (item.mode == MODE_ALL || item.mode.contains(ctx.mode)) {
-          ret.add(item);
+        if (item.mode == MODE_ALL || item.mode!.contains(ctx.mode)) {
+          ret.add(item as T);
         }
       }
     }
@@ -113,8 +114,8 @@ class DicoOrdered<T extends XUIModel> {
 ///------------------------------------------------------------------
 
 abstract class XUIReader {
-  Provider provider;
-  var id;
+  late Provider provider;
+  late var id;
 
   Future parseFile(XMLElemReader elemReader) async {}
 }
@@ -124,9 +125,9 @@ abstract class XMLElemReader {
 }
 
 class XMLElem {
-  String tag;
-  StringBuffer text;
-  LinkedHashMap<dynamic, String> attributs;
+  late String tag;
+  StringBuffer? text;
+  LinkedHashMap<dynamic, String>? attributs;
 }
 
 /// representation d'un fichier XUI
@@ -148,13 +149,13 @@ class XUIResource extends XMLElemReader {
     var curDesign = designs[aDesign["xid"]];
     if (curDesign == null) {
       var elemXui = XUIElementXUI();
-      elemXui.idRessource = reader?.id;
+      elemXui.idRessource = reader.id;
       elemXui.xid = aDesign["xid"];
       curDesign = DicoOrdered();
-      designs[elemXui.xid] = curDesign;
-      designs[elemXui.xid].add(XUIDesign(elemXui, MODE_ALL));
+      designs[elemXui.xid!] = curDesign;
+      designs[elemXui.xid]!.add(XUIDesign(elemXui, MODE_ALL));
     }
-    var xuiDesign = curDesign.sort(context)?.first;
+    XUIDesign xuiDesign = curDesign.sort(context).first;
 
     // print(xuiDesign);
 
@@ -168,7 +169,7 @@ class XUIResource extends XMLElemReader {
 
         xuiDesign.elemXUI.propertiesXUI ??= HashMap<String, XUIProperty>();
         // if (xuiDesign.elemXUI.propertiesXUI[variable] == null) {
-        xuiDesign.elemXUI.propertiesXUI[variable] = binding == null
+        xuiDesign.elemXUI.propertiesXUI![variable] = binding == null
             ? XUIProperty(value)
             : XUIPropertyBinding(value, binding);
         // }
@@ -177,11 +178,11 @@ class XUIResource extends XMLElemReader {
       }
     }
 
-    List children = aDesign["children"];
+    List? children = aDesign["children"];
     var parent = xuiDesign.elemXUI;
 
     if (children != null &&
-        (parent.children == null || parent.children.isEmpty)) {
+        (parent.children == null || parent.children!.isEmpty)) {
       // ajout des enfants
       for (var aChild in children) {
         var childElemXui = XUIElementXUI();
@@ -199,7 +200,7 @@ class XUIResource extends XMLElemReader {
   }
 
   //-------------------------------------------------------------------------------------------
-  DicoOrdered<XUIComponent> searchComponent(String tag) {
+  DicoOrdered<XUIComponent>? searchComponent(String tag) {
     var cmp = components[tag];
     if (cmp == null) {
       for (var subFile in listImport) {
@@ -221,7 +222,7 @@ class XUIResource extends XMLElemReader {
       //if (cmp != null) break;
     }
     // }
-    return listCmp;
+    return listCmp as List<DicoOrdered<XUIDesign>>;
   }
 
   //-------------------------------------------------------------------------------------------
@@ -243,35 +244,35 @@ class XUIResource extends XMLElemReader {
     DocInfo doc;
     doc = DocInfo();
 
-    doc.xid = elem.xid;
+    doc.xid = elem.xid!;
     elem.children?.forEach((prop) {
-      if (prop.attributes["id"] != null) {
-        String id = prop.attributes["id"]?.content;
+      if (prop.attributes!["id"] != null) {
+        String id = prop.attributes!["id"]?.content;
         if (id == "componentAs") {
           doc.componentAs =
-              (prop.children.first as XUIElementText).content.toString();
+              (prop.children!.first as XUIElementText).content.toString();
         } else if (id == "name") {
-          doc.name = (prop.children.first as XUIElementText).content.toString();
+          doc.name = (prop.children!.first as XUIElementText).content.toString();
         } else if (id == "icon") {
-          doc.icon = (prop.children.first as XUIElementText).content.toString();
+          doc.icon = (prop.children!.first as XUIElementText).content.toString();
         } else if (id == "desc") {
-          doc.desc = (prop.children.first as XUIElementText).content.toString();
+          doc.desc = (prop.children!.first as XUIElementText).content.toString();
         } else if (id == "add-remove") {
           doc.addRemove =
-              (prop.children.first as XUIElementText).content.toString();
+              (prop.children!.first as XUIElementText).content.toString();
         }
-      } else if (prop.attributes["var"] != null) {
+      } else if (prop.attributes!["var"] != null) {
         DocVariables propDoc = DocVariables();
-        propDoc.id = prop.attributes["var"]?.content;
-        propDoc.def = prop.attributes["def"]?.content;
-        propDoc.editor = prop.attributes["editor"]?.content;
-        propDoc.link = prop.attributes["link"]?.content;
-        propDoc.list = prop.attributes["list"]?.content;
-        propDoc.cat = prop.attributes["cat"]?.content;
-        propDoc.bindType = prop.attributes["bind-type"]?.content;
+        propDoc.id = prop.attributes!["var"]?.content;
+        propDoc.def = prop.attributes!["def"]?.content;
+        propDoc.editor = prop.attributes!["editor"]?.content;
+        propDoc.link = prop.attributes!["link"]?.content;
+        propDoc.list = prop.attributes!["list"]?.content;
+        propDoc.cat = prop.attributes!["cat"]?.content;
+        propDoc.bindType = prop.attributes!["bind-type"]?.content;
 
         propDoc.doc =
-            (prop.children.first as XUIElementText).content.toString();
+            (prop.children!.first as XUIElementText).content.toString();
         doc.variables.add(propDoc);
       }
     });
@@ -290,8 +291,9 @@ class XUIResource extends XMLElemReader {
   ///     return l'element pour avoir le parent des enfants
   ///
   @override
-  Future<XUIElementXUI> parseElem(dynamic parent, XMLElem element) async {
-    XUIElementXUI elemXui;
+  Future<XUIElementXUI?> parseElem(dynamic parent, XMLElem element) async {
+
+    XUIElementXUI? elemXui;
 
     bool isChild = true;
 
@@ -299,7 +301,7 @@ class XUIResource extends XMLElemReader {
       // cas d'un texte
       if (isSupportTextElement(parent)) {
         elemXui = XUIElementText();
-        (elemXui as XUIElementText).content = element.text;
+        (elemXui as XUIElementText).content = element.text!;
       } else {
         isChild = false;
       }
@@ -307,7 +309,7 @@ class XUIResource extends XMLElemReader {
       //***************   LES IMPORT ***********************************/
       if (element.tag == TAG_IMPORT) {
         var subReader =
-            HTMLReader(element.attributs["xui-path"], reader.provider);
+            HTMLReader(element.attributs!["xui-path"]!, reader.provider);
         XUIResource subFile = XUIResource(subReader, context);
         await subFile.parseXUIFile();
         // subFile.reader.content = null;
@@ -318,13 +320,13 @@ class XUIResource extends XMLElemReader {
         //***************   LES PROPERTIES EN ATTRIBUT SAUF SI DOCUMENTATION *****************************/
         XUIElementXUI p = parent;
         p.propertiesXUI ??= HashMap<String, XUIProperty>();
-        var b = element.attributs["binding"];
+        var b = element.attributs!["binding"];
         if (b != null) {
-          var prop = XUIPropertyBinding(element.attributs["val"], b);
-          p.propertiesXUI[element.attributs["id"]] = prop;
+          var prop = XUIPropertyBinding(element.attributs!["val"], b);
+          p.propertiesXUI![element.attributs!["id"]!] = prop;
         } else {
-          var prop = XUIProperty(element.attributs["val"]);
-          p.propertiesXUI[element.attributs["id"]] = prop;
+          var prop = XUIProperty(element.attributs!["val"]);
+          p.propertiesXUI![element.attributs!["id"]!] = prop;
         }
 
         return Future.value();
@@ -332,37 +334,37 @@ class XUIResource extends XMLElemReader {
 
       // cas d'un elem HTML
       elemXui = XUIElementXUI();
-      elemXui.idRessource = reader?.id;
+      elemXui.idRessource = reader.id;
 
       // gestion des tag escape (HTML, HEAD, ETC...)
       elemXui.tag = element.tag.startsWith(TAG_ESCAPE)
           ? element.tag.substring(TAG_ESCAPE.length)
           : element.tag;
 
-      elemXui.xid = element.attributs[ATTR_XID];
-      element.attributs.remove(ATTR_XID);
+      elemXui.xid = element.attributs![ATTR_XID];
+      element.attributs!.remove(ATTR_XID);
 
       _processAttributs(element, elemXui);
 
       String mode = MODE_ALL;
       if (elemXui.propertiesXUI != null) {
-        var attr = elemXui.propertiesXUI[ATTR_MODE];
+        var attr = elemXui.propertiesXUI![ATTR_MODE];
         mode = attr == null ? mode : attr.content.toString();
       }
 
       if (element.tag.toString().toLowerCase() == TAG_DOC) {
         //***************   LES DOCUMENTATION *****************************/
         isChild = false;
-        documentation[elemXui.xid] ??= DicoOrdered();
-        documentation[elemXui.xid].add(XUIModel(elemXui, mode));
+        documentation[elemXui.xid!] ??= DicoOrdered();
+        documentation[elemXui.xid]!.add(XUIModel(elemXui, mode));
       } else if (element.tag.toString().toLowerCase() == TAG_DESIGN) {
         // gestion des design
         elemXui.tag = null; // pas de tag a affecter si cest le tag design
         if (elemXui.xid != null) {
           isChild = false;
           //  if (elemXui.xid == "xui-script-data") isChild = false;
-          designs[elemXui.xid] ??= DicoOrdered();
-          designs[elemXui.xid].add(XUIDesign(elemXui, mode));
+          designs[elemXui.xid!] ??= DicoOrdered();
+          designs[elemXui.xid]!.add(XUIDesign(elemXui, mode));
         }
       } else {
         if (elemXui.xid != null) {
@@ -370,24 +372,24 @@ class XUIResource extends XMLElemReader {
           if ((parent as XUIElementXUI).tag.toString().toLowerCase() ==
               TAG_FACTORY) {
             isChild = false;
-            components[elemXui.xid] ??= DicoOrdered();
-            components[elemXui.xid].add(XUIComponent(elemXui, mode));
+            components[elemXui.xid!] ??= DicoOrdered();
+            components[elemXui.xid]!.add(XUIComponent(elemXui, mode));
           }
         }
       }
     }
 
-    if (isChild) {
+    if (isChild && parent!=null) {
       // ajout des enfants
-      (parent as XUIElement)?.children ??= [];
-      (parent as XUIElement)?.children?.add(elemXui);
+      (parent as XUIElement).children ??= [];
+      (parent as XUIElement).children!.add(elemXui!);
     }
 
     return Future.value(elemXui);
   }
 
   void _processAttributs(XMLElem element, XUIElementXUI elemXui) {
-    element.attributs.entries.forEach((f) {
+    element.attributs!.entries.forEach((f) {
       String keyAttr = f.key.toString();
       if (keyAttr.startsWith("-")) {
         keyAttr = keyAttr.substring(1);
@@ -396,10 +398,10 @@ class XUIResource extends XMLElemReader {
       if (keyAttr.startsWith("xui-")) {
         // les xui- sont des properties
         elemXui.propertiesXUI ??= HashMap<String, XUIProperty>();
-        elemXui.propertiesXUI[keyAttr.substring(4)] = XUIProperty(f.value);
+        elemXui.propertiesXUI![keyAttr.substring(4)] = XUIProperty(f.value);
       } else {
         elemXui.attributes ??= HashMap<String, XUIProperty>();
-        elemXui.attributes[keyAttr] =
+        elemXui.attributes![keyAttr] =
             XUIProperty(f.value == "" ? null : f.value);
       }
     });
@@ -409,13 +411,14 @@ class XUIResource extends XMLElemReader {
 ///------------------------------------------------------------------
 
 class XUIEngine {
-  XUIResource xuiFile;
-  var mapSlotInfo = HashMap<String, SlotInfo>();
+  late XUIResource xuiFile;
   var docInfo = HashMap<String, DocInfo>();
-  // plus forcement utiliser sauf text avec moustache {{}}
 
-  var dataBindingInfo = XUIParseJSDataBinding();
+  var mapSlotInfo = HashMap<String, SlotInfo>();
   var binding = LinkedHashMap<String, XUIBinding>();
+
+  // plus forcement utiliser sauf text avec moustache {{}}
+  var dataBindingInfo = XUIParseJSDataBinding();
 
   Future initialize(HTMLReader reader, XUIContext ctx) async {
     xuiFile = XUIResource(reader, ctx);
@@ -434,14 +437,14 @@ class XUIEngine {
 
   ///------------------------------------------------------------------------------------
   /// change une property de design
-  XUIProperty getXUIProperty(String xid, String variable) {
+  XUIProperty? getXUIProperty(String xid, String variable) {
     var listDesign = xuiFile.designs[xid];
     if (listDesign == null) {
       return null;
     }
 
     var xuiDesign = listDesign.sort(xuiFile.context).first;
-    return xuiDesign.elemXUI.propertiesXUI[variable];
+    return xuiDesign.elemXUI.propertiesXUI![variable];
 
     // List<DesignInfo> designs = getDesignInfo(xid, xid, false);
     // for (var design in designs) {
@@ -461,7 +464,7 @@ class XUIEngine {
     // return null;
   }
 
-  SlotInfo getSlotInfo(String id, String idslot) {
+  SlotInfo? getSlotInfo(String id, String idslot) {
     var info = mapSlotInfo[id];
     if (info == null) info = mapSlotInfo[idslot];
 
@@ -473,11 +476,11 @@ class XUIEngine {
     xuiElem.xid = xid;
     xuiElem.idRessource = xuiFile.reader.id;
     xuiFile.designs[xid] ??= DicoOrdered();
-    xuiFile.designs[xid].add(XUIDesign(xuiElem, MODE_ALL));
+    xuiFile.designs[xid]!.add(XUIDesign(xuiElem, MODE_ALL));
   }
 
   getReloaderID(f) {
-    SlotInfo info = getSlotInfo(f, f);
+    SlotInfo? info = getSlotInfo(f, f);
     if (info == null || !XUIConfigManager.reloaderEnable) {
       return null;
     }
@@ -485,9 +488,9 @@ class XUIEngine {
     var reloaderId;
     while (html != null) {
       if (html.originElemXUI != null &&
-          html.originElemXUI.propertiesXUI != null &&
-          html.originElemXUI.propertiesXUI.containsKey(ATTR_RELOADER)) {
-        reloaderId = html.calculatePropertyXUI(html.originElemXUI.xid, null);
+          html.originElemXUI!.propertiesXUI != null &&
+          html.originElemXUI!.propertiesXUI!.containsKey(ATTR_RELOADER)) {
+        reloaderId = html.calculatePropertyXUI(html.originElemXUI!.xid, null);
         html = null;
       } else {
         html = html.parent;
@@ -508,18 +511,18 @@ class XUIEngine {
 
   List<DesignInfo> getDesignInfo(String id, String idslot, bool withParent) {
     List<DesignInfo> listDesignInfo = [];
-    SlotInfo slotInfo = getSlotInfo(id, idslot);
+    SlotInfo? slotInfo = getSlotInfo(id, idslot);
     if (slotInfo == null) {
       XUIConfigManager.printc("getDesignInfo Erreur id inconnu " + id);
       return listDesignInfo;
     }
-    DocInfo doc = docInfo[slotInfo.docId];
+    DocInfo? doc = docInfo[slotInfo.docId];
     listDesignInfo.add(DesignInfo(slotInfo, doc));
     if (withParent) {
       var next = slotInfo.parentXid;
       while (next != null) {
         slotInfo = getSlotInfo(next, next);
-        if (slotInfo.elementHTML.tag != TAG_RELOADER) {
+        if (slotInfo!.elementHTML!.tag != TAG_RELOADER) {
           doc = docInfo[slotInfo.docId];
           listDesignInfo.add(DesignInfo(slotInfo, doc));
         }
@@ -534,7 +537,7 @@ class XUIEngine {
         xuiFile.context.mode != MODE_PREVIEW;
   }
 
-  toHTMLString(XUIHtmlBuffer writer, String xid, XUIContext ctx) async {
+  toHTMLString(XUIHtmlBuffer? writer, String xid, XUIContext ctx) async {
     xuiFile.context = ctx;
     if (writer == null) {
       XUIConfigManager.printc("toHTMLString for only init XUI xid=" + xid);
@@ -544,10 +547,10 @@ class XUIEngine {
 
     var listCmp = xuiFile.searchComponent(xid);
     if (listCmp == null) {
-      dynamic obj = ObjectWriter().toObjects(xuiFile);
+      //dynamic obj = ObjectWriter().toObjects(xuiFile);
 
-      final yamld = toYamlString(obj);
-      XUIConfigManager.printc("xid inconnu $xid\n" + yamld.toString());
+      //final yamld = toYamlString(obj);
+      //XUIConfigManager.printc("xid inconnu $xid\n" + yamld.toString());
 
       throw "xid inconnu $xid";
     }
@@ -557,7 +560,7 @@ class XUIEngine {
     XUIElementHTML htmlRoot = XUIElementHTML();
     if (isModeDesign() || XUIConfigManager.forceSlotInfo) {
       htmlRoot.attributes ??= HashMap<String, XUIProperty>();
-      htmlRoot.attributes["data-" + ATTR_XID] = XUIProperty(xid);
+      htmlRoot.attributes!["data-" + ATTR_XID] = XUIProperty(xid);
       htmlRoot.originElemXUI = root.elemXUI;
     }
 
@@ -611,34 +614,34 @@ class XUIEngine {
     });
 
     // reconstruit l'arborescence
-    SlotInfo rootSlot;
+    SlotInfo? rootSlot;
     mapSlotInfo.forEach((key, SlotInfo child) {
       var parentID = child.parentXid;
       if (parentID != null) {
-        mapSlotInfo[parentID].children = mapSlotInfo[parentID].children ?? [];
-        mapSlotInfo[parentID].children.add(child);
+        mapSlotInfo[parentID]?.children = mapSlotInfo[parentID]?.children ?? [];
+        mapSlotInfo[parentID]?.children!.add(child);
       } else {
         rootSlot = child;
       }
     });
 
     if (rootSlot != null) {
-      treeSlotBuilder.tree.add(displaySlot(treeSlotBuilder, rootSlot, 0, null));
+      treeSlotBuilder.tree.add(displaySlot(treeSlotBuilder, rootSlot!, 0, null));
     }
 
     return treeSlotBuilder.tree;
   }
 
   TreeSlot displaySlot(TreeSlotBuilder treeSlotBuilder, SlotInfo slot, int tab,
-      TreeSlot parent) {
+      TreeSlot? parent) {
     var ts = TreeSlot();
     ts.id = treeSlotBuilder.nb++;
 
     //ts.name = slot.xid+" <"+(slot.slotname??"")+">";
-    ts.name = slot.slotname ?? (slot.implement ?? slot.xid);
+    ts.name = slot.slotname ?? (slot.implement ?? slot.xid!);
     if (slot.docId != null) {
       if (slot.slotname == null && docInfo[slot.docId] != null) {
-        ts.name = docInfo[slot.docId].name;
+        ts.name = docInfo[slot.docId]!.name;
       }
     }
 
@@ -656,7 +659,7 @@ class XUIEngine {
         s = s + "\t";
       }
 
-      s = s + "# " + slot.xid + " <" + (slot.slotname ?? "") + ">";
+      s = s + "# " + slot.xid! + " <" + (slot.slotname ?? "") + ">";
       XUIConfigManager.printc(s);
     }
 
@@ -666,7 +669,7 @@ class XUIEngine {
         s = s + "\t";
       }
 
-      String res = slot.idRessource;
+      String? res = slot.idRessource;
       if (res == null) {
         res = "?";
       } else {
@@ -694,28 +697,28 @@ class XUIEngine {
     }
 
     for (SlotInfo item in slot.children ?? []) {
-      if (!(item.elementHTML.hasPropXUIIF() &&
-          !item.elementHTML.isXUIIF(this))) {
+      if (!(item.elementHTML!.hasPropXUIIF() &&
+          !item.elementHTML!.isXUIIF(this))) {
         var child = displaySlot(treeSlotBuilder, item, tab + 1, ts);
 
         if (isNoDisplay) {
-          if (parent.children == null) {
+          if (parent!.children == null) {
             parent.children = [];
           }
           child.name = child.name + " (" + ts.name + ")"; //isFlow  ts
           if (!child.isSlot) {
-            parent.children.add(child);
+            parent.children!.add(child);
           } else {
-            parent.children.addAll(child.children ?? []);
+            parent.children!.addAll(child.children ?? []);
           }
         } else {
           if (ts.children == null) {
             ts.children = [];
           }
           if (!child.isSlot) {
-            ts.children.add(child);
+            ts.children!.add(child);
           } else {
-            ts.children.addAll(child.children ?? []);
+            ts.children!.addAll(child.children ?? []);
           }
         }
       }
@@ -732,34 +735,34 @@ class XUIEngine {
     //   XUIConfigManager.printc(p.binding +" --------------- bind info " + doc.name);
     // }
 
-    StringBuffer buf = NativeInjectText.getcacheText('data-binding');
+
+    StringBuffer buf = NativeInjectText.getcacheText('data-binding')!;
 
     StringBuffer jsonBinding = StringBuffer();
     this.binding.forEach((key, bindInfo) {
-      var type = "?";
+      String type = "?";
 
-      SlotInfo slotInfo = getSlotInfo(bindInfo.xid, bindInfo.xid);
+      SlotInfo? slotInfo = getSlotInfo(bindInfo.xid, bindInfo.xid);
       if (slotInfo != null) {
-        DocInfo doc = docInfo[slotInfo.docId];
-        DocVariables varInfo;
-        for (DocVariables varCmp in doc.variables ?? const []) {
+        DocInfo doc = docInfo[slotInfo.docId]!;
+        DocVariables varInfo = DocVariables() ;
+        for (DocVariables varCmp in doc.variables) {
           if (varCmp.id == bindInfo.propName) {
             varInfo = varCmp;
             break;
           }
         }
 
-        type = varInfo.bindType != null ? varInfo.bindType : "?";
+        type = varInfo.bindType != null ? varInfo.bindType! : "?" ;
 
         XUIConfigManager.printc("/*/*/*/ xid=" +
             bindInfo.xid +
             " bind " +
             bindInfo.attr +
             " [" +
-            (varInfo.bindType != null ? varInfo.bindType : "?") +
-            "]"
-                " =>" +
-            slotInfo.docId +
+            type +
+            "] =>" +
+            slotInfo.docId! +
             "." +
             bindInfo.propName);
       }
@@ -772,7 +775,11 @@ class XUIEngine {
 
       var v = isBool ? bindInfo.value : '"' + bindInfo.value + '"';
       if (type == "array") {
-        v = '[{ key:"a" }]';
+        v = '[{ "key":"a" }]';
+      }
+
+      if (!isBool && type == "bool") {
+        v = 'false';
       }
 
       if (type != "item-array" && !bindInfo.attr.contains(".")) {
@@ -786,7 +793,7 @@ class XUIEngine {
     // }
 
     //String userBinding = xuiFile.context.jsonBinding;
-    XUIProperty propBinding = getXUIProperty("root", "binding");
+    XUIProperty? propBinding = getXUIProperty("root", "binding");
     String lastBinding = "";
     if (propBinding != null) {
       lastBinding = propBinding.content.toString();
@@ -797,12 +804,12 @@ class XUIEngine {
     }
 
      var newBinding = templateBinding;
-     if (lastBinding!="") {
+     if (isModeDesign() || lastBinding!="") {
         newBinding = generateApplicationStateJS(templateBinding, lastBinding);
     }
 
     if (newBinding != lastBinding) {
-      print(" SAVE *********************----------------*********** " + newBinding);
+      print(" SAVE STATE APP *********************----------------*********** " + newBinding);
       XUIActionManager(this).changeProperty("root", "binding", newBinding, "");
     }
 
@@ -815,16 +822,16 @@ class XUIEngine {
 
 ///------------------------------------------------------------------
 class SlotInfo {
-  String xid;
-  String parentXid;
-  String slotname;
-  String docId;
-  String idRessource;
-  String implement;
-  String
-      designInfo; // chaine caractere des info de design (NB + nom des fichier)
-  XUIElementHTML elementHTML;
-  List<SlotInfo> children;
+  String? xid;
+  String? parentXid;
+  String? slotname;
+  String? docId;
+  String? idRessource;
+  String? implement;
+  late String designInfo; 
+      // chaine caractere des info de design (NB + nom des fichier)
+  XUIElementHTML? elementHTML;
+  List<SlotInfo>? children;
 }
 
 class TreeSlotBuilder {
@@ -833,30 +840,30 @@ class TreeSlotBuilder {
 }
 
 class DocInfo {
-  String xid;
-  String componentAs;
-  String name;
-  String icon;
-  String desc;
-  String addRemove;
+  late String xid;
+  String? componentAs;
+  late String name;
+  late String icon;
+  late String desc;
+  String? addRemove;
   List<DocVariables> variables = [];
 }
 
 class DocVariables {
-  String id;
-  String def; // valeur par defaut
-  String editor;
-  String doc; // description
-  String link; // lien vers la doc
-  String list; // pour les combox
-  String cat; // la categorie  layout/style
-  String bindType;
+  late String id;
+  String? def; // valeur par defaut
+  String? editor;
+  String? doc; // description
+  String? link; // lien vers la doc
+  String? list; // pour les combox
+  String? cat; // la categorie  layout/style
+  String? bindType;
 }
 
 ///------------------------------------------------------------------
 class DesignInfo {
   SlotInfo slotInfo;
-  DocInfo docInfo;
+  DocInfo? docInfo;
 
   DesignInfo(this.slotInfo, this.docInfo);
 }

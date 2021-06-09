@@ -45,7 +45,7 @@ class HTMLReader extends XUIReader {
     var xmlelem = XMLElem();
 
     if (elem is Element) {
-      xmlelem.tag = elem.localName;
+      xmlelem.tag = elem.localName!;
     } else if (elem is Text) {
       xmlelem.text = StringBuffer(elem.text);
     } 

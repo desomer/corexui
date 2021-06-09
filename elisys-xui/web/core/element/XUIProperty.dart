@@ -50,7 +50,7 @@ class XUIProperty {
 
 ///--------------------------------------------------------------------
 class XUIPropertyBinding extends XUIProperty {
-  String binding;
+  String? binding;
 
   XUIPropertyBinding(v, b) : super(v) {
     this.binding = b;
@@ -66,14 +66,14 @@ class XUIPropertyBinding extends XUIProperty {
 enum ParseInfoMode { CONTENT, PROP, KEY, ATTR }
 
 class ParseInfo {
-  StringBuffer parsebuilder;
+  late StringBuffer parsebuilder;
   int nbTag = 0;
-  ParseInfoMode mode;
-  String context; // nom de l'attribut
-  String prefix;  //  ajoute un prefix à l'attribut   (ex : v-bind:)
+  late ParseInfoMode mode;
+  String? context; // nom de l'attribut
+  String? prefix;  //  ajoute un prefix à l'attribut   (ex : v-bind:)
 
 
-  ParseInfo(content, String context, ParseInfoMode mode) {
+  ParseInfo(content, String? context, ParseInfoMode mode) {
     parsebuilder = StringBuffer(content.toString());
     this.context = context;
     this.mode = mode;

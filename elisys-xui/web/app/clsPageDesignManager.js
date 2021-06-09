@@ -31,9 +31,15 @@ export class PageDesignManager {
             $xui.rootdata.listSlot.push(...param.treeSlot);
         }
 
-        console.debug(param.dataState);
-        $xui.rootdata.jsonEditorData = JSON.parse(param.dataState);
-        $xui.vuejs.$refs.root.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
+        //console.debug("************ App State initial ", param.dataState);
+        // $xui.rootdata.jsonEditorData = JSON.parse(param.dataState);
+
+        // try {
+        //     $xui.vuejs.$refs.root.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
+        // } catch (error) {
+            
+        // }
+
 
         setTimeout(() => {
             $xui.displayComponents("", "");
@@ -90,8 +96,16 @@ export class PageDesignManager {
             this.export();
         }
 
+        if (param.action == "clear") {
+            $xui.doPromiseJS("changePageFinish");
+        }
+    
         if (param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")
             this.store(); // save un nouvelle version
+
+        if ($xui.doStoreOnNextReload) {
+            this.store(); // save un nouvelle version
+        }
 
         if ($xui.rootdata.activeTab == 2)  // si onglet 2 actif
         {

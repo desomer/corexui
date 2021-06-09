@@ -1,0 +1,72 @@
+<xui-factory version="1.0">
+
+    <div xid="bottom-editor" style="display:flex">
+        <v-icon style="font-size:18px"  @click="$xui.deleteCmp()">mdi-delete</v-icon>
+        <v-icon style="font-size:18px"  @click="$xui.OpenPopupAction($event)">mdi-plus-box</v-icon>
+        <v-icon style="font-size:18px">mdi-pencil</v-icon>
+    </div>
+
+    <!------------------------------------------------------------------------------------->
+
+    <xui-slot xid="editor-header">
+        <v-subheader @click='[[selectAction@1]]' class='elevation-2 xui-style-prop'><span class='text-truncate'>[[title@3]]</span><v-spacer></v-spacer>
+            <v-icon @click='[[selectActionClick@2]]' dark >mdi-dots-horizontal</v-icon>
+        </v-subheader>
+        <v-divider></v-divider>
+    </xui-slot> 
+
+    <div xid="editor-text" style="display: inline-flex; width: 100%;">
+        <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
+        <v-text-field dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+    </div>
+
+    <div xid="editor-int" style="display: inline-flex; width: 100%;">
+        <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
+        <v-text-field class='ma-1' hide-details clearable type='number' min='0' max='99' 
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+    </div>
+
+    <div xid="editor-bool" style="display: inline-flex; width: 100%;">
+        <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
+        <v-switch dense style='margin: 4px 0px 2px 6px !important; padding: 0px 0px !important;' hide-details inset
+            :label='[[label@1]]'
+            v-model='[[value@1]]'>
+        </v-switch>
+    </div>
+
+    <v-combobox xid="editor-combo" dense class='mx-1 mt-3' hide-details clearable
+        :items='[[items]]'
+        :label='[[label]]' 
+        v-model='[[value]]'>
+    </v-combobox>
+
+    <div xid="editor-class" style="display: inline-flex; width: 100%;">
+        <v-text-field dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+        <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openClassEditor([[id@1]])"><v-icon dense>mdi-dots-horizontal</v-icon></v-btn>
+    </div>
+
+    <div xid="editor-icon" style="display: inline-flex; width: 100%;">
+        <v-text-field dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+        <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openTabUrl('pageIcon')"><v-icon dense>mdi-application-import</v-icon></v-btn>
+    </div>
+
+    <div xid="editor-image" style="display: inline-flex; width: 100%;">
+        <v-text-field dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+        <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openTabUrl('siteImage')"><v-icon dense>mdi-application-import</v-icon></v-btn>
+    </div>
+
+</xui-factory>

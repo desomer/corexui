@@ -34,19 +34,21 @@ class HTMLWriter {
 
 
         if (item.elemXUI.propertiesXUI != null) {
-          item.elemXUI.propertiesXUI.forEach((k, v) {
+          item.elemXUI.propertiesXUI!.forEach((k, v) {
              buf.addTab();
              buf.html.writeln(v.toHTML(k));
           });
         }
 
         if (item.elemXUI.children != null) {
-          for (XUIElementXUI aChild in item.elemXUI.children) {
-            if (aChild is! XUIElementText) {
+          item.elemXUI.children!.forEach((elem) { 
+            XUIElementXUI aChild = elem as XUIElementXUI;
+            bool isText = aChild is XUIElementText;
+            if (!isText) {
               buf.addTab();
               buf.html.writeln('<${aChild.tag} xid="${aChild.xid}"></${aChild.tag}>');
             }
-          }
+          });
         }
 
         buf.tab(-1);

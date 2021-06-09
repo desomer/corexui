@@ -47,16 +47,47 @@ $xui.changePageJS = (param) => {
 };
 
 
-$xui.generateApplicationStateJS = (template, last) => {
-    var template = JSON.parse("{" + template + "}");
-    var last = JSON.parse("{" + last + "}");
-    var ret = Object.assign(template, last);
+$xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
+    var jsonTemplate = JSON.parse("{" + StateTemplate + "}");
+    var jsonStateProp = JSON.parse("{" + StateInProperty + "}");
+    var ret = Object.assign(jsonTemplate, jsonStateProp);
     ret = Object.assign(ret, $xui.rootdata.jsonEditorData);
+
     $xui.rootdata.jsonEditorData = ret;
-    // console.debug("App State", ret, current , $xui.rootdata.jsonEditorData);
+    console.debug("******* set app state for editor", $xui.rootdata.jsonEditorData)
+
+    // const r = iterateJSON($xui.rootdata.jsonEditorData, template,
+    //     (k,v)=>{
+    //     console.log("k=", k, " v=", v);
+    //     return v;
+    // }, (a,i)=>{
+    //     console.log("---- array=", a, "  i=", i);
+    //     return i;
+    // });
+    
+
+     console.debug("************ App State template & prop", jsonTemplate, jsonStateProp);
+     console.debug("************ App State ret & editor", ret, $xui.rootdata.jsonEditorData);
     var ret = JSON.stringify(ret);
     return ret.substring(1, ret.length-1);
 };
+
+const iterateJSON = (src, template, funct, functArray) => {
+    const entries = Object.entries(src).map(([key, value]) =>
+      Array.isArray(value) ? [key, value.map(e => { 
+                 functArray( value, e); 
+                 var nt = null;
+                 if (Array.isArray(template[key]))
+                 {
+                    nt=template[key][0];
+                 }
+                 iterateJSON(e, nt, funct, functArray) })]
+        : typeof value === 'object'
+        ? [key, iterateJSON(value, template, funct)]
+        : [key, funct(key, value)]
+    );
+    return Object.fromEntries(entries);
+  };
 
 /******************************************************************************** */
 // gestion des button refresh et export de la page
@@ -213,7 +244,9 @@ $xui.setCurrentAction = (actionName) => {
 $xui.clearAll = () => {
     $xui.setCurrentAction("clearAll");
     $xui.pageDesignManager.clearAll();
+    $xui.rootdata.jsonEditorData="";
     $xui.refreshAction("template:clearAll");
+    
 }
 
 $xui.addCmp = (cmp) => {

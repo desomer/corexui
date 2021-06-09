@@ -46,14 +46,18 @@
         winFrame.srcdoc = html;
         setTimeout(() => {
             console.debug(window.location.hash);
-            winFrame.contentWindow.location.hash=window.location.hash;
+            winFrame.contentWindow.location.hash = window.location.hash;
         }, 100);
+    };
+
+    $xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
+        return StateInProperty;
     };
 
     window.onhashchange = () => {
         console.debug(window.location.hash);
         let winFrame = document.querySelector("#rootFrame");
-        winFrame.contentWindow.location.hash=window.location.hash;
+        winFrame.contentWindow.location.hash = window.location.hash;
     }
 
 </script>
