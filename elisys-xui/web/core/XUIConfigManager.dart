@@ -10,6 +10,9 @@ class XUIConfigManager {
     static bool verboseChange = false;
     static bool verboseEditor = false;
     static bool verboseReloader = false;
+    static bool verboseInitXUI = false;
+    static bool verboseBinding = true;
+
     static bool forceSlotInfo = false;  // pour la generation du template de json
 
     static printc(Object object)

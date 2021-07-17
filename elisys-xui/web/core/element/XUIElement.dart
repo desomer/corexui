@@ -151,12 +151,22 @@ class XUIElementHTML extends XUIElement {
     }
 
     if (prop is XUIPropertyBinding) {
+
+      var name=prop.binding;
+      int isArray = prop.binding!.lastIndexOf("[]");
+      if (isArray>0)
+      {
+         var arrayName = prop.binding!.substring(0,isArray);
+         name= arrayName.split(".").last+"_item"+prop.binding!.substring(isArray+2);
+      }
+
+
       if (parseInfo.mode == ParseInfoMode.CONTENT) {
         // si dans un contenu de tag <div>{{binding}}</div>
-        return "{{" + prop.binding! + "}}";
+        return "{{" + name! + "}}";
       }
       parseInfo.prefix = "v-bind:";
-      return prop.binding;
+      return name;
     }
 
     // sinon retour en directe

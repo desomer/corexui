@@ -179,10 +179,12 @@ class NativeInjectFile extends XUIElementNative {
   }
 }
 
+const JS_BINDING="data-binding";
+
 ///------------------------------------------------------------------
 class NativeInjectText extends XUIElementNative {
   // dictionnaire de cache de fichier
-  static var cacheText = { 'data-binding':  StringBuffer() };
+  static var cacheText = { JS_BINDING:  StringBuffer() };   //gestion 
 
   static StringBuffer? getcacheText(idResource)
   {

@@ -49,10 +49,9 @@
         <xui-prop id="exclude">container</xui-prop>
 
         <xui-prop var=":varItems" editor="text" def="items" bind-type="array">items var name</xui-prop>
-        <xui-prop var=":varName" editor="text" def="item" bind-type="item-array">item var name</xui-prop>
     </xui-doc>
 
-    <template xid="xui-for" v-for="([[:varName]], [[:varName]]_index) in [[:varItems]]">
+    <template xid="xui-for" v-for="([[:varItems]]_item, [[:varItems]]_index) in [[:varItems]]">
         <xui-slot style-slot="height:100%" xid="[[parent-xid]]-for" xui-slot-name="For block"></xui-slot>
     </template>
     

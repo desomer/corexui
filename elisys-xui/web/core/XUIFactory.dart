@@ -10,7 +10,7 @@ import 'element/XUIProperty.dart';
 class XUIHtmlBuffer {
   var html = StringBuffer();
   int idxTab = 0;
-  bool trim =false;
+  bool trim = false;
 
   addTab() {
     for (var i = 0; i < idxTab; i++) {
@@ -42,6 +42,7 @@ class XUIBinding {
   String attr;
   dynamic value;
   String xid;
+  String? type;
 
   XUIBinding(this.propName, this.attr, this.value, this.xid);
 }
@@ -65,7 +66,8 @@ class XUIModel implements Comparable<XUIModel> {
 
     /********** AFFECTE LES INFO POUR LE DESIGNER *************/
     if (this is XUIComponent) {
-      elemHtml.implementBy = (elemHtml.implementBy ?? [])..add(this as XUIComponent);
+      elemHtml.implementBy = (elemHtml.implementBy ?? [])
+        ..add(this as XUIComponent);
     } else if (this is XUIDesign) {
       elemHtml.designBy = (elemHtml.designBy ?? [])..add(this as XUIDesign);
     }
@@ -101,7 +103,10 @@ class XUIModel implements Comparable<XUIModel> {
     await _processPhase1Component(engine, elemHtml);
 
     // affecte les xid uniquement si child (pas design ni component)
-    if (elemXUI.xid != null &&  (engine.isModeDesign() || XUIConfigManager.forceSlotInfo)  /*&& engine.xuiFile.context.mode != MODE_FINAL*/) {
+    if (elemXUI.xid != null &&
+        (engine.isModeDesign() ||
+            XUIConfigManager
+                .forceSlotInfo) /*&& engine.xuiFile.context.mode != MODE_FINAL*/) {
       elemHtml.attributes ??= HashMap<String, XUIProperty>();
       if (this is! XUIComponent && this is! XUIDesign) {
         elemHtml.attributes!["data-" + ATTR_XID] = XUIProperty(xidCal);
@@ -256,25 +261,7 @@ class XUIModel implements Comparable<XUIModel> {
           // n'affecte pas le XID car gerer par attribut xid  => affecte tous les autres
           XUIProperty p = prop.value;
 
-          if (prop.key.startsWith(":")) {
-            // gestion du v-for    :items
-            var propB = XUIPropertyBinding("", prop.value.content);
-            var pme = MapEntry<String, XUIProperty>(prop.key, propB);
-            _addXUIBinding(pme, engine);
-          }
-
-          if (prop.value.content is String && prop.value.content.startsWith("{{")==true) {
-            // gestion du {{value}}
-            var varName = prop.value.content.toString().substring(2);
-            varName=varName.substring(0, varName.length-2);
-            var propB = XUIPropertyBinding("", varName);
-            var pme = MapEntry<String, XUIProperty>(prop.key, propB);
-            _addXUIBinding(pme, engine);
-          }
-
-          if (p is XUIPropertyBinding) {
-            _addXUIBinding(prop, engine);
-          }
+          _ProcessPropertiesBinding(prop, engine, p);
 
           elemHtml.propertiesXUI![prop.key] = p;
         }
@@ -282,18 +269,45 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
+  void _ProcessPropertiesBinding(
+      MapEntry<String, XUIProperty> prop, cst.XUIEngine engine, XUIProperty p) {
+    if (prop.key.startsWith(":")) {
+      // gestion du v-for    :items
+      var propB = XUIPropertyBinding("", prop.value.content);
+      var pme = MapEntry<String, XUIProperty>(prop.key, propB);
+      _addXUIBinding(pme, engine);
+    }
+
+    if (prop.value.content is String &&
+        prop.value.content.startsWith("{{") == true) {
+      // gestion du {{value}}
+      var varName = prop.value.content.toString().substring(2);
+      varName = varName.substring(0, varName.length - 2);
+      var propB = XUIPropertyBinding("", varName);
+      var pme = MapEntry<String, XUIProperty>(prop.key, propB);
+      _addXUIBinding(pme, engine);
+    }
+
+    if (p is XUIPropertyBinding) {
+      _addXUIBinding(prop, engine);
+    }
+  }
+
   void _addXUIBinding(
       MapEntry<String, XUIProperty> prop, cst.XUIEngine engine) {
     XUIPropertyBinding p = prop.value as XUIPropertyBinding;
-    XUIConfigManager.printc("////// Prop key " +
-        prop.key.toString() +
-        " on var binding " +
-        p.binding! +
-        " xid=" +
-        this.elemXUI.xid.toString());
+
+    if (XUIConfigManager.verboseBinding) {
+      XUIConfigManager.printc("Prop key [" +
+          prop.key.toString() +
+          "] on var binding [" +
+          p.binding! +
+          "] xid=" +
+          this.elemXUI.xid.toString());
+    }
 
     // affecte le binding pour la creation du JSON de binding
-    engine.binding[p.binding!] =
+    engine.bindingInfo[p.binding!] =
         XUIBinding(prop.key, p.binding!, p.content, this.elemXUI.xid!);
   }
 
@@ -343,13 +357,14 @@ class XUIModel implements Comparable<XUIModel> {
     // boucle sur les enfant
     if (elemHtml.children != null) {
       for (var child in elemHtml.children!) {
-        await processPhase2(
-            engine, child as XUIElementHTML, addSlotInfo ? slotInfo.xid : parentXId);
+        await processPhase2(engine, child as XUIElementHTML,
+            addSlotInfo ? slotInfo.xid : parentXId);
       }
     }
 
     //genere les infos de design (info, doc, etc...)
-    if (addSlotInfo && (XUIConfigManager.forceSlotInfo || engine.isModeDesign())) {
+    if (addSlotInfo &&
+        (XUIConfigManager.forceSlotInfo || engine.isModeDesign())) {
       slotInfo.parentXid = parentXId;
 
       slotInfo.idRessource = elemHtml.originElemXUI!.idRessource;

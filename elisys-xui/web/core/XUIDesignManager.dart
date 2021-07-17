@@ -47,9 +47,9 @@ class XUIDesignManager {
   Future<String?> getHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
 
-     if (xid == null) {
-       return null;
-     }
+    //  if (xid == null) {
+    //    return null;
+    //  }
     
     var bufferHtml = XUIHtmlBuffer();
     await getXUIEngine().toHTMLString(bufferHtml, xid, ctx);
@@ -76,7 +76,9 @@ class XUIDesignManager {
         xuiEngine = XUIEngine();
         var provider = ProviderAjax();
         if (uri.endsWith(".html")) {
-          XUIConfigManager.printc("initEngine file html : read ${uri}");
+          if (XUIConfigManager.verboseInitXUI) {
+            XUIConfigManager.printc("initEngine file html : read ${uri}");
+          }
           var reader = HTMLReader(uri, provider);
           await getXUIEngine().initialize(reader, ctx);
         }

@@ -258,7 +258,7 @@ void cutDesign(FileDesignInfo fileInfo, String id) async {
 
   if (lastCopyXid != null) {
     // supprime la vielle trashcan
-    designMgr.removeDesign(lastCopyXid, null);
+    await designMgr.removeDesign(lastCopyXid, null);
   }
 
   // ajoute un design a la trashcan
@@ -281,7 +281,7 @@ void copyDesign(FileDesignInfo fileInfo, String id) async {
 
   if (lastCopyXid != null) {
     // supprime la vielle trashcan
-    designMgr.removeDesign(lastCopyXid, null);
+    await designMgr.removeDesign(lastCopyXid, null);
   }
 
   // ajoute un design a la trashcan
