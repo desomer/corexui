@@ -45,13 +45,14 @@ main
 
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2021 v0.6.1 09/06/2021"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2021 v0.7.0 25/07/2021"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
         <xui-prop id="withFooter" val="true"></xui-prop>
         <xui-prop id="navTemporary" val="true"></xui-prop>
         <xui-prop id=":isNavdrawerOpen" val="isNavdrawerOpen"></xui-prop>
+        <xui-prop id="binding" val="'isNavdrawerOpen': false"></xui-prop>
     </xui-design>
 
 
@@ -73,7 +74,7 @@ main
     </v-dialog>
 
     <!--  composant editor de binding  -->
-    <v-dialog xid="xui-binding-editor" v-model="dialogBinding" v-on:click:outside="$xui.saveBindingEditor()"
+    <v-dialog ref="dialogBind" xid="xui-binding-editor" v-model="dialogBinding" v-on:click:outside="$xui.saveBindingEditor()"
         max-width="80vw">
         <v-card>
             <div class="white--text elevation-6"
@@ -81,7 +82,7 @@ main
                 <v-card-title>Binding & watch</v-card-title>
             </div>
             <div style="height:65vh; overflow-y: scroll;">
-                <cmp-bind-editor></cmp-bind-editor>
+                <cmp-bind-editor ref="jsonEditorBindingCont"></cmp-bind-editor>
             </div>
             <v-card-actions class="elevation-6">
                 <v-btn text @click="dialogBinding=false;">Cancel</v-btn>
@@ -253,8 +254,30 @@ main
 
     <!---------------------------------- ONGLET DATA JSON------------------------------------>
     <xui-design xid="main-tab-tab-item-1">
-        <v-jsoneditor ref="jsonEditor" v-model="jsonEditorData" :options="jsonEditorOptions" :plus="false"
+        <v-row style="height:60px" no-gutters>
+            <v-col cols="12">
+               <v-radio-group row v-model="jsonEditorDataSrc" class="ml-4">
+                  <div class="v-radio"></div>
+                     <v-radio label="Template" value="template"></v-radio>
+                  </div>
+                  <div style="width:40%">
+                  </div>
+                  <div class="v-radio">
+                     <v-radio label="Mock" value="mock"></v-radio>
+                  </div>
+               </v-radio-group>
+            </v-col>
+         </v-row>
+         <v-row style="height:calc(100% - 60px)" no-gutters>
+            <v-col cols="6">
+                <v-jsoneditor ref="jsonEditor" v-model="jsonEditorData" :options="jsonEditorOptions" :plus="false"
             height="100%"></v-jsoneditor>
+            </v-col>
+            <v-col cols="6">
+                <v-jsoneditor ref="jsonEditor2" v-model="jsonEditorDataMock" :options="jsonEditorOptions" :plus="false"
+                height="100%"></v-jsoneditor>
+            </v-col>
+         </v-row>
     </xui-design>
 
     <!------------------------------- ONGLEt CODE------------------------------------>

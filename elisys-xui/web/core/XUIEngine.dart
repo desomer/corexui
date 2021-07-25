@@ -733,18 +733,46 @@ class XUIEngine {
   }
 
   void processPhase2JS() {
-    //var docID = getDocumentationID(elemHtml);
-    // DocInfo doc = engine.docInfo[docID];
-    // if (doc!=null) {
-    //   XUIConfigManager.printc(p.binding +" --------------- bind info " + doc.name);
-    // }
 
     var dicoObjBind = LinkedHashMap<String, List<XUIBinding>>();
     var dicoObjType = LinkedHashMap<String, XUIBinding>();
-
-    StringBuffer buf = NativeInjectText.getcacheText(JS_BINDING)!;
-
     StringBuffer jsonBinding = StringBuffer();
+
+    doDicoObjectBinding(dicoObjBind, dicoObjType);
+    processPhase2JSBinding("root", dicoObjBind, jsonBinding);
+
+    XUIProperty? propBinding = getXUIProperty("root", "binding");
+    String lastBinding = "";
+    if (propBinding != null) {
+      lastBinding = propBinding.content.toString();
+    }
+    String templateBinding = "";
+    if (jsonBinding.isNotEmpty) {
+      templateBinding = jsonBinding.toString();
+      XUIConfigManager.printc("---> ************ TMPL *************** " +
+          templateBinding.toString());
+    }
+
+    var newBinding = templateBinding;
+    if (isModeDesign()) {
+      newBinding = generateApplicationStateJS(templateBinding, lastBinding);
+    }
+    if (!isModeDesign() && lastBinding != "") {
+      newBinding = lastBinding;
+    }
+
+    XUIConfigManager.printc(
+        "---> ************ BIND *************** " + newBinding.toString());
+
+    var str =
+        '\$xui.rootdata = { ...\$xui.rootdata ,' + newBinding + '\n\t\t};';
+    StringBuffer buf = NativeInjectText.getcacheText(JS_BINDING)!;    
+    buf.clear();
+    buf.write(str);
+  }
+
+  void doDicoObjectBinding(LinkedHashMap<String, List<XUIBinding>> dicoObjBind,
+      LinkedHashMap<String, XUIBinding> dicoObjType) {
     this.bindingInfo.forEach((key, bindInfo) {
       String type = "?";
 
@@ -761,16 +789,16 @@ class XUIEngine {
 
         type = varInfo.bindType != null ? varInfo.bindType! : "?";
 
-        XUIConfigManager.printc("/*/*/*/ xid=" +
-            bindInfo.xid +
-            " bind on {" +
-            bindInfo.attr +
-            "} as [" +
-            type +
-            "] doc on" +
-            slotInfo.docId! +
-            "#" +
-            bindInfo.propName);
+        // XUIConfigManager.printc("/*/*/*/ xid=" +
+        //     bindInfo.xid +
+        //     " bind on {" +
+        //     bindInfo.attr +
+        //     "} as [" +
+        //     type +
+        //     "] doc on " +
+        //     slotInfo.docId! +
+        //     "#" +
+        //     bindInfo.propName);
       }
 
       var isBool = false;
@@ -796,25 +824,27 @@ class XUIEngine {
               dicoObjBind[path] = [];
             }
 
+            bool isArray = false;
             if (newPath.endsWith("[]")) {
               newPath = newPath.substring(0, newPath.length - 2);
+              isArray = true;
             }
 
-            if (dicoObjType[newPath] == null) {
+            if (!isArray && dicoObjType[newPath] == null) {
               var newObj = XUIBinding("?", element, "{}", "?");
               newObj.type = "object";
               dicoObjBind[path]?.add(newObj);
               dicoObjType[newPath] = newObj;
-              XUIConfigManager.printc(
-                  "---> addObj " + element + " on path " + path);
+              // XUIConfigManager.printc(
+              //     "---> addObj " + element + " on path " + path);
             } else {
-              var type = (dicoObjType[newPath]?.type ?? "?");
-              XUIConfigManager.printc("---> onObj " +
-                  element +
-                  " as [" +
-                  type +
-                  "] on path " +
-                  newPath);
+              // var type = (dicoObjType[newPath]?.type ?? "?");
+              // XUIConfigManager.printc("---> onObj " +
+              //     element +
+              //     " as [" +
+              //     type +
+              //     "] on path " +
+              //     newPath);
             }
           } else {
             // ajout de l'attribut
@@ -825,7 +855,7 @@ class XUIEngine {
               dicoObjBind[path] = [];
             }
             dicoObjBind[path]?.add(newObj);
-            XUIConfigManager.printc("---> addAttr " + element + " on " + path);
+            // XUIConfigManager.printc("---> addAttr " + element + " on " + path);
           }
 
           path = newPath;
@@ -839,51 +869,15 @@ class XUIEngine {
 
         if (bindInfo.type == "array") {
           dicoObjType[path + "." + bindInfo.attr] = bindInfo;
-          XUIConfigManager.printc(
-              "---> set array " + bindInfo.attr + " on " + path);
+          // XUIConfigManager.printc(
+          //     "---> set array " + bindInfo.attr + " on " + path);
         } else {
-          XUIConfigManager.printc(
-              "---> set Attr " + bindInfo.attr + " on " + path);
+          // XUIConfigManager.printc(
+          //     "---> set Attr " + bindInfo.attr + " on " + path);
         }
         dicoObjBind[path]?.add(bindInfo);
       }
     });
-
-    processPhase2JSBinding("root", dicoObjBind, jsonBinding);
-
-    XUIProperty? propBinding = getXUIProperty("root", "binding");
-    String lastBinding = "";
-    if (propBinding != null) {
-      lastBinding = propBinding.content.toString();
-    }
-    String templateBinding = "";
-    if (jsonBinding.isNotEmpty) {
-      templateBinding = jsonBinding.toString();
-    }
-
-    var newBinding = templateBinding;
-    if (isModeDesign() || lastBinding != "") {
-      newBinding = generateApplicationStateJS(templateBinding, lastBinding);
-    }
-
-    if (templateBinding.isNotEmpty) {
-      XUIConfigManager.printc("---> ************ TMPL *************** " +
-          templateBinding.toString());
-      XUIConfigManager.printc(
-          "---> ************ NEW  *************** " + newBinding.toString());
-      XUIConfigManager.printc(
-          "---> ************ LAST *************** " + lastBinding.toString());
-    }
-
-    if (newBinding.toString() != lastBinding.toString()) {
-      print("************** SAVE STATE APP " + newBinding);
-      XUIActionManager(this).changeProperty("root", "binding", newBinding, "");
-    }
-
-    var str =
-        '\$xui.rootdata = { ...\$xui.rootdata ,' + newBinding + '\n\t\t};';
-    buf.clear();
-    buf.write(str);
   }
 
   void processPhase2JSBinding(
@@ -893,7 +887,7 @@ class XUIEngine {
     dicoObjBind[objName]?.forEach((bindInfo) {
       var type = bindInfo.type;
 
-      var v = type == "bool" ? bindInfo.value : '"' + bindInfo.value + '"';
+      var v = type == "bool" ? (bindInfo.value) : ('"' + bindInfo.value + '"');
 
       if (type == "array") {
         var newjsonBinding = StringBuffer();
@@ -902,7 +896,7 @@ class XUIEngine {
         v = "[{ " + newjsonBinding.toString() + " }]";
       }
 
-      if (v == null && type == "bool") {
+      if ((v == null || v == "") && type == "bool") {
         v = 'false';
       }
 

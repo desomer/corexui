@@ -272,7 +272,7 @@ class XUIModel implements Comparable<XUIModel> {
   void _ProcessPropertiesBinding(
       MapEntry<String, XUIProperty> prop, cst.XUIEngine engine, XUIProperty p) {
     if (prop.key.startsWith(":")) {
-      // gestion du v-for    :items
+      // gestion du v-for    :items 
       var propB = XUIPropertyBinding("", prop.value.content);
       var pme = MapEntry<String, XUIProperty>(prop.key, propB);
       _addXUIBinding(pme, engine);

@@ -262,8 +262,6 @@ class XUIDesignManager {
         XUIComponent cmp =
             await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
         cmp.addProperties("items", "data[##idx##].items");
-      } else if (varCmp.editor == "style") {
-        fi.xid = 'editor-text';
       } else {
         fi.xid = 'editor-' + varCmp.editor!;
       }

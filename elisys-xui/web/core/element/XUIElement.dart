@@ -151,21 +151,50 @@ class XUIElementHTML extends XUIElement {
     }
 
     if (prop is XUIPropertyBinding) {
-
-      var name=prop.binding;
-      int isArray = prop.binding!.lastIndexOf("[]");
-      if (isArray>0)
-      {
-         var arrayName = prop.binding!.substring(0,isArray);
-         name= arrayName.split(".").last+"_item"+prop.binding!.substring(isArray+2);
+      var name = prop.binding;
+      int isArray = name!.lastIndexOf("[]");
+      if (isArray > 0) {
+        var arrayName = name.substring(0, isArray);
+        name =
+            arrayName.split(".").last + "_item" + name.substring(isArray + 2);
       }
-
 
       if (parseInfo.mode == ParseInfoMode.CONTENT) {
         // si dans un contenu de tag <div>{{binding}}</div>
-        return "{{" + name! + "}}";
+        return "{{" + name + "}}";
       }
       parseInfo.prefix = "v-bind:";
+      return name;
+    }
+
+    if (tag.startsWith(":")) {
+      var numVar = 0;
+      if (parseInfo.context == "v-for") {
+        numVar = 5 - parseInfo.parsebuilder.toString().split(tag).length;
+        // print("tag " +
+        //     tag +
+        //     " c=" +
+        //     prop.content +
+        //     " ctx " +
+        //     parseInfo.context! +
+        //     " nb=" +
+        //     numVar.toString() +
+        //     " mode=" +
+        //     parseInfo.parsebuilder.toString());
+      }
+
+      var name = prop.content.toString();
+      int isArray = name.lastIndexOf("[]");
+      if (isArray > 0) {
+        var arrayName = name.substring(0, isArray);
+        if (numVar == 1) {  // attribut variable item du v-for
+          name=name.substring(isArray + 3);
+        } else if (numVar == 2) { // attribut variable idx du v-for
+          name=name.substring(isArray + 3);
+        } else {
+          name =arrayName.split(".").last + "_item" + name.substring(isArray + 2);
+        }
+      }
       return name;
     }
 
@@ -450,9 +479,8 @@ class XUIElementHTMLText extends XUIElementHTML {
       cont = cTrim;
       // print("trim <"+cont+">");
       // cont= cont.toString().trimRight();
-      if (cTrim.endsWith(";"))
-      {
-         cont=cTrim+"\n";
+      if (cTrim.endsWith(";")) {
+        cont = cTrim + "\n";
       }
       // print("result <"+cont+">");
     }

@@ -21,8 +21,14 @@
 
                 $xui.modeDisplaySelection = false;
                 $xui.rootdata.dialogBinding = true;
-                console.debug("open Binding Editor", xid, propId);
 
+                setTimeout(() => {
+                    $xui.vuejs.$refs.root.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set($xui.rootdata.jsonEditorData)
+                    console.debug("open Binding Editor", xid, propId, $xui.vuejs.$refs.root.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding);
+                }, 100);
+
+
+     
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
                         console.debug("load binding", aProperty);
@@ -56,7 +62,7 @@
     <div xid="vue-xui-bind-editor">
         <v-text-field class="ma-6" :label="nameBinding" v-model="variableBinding" hint="Bind variable name" outlined
             clearable persistent-hint></v-text-field>
-        <v-jsoneditor ref="editor" v-model="jsonEditorData" :options="jsonEditorOptions" :plus="false" height="100%">
+        <v-jsoneditor ref="jsonEditorBinding" v-model="jsonEditorData" :options="jsonEditorOptions" :plus="false" height="100%">
         </v-jsoneditor>
     </div>
 

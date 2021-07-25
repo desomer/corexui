@@ -508,20 +508,33 @@
         <xui-prop id="desc">Une Card</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
 
-        <xui-prop var="height" def="80px" editor="text">hauteur header</xui-prop>
+        <xui-prop var="height" def="80px" editor="text">Header height (px)</xui-prop>
+        <xui-prop var="withTitle" editor="bool">With title</xui-prop>
+
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        
     </xui-doc>
 
     <xui-doc xid="CardContent">
         <xui-prop id="name">Card content</xui-prop>
     </xui-doc>
 
-    <v-card xid="xui-card-1" xui-for="idxc" class="mx-auto">
-        <v-img src="https://cdn.vuetifyjs.com/images/cards/store.jpg" class="white--text align-end"
+    <v-card-title xid="xui-card-title" xui-slot-name="Card Title Container" class="[[class]]" -style="[[style]]" xui-doc-id="CardTitleContainer">
+        <xui-slot xid="[[parent-xid]]-title" xui-slot-name="Card Title"  xui-doc-id="CardTitle"></xui-slot>
+    </v-card-title>
+
+    <v-card xid="xui-card-1" xui-for="idxc" class="[[class]]" -style="[[style]]">
+        <xui-image-1 xid="[[parent-xid]]-CardImage" xui-slot-name="CardImage" xui-withSlot="false" height="[[height@1]]">
+            <xui-card-title xid="[[parent-xid]]-titlec" xui-if="[[withTitle@2]]">
+            </xui-card-title>
+        </xui-image-1>
+        <!--v-img src="[[url@1]]" class="white--text align-end"
             height="[[height@1]]">
             <v-card-title>
                 <xui-slot xid="[[parent-xid]]-card-title" xui-slot-name="Card Title"  xui-doc-id="CardTitle"></xui-slot>
             </v-card-title>
-        </v-img>
+        </v-img-->
 
         <v-card-text>
             <xui-slot xid="[[parent-xid]]-card-main" xui-slot-name="Card Content" xui-doc-id="CardContent"></xui-slot>

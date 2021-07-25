@@ -11,9 +11,11 @@
 		<xui-prop var="withAppBar" editor="bool">App bar</xui-prop>
 		<xui-prop var="withFooter" editor="bool">Footer bar</xui-prop>
 		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
+		<xui-prop var="fullRoot" editor="bool">fill height</xui-prop>
+		
 
 		<xui-prop var="withLeftNavigation" editor="bool">Left Navigation Drawer</xui-prop>
-		<xui-prop var=":isNavdrawerOpen" editor="text" bind-type="text" bind-type="bool">var isNavdrawerOpen</xui-prop>
+		<xui-prop var=":isNavdrawerOpen" editor="text" bind-type="bool">var isNavdrawerOpen</xui-prop>
 		
 		<xui-prop var="navPermanent" editor="bool">Nav permanent</xui-prop>
 		<xui-prop var="navTemporary" editor="bool">Force temporary nav on Desktop</xui-prop>
@@ -104,7 +106,7 @@
 		<xui-prop var="colorBg" editor="text" link="https://materialdesignicons.com/">router content color</xui-prop>
 	</xui-doc>
 
-	<v-main xid="vue-router-1" class="fill-height" -style="background-color:[[colorBg]]">
+	<v-main xid="vue-router-1" -style="background-color:[[colorBg]]">
 		<router-view ref="routerview">  <!-- ICI LA PAGE --> </router-view>
 	</v-main>
 
@@ -113,7 +115,7 @@
 		<vue-systembar-1 xid="systembar"  xui-if=[[withSysBar@0+]]></vue-systembar-1>
 		<vue-nav-drawer-1 xid="navdrawerleft" xui-if=[[withLeftNavigation@0+]]></vue-nav-drawer-1>
 		<vue-apptoolbar-1 xid="toolbar" xui-if=[[withAppBar@0+]]></vue-apptoolbar-1>
-		<vue-router-1 xid="rooter"></vue-router-1>
+		<vue-router-1 class="[[fullRoot@0+]]" xid="rooter"></vue-router-1>
 		<vue-footer-1 xid="footer" xui-if=[[withFooter@0+]]></vue-footer-1>
 		<vue-bottom-nav-1 xid="bottom-nav" xui-if=[[withBottomNavigation@0+]]></vue-bottom-nav-1>
 	</xui-design>
@@ -388,7 +390,7 @@
 
 	<xui-design xid="inject-style">
 		<style xui-no-dom>
-			.v-main__wrap {
+			.fullRoot>.v-main__wrap {
 				display: contents; /* no div de type block */   
 				height: 100%;
 			}

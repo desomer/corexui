@@ -11,7 +11,7 @@ export class PageDesignManager {
             file: 'app/' + window.$xui.rootdata.frameName + '.html',
             xid: 'root',
             mode: mode,
-            jsonBinding : JSON.stringify($xui.rootdata.jsonEditorData)
+            jsonBinding: JSON.stringify($xui.rootdata.jsonEditorData)
         };
     }
 
@@ -30,16 +30,6 @@ export class PageDesignManager {
             $xui.rootdata.listSlot.length = 0;
             $xui.rootdata.listSlot.push(...param.treeSlot);
         }
-
-        //console.debug("************ App State initial ", param.dataState);
-        // $xui.rootdata.jsonEditorData = JSON.parse(param.dataState);
-
-        // try {
-        //     $xui.vuejs.$refs.root.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
-        // } catch (error) {
-            
-        // }
-
 
         setTimeout(() => {
             $xui.displayComponents("", "");
@@ -64,8 +54,14 @@ export class PageDesignManager {
         //console.debug("change page", param);
 
         $xui.unDisplaySelector();
-        
-        param.jsonBinding = $xui.rootdata.jsonEditorData;
+
+        param.jsonTemplate = $xui.rootdata.jsonEditorData;
+        if ($xui.rootdata.jsonEditorDataSrc == "mock") {
+            param.jsonBinding = $xui.rootdata.jsonEditorDataMock;
+        }
+        else {
+            param.jsonBinding = $xui.rootdata.jsonEditorData;
+        }
 
         if (param.mode == "template") {
             // change uniquement template de la page aprés le demarrage en mode design et les reloader
@@ -99,12 +95,16 @@ export class PageDesignManager {
         if (param.action == "clear") {
             $xui.doPromiseJS("changePageFinish");
         }
-    
+
         if (param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")
             this.store(); // save un nouvelle version
 
         if ($xui.doStoreOnNextReload) {
             this.store(); // save un nouvelle version
+            $xui.doStoreOnNextReload=false;
+            setTimeout(() => {
+                $xui.displayPropertiesJS("root", "root");   // reaffecte le nouveau mapping sur la page
+            }, 500);
         }
 
         if ($xui.rootdata.activeTab == 2)  // si onglet 2 actif

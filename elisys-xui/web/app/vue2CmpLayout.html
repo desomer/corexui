@@ -48,7 +48,7 @@
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
 
-        <xui-prop var=":varItems" editor="text" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var=":varItems" editor="var" def="items" bind-type="array">items var name</xui-prop>
     </xui-doc>
 
     <template xid="xui-for" v-for="([[:varItems]]_item, [[:varItems]]_index) in [[:varItems]]">

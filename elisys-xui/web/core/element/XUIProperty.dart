@@ -16,12 +16,6 @@ class XUIProperty {
     String endTag = "]]";
 
     int next = parse.indexOf(startTag, idx);
-    // if (next==-1)
-    // {
-    //     startTag="--";
-    //     endTag= "--";
-    //     next = parse.indexOf(startTag, idx);
-    // }
 
     int nextEnd = next;
     if (next >= 0) {

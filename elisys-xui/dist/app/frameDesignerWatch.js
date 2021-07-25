@@ -16,16 +16,16 @@ $xui.initVuejs = (instanceVue) => {
 
     if (oldValue == 1) {
       // retour de l'onglet jsonEditor
-      if ($xui.lastEditorAppStateValue != JSON.stringify($xui.rootdata.jsonEditorData)) {
+      var ctrlStr = $xui.rootdata.jsonEditorDataSrc+"#"+JSON.stringify($xui.rootdata.jsonEditorDataMock);
+      if ($xui.lastEditorAppStateValue != ctrlStr) {
         $xui.refreshAction('template:reload-json')   // recharge le json
         $xui.doStoreOnNextReload = true;
       }
-
     }
 
     if (newValue == 1) {
-      console.debug("******* set app state in editor", $xui.rootdata.jsonEditorData)
-      $xui.lastEditorAppStateValue = JSON.stringify($xui.rootdata.jsonEditorData);
+      $xui.lastEditorAppStateValue = $xui.rootdata.jsonEditorDataSrc+"#"+JSON.stringify($xui.rootdata.jsonEditorDataMock);
+
       $xui.vuejs.$refs.root.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
     }
 

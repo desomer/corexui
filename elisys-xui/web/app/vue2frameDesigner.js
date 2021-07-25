@@ -23,8 +23,8 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
 
                     // creation du composant 
                     Vue.component(newId,
-                        { 
-                            template: '<div style="display:' + this.modedisplay + '">' + e.template + '</div>' ,
+                        {
+                            template: '<div style="display:' + this.modedisplay + '">' + e.template + '</div>',
                             data: function () {
                                 return $xui.rootdata;
                             },
@@ -34,10 +34,10 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
                                 },
                                 ...$xui.storeDataBinding
                             },
-                            methods : $xui.storeAction
+                            methods: $xui.storeAction
                         }
-                        
-                        );
+
+                    );
                     this.componentToReload = newId;   // change le contenu du composant  id = componentToReload
 
                     this.$nextTick(function () {
@@ -100,7 +100,7 @@ document.addEventListener('drop', function (e) {
         var idCmp = e.dataTransfer.getData('text/plain');
         let targetAction = e.target.closest("[data-xid]");
         console.debug("drop ", idCmp, targetAction);
-        var message = { action: "drop", ctrlKey : e.ctrlKey, xid: targetAction.dataset.xid, xid_slot: targetAction.dataset.xidSlot };
+        var message = { action: "drop", ctrlKey: e.ctrlKey, xid: targetAction.dataset.xid, xid_slot: targetAction.dataset.xidSlot };
         window.parent.postMessage(message, "*");
     }
 });
@@ -160,21 +160,70 @@ window.addEventListener('resize', function (event) {
 });
 
 //********************************** DISPACH DES EVENTS PROVENANT DU DESIGNER ******************************** */
+const iterateJSON = (src, dest, funct, functArray) => {
+    const entries = Object.entries(src).map(([key, value]) =>
+        Array.isArray(value) ? [key, value.map(e => {
+            functArray(value, e);
+            var nt = null;
+            if (Array.isArray(dest[key])) {
+                nt = dest[key][0];
+            }
+            iterateJSON(e, nt, funct, functArray)
+        })]
+            : typeof value === 'object'
+                ? [key, iterateJSON(value, dest[key], funct, functArray)]
+                : [key, funct(key, value, dest)]
+    );
+    return Object.fromEntries(entries);
+};
 
 window.addEventListener('message', function (e) {
     var data = e.data;
+    if (data.action!="getInfoForSelector") {
+        console.debug("--- CORE --- message ", data);
+    }
+
     if (data.action == "changeTemplate") {
 
-        if (data.param.jsonBinding!=null) 
-        {  // change uniquement le json du template
-           Object.assign($xui.rootdata, data.param.jsonBinding);
-           console.debug("****************************  assign data state ", data.param.jsonBinding,  $xui.rootdata);
-        } 
+        var hasChangeBinding = false;
 
-         if (data.param.action == "reload-json") 
-         {  // change uniquement le json du template
-            return;
-         }  
+        if (data.param.jsonBinding != null) {  // change uniquement le json du template
+            //Object.assign($xui.rootdata, data.param.jsonBinding);
+            var jsonBinding = data.param.jsonBinding;
+            var jsonTemplate = data.param.jsonTemplate;
+
+
+            // 
+
+            const r = iterateJSON(data.param.jsonTemplate, $xui.rootdata,
+                (k, v, dest) => {
+                    //console.log("k=", k, " v=", v);
+                    //Vue.set($xui.rootdata, k, v);
+                    if (dest[k] == null) {
+                        hasChangeBinding = true;
+                    }
+                    return v;
+                }, (a, i) => {
+                    //console.log("---- array=", a, "  i=", i);
+                    return i;
+                });
+
+            if (hasChangeBinding) {
+                $xui.rootdata = Object.assign({}, $xui.rootdata, data.param.jsonBinding);
+            }
+            else {
+                Object.assign($xui.rootdata, data.param.jsonBinding);
+            }
+
+            console.debug("***************** iframe assign data state ", hasChangeBinding, data.param.jsonBinding, $xui.rootdata);
+        }
+
+        if (data.param.action == "reload-json") {  
+            if (hasChangeBinding)
+                data.param.listReloader = null;  // recharge tout
+            else
+                return;  // change uniquement le json du template
+        }
 
 
         if (data.param.listReloader != null) {
@@ -215,11 +264,11 @@ window.addEventListener('message', function (e) {
     }
     else if (data.action == "getInfoForSelector") {
 
-        var ret =$xui.getInfoForSelector(data.selector, data.parent);
+        var ret = $xui.getInfoForSelector(data.selector, data.parent);
 
         var message = {
             action: "return getInfoForSelector",
-            info : data,
+            info: data,
             ret: ret
         };
 

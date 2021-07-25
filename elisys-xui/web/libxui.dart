@@ -112,6 +112,8 @@ Future initPageXUI(FileDesignInfo fileInfo) async {
 
 // recharge la page  (reload ou clear)
 Future refreshPageXUI(FileDesignInfo fileInfo) async {
+  XUIConfigManager.printc("--- CORE --- refreshPageXUI ["+fileInfo.mode + "] action ["+fileInfo.action+"] id="+fileInfo.xid);
+
   if (fileInfo.action == "reload") {
     print("reload all from storage");
     XUIDesignManager.removeDesignManager(fileInfo);

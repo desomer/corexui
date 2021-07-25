@@ -75,6 +75,36 @@
         
         label="[[label]]">[[value@1]]</v-text-field>
 
+
+    <!--------------------------  XUI-RADIO-GROUP-1   ---------------------------->
+    <xui-doc xid="xui-radio-group-1">
+        <xui-prop id="name">Radio Group</xui-prop>
+        <xui-prop id="icon">mdi-arrow-up-down mdi-rotate-90</xui-prop>
+        <xui-prop id="desc">Radio Group</xui-prop>
+        <xui-prop id="componentAs">Group</xui-prop>
+        <xui-prop var=":radioGroup" editor="var" def="groupChoise">var name</xui-prop>
+        <xui-prop var="row" editor="bool">Displays in row</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <v-radio-group xid="xui-radio-group-1" v-model="[[:radioGroup]]" row="[[row]]" class="[[class]]" -style="[[style]]" >
+        <xui-slot style-slot="height:100%" xid="[[parent-xid]]-rg" xui-slot-name="Group slot" xui-doc-id="d">
+        </xui-slot>
+    </v-radio-group>
+
+    <!--------------------------  XUI-RADIO-1   ---------------------------->
+    <xui-doc xid="xui-radio-1">
+        <xui-prop id="name">Radio</xui-prop>
+        <xui-prop id="icon">mdi-arrow-up-down mdi-rotate-90</xui-prop>
+        <xui-prop id="desc">Radio</xui-prop>
+        <xui-prop id="componentAs">input</xui-prop>
+        <xui-prop var="label" editor="text">label</xui-prop>
+    </xui-doc>
+
+    <div xid="xui-radio-1" class="v-radio"><v-radio label="[[label@1]]"></v-radio></div>
+   
+
     <!--------------------------  XUI-BTN-1  ---------------------------->
     <xui-doc xid="xui-btn-1">
         <xui-prop id="name">Button</xui-prop>
@@ -82,7 +112,7 @@
         <xui-prop id="desc">Un bouton</xui-prop>
         <xui-prop id="componentAs">action</xui-prop>
 
-        <xui-prop var="text" editor="text">text</xui-prop>
+        <xui-prop var="label" editor="text">label</xui-prop>
         <xui-prop var="btn-type" editor="combo" list='["depressed","outlined","rounded","text","tile","icon","fab"]'>type depressed/outlined/...</xui-prop>
         <xui-prop var="color" cat="style" editor="text">bgcolor</xui-prop>
         <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
@@ -96,7 +126,7 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-btn xid="xui-btn-1" class="[[class]]" -style="[[style]]" [[btn-type]] [[position]] disabled="[[disabled]]"  [[size]] color="[[color]]" dark="[[dark]]" light="[[light]]">[[text@1]]
+    <v-btn xid="xui-btn-1" class="[[class]]" -style="[[style]]" [[btn-type]] [[position]] disabled="[[disabled]]"  [[size]] color="[[color]]" dark="[[dark]]" light="[[light]]">[[label@1]]
     </v-btn>
 
     <!--------------------------  XUI-BTN-ICON-1   ---------------------------->

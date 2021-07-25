@@ -23,6 +23,14 @@
         </v-text-field>
     </div>
 
+    <div xid="editor-var" style="display: inline-flex; width: 100%;">
+        <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
+        <v-text-field dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+    </div>
+
     <div xid="editor-int" style="display: inline-flex; width: 100%;">
         <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
         <v-text-field class='ma-1' hide-details clearable type='number' min='0' max='99' 
@@ -53,6 +61,14 @@
         <v-btn small class="xui-editor-action-btn" @click.stop="$xui.openClassEditor([[id@1]])"><v-icon dense>mdi-dots-horizontal</v-icon></v-btn>
     </div>
 
+    <div xid="editor-style" style="display: inline-flex; width: 100%;">
+        <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
+        <v-text-field dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+    </div>
+
     <div xid="editor-icon" style="display: inline-flex; width: 100%;">
         <v-text-field dense class='mx-1 mt-3' hide-details clearable
             :label='[[label@1]]' 
@@ -62,6 +78,7 @@
     </div>
 
     <div xid="editor-image" style="display: inline-flex; width: 100%;">
+        <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
         <v-text-field dense class='mx-1 mt-3' hide-details clearable
             :label='[[label@1]]' 
             v-model='[[value@1]]'>

@@ -19,7 +19,9 @@ var json = {
     snackbar_timeout: 3000,
 
     listSlot : [],
+    jsonEditorDataSrc : "template",
     jsonEditorData : {},
+    jsonEditorDataMock : {},
     jsonEditorOptions : { mode: 'code' }
 };
 
