@@ -1,4 +1,4 @@
-@JS("\$xui")
+@JS("\$xuicore")
 library xuiapp;
 
 import 'dart:async';
@@ -19,19 +19,6 @@ import 'core/element/XUIProperty.dart';
 import 'core/parser/HTMLWriter.dart';
 import 'core/parser/ObjectWriter.dart';
 
-///------------------------- methode XUI vers JS -----------------------------
-
-@JS()
-external void loadPageJS(obj, bind);
-
-@JS()
-external void changePageJS(obj);
-
-@JS()
-external void doPromiseJS(idPromise, ret);
-
-@JS()
-external String generateApplicationStateJS(template, last);
 
 ///-------------------------- methode JS vers XUI ----------------------------
 @JS('initPageXUI')
@@ -47,21 +34,21 @@ external set _addDesignXUI(
 @JS('getHtmlFromXUI')
 external set _getHtmlFromXUI(void Function(FileDesignInfo, String) f);
 
-@JS('cutDesign')
-external set _cutDesign(void Function(FileDesignInfo, String) f);
+@JS('cutDesignXUI')
+external set _cutDesignXUI(void Function(FileDesignInfo, String) f);
 
-@JS('copyDesign')
-external set _copyDesign(void Function(FileDesignInfo, String) f);
+@JS('copyDesignXUI')
+external set _copyDesignXUI(void Function(FileDesignInfo, String) f);
 
-@JS('deleteDesign')
-external set _deleteDesign(void Function(FileDesignInfo, String) f);
+@JS('deleteDesignXUI')
+external set _deleteDesignXUI(void Function(FileDesignInfo, String) f);
 
-@JS('surroundDesign')
-external set _surroundDesign(
+@JS('surroundDesignXUI')
+external set _surroundDesignXUI(
     void Function(FileDesignInfo, String, String, String) f);
 
-@JS('moveDesign')
-external set _moveDesign(void Function(FileDesignInfo, String, String) f);
+@JS('moveDesignXUI')
+external set _moveDesignXUI(void Function(FileDesignInfo, String, String) f);
 
 @JS('changeNbChildXUI')
 external set _changeNbChildXUI(void Function(FileDesignInfo, String, String) f);
@@ -78,8 +65,8 @@ external set _getActionsXUI(
     dynamic Function(FileDesignInfo, String, String, String) f);
 
 /// retourne les properties
-@JS('getDesignProperties')
-external set _getDesignProperties(
+@JS('getDesignPropertiesXUI')
+external set _getDesignPropertiesXUI(
     void Function(FileDesignInfo, String, String) f);
 
 /// change les properties
@@ -90,8 +77,8 @@ external set _saveDesignPropertiesXUI(
 ///------------------------------------------------------------------
 Future initPageXUI(FileDesignInfo fileInfo) async {
   XUIConfigManager.printc("-------------- start initPage xui ----------------");
-
-  var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
+  XUIDesignManager.removeDesignManager(fileInfo);
+  var ctx = XUIContext(fileInfo.mode);
   var designManager = _getDesignManager(fileInfo);
 
   await _initStoreVersion(designManager, fileInfo, ctx);
@@ -103,7 +90,7 @@ Future initPageXUI(FileDesignInfo fileInfo) async {
       designManager.getXUIEngine().getXUIProperty("root", "binding");
   String? lastBinding = propBinding?.content;
 
-  options.binding = designManager.getXUIEngine().getBindingInfo();
+  //options.binding = designManager.getXUIEngine().getBindingInfo();
   options.treeSlot = designManager.getXUIEngine().getSlotTree();
   options.dataState = "{" + (lastBinding ?? "") + "}";
 
@@ -117,7 +104,7 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
   if (fileInfo.action == "reload") {
     print("reload all from storage");
     XUIDesignManager.removeDesignManager(fileInfo);
-    var ctx = XUIContext(MODE_TEMPLATE, fileInfo.jsonBinding);
+    var ctx = XUIContext(MODE_TEMPLATE);
     var designManager = _getDesignManager(fileInfo);
 
     await _initStoreVersion(designManager, fileInfo, ctx);
@@ -133,7 +120,7 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
   if (fileInfo.action == "clear") {
     print("clear all from storage");
     XUIDesignManager.removeDesignManager(fileInfo);
-    var ctx = XUIContext(MODE_TEMPLATE, fileInfo.jsonBinding);
+    var ctx = XUIContext(MODE_TEMPLATE);
     var designManager = _getDesignManager(fileInfo);
     await designManager.initEngine(fileInfo.file, ctx);
   }
@@ -163,13 +150,13 @@ void saveDesignPropertiesXUI(FileDesignInfo fileInfo, dynamic listDesig) async {
   // doPromiseJS("setDesignProperties", xidProp);
 }
 
-void getDesignProperties(
+void getDesignPropertiesXUI(
     FileDesignInfo fileInfo, String id, String? idslot) async {
   if (idslot == null) {
     idslot = id;
   }
   var designInfo =
-      await _getDesignManager(fileInfo).getJSDesignInfo(id, idslot);
+      await _getDesignManager(fileInfo).getJSDesignInfo(id, idslot, fileInfo.action);
 
   var ret = ObjectDesignProperties();
   ret.xid = designInfo.xid;
@@ -229,7 +216,7 @@ Future addDesignXUI(FileDesignInfo fileInfo, String id, String template,
   await designMgr.addDesign(id, template);
 
   if (!reload && init == true) {
-    var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
+    var ctx = XUIContext(fileInfo.mode);
     await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
   } else {
     if (id != XUI_COPYZONE_SLOT) designMgr.listXidChanged.add(id);
@@ -242,7 +229,7 @@ Future addDesignXUI(FileDesignInfo fileInfo, String id, String template,
 
 ///****************************************************************** */
 
-Future deleteDesign(FileDesignInfo fileInfo, String id) async {
+Future deleteDesignXUI(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
   SlotInfo info = designMgr.getXUIEngine().getSlotInfo(id, id)!;
   await designMgr.removeDesign(id, null);
@@ -251,7 +238,7 @@ Future deleteDesign(FileDesignInfo fileInfo, String id) async {
   await _reloadTemplate(fileInfo);
 }
 
-void cutDesign(FileDesignInfo fileInfo, String id) async {
+void cutDesignXUI(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
   SlotInfo info = designMgr.getXUIEngine().getSlotInfo(id, id)!;
@@ -276,7 +263,7 @@ void cutDesign(FileDesignInfo fileInfo, String id) async {
   await _reloadTemplate(fileInfo);
 }
 
-void copyDesign(FileDesignInfo fileInfo, String id) async {
+void copyDesignXUI(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
   String? lastCopyXid = _getContentCopyZoneID(designMgr);
@@ -300,7 +287,7 @@ void copyDesign(FileDesignInfo fileInfo, String id) async {
   await _reloadTemplate(fileInfo);
 }
 
-void surroundDesign(FileDesignInfo fileInfo, String id, String template,
+void surroundDesignXUI(FileDesignInfo fileInfo, String id, String template,
     String xidSurround) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
@@ -323,7 +310,7 @@ void surroundDesign(FileDesignInfo fileInfo, String id, String template,
   await _reloadTemplate(fileInfo);
 }
 
-void moveDesign(FileDesignInfo fileInfo, String? id, String idMoveTo) async {
+void moveDesignXUI(FileDesignInfo fileInfo, String? id, String idMoveTo) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
   if (id == null) {
@@ -397,7 +384,7 @@ void changeNbChildXUI(
 
   if (action == "delete") {
     if (nbItem - 1 == 0) {
-      return await deleteDesign(fileInfo, infoSlot.parentXid!);
+      return await deleteDesignXUI(fileInfo, infoSlot.parentXid!);
     }
 
     // retire un slot
@@ -427,7 +414,7 @@ Future _doMoveChildByIdx(String suffix, int i, int idst,
     designManager.addXUIDesignEmpty(idSlotToDest);
     //String slot = "<xui-design xid=\"" + idSlotToDest + "\"></xui-design>";
     //await addDesign(fileInfo, idSlotToDest, slot, false, true);
-    var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
+    var ctx = XUIContext(fileInfo.mode);
     await designManager.initHtml(ctx, fileInfo.file, fileInfo.xid);
 
     designManager.moveDesign(id, null, idSlotToDest);
@@ -436,7 +423,8 @@ Future _doMoveChildByIdx(String suffix, int i, int idst,
 
 /// retourne le code html d'un xui (pour les reloader)
 void getHtmlFromXUI(FileDesignInfo fileInfo, String idPromise) async {
-  var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
+  var ctx = XUIContext(fileInfo.mode);
+  ctx.setCause("getHtmlFromXUI");
   var designMgr = _getDesignManager(fileInfo);
   var html;
 
@@ -479,8 +467,9 @@ Future _reloadTemplate(FileDesignInfo fileInfo) async {
   });
 
   designMgr.listXidChanged.clear();
-
-  var ctx = XUIContext(fileInfo.mode, fileInfo.jsonBinding);
+ 
+  var ctx = XUIContext(fileInfo.mode);
+  ctx.setCause("reloadTemplate");
   var options = Options(mode: fileInfo.mode);
   if (listReloader.isEmpty) {
     if (XUIConfigManager.verboseReloader) {
@@ -500,7 +489,7 @@ Future _reloadTemplate(FileDesignInfo fileInfo) async {
   options.xuifile = HTMLWriter().toHTMLString(designMgr.getXUIEngine().xuiFile);
   options.action = fileInfo.action;
 
-  options.binding = designMgr.getXUIEngine().getBindingInfo();
+  //options.binding = designMgr.getXUIEngine().getBindingInfo();
   options.treeSlot = designMgr.getXUIEngine().getSlotTree();
 
   changePageJS(options);
@@ -510,7 +499,7 @@ dynamic getActionsXUI(
     FileDesignInfo fileInfo, String id, String idSlot, String action) {
   print("-------------- getActionsXUI ----------------   " + action);
 
-  var ctx = XUIContext(MODE_DESIGN, fileInfo.jsonBinding);
+  var ctx = XUIContext(MODE_DESIGN);
   var designManager = _getDesignManager(fileInfo);
 
   return designManager.getActionsPopup(ctx, id, idSlot, action);
@@ -519,17 +508,18 @@ dynamic getActionsXUI(
 void main() async {
   _refreshPageXUI = allowInterop(refreshPageXUI);
   _addDesignXUI = allowInterop(addDesignXUI);
-  _cutDesign = allowInterop(cutDesign);
-  _copyDesign = allowInterop(copyDesign);
-  _surroundDesign = allowInterop(surroundDesign);
-  _moveDesign = allowInterop(moveDesign);
+  _cutDesignXUI = allowInterop(cutDesignXUI);
+  _copyDesignXUI = allowInterop(copyDesignXUI);
+  _surroundDesignXUI = allowInterop(surroundDesignXUI);
+  _moveDesignXUI = allowInterop(moveDesignXUI);
+
   _changeNbChildXUI = allowInterop(changeNbChildXUI);
   _getInfoXUI = allowInterop(getInfoXUI);
-  _getDesignProperties = allowInterop(getDesignProperties);
+  _getDesignPropertiesXUI = allowInterop(getDesignPropertiesXUI);
   _saveDesignPropertiesXUI = allowInterop(saveDesignPropertiesXUI);
   _getComponentsXUI = allowInterop(getComponentsXUI);
   _getHtmlFromXUI = allowInterop(getHtmlFromXUI);
-  _deleteDesign = allowInterop(deleteDesign);
+  _deleteDesignXUI = allowInterop(deleteDesignXUI);
   _initPageXUI = allowInterop(initPageXUI);
   _getActionsXUI = allowInterop(getActionsXUI);
 }

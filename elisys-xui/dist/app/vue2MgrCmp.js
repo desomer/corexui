@@ -93,7 +93,7 @@ export class ComponentManager {
                         $xui: function () {
                             return window.$xui;
                         },
-                        ...$xui.storeDataBinding
+                        ...$xui.computeDataBinding
                     },
                     ...namespaceObject.default
                 };

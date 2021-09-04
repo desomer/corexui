@@ -10,6 +10,7 @@ var json = {
     activeAction: 0,
     contentEditor: '',
     saveLayout: false,
+    overlay: false,
 
     listPopupAdd: [
     ],
@@ -19,10 +20,18 @@ var json = {
     snackbar_timeout: 3000,
 
     listSlot : [],
-    jsonEditorDataSrc : "template",
+    routeEnable : true,
+    jsonEditorDataSrc : "template",   // ou mock
     jsonEditorData : {},
     jsonEditorDataMock : {},
-    jsonEditorOptions : { mode: 'code' }
+    jsonEditorOptions : { mode: 'code', onEditable:() => {return false;} },
+    jsonEditorOptionsCode : { mode: 'code' },
+
+    ListActions : [
+        { id:"add"}
+    ],
+    currentCode : "no code"
 };
 
 $xui.rootdata = { ...$xui.rootdata, ...json };
+//$xui.disableVuex = true;

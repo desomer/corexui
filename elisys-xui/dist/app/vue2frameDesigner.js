@@ -188,12 +188,8 @@ window.addEventListener('message', function (e) {
         var hasChangeBinding = false;
 
         if (data.param.jsonBinding != null) {  // change uniquement le json du template
-            //Object.assign($xui.rootdata, data.param.jsonBinding);
             var jsonBinding = data.param.jsonBinding;
             var jsonTemplate = data.param.jsonTemplate;
-
-
-            // 
 
             const r = iterateJSON(data.param.jsonTemplate, $xui.rootdata,
                 (k, v, dest) => {

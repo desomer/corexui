@@ -45,7 +45,7 @@ main
 
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2021 v0.7.0 25/07/2021"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2021 v0.7.2 06/08/2021"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
@@ -245,7 +245,7 @@ main
     </xui-design>
     <xui-design xid="action-tab-tab-item-4">
         <div id="treeCmp" class='barcustom xui-div-scroll-vertical'>
-            <v-treeview dense :items="listSlot"></v-treeview>
+            <v-treeview dense transition=true :items="listSlot"></v-treeview>
         </div>
     </xui-design>
     <xui-design xid="action-tab-tab-item-5">
@@ -283,9 +283,43 @@ main
     <!------------------------------- ONGLEt CODE------------------------------------>
 
     <xui-design xid="main-tab-tab-item-2">
-        <xui-tabs ref="test" xid="tab-code" class="tab-code fill-height" xui-dark=true xui-height-tabs="35px"
+        <xui-row-1 xid="code-action"></xui-row-1>
+        <xui-tabs ref="test" xid="tab-code" style="height:calc(100% - 49px)" class="tab-code fill-height" xui-dark=true xui-height-tabs="35px"
             xui-nb="3"></xui-tabs>
     </xui-design>
+
+    <xui-design xid="code-action">
+        <xui-prop id="nb" val="4"></xui-prop>
+        <xui-prop id="class" val="mx-3 mt-2 mb-1"></xui-prop>
+     </xui-design>
+
+     <xui-design xid="code-action-col-0">
+        <xui-prop id="cols" val="1"></xui-prop>
+        <xui-btn-icon-1 xid="code-action-btn-export" @click="$xui.downloadPage()"></xui-btn-icon-1>
+     </xui-design>
+
+     <xui-design xid="code-action-col-1">
+        <xui-prop id="cols" val="1"></xui-prop> 
+     </xui-design>
+
+     <xui-design xid="code-action-col-2">
+        <xui-prop id="cols" val="4"></xui-prop>
+        <xui-fileinput-1 xid="code-action-file" @change="$xui.importPage($event)"></xui-fileinput-1>
+     </xui-design>
+
+     <xui-design xid="code-action-file">
+        <xui-prop id="label" val="import file"></xui-prop>
+        <xui-prop id="dense" val="true"></xui-prop>
+        <xui-prop id="hide-detail" val="true"></xui-prop>
+     </xui-design>
+
+
+     <xui-design xid="code-action-btn-export">
+        <xui-prop id="btn-type" val="rounded"></xui-prop>
+        <xui-prop id="icon" val="mdi-download"></xui-prop>
+        <xui-prop id="textright" val="export"></xui-prop>
+        <xui-prop id="positionicon" val="left"></xui-prop>
+     </xui-design>
 
     <!--------------------------------------------------------------------------->
     <xui-design xid="tab-code-tab-0"><span> Html </span></xui-design>
@@ -396,6 +430,7 @@ main
             <v-icon>mdi-database-export-outline</v-icon>
         </xui-btn-small>
 
+
         <v-spacer></v-spacer>
         <span>&amp;copy;&amp;nbsp;[[copyrightApp@0+]]</span>
     </xui-design>
@@ -419,6 +454,7 @@ main
 
     <xui-design xid="inject-after-body">
         <script defer src="app/vueHelper.js"></script>
+        <script defer src="app/FileSaver.js"></script>
         <script defer src="app/frameDesignerError.js"></script>
 
         <script defer src="app/frameDesigner.js"></script>
@@ -428,10 +464,13 @@ main
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>
         <script defer src="https://unpkg.com/region2d@1.0.0/plain/region2d.min.js"></script>
+        
+
         <script defer src="libxui.dart.js"></script>
 
         <script defer src="app/frameDesignerWatch.js"></script>
         <script defer src="app/frameDesignerData.js"></script>
+
 
         <script defer src="https://cdn.jsdelivr.net/npm/vue2-editor@2.6.6/dist/vue2-editor.min.js"></script>
 

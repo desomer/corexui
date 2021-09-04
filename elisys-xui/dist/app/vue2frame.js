@@ -34,6 +34,58 @@ $xui.loadApplicationJS = () => {
 	}
 	else {
 		/********************** creation des composants une seule fois xui/vuejs  *****************/
+		console.debug("*** add directive ***");
+		Vue.directive('bottomnavigationhideonscroll', {
+			// Quand l'élément lié est inséré dans le DOM...
+			inserted: function (el, binding) {
+				var lastScroll = 0;
+				var bottomIsShow = true;
+				window.addEventListener('scroll', function (e) {
+					console.debug(window.scrollY);
+
+					if (!bottomIsShow && lastScroll > window.scrollY) // remonte
+					{
+						var el = document.querySelector(".v-bottom-navigation");
+						el.style.transform = "none";
+						bottomIsShow = true;
+					}
+					else if (window.scrollY > document.body.scrollHeight - document.body.offsetHeight - 30) {   // tous en bas
+						var el = document.querySelector(".v-bottom-navigation");
+						el.style.transform = "none";
+						bottomIsShow = true;
+					}
+					else if (bottomIsShow && lastScroll < window.scrollY) { // descent
+						var el = document.querySelector(".v-bottom-navigation");
+						el.style.transform = "translateY(100%)";
+						bottomIsShow = false;
+					}
+					lastScroll = window.scrollY;
+				});
+			}
+		});
+
+
+
+		Vue.directive('pressanimation', {
+			// Quand l'élément lié est inséré dans le DOM...
+			inserted: function (el, binding) {
+				// L'élément prend le focus
+				console.debug("------------------------------v-pressAnimation", el, binding);
+				el.classList.add('clickAnimation');
+				el.addEventListener('click', function () {
+					if (el.classList.contains('clickAnimationPress')) {
+						el.classList.remove('clickAnimationPress');
+					} else {
+						el.classList.add('clickAnimationPress');
+						setTimeout(() => {
+							el.classList.remove('clickAnimationPress');
+							$xui.router.push(binding.value.link);
+						}, 100);
+					}
+				})
+			}
+		})
+
 		var listFunctCreateCmp = $xui.initComponentVuejs;
 		for (const functCreateCmp of listFunctCreateCmp) {
 			functCreateCmp();
@@ -48,7 +100,7 @@ $xui.loadApplicationJS = () => {
 		mutations: {
 			increment(state, info) {
 				console.debug("-------event info = ", info);
-				state.count+=info.amount;
+				state.count += info.amount;
 			}
 		},
 		actions: {
@@ -57,13 +109,13 @@ $xui.loadApplicationJS = () => {
 				context.commit({
 					type: 'increment',
 					amount: payload
-				  })
-				
-				  $xui.rootdata.titre+=payload;
+				})
+
+				$xui.rootdata.titre += payload;
 			},
 			say(context, event) {
-				console.debug("message say",context, event, this);
-				$xui.rootdata.items.push({ "key":"c"});
+				console.debug("message say", context, event, this);
+				$xui.rootdata.items.push({ "key": "c" });
 			}
 		}
 	})
@@ -90,12 +142,12 @@ $xui.loadApplicationJS = () => {
 
 	var i = 0;
 	while (true) {
-		var idTemplate = "xui-route-"+i;
-		console.info("create route <" + idTemplate +"> uri='/route"+i+"'");
+		var idTemplate = "xui-route-" + i;
+		console.info("create route <" + idTemplate + "> uri='/route" + i + "'");
 		const template = document.querySelector("#" + idTemplate);
-		if (template==null) break;
+		if (template == null) break;
 		const infoRoute = vue2CmpMgr.ComponentManager.getComponentFromTemplate(idTemplate, $xui.storeDataBinding);
-		routes.push({ path: '/route'+i, component: infoRoute });
+		routes.push({ path: '/route' + i, component: infoRoute });
 		i++;
 	}
 
@@ -130,13 +182,15 @@ $xui.loadApplicationJS = () => {
 
 	/*********************************** VUEJS ***********************************/
 	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-rootTemplate", $xui.storeDataBinding);
-	
-	
+
+
 	/*************************************************************************** */
 	//$xui.rootdata.toto="4444";
 	// var json = { items:[{ key:"a" }, { key:"b"}]}
 	// $xui.rootdata = { ...$xui.rootdata, ...json };
 
+	$xui.rootdata.animationNameEnter = "xui-classes-transition animate__animated animate__fadeInUp";
+	$xui.rootdata.animationNameExit = "";
 
 	var allState = Reflect.ownKeys($xui.store.state);
 	console.debug("vue store allState ", allState)
@@ -149,11 +203,33 @@ $xui.loadApplicationJS = () => {
 
 
 	$xui.router.afterEach((to, from) => {
-		console.log("router going to " + to.fullPath)
-		console.log(to);
-	  
+		console.log("router going to " + to.fullPath + " from " + from.fullPath)
+		console.log(to, from);
+		var el = document.querySelector(".v-main__wrap");
+		if (el == null) return;
+		var scrollPos = window.scrollY;
+		var exitElem = el.firstChild;
+		var exitElemscrollHeight = exitElem.scrollHeight;
+
+		// force le retour en haut du scroll en debut d'animation
+		exitElem.style.position = 'absolute';
+		exitElem.style.height = exitElemscrollHeight + "px";
+		exitElem.style.top = "-" + scrollPos + "px";
+		window.scrollTo(0, 0);
+
+		if (to.fullPath == "/") {
+			$xui.rootdata.animationNameEnter = "xui-classes-transition-down"; //"xui-classes-transition animate__animated animate__fadeInUp"
+			$xui.rootdata.animationNameExit = "xui-classes-transition animate__animated animate__fadeOutDown"
+		}
+		else {
+			$xui.rootdata.animationNameEnter = "xui-classes-transition animate__animated animate__fadeInUp"
+			$xui.rootdata.animationNameExit = "xui-classes-transition-down"
+		}
+
+
 		// console.log("all ref", $xui.router );
-	  })
+	})
+
 
 	/*************************************************************************** */
 	$xui.vuejs = new Vue({

@@ -53,7 +53,7 @@ export class PageDesignManager {
     changePageOnFrame(param) {
         //console.debug("change page", param);
 
-        $xui.unDisplaySelector();
+        $xui.SelectorManager.unDisplaySelector();
 
         param.jsonTemplate = $xui.rootdata.jsonEditorData;
         if ($xui.rootdata.jsonEditorDataSrc == "mock") {
@@ -93,7 +93,7 @@ export class PageDesignManager {
         }
 
         if (param.action == "clear") {
-            $xui.doPromiseJS("changePageFinish");
+            doPromiseJS("changePageFinish");
         }
 
         if (param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")

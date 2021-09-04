@@ -67,3 +67,11 @@ https://medium.com/@jovanoskinenad/dynamic-reusable-vuex-store-31ddad8df776
 https://linuxfr.org/users/spacefox/journaux/8-mois-avec-javascript-es6-et-vue-js-mon-retour-d-experience-du-developpement-front-en-2018
 
 
+watch vuex
+https://dev.to/viniciuskneves/watch-for-vuex-state-changes-2mgj
+https://markus.oberlehner.net/blog/how-to-structure-a-complex-vuex-store/
+
+
+DTD
+https://www.chaijs.com/
+https://codeburst.io/vuex-getters-are-great-but-dont-overuse-them-9c946689b414

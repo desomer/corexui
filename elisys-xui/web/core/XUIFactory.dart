@@ -52,7 +52,6 @@ class XUIBinding {
 /// gestion des designs ou des components
 ///
 ///------------------------------------------------------------------
-
 class XUIModel implements Comparable<XUIModel> {
   int priority = 0; // gestion de la priorité d'application
   late XUIElementXUI elemXUI;
@@ -247,8 +246,7 @@ class XUIModel implements Comparable<XUIModel> {
     elemXUI.propertiesXUI![key] = XUIProperty(value);
   }
 
-  void _processPropertiesPhase1AndBind(
-      XUIElementHTML elemHtml, XUIEngine engine) {
+  void _processPropertiesPhase1AndBind( XUIElementHTML elemHtml, XUIEngine engine) {
     if (elemXUI.propertiesXUI != null) {
       elemXUI.propertiesXUI!.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
@@ -261,7 +259,7 @@ class XUIModel implements Comparable<XUIModel> {
           // n'affecte pas le XID car gerer par attribut xid  => affecte tous les autres
           XUIProperty p = prop.value;
 
-          _ProcessPropertiesBinding(prop, engine, p);
+          engine.bindingManager.processPropertiesBinding(prop, this);
 
           elemHtml.propertiesXUI![prop.key] = p;
         }
@@ -269,47 +267,7 @@ class XUIModel implements Comparable<XUIModel> {
     }
   }
 
-  void _ProcessPropertiesBinding(
-      MapEntry<String, XUIProperty> prop, cst.XUIEngine engine, XUIProperty p) {
-    if (prop.key.startsWith(":")) {
-      // gestion du v-for    :items 
-      var propB = XUIPropertyBinding("", prop.value.content);
-      var pme = MapEntry<String, XUIProperty>(prop.key, propB);
-      _addXUIBinding(pme, engine);
-    }
 
-    if (prop.value.content is String &&
-        prop.value.content.startsWith("{{") == true) {
-      // gestion du {{value}}
-      var varName = prop.value.content.toString().substring(2);
-      varName = varName.substring(0, varName.length - 2);
-      var propB = XUIPropertyBinding("", varName);
-      var pme = MapEntry<String, XUIProperty>(prop.key, propB);
-      _addXUIBinding(pme, engine);
-    }
-
-    if (p is XUIPropertyBinding) {
-      _addXUIBinding(prop, engine);
-    }
-  }
-
-  void _addXUIBinding(
-      MapEntry<String, XUIProperty> prop, cst.XUIEngine engine) {
-    XUIPropertyBinding p = prop.value as XUIPropertyBinding;
-
-    if (XUIConfigManager.verboseBinding) {
-      XUIConfigManager.printc("Prop key [" +
-          prop.key.toString() +
-          "] on var binding [" +
-          p.binding! +
-          "] xid=" +
-          this.elemXUI.xid.toString());
-    }
-
-    // affecte le binding pour la creation du JSON de binding
-    engine.bindingInfo[p.binding!] =
-        XUIBinding(prop.key, p.binding!, p.content, this.elemXUI.xid!);
-  }
 
   //////////////////////////////////////////// PHASE 2 //////////////////////////////////////////
 

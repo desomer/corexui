@@ -1,0 +1,51 @@
+.fullRoot>.v-main__wrap {
+    display: contents;
+    /* no div de type block */
+    height: 100%;
+}
+
+/****************************************************/
+.v-navigation-drawer__content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.v-navigation-drawer__content::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px 0px rgba(0, 0, 0, 0.1);
+}
+
+.v-navigation-drawer__content:hover::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px 0px rgba(0, 0, 0, 0.3);
+}
+
+.v-navigation-drawer__content::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 15px 0px;
+    border-radius: 5px;
+}
+
+/****************************************************/
+
+.xui-classes-transition {
+    --animate-duration: 300ms;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 3;
+}
+
+.xui-classes-transition-down
+ {
+    z-index: 0;
+}
+
+.clickAnimation {
+    transition-duration: 100ms;
+    perspective: 1000px;
+    transform-origin: center bottom 0px;
+    transform: matrix(1, 0, 0, 1, 0, 0);
+    will-change: transform;
+    transition-property: transform;
+}
+
+.clickAnimationPress {
+    transform: matrix(0.95, 0, 0, 0.95, 0, 0);
+}

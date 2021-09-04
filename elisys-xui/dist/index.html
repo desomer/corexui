@@ -12,6 +12,7 @@
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
+      <link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
       <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
@@ -101,8 +102,10 @@
                   <v-icon>mdi-application-export</v-icon>
                </v-btn>
             </v-app-bar>
-            <v-main style="background-color:">
-               <router-view ref="routerview"></router-view>
+            <v-main v-scroll2.self="$xui.onScrollMain" style="background-color:">
+               <transition :duration="300" name="custom-classes-transition" :enter-active-class="animationNameEnter" :leave-active-class="animationNameExit">
+                  <router-view ref="routerview"></router-view>
+               </transition>
             </v-main>
             <v-footer style="padding-top: 1px;" app height="32" dark color="#ff5900">
                <v-btn @click="$xui.deleteCmp()" small class="xui-btn-action">
@@ -143,7 +146,7 @@
                   <v-icon>mdi-database-export-outline</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2021 v0.7.0 25/07/2021</span>
+               <span>&copy;&nbsp;Elisys 2021 v0.7.2 06/08/2021</span>
             </v-footer>
          </v-app>
       </template>
@@ -152,13 +155,13 @@
             <v-tab>
                <v-icon>mdi-square-edit-outline</v-icon>
             </v-tab>
-            <v-tab-item eager>
+            <v-tab-item eager style="background-color:">
                <v-tabs class="fill-height xui-tabs" height="35px" style="--xui-tab-h:35px;" dark>
                   <v-tab>
                      <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
                      <span style="margin-left: 5px;">Page {{frameName}}</span>
                   </v-tab>
-                  <v-tab-item eager>
+                  <v-tab-item eager style="background-color:">
                      <div class="main-container fill-height">
                         <div class="main-item main-item-1"></div>
                         <div class="main-item main-item-2">
@@ -172,39 +175,39 @@
                               <v-tab>
                                  <v-icon>mdi-layers-triple</v-icon>
                               </v-tab>
-                              <v-tab-item eager>
+                              <v-tab-item eager style="background-color:">
                                  <div id="AppPropertiesSetting"></div>
                               </v-tab-item>
                               <v-tab>
                                  <v-icon>mdi-plus-box-multiple</v-icon>
                               </v-tab>
-                              <v-tab-item eager>
+                              <v-tab-item eager style="background-color:">
                                  <div id="AppComponents"></div>
                               </v-tab-item>
                               <v-tab>
                                  <v-icon>mdi-palette-swatch</v-icon>
                               </v-tab>
-                              <v-tab-item eager>
+                              <v-tab-item eager style="background-color:">
                                  <div>Extended Style coming soon...</div>
                               </v-tab-item>
                               <v-tab>
                                  <v-icon>mdi-database-import</v-icon>
                               </v-tab>
-                              <v-tab-item eager>
+                              <v-tab-item eager style="background-color:">
                                  <div id="AppPropertiesBindingSetting"></div>
                               </v-tab-item>
                               <v-tab>
                                  <v-icon>mdi-file-tree</v-icon>
                               </v-tab>
-                              <v-tab-item eager>
+                              <v-tab-item eager style="background-color:">
                                  <div id="treeCmp" class="barcustom xui-div-scroll-vertical">
-                                    <v-treeview dense :items="listSlot"></v-treeview>
+                                    <v-treeview dense transition :items="listSlot"></v-treeview>
                                  </div>
                               </v-tab-item>
                               <v-tab>
                                  <v-icon>mdi-chevron-right-box</v-icon>
                               </v-tab>
-                              <v-tab-item eager>
+                              <v-tab-item eager style="background-color:">
                                  <div>CLI coming soon...</div>
                               </v-tab-item>
                            </v-tabs>
@@ -215,19 +218,19 @@
                      <v-icon>mdi-palette</v-icon>
                      <span>Style</span>
                   </v-tab>
-                  <v-tab-item eager>
+                  <v-tab-item eager style="background-color:">
                      <div>Coming soon...</div>
                   </v-tab-item>
                   <v-tab>
                   </v-tab>
-                  <v-tab-item eager>
+                  <v-tab-item eager style="background-color:">
                   </v-tab-item>
                </v-tabs>
             </v-tab-item>
             <v-tab>
                <v-icon>mdi-database</v-icon>
             </v-tab>
-            <v-tab-item eager>
+            <v-tab-item eager style="background-color:">
                <v-row style="height:60px" no-gutters>
                   <v-col cols="12">
                      <v-radio-group row v-model="jsonEditorDataSrc" class="ml-4">
@@ -252,12 +255,27 @@
             <v-tab>
                <v-icon>mdi-code-tags</v-icon>
             </v-tab>
-            <v-tab-item eager>
-               <v-tabs ref="test" class="tab-code fill-height xui-tabs" height="35px" style="--xui-tab-h:35px;" dark>
+            <v-tab-item eager style="background-color:">
+               <v-row class="mx-3 mt-2 mb-1" no-gutters>
+                  <v-col cols="1">
+                     <v-btn @click="$xui.downloadPage()" rounded>
+                        <v-icon left>mdi-download</v-icon>
+                        <span>export</span>
+                     </v-btn>
+                  </v-col>
+                  <v-col cols="1">
+                  </v-col>
+                  <v-col cols="4">
+                     <v-file-input @change="$xui.importPage($event)" small-chips truncate-length="15" dense hide-details label="import file"></v-file-input>
+                  </v-col>
+                  <v-col>
+                  </v-col>
+               </v-row>
+               <v-tabs ref="test" style="height:calc(100% - 49px);--xui-tab-h:35px;" class="tab-code fill-height xui-tabs" height="35px" dark>
                   <v-tab>
                      <span> Html </span>
                   </v-tab>
-                  <v-tab-item eager>
+                  <v-tab-item eager style="background-color:">
                      <div class="fill-height">
                         <pre>
                            <code id="xui-code-html" spellcheck></code>
@@ -267,7 +285,7 @@
                   <v-tab>
                      <span>XUI</span>
                   </v-tab>
-                  <v-tab-item eager>
+                  <v-tab-item eager style="background-color:">
                      <div class="fill-height">
                         <pre>
                            <code id="xui-code-xui" spellcheck></code>
@@ -277,7 +295,7 @@
                   <v-tab>
                      <span>JSON</span>
                   </v-tab>
-                  <v-tab-item eager>
+                  <v-tab-item eager style="background-color:">
                      <div class="fill-height">
                         <pre>
                            <code id="xui-code-json" spellcheck></code>
@@ -289,7 +307,7 @@
             <v-tab>
                <v-icon>mdi-api</v-icon>
             </v-tab>
-            <v-tab-item eager>
+            <v-tab-item eager style="background-color:">
                <div id="editorContent">
                   <vue-editor v-model="contentEditor"></vue-editor>
                </div>
@@ -300,17 +318,17 @@
             <v-tab>
                <v-icon>mdi-apps</v-icon>
             </v-tab>
-            <v-tab-item eager>
+            <v-tab-item eager style="background-color:">
             </v-tab-item>
             <v-tab>
                <v-icon>mdi-image-multiple-outline</v-icon>
             </v-tab>
-            <v-tab-item eager>
+            <v-tab-item eager style="background-color:">
             </v-tab-item>
             <v-tab>
                <v-icon>mdi-border-inside</v-icon>
             </v-tab>
-            <v-tab-item eager>
+            <v-tab-item eager style="background-color:">
             </v-tab-item>
          </v-tabs>
       </template>
@@ -318,7 +336,7 @@
       </template>
    </body>
    <script>
-		
+
 		$xui = {};
 		$xui.rootdata = {};
 		// ------ ici le data binding dynamique ---------;
@@ -345,6 +363,7 @@
                     listClass: [
                         { sel: false, type: 'check', text: 'fill height', value: 'fill-height' },
                         { sel: false, type: 'check', text: 'overflow scroll', value: 'xui-overflow' },
+                        { sel: false, type: 'check', text: 'ripple', value: 'v-ripple' },
                         { sel: false, type: 'divider' },
                         { sel: false, text: 'elevation', value: 'elevation', type: 'list', vl: '1', list: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'] },
                         {
@@ -448,13 +467,17 @@
                         },
                         { sel: false, type: 'divider' },
                         {
-                            sel: false, text: 'size', value: '', type: 'list', vl: '1', list:
-                                ['display-4', 'display-3', 'display-2', 'display-1', 'headline', 'title',
-                                    'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'caption', 'overline']
+                            sel: false, text: 'size', value: 'text', type: 'list', vl: '1', list:
+                                ['h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                                    'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'button', 'caption', 'overline']
                         },
                         {
                             sel: false, text: 'Style', value: '', type: 'list', vl: '1', list:
                                 ['font-regular', 'font-italic']
+                        },
+                        {
+                            sel: false, text: 'decoration', value: 'text', type: 'list', vl: '1', list:
+                                ['decoration-none', 'decoration-overline', 'decoration-underline', 'decoration-line-through']
                         },
                         {
                             sel: false, text: 'weight', value: '', type: 'list', vl: '1', list:
@@ -565,7 +588,8 @@
    <style id="xui-style">
 
 			.fullRoot>.v-main__wrap {
-				display: contents; /* no div de type block */   
+				display: contents;
+				/* no div de type block */
 				height: 100%;
 			}
 		
@@ -585,73 +609,46 @@
 				box-shadow: inset 0 0 15px 0px;
 				border-radius: 5px;
 			}
+
+			.xui-classes-transition {
+				--animate-duration: 300ms;
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				z-index: 3;
+			}
+
+			.xui-classes-transition-down
+		     {
+				z-index: 0;
+			}
+
+			.clickAnimation {
+				transition-duration: 100ms;
+				perspective: 1000px;
+				transform-origin: center bottom 0px;
+				transform: matrix(1, 0, 0, 1, 0, 0);
+				will-change: transform;
+				transition-property: transform;
+			}
+
+			.clickAnimationPress {
+				transform: matrix(0.95, 0, 0, 0.95, 0, 0);
+			}
 		
-            .xui-column-layout {
-                display:grid;
+            .xui-grid-layout {
+                display: grid;
                 width: 100%;
             }
         
-            .xui-column>[class*=col-] {max-width: 100% !important;}
-
-            .xui-column>.col-auto {
-                height: auto;
-                max-height: 100%
+            .xui-column {
+                max-width: 100% !important;
             }
-
-            .xui-column>.col-1 {
-                max-height: 8.3333333333%
-            }
-
-            .xui-column>.col-2 {
-                max-height: 16.6666666667%
-            }
-
-            .xui-column>.col-3 {
-                max-height: 25%
-            }
-
-            .xui-column>.col-4 {
-                max-height: 33.3333333333%
-            }
-
-            .xui-column>.col-5 {
-                max-height: 41.6666666667%
-            }
-
-            .xui-column>.col-6 {
-                max-height: 50%
-            }
-
-            .xui-column>.col-7 {
-                max-height: 58.3333333333%
-            }
-
-            .xui-column>.col-8 {
-                max-height: 66.6666666667%
-            }
-
-            .xui-column>.col-9 {
-                max-height: 75%
-            }
-
-            .xui-column>.col-10 {
-                max-height: 83.3333333333%
-            }
-
-            .xui-column>.col-11 {
-                max-height: 91.6666666667%
-            }
-
-            .xui-column>.col-12 {
-                max-height: 100%
-            }
-
         
             .xui-grid2 {
                 max-width: unset;
             }
         
-
             .xui-form-gutter>.col,
             .xui-form-gutter>[class*=col-] {
                 padding: 5px 6px;
@@ -662,26 +659,25 @@
                 font-size: 0.9rem;
             }
         
-
-            .xui-tabs:not(.v-tabs--vertical) > .v-tabs-items {
+            .xui-tabs:not(.v-tabs--vertical)>.v-tabs-items {
                 height: calc(100% - var(--xui-tab-h, 48px));
                 background-color: unset !important;
             }
 
-            .xui-tabs > .v-tabs-items {
+            .xui-tabs>.v-tabs-items {
                 background-color: unset !important;
             }
 
-            .xui-tabs.tabs-dense > * > * > * > .v-tab {
+            .xui-tabs.tabs-dense>*>*>*>.v-tab {
                 min-width: 0px;
                 padding: 0px 10px;
             }
 
-            .xui-tabs > .v-tabs-items > .v-window__container {
+            .xui-tabs>.v-tabs-items>.v-window__container {
                 height: 100% !important
             }
 
-            .xui-tabs > .v-tabs-items > .v-window__container>.v-window-item {
+            .xui-tabs>.v-tabs-items>.v-window__container>.v-window-item {
                 height: 100%
             }
         
@@ -689,12 +685,18 @@
                 height: 100%;
                 width: 100%;
             }
-            .xui-p-relative {position:relative}
-            .xui-p-absolute {position:absolute}
+
+            .xui-p-relative {
+                position: relative
+            }
+
+            .xui-p-absolute {
+                position: absolute
+            }
 
             .xui-overflow {
                 overflow: auto;
-                width:100%;
+                width: 100%;
                 height: 100%;
             }
         
@@ -720,8 +722,10 @@
             }
            </style>
    <script defer src="app/vueHelper.js"></script>
+   <script defer src="app/FileSaver.js"></script>
    <script defer src="app/frameDesignerError.js"></script>
    <script defer src="app/frameDesigner.js"></script>
+   <script defer src="app/frameDesignerProp.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/v-jsoneditor@1.4.2/dist/v-jsoneditor.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>

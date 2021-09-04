@@ -23,8 +23,8 @@
                 $xui.rootdata.dialogBinding = true;
 
                 setTimeout(() => {
-                    $xui.vuejs.$refs.root.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set($xui.rootdata.jsonEditorData)
-                    console.debug("open Binding Editor", xid, propId, $xui.vuejs.$refs.root.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding);
+                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set($xui.rootdata.jsonEditorData)
+                    console.debug("open Binding Editor", xid, propId);
                 }, 100);
 
 
@@ -55,6 +55,7 @@
     <script xid="xui-bind-editor" xui-no-dom>
         export default {
             template: <vue-xui-bind-editor xui-convert-json></vue-xui-bind-editor>,
+            props: ['optionsEditor'],
             watch: {}
         }
     </script>
@@ -62,7 +63,7 @@
     <div xid="vue-xui-bind-editor">
         <v-text-field class="ma-6" :label="nameBinding" v-model="variableBinding" hint="Bind variable name" outlined
             clearable persistent-hint></v-text-field>
-        <v-jsoneditor ref="jsonEditorBinding" v-model="jsonEditorData" :options="jsonEditorOptions" :plus="false" height="100%">
+        <v-jsoneditor ref="jsonEditorBinding" v-model="jsonEditorData" :options="optionsEditor" :plus="false" height="100%">
         </v-jsoneditor>
     </div>
 

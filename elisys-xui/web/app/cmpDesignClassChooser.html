@@ -45,6 +45,115 @@
                     ]
                 },
                 {
+                    title: "Border radius",
+                    icon: "mdi-alpha-b-circle-outline",
+                    open: false,
+                    nb: "0",
+                    listClass: [                        
+                        {
+                            sel: false, text: 'radius top right', value: 'rounded-tr', type: 'list', vl: '1', list: [
+                            '0',
+                            'sm',
+                            'md',
+                            'lg',
+                            'xl',
+                            'pill',
+                            'circle',
+                              ]
+                        },
+                        {
+                            sel: false, text: 'radius top left', value: 'rounded-tl', type: 'list', vl: '1', list: [
+                            '0',
+                            'sm',
+                            'md',
+                            'lg',
+                            'xl',
+                            'pill',
+                            'circle',
+                              ]
+                        },
+                        {
+                            sel: false, text: 'radius bottom right', value: 'rounded-br', type: 'list', vl: '1', list: [
+                            '0',
+                            'sm',
+                            'md',
+                            'lg',
+                            'xl',
+                            'pill',
+                            'circle',
+                              ]
+                        },
+                        {
+                            sel: false, text: 'radius bottom left', value: 'rounded-bl', type: 'list', vl: '1', list: [
+                            '0',
+                            'sm',
+                            'md',
+                            'lg',
+                            'xl',
+                            'pill',
+                            'circle',
+                              ]
+                        },
+                        { sel: false, type: 'divider' },
+                        {
+                            sel: false, text: 'radius top side', value: 'rounded-t', type: 'list', vl: '1', list: [
+                            '0',
+                            'sm',
+                            'md',
+                            'lg',
+                            'xl',
+                            'pill',
+                            'circle',
+                              ]
+                        },
+                        {
+                            sel: false, text: 'radius bottom side', value: 'rounded-b', type: 'list', vl: '1', list: [
+                            '0',
+                            'sm',
+                            'md',
+                            'lg',
+                            'xl',
+                            'pill',
+                            'circle',
+                              ]
+                        },
+                        {
+                            sel: false, text: 'radius right side', value: 'rounded-r', type: 'list', vl: '1', list: [
+                            '0',
+                            'sm',
+                            'md',
+                            'lg',
+                            'xl',
+                            'pill',
+                            'circle',
+                              ]
+                        },
+                        {
+                            sel: false, text: 'radius left side', value: 'rounded-l', type: 'list', vl: '1', list: [
+                            '0',
+                            'sm',
+                            'md',
+                            'lg',
+                            'xl',
+                            'pill',
+                            'circle',
+                              ]
+                        },
+                        { sel: false, type: 'divider' },
+                        {
+                            sel: false, text: 'radius all corner', value: 'rounded', type: 'list', vl: '1', list: [
+                            '0',
+                            'sm',
+                            'md',
+                            'lg',
+                            'xl',
+                            'pill',
+                            'circle',
+                              ]
+                        },
+                      ],
+                },
+                {
                     title: "Margin",
                     icon: "mdi-image-filter-none",
                     open: false,
@@ -115,13 +224,17 @@
                         },
                         { sel: false, type: 'divider' },
                         {
-                            sel: false, text: 'size', value: '', type: 'list', vl: '1', list:
-                                ['display-4', 'display-3', 'display-2', 'display-1', 'headline', 'title',
-                                    'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'caption', 'overline']
+                            sel: false, text: 'size', value: 'text', type: 'list', vl: '1', list:
+                                ['h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                                    'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'button', 'caption', 'overline']
                         },
                         {
                             sel: false, text: 'Style', value: '', type: 'list', vl: '1', list:
                                 ['font-regular', 'font-italic']
+                        },
+                        {
+                            sel: false, text: 'decoration', value: 'text', type: 'list', vl: '1', list:
+                                ['decoration-none', 'decoration-overline', 'decoration-underline', 'decoration-line-through']
                         },
                         {
                             sel: false, text: 'weight', value: '', type: 'list', vl: '1', list:
@@ -176,7 +289,7 @@
                         console.debug("save class", aProperty);
                         aProperty.value = new DesignClassManager().getClassTextFromSeletor(aProperty.value, $xui.rootdata.listCatClass);
                         $xui.hasPropertiesChanged = true;
-                        $xui.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+                        $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
                     }
                 }
             }
@@ -187,9 +300,28 @@
         export default {
             template: <vue-xui-list-class xui-convert-json></vue-xui-list-class>,
             watch: {
-                selectedClass: (newValue, oldValue) => {
-                    console.debug('The selectedClass name was changed from <' + oldValue + '> to <' + newValue + '>');
-                }
+                "listCatClass": {
+                    handler: function (after, before) {
+                        //console.debug('The selectedClass name was changed from <' , after , '> to <' , before , '>', this);
+                        var i = 0;
+                        for (const catDesc of after) {
+                            var j = 0;
+                            for (const classDesc of catDesc.listClass) {
+                                if (classDesc.type == "list") {
+                                    if (classDesc.vlold!=classDesc.vl)
+                                    {
+                                        console.debug("changed cat ", classDesc); 
+                                        classDesc.sel=true;
+                                    }
+                                }
+                                j++;
+                            }
+                            i++;
+                        }
+
+                    },
+                deep: true
+                }     
             }
         }
     </script>

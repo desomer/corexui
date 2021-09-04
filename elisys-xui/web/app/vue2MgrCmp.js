@@ -7,31 +7,44 @@ export class ComponentManager {
                 template: "<div>no template</div>"
             };
         else
-            return {
-                template: template.innerHTML,
-                data: () => { return $xui.rootdata; },
-                methods : $xui.storeAction,
-                computed: {
-                    $xui: () => $xui,  // pour les @click="$xui.doXXX()"
-                    ...computeDataBinding
+          {
+            // if ($xui.disableVuex)
+            // {   // pour que le watch fonctionne
+            //     return {
+            //         template: template.innerHTML,
+            //         data: () => { return $xui.rootdata; },
+            //         methods : $xui.storeAction,
+            //         computed: {
+            //             $xui: () => $xui,  // pour les @click="$xui.doXXX()"
+            //             ...computeDataBinding
+            //         }
+            //     }
+            // }
+            // else {
+                return {
+                    template: template.innerHTML,
+                    mixins: [$xui.mixinStore],
                 }
-            }
+           // }
+
+          }
+
     }
 
-    static getRoute(path, file, xid) {
-        return {
-            path: path, component: () => {
-                return new Promise((resolve, reject) => {
-                    console.debug("create route " + path + " to " + xid);
-                    new vue2CmpMgr.ComponentManager().getVueTemplate(file, xid, 'final',
-                        (str) => {
-                            resolve({ template: str });
-                        }
-                    );
-                })
-            }
-        }
-    }
+    // static getRoute(path, file, xid) {
+    //     return {
+    //         path: path, component: () => {
+    //             return new Promise((resolve, reject) => {
+    //                 console.debug("create route " + path + " to " + xid);
+    //                 new vue2CmpMgr.ComponentManager().getVueTemplate(file, xid, 'final',
+    //                     (str) => {
+    //                         resolve({ template: str });
+    //                     }
+    //                 );
+    //             })
+    //         }
+    //     }
+    // }
 
     getVueTemplate(file, xid, mode, aPromise) {
 
@@ -40,7 +53,7 @@ export class ComponentManager {
                 console.debug("getVueTemplate local ", xid)
                 var infoFileCmp = { file: file, xid: xid, mode: mode };
                 var prom = getPromise("getVueCmp" + xid)
-                $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp" + xid);
+                $xuicore.getHtmlFromXUI(infoFileCmp, "getVueCmp" + xid);
                 prom.then(jsCmp => {
                     console.debug("returnCmpForFile ", jsCmp)
                     aPromise(jsCmp);
@@ -93,7 +106,7 @@ export class ComponentManager {
                         $xui: function () {
                             return window.$xui;
                         },
-                        ...$xui.storeDataBinding
+                        ...$xui.computeDataBinding
                     },
                     ...namespaceObject.default
                 };

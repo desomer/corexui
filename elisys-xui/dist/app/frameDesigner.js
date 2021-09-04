@@ -16,6 +16,7 @@ import("./clsPageDesignManager.js").then((module) => {
     $xui.pageDesignManager = new module.PageDesignManager();
 
     waitForXuiLib("initPageXUI", function () {
+        $xui.
         var infoFile = $xui.pageDesignManager.getInfoFile("design");
         $xui.initPageXUI(infoFile);
     }, this);
@@ -51,40 +52,37 @@ $xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
     var jsonTemplate = JSON.parse("{" + StateTemplate + "}");
     var jsonStateProp = JSON.parse("{" + StateInProperty + "}");
     var ret = null;
-    if (false)
-    {
+    if (false) {
         ret = Object.assign(jsonTemplate, jsonStateProp);
         ret = Object.assign(ret, $xui.rootdata.jsonEditorData);
         $xui.rootdata.jsonEditorData = ret;
     }
     else {
-        Object.keys($xui.rootdata.jsonEditorData).forEach(function(key){
-               delete $xui.rootdata.jsonEditorData[key];
-           });
+        Object.keys($xui.rootdata.jsonEditorData).forEach(function (key) {
+            delete $xui.rootdata.jsonEditorData[key];
+        });
         Object.assign($xui.rootdata.jsonEditorData, jsonTemplate);
-        ret = $xui.rootdata.jsonEditorData ;
+        ret = $xui.rootdata.jsonEditorData;
     }
 
-    if ($xui.rootdata.jsonEditorDataSrc=="mock")
-    { 
-        ret=$xui.rootdata.jsonEditorDataMock;
+    if ($xui.rootdata.jsonEditorDataSrc == "mock") {
+        ret = $xui.rootdata.jsonEditorDataMock;
     }
 
-    if (StateTemplate=="" && StateInProperty=="")  // sauvegarde le mock
+    if (StateTemplate == "" && StateInProperty == "")  // sauvegarde le mock
     {
-        ret=$xui.rootdata.jsonEditorDataMock;
+        ret = $xui.rootdata.jsonEditorDataMock;
     }
-    else
-    {
-        $xui.rootdata.jsonEditorDataMock=jsonStateProp;
+    else {
+        $xui.rootdata.jsonEditorDataMock = jsonStateProp;
     }
 
 
-     console.debug("************ App State template & prop", jsonTemplate, jsonStateProp);
-     console.debug("************ App State ret & editor", ret, $xui.rootdata.jsonEditorData);
+    console.debug("************ App State template & prop", jsonTemplate, jsonStateProp);
+    console.debug("************ App State ret & editor", ret, $xui.rootdata.jsonEditorData);
     // retourne au XUI le chaine à sauvegarder 
     var ret = JSON.stringify(ret);
-    return ret.substring(1, ret.length-1);
+    return ret.substring(1, ret.length - 1);
 };
 
 
@@ -244,9 +242,9 @@ $xui.setCurrentAction = (actionName) => {
 $xui.clearAll = () => {
     $xui.setCurrentAction("clearAll");
     $xui.pageDesignManager.clearAll();
-    $xui.rootdata.jsonEditorData={};
+    $xui.rootdata.jsonEditorData = {};
     $xui.refreshAction("template:clearAll");
-    
+
 }
 
 $xui.addCmp = (cmp) => {
@@ -415,7 +413,7 @@ $xui.doActionPopup = (actionId) => {
         const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
         const currentXid = info.parentXid;
         const template = "<xui-design xid=\"" + currentXid + "\"><" + cmp.xid + " xid=\"" + newXid + "\"></" + cmp.xid + "></xui-design>";
-        $xui.surroundDesign(infoFile, $xui.propertiesDesign.xid, template, newXid);
+        $xuicore.surroundDesignXUI(infoFile, $xui.propertiesDesign.xid, template, newXid);
         return true;
     }
 
@@ -495,6 +493,28 @@ $xui.deploy = () => {
     $xui.refreshAction("export");
 }
 
+
+$xui.downloadPage = () => {
+
+    var file = new File([$xui.pageDesignManager.codeXUIdata], "export.txt", { type: "text/plain;charset=utf-8" });
+    FileSaver.saveAs(file);
+}
+
+$xui.importPage = (file) => {
+    console.debug(file);
+    var reader = new FileReader();
+    reader.onload = function (event) {
+        $xui.pageDesignManager.clearAll();
+        $xui.pageDesignManager.codeXUIdata = event.target.result;
+        $xui.pageDesignManager.store();
+        var infoFile = $xui.pageDesignManager.getInfoFile("design");
+        $xui.initPageXUI(infoFile);
+        $xui.rootdata.activeTab=0;
+    }
+    reader.readAsText(file);
+}
+
+
 /***************************************************************************************************************/
 var pageIcon = null;
 var pageImage = null;
@@ -502,7 +522,7 @@ var pageImage = null;
 $xui.openTabUrl = (url) => {
     if (url == "pageIcon") {
         if (pageIcon == null || pageIcon.closed)
-            pageIcon = window.open('https://cdn.materialdesignicons.com/5.9.55/', '_blank');
+            pageIcon = window.open('https://materialdesignicons.com/', '_blank');
         pageIcon.focus()
     }
     if (url == "siteImage") {

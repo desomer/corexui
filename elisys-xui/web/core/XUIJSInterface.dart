@@ -3,6 +3,24 @@ library xuiapp;
 
 import 'package:js/js.dart';
 
+///------------------------- methode XUI vers JS -----------------------------
+
+@JS()
+external void loadPageJS(obj, bind);
+
+@JS()
+external void changePageJS(obj);
+
+@JS()
+external void doPromiseJS(idPromise, ret);
+
+@JS()
+external String generateApplicationStateJS(template, last);
+
+@JS()
+external String generateApplicationStoreJS(state);
+
+
 @JS()
 @anonymous
 class FileDesignInfo {
@@ -92,8 +110,8 @@ class Options {
   external set xuidata(String xuidata);
   external String get xuifile;              //code XML XUI
   external set xuifile(String xuifile);
-  external List get binding;
-  external set binding(List binding);
+  // external List get binding;
+  // external set binding(List binding);
   external List get treeSlot;
   external set treeSlot(List tree);
   external String get dataState;

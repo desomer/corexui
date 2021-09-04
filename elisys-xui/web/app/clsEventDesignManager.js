@@ -18,7 +18,7 @@ export class EventManager {
                 var act = "returnCmpForFile_" + data.infoFileCmp.file + "_" + data.infoFileCmp.xid;
                 var prom = getPromise(act)
                 waitForXuiLib("getHtmlFromXUI", function () {
-                    $xui.getHtmlFromXUI(data.infoFileCmp, act);
+                    $xuicore.getHtmlFromXUI(data.infoFileCmp, act);
                     prom.then(jsCmp => {
                         document.querySelector("#rootFrame").contentWindow.postMessage({ "action": act, jsCmp: jsCmp }, "*");
                     });
@@ -34,7 +34,7 @@ export class EventManager {
             $xui.dragItem = item;
             $xui.dragMoveItem = null;
             e.dataTransfer.setData('text/plain', "add cmp " + item.xid);
-            $xui.unDisplaySelector();
+            $xui.SelectorManager.unDisplaySelector();
         }
 
         // gestion du déplacement de composant entre slot sur selector
@@ -68,18 +68,20 @@ export class EventManager {
             if (data.action == "select") {
                 $xui.closePopup();
                 //this.console.debug("message select ", data);
-                $xui.displaySelectorByPosition(data.position);
+                $xui.SelectorManager.displaySelectorByPosition(data.position);
                 $xui.modeDisplaySelection = true;
 
                 // se repositionne sur l'onglet 0
-                $xui.rootdata.activeAction = 0;
+                if ($xui.rootdata.activeAction!=0 && $xui.rootdata.activeAction!=1)
+                    $xui.rootdata.activeAction = 0;
+
                 // 250 = delay d'animation des v-tabs
                 const delayWaitEndAnim = 250;
                 setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, delayWaitEndAnim);
             }
             else if (data.action == "unselect") {   // sur scroll ou resize
                 $xui.closePopup();
-                $xui.unDisplaySelector();
+                $xui.SelectorManager.unDisplaySelector();
             }
             else if (data.action == "drop") {
                 if ($xui.dragItem != null) {
@@ -122,7 +124,7 @@ export class EventManager {
                 }
             }
             else if (data.action == "updateDirectProp") {
-                $xui.unDisplaySelector();
+                $xui.SelectorManager.unDisplaySelector();
                 $xui.updateDirectProperty(data.value, data.variable, data.xid);
             }
             // gestion d'un hot load reloader
@@ -130,18 +132,18 @@ export class EventManager {
                 var infoFileCmp = $xui.pageDesignManager.getInfoFile('template');
                 infoFileCmp.partXID = data.xid;
                 var prom = getPromise("getVueCmp")
-                $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp");
+                $xuicore.getHtmlFromXUI(infoFileCmp, "getVueCmp");
                 prom.then(template => {
                     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "doChangeComponent", "xid": data.xid, "template": template }, "*");
                 })
             }
             else if (data.action == "reloader finish") {
                 // lancer par les v-xui-reloader  ou aprés un rechargement global du body
-                $xui.doPromiseJS("changePageFinish");
+                doPromiseJS("changePageFinish");
             }
             else if (data.action == "return getInfoForSelector") {
                 //console.debug("*******>", data);
-                $xui.doPromiseJS("getInfoForSelectorOnIFrame"+data.info.idx, data.ret);
+                doPromiseJS("getInfoForSelectorOnIFrame"+data.info.idx, data.ret);
             }
 
             

@@ -37,8 +37,7 @@ class XUIDesignManager {
     }
   }
 
-  XUIEngine getXUIEngine()
-  {
+  XUIEngine getXUIEngine() {
     return xuiEngine!;
   }
 
@@ -50,7 +49,7 @@ class XUIDesignManager {
     //  if (xid == null) {
     //    return null;
     //  }
-    
+
     var bufferHtml = XUIHtmlBuffer();
     await getXUIEngine().toHTMLString(bufferHtml, xid, ctx);
     return Future.value(bufferHtml.html.toString());
@@ -105,8 +104,10 @@ class XUIDesignManager {
     return id;
   }
 
-  Future changeProperty(String xid, String variable, dynamic value, String? bind) async {
-    return XUIActionManager(getXUIEngine()).changeProperty(xid, variable, value, bind);
+  Future changeProperty(
+      String xid, String variable, dynamic value, String? bind) async {
+    return XUIActionManager(getXUIEngine())
+        .changeProperty(xid, variable, value, bind);
   }
 
   void addXUIDesignEmpty(String xid) {
@@ -146,7 +147,7 @@ class XUIDesignManager {
   }
 
   ///------------------------------------------------------------------------------------------
-  Future<JSDesignInfo> getJSDesignInfo(String id, String idslot) async {
+  Future<JSDesignInfo> getJSDesignInfo(String id, String idslot, String mode) async {
     var ret = JSDesignInfo();
     var designs = getXUIEngine().getDesignInfo(id, idslot, true);
     ret.xid = id;
@@ -156,7 +157,8 @@ class XUIDesignManager {
     fi.file = 'app/cmpDesignPropEditor.html';
 
     fi.mode = MODE_FINAL;
-    var ctx = XUIContext(fi.mode, null);
+    var ctx = XUIContext(fi.mode);
+    ctx.setCause("getJSDesignInfo");
 
     int i = 0;
     // boucle sur l'ensemble des couches de widget
@@ -167,6 +169,13 @@ class XUIDesignManager {
       //------------------------------------------------------------------
       // gestion des variable du composant du widget
       for (DocVariables varCmp in design.docInfo?.variables ?? const []) {
+
+        bool isStyle = (varCmp.cat=="class" || varCmp.cat=="style" || varCmp.cat=="vstyle");
+        if ( (mode=="design" && isStyle) || (mode=="style" && !isStyle) || varCmp.cat=="config")
+        {
+            continue;
+        }
+
         String template =
             await _getJSDesignVariableTemplate(varCmp, fi, ctx, i, design);
         ret.bufTemplate.write(template);
@@ -204,7 +213,8 @@ class XUIDesignManager {
       if (design.slotInfo.elementHTML?.propertiesXUI![varCmp.id]
           is XUIPropertyBinding) {
         BindOfCmp = ((design.slotInfo.elementHTML?.propertiesXUI![varCmp.id]
-                as XUIPropertyBinding).binding!);
+                as XUIPropertyBinding)
+            .binding!);
       }
 
       if (valInCmp != null && varCmp.editor == "bool") {
@@ -245,7 +255,7 @@ class XUIDesignManager {
         ", \"bind_orig\":\"" +
         BindOfCmp.toString() +
         "\", \"exist\":" +
-        exist.toString() + 
+        exist.toString() +
         extend +
         "}");
   }
@@ -303,17 +313,21 @@ class XUIDesignManager {
     var keyCache = 'editor-header';
     var template = cacheTemplateEditor[keyCache];
     // titre du widget
-    String? titleCmp = design.docInfo?.name ?? design.slotInfo.docId;
+    String? titleCmp = design.docInfo?.name;
+    if (titleCmp == null && design.slotInfo.docId != null) {
+      titleCmp = "docID=" + design.slotInfo.docId.toString();
+    }
+
     if (template == null) {
       fi.xid = 'editor-header';
 
       XUIComponent cmp =
           await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
       cmp.addProperties(
-          "selectAction", "\$xui.displaySelectorByXid('##xid##', '##xid##')");
+          "selectAction", "\$xui.SelectorManager.displaySelectorByXid('##xid##', '##xid##')");
 
       cmp.addProperties("selectActionClick",
-          "\$xui.displayBindingByXid('##xid##', '##xid##')");
+          "\$xui.displayPropActionByXid('##xid##', '##xid##')");
 
       cmp.addProperties("title", "##title##");
 
@@ -324,7 +338,8 @@ class XUIDesignManager {
       }
       cacheTemplateEditor[keyCache] = template!;
     }
-    titleCmp = titleCmp ?? ("xid = " + design.slotInfo.xid!);
+
+    titleCmp = titleCmp ?? ("nodoc xid=" + design.slotInfo.xid.toString());
     if (design.slotInfo.slotname != null) {
       titleCmp = titleCmp + " (" + design.slotInfo.slotname! + ")";
     }
@@ -352,7 +367,8 @@ class XUIDesignManager {
       });
     }
 
-    XUIComponent cmp = getXUIEngine().xuiFile.components[idCmp]!.sort(ctx).first;
+    XUIComponent cmp =
+        getXUIEngine().xuiFile.components[idCmp]!.sort(ctx).first;
     return cmp;
   }
 
@@ -395,7 +411,7 @@ class XUIDesignManager {
               action: "incNbAfter",
               icon: "mdi-tab",
               type: "tabs",
-              title: "Add new Tab (after " + design.slotInfo.slotname!+ ")");
+              title: "Add new Tab (after " + design.slotInfo.slotname! + ")");
           ret.add(act);
         } else if (design.docInfo!.xid == "xui-no-dom:xui-flow") {
           ObjectAction act = ObjectAction(

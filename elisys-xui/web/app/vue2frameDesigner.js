@@ -25,16 +25,18 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
                     Vue.component(newId,
                         {
                             template: '<div style="display:' + this.modedisplay + '">' + e.template + '</div>',
-                            data: function () {
-                                return $xui.rootdata;
-                            },
-                            computed: {
-                                $xui: function () {
-                                    return window.$xui;
-                                },
-                                ...$xui.storeDataBinding
-                            },
-                            methods: $xui.storeAction
+                            mixins: [$xui.mixinStore],
+
+                            // data: function () {
+                            //     return $xui.rootdata;
+                            // },
+                            // computed: {
+                            //     $xui: function () {
+                            //         return window.$xui;
+                            //     },
+                            //     ...$xui.storeDataBinding
+                            // },
+                            // methods: $xui.storeAction
                         }
 
                     );
@@ -177,29 +179,28 @@ const iterateJSON = (src, dest, funct, functArray) => {
     return Object.fromEntries(entries);
 };
 
+
+
 window.addEventListener('message', function (e) {
     var data = e.data;
     if (data.action!="getInfoForSelector") {
         console.debug("--- CORE --- message ", data);
     }
-
-    if (data.action == "changeTemplate") {
+    if (data.action == "changeConfig") {
+        $xui.routeEnable = data.param.routeEnable;  // autorisation de changement de root
+    }
+    else if (data.action == "changeTemplate") {
 
         var hasChangeBinding = false;
 
         if (data.param.jsonBinding != null) {  // change uniquement le json du template
-            //Object.assign($xui.rootdata, data.param.jsonBinding);
             var jsonBinding = data.param.jsonBinding;
             var jsonTemplate = data.param.jsonTemplate;
 
-
-            // 
-
-            const r = iterateJSON(data.param.jsonTemplate, $xui.rootdata,
+            iterateJSON(jsonTemplate, $xui.rootdata,
                 (k, v, dest) => {
                     //console.log("k=", k, " v=", v);
-                    //Vue.set($xui.rootdata, k, v);
-                    if (dest[k] == null) {
+                    if (dest==null || dest[k] == null) {
                         hasChangeBinding = true;
                     }
                     return v;
@@ -208,14 +209,12 @@ window.addEventListener('message', function (e) {
                     return i;
                 });
 
-            if (hasChangeBinding) {
-                $xui.rootdata = Object.assign({}, $xui.rootdata, data.param.jsonBinding);
-            }
-            else {
-                Object.assign($xui.rootdata, data.param.jsonBinding);
-            }
 
-            console.debug("***************** iframe assign data state ", hasChangeBinding, data.param.jsonBinding, $xui.rootdata);
+            $xui.rootdata=jsonBinding;
+            $xui.modulesManager.addModule("main", $xui.rootdata);
+            $xui.modulesManager.reload();
+
+            console.debug("***************** iframe store reload ", hasChangeBinding, data.param.jsonBinding);
         }
 
         if (data.param.action == "reload-json") {  
@@ -225,10 +224,12 @@ window.addEventListener('message', function (e) {
                 return;  // change uniquement le json du template
         }
 
+        var oldrouteEnable = $xui.routeEnable;
+        $xui.routeEnable = true;  // autorise le positionnements des routes durant les reloads
 
         if (data.param.listReloader != null) {
             var uniqReloader = [...new Set(data.param.listReloader)];
-            this.console.info("+++++++++++> changeTemplate event reloader", data.param);
+            this.console.info("+++++++++++> changeTemplate event only reloader", data.param);
 
             for (const idReloader of uniqReloader) {
                 if ($xui.listReloader[idReloader] != null)
@@ -255,6 +256,8 @@ window.addEventListener('message', function (e) {
             window.parent.postMessage(message, "*");
         }
 
+        $xui.routeEnable=oldrouteEnable;
+
     }
     else if (data.action == "doChangeComponent") {
         //console.debug("load reloader", data.xid, data);
@@ -272,7 +275,6 @@ window.addEventListener('message', function (e) {
             ret: ret
         };
 
-        //console.debug("getInfoForSelector --------------->", message);
         window.parent.postMessage(message, "*");
     }
 });

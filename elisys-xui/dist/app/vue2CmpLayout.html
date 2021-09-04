@@ -1,27 +1,5 @@
 <xui-factory version="1.0">
 
-
-    <!--------------------------  XUI-FLOW   ------------------------------->
-    <xui-doc xid="xui-flow">
-        <xui-prop id="name">Flow</xui-prop>
-        <xui-prop id="icon">mdi-transfer-right</xui-prop>
-        <xui-prop id="desc">Flows</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-        <xui-prop var="nb" def="2" editor="int">nb slot</xui-prop>
-       
-    </xui-doc>
-
-    <xui-doc xid="xui-no-dom:xui-flow">
-        <xui-prop id="name">Flow item</xui-prop>
-        <xui-prop id="desc">Un Slot</xui-prop>
-        <xui-prop id="add-remove">incNb</xui-prop>
-    </xui-doc>
-
-    <xui-slot xid="xui-flow" xui-for="idxf" xui-slot-name="Flow">
-        <xui-slot style-slot="display:inline-flex" xid="[[parent-xid]]-col-[[idxf@2]]" xui-slot-name="Flow [[idxf@2]]">
-        </xui-slot>
-    </xui-slot>
-
     <!--------------------------  XUI-BLOCK   ------------------------------->
     <xui-doc xid="xui-block">
         <xui-prop id="name">Block</xui-prop>
@@ -39,6 +17,22 @@
         <xui-slot style-slot="height:100%" xid="[[parent-xid]]-block" xui-slot-name="Block"></xui-slot>
     </div>
 
+    <!-------------------------------- SCROLLPANE ---------------------------->
+    <xui-doc xid="xui-scrollpane-1">
+        <xui-prop id="name">ScrollPane</xui-prop>
+        <xui-prop id="icon">mdi-page-layout-sidebar-right</xui-prop>
+        <xui-prop id="desc">Un ScrollPane</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <div xid="xui-scrollpane-1" class="fill-height xui-p-relative [[class]]" -style="[[style]]">
+        <div class="xui-p-absolute xui-overflow">
+            <xui-slot xid="[[parent-xid]]-scroll" style-slot="height:100%" xui-slot-name="ScrollPane"></xui-slot>
+        </div>
+    </div>
+
     <!--------------------------  XUI-FOR   ------------------------------->
     <xui-doc xid="xui-for">
         <xui-prop id="name">For</xui-prop>
@@ -54,7 +48,36 @@
     <template xid="xui-for" v-for="([[:varItems]]_item, [[:varItems]]_index) in [[:varItems]]">
         <xui-slot style-slot="height:100%" xid="[[parent-xid]]-for" xui-slot-name="For block"></xui-slot>
     </template>
-    
+
+    <!--------------------------  XUI-ITERATOR   ------------------------------->
+    <xui-doc xid="xui-iterator-1">
+        <xui-prop id="name">Iterator</xui-prop>
+        <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
+        <xui-prop id="desc">Un block</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var=":varItems" editor="var" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
+
+        <xui-prop var="classBlock" cat="class" editor="class">class iterable</xui-prop>
+        <xui-prop var="styleBlock" cat="style" def="width:50%" editor="style">style iterable</xui-prop>
+
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <div xid="xui-iterator-1"
+        class="[[fill-height]] d-flex align-start flex-wrap align-content-start [[class]]"
+        -style="[[style]]">
+        <template v-for="([[:varItems@1]]_item, [[:varItems@1]]_index) in [[:varItems@1]]">
+            <div -style=[[styleBlock@2]] class="[[classBlock@2]]">
+                <xui-slot xid="[[parent-xid]]-iterator" xui-slot-name="For block"></xui-slot>
+            </div>
+        </template>
+    </div>
+
     <!--------------------------  XUI-IF-ELSE   ------------------------------->
     <xui-doc xid="xui-if-else">
         <xui-prop id="name">If elseIf else</xui-prop>
@@ -80,23 +103,6 @@
         </template>
     </template>
 
-
-    <!--------------------------  XUI-ROUTE-template ------------------------------->
-    <xui-doc xid="template:xui-route-template">
-        <xui-prop id="name">Route</xui-prop>
-        <xui-prop id="icon">mdi-view-day</xui-prop>
-        <xui-prop id="desc">Une session</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-    </xui-doc>
-
-
-    <template xid="xui-route-template" xui-for="idxroute" xui-no-dom>
-        <template xui-doc-id="xui-route-template-item" id="[[parent-xid]]-[[idxroute@0+]]" xid="[[parent-xid]]-route-[[idxroute@0+]]">
-            <xui-slot xui-reloader=true xui-slot-full xid="[[parent-xid]]-content-[[idxroute@0+]]"  xui-slot-name="route [[idxroute@0+]]">
-            </xui-slot>
-        </template>
-    </template>
-
     <!--------------------------  XUI-SESSION   ------------------------------->
     <xui-doc xid="xui-session">
         <xui-prop id="name">Sessions</xui-prop>
@@ -117,7 +123,7 @@
     </xui-doc>
 
     <div xid="xui-session" class="[[class]]" -style="[[style]];flex: 1 0 auto" xui-for="idxr">
-        <xui-slot xui-reloader=true xid="[[parent-xid]]-session-[[idxr@0+]]"  xui-slot-name="session">
+        <xui-slot xui-reloader=true xid="[[parent-xid]]-session-[[idxr@0+]]" xui-slot-name="session">
             <session class="xui-session [[class@-1]]" -style="[[style@-1]]">
                 <xui-slot xui-slot-full xid="[[parent-xid]]-item" xui-slot-name="session [[idxr@0+]]"></xui-slot>
             </session>
@@ -131,6 +137,46 @@
             }
         </style>
     </xui-design>
+
+
+    <!--------------------------  XUI-FLOW   ------------------------------->
+    <xui-doc xid="xui-flow">
+        <xui-prop id="name">Flow</xui-prop>
+        <xui-prop id="icon">mdi-transfer-right</xui-prop>
+        <xui-prop id="desc">Flows</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop var="nb" def="2" editor="int">nb slot</xui-prop>
+
+    </xui-doc>
+
+    <xui-doc xid="xui-no-dom:xui-flow">
+        <xui-prop id="name">Flow item</xui-prop>
+        <xui-prop id="desc">Un Slot</xui-prop>
+        <xui-prop id="add-remove">incNb</xui-prop>
+    </xui-doc>
+
+    <xui-slot xid="xui-flow" xui-for="idxf" xui-slot-name="Flow">
+        <xui-slot style-slot="display:inline-flex" xid="[[parent-xid]]-col-[[idxf@2]]" xui-slot-name="Flow [[idxf@2]]">
+        </xui-slot>
+    </xui-slot>
+
+    <!--------------------------  XUI-ROUTE-template ------------------------------->
+    <xui-doc xid="template:xui-route-template">
+        <xui-prop id="name">Route</xui-prop>
+        <xui-prop id="icon">mdi-view-day</xui-prop>
+        <xui-prop id="desc">Une session</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+    </xui-doc>
+
+
+    <template xid="xui-route-template" xui-for="idxroute" xui-no-dom>
+        <template xui-doc-id="xui-route-template-item" id="[[parent-xid]]-[[idxroute@0+]]"
+            xid="[[parent-xid]]-route-[[idxroute@0+]]">
+            <xui-slot xui-reloader=true xui-slot-full xid="[[parent-xid]]-content-[[idxroute@0+]]"
+                xui-slot-name="route [[idxroute@0+]]">
+            </xui-slot>
+        </template>
+    </template>
 
 
     <!-------------------------------  SPLIT 1  ------------------------------->
@@ -174,7 +220,7 @@
     <xui-design xid="inject-other-header">
         <script defer src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
     </xui-design>
-    
+
     <xui-design xid="xui-script-data">
         <script xui-no-dom xui-trim-content>
             $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File

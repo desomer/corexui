@@ -14,12 +14,16 @@
     if (typeof window.$xui === 'undefined')
         window.$xui = {};
 
+    if (typeof window.$xuicore === 'undefined')
+        window.$xuicore = {};
+
     if (window.$xui.rootdata == null)
         window.$xui.rootdata = {};
 </script>
 
 <script defer src="libxui.dart.js"></script>
 <script defer src="app/vueHelper.js"></script>
+<script defer src="app/vuexHelper.js"></script>
 
 <script type="module">
 
@@ -34,8 +38,9 @@
         $xui.pageDesignManager = new module.PageDesignManager();
 
         waitForXuiLib("initPageXUI", function () {
+            $xui.doPromiseJS  = doPromiseJS;
             var infoFile = $xui.pageDesignManager.getInfoFile("final");
-            $xui.initPageXUI(infoFile);
+            $xuicore.initPageXUI(infoFile);
         }, this);
     });
 

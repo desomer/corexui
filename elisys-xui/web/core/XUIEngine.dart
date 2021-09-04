@@ -1,12 +1,10 @@
 import 'dart:collection';
 //import 'package:yamlicious/yamlicious.dart';
-import '../libxui.dart';
-import 'XUIActionManager.dart';
+import 'XUIBindingManager.dart';
 import 'XUIConfigManager.dart';
 import 'XUIFactory.dart';
 import 'XUIJSInterface.dart';
 import 'element/XUIElement.dart';
-import 'element/XUIParseJSDataBind.dart';
 import 'element/XUIProperty.dart';
 import 'native/register.dart';
 import 'parser/HTMLReader.dart';
@@ -72,8 +70,12 @@ abstract class Provider {
 
 class XUIContext {
   String mode;
-  String? jsonBinding;
-  XUIContext(this.mode, this.jsonBinding);
+  String? cause;
+  XUIContext(this.mode);
+
+  void setCause(String cause) {
+    this.cause = cause;
+  }
 }
 
 class DicoOrdered<T extends XUIModel> {
@@ -414,12 +416,12 @@ class XUIResource extends XMLElemReader {
 class XUIEngine {
   late XUIResource xuiFile;
   var docInfo = HashMap<String, DocInfo>();
-
   var mapSlotInfo = HashMap<String, SlotInfo>();
-  var bindingInfo = LinkedHashMap<String, XUIBinding>();
+  late XUIBindingManager bindingManager= XUIBindingManager(this);
+
 
   // plus forcement utiliser sauf text avec moustache {{}}
-  var dataBindingInfo = XUIParseJSDataBinding();
+  //var dataBindingInfo = XUIParseJSDataBinding();
 
   Future initialize(HTMLReader reader, XUIContext ctx) async {
     xuiFile = XUIResource(reader, ctx);
@@ -446,23 +448,6 @@ class XUIEngine {
 
     var xuiDesign = listDesign.sort(xuiFile.context).first;
     return xuiDesign.elemXUI.propertiesXUI![variable];
-
-    // List<DesignInfo> designs = getDesignInfo(xid, xid, false);
-    // for (var design in designs) {
-    //   DocInfo doc = design.docInfo;
-    //   if (doc != null && doc.variables.isNotEmpty) {
-    //     for (var aVariable in doc.variables) {
-    //       if (aVariable.id == variable) {
-    //         var prop = xuiDesign.elemXUI.propertiesXUI[variable];
-    //         if (prop != null) {
-    //           return prop;
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-
-    // return null;
   }
 
   SlotInfo? getSlotInfo(String id, String idslot) {
@@ -569,7 +554,7 @@ class XUIEngine {
 
     if (isModeDesign()) {
       mapSlotInfo.clear(); // vide le slot info contruit dans la Phase2
-      bindingInfo.clear();
+      bindingManager.bindingInfo.clear();
     }
 
     await root.processPhase1(this, htmlRoot);
@@ -585,28 +570,21 @@ class XUIEngine {
           "-- designs " + xuiFile.designs.length.toString());
       XUIConfigManager.printc(
           "-- documentation " + xuiFile.documentation.length.toString());
-      XUIConfigManager.printc("-- binding " + bindingInfo.length.toString());
+      XUIConfigManager.printc("-- binding " + bindingManager.bindingInfo.length.toString());
       XUIConfigManager.printc(
           "-- listImport " + xuiFile.listImport.length.toString());
     }
 
-    processPhase2JS();
+    if (ctx.cause != "getHtmlFromXUI" && ctx.cause != "getJSDesignInfo") {
+      bindingManager.processPhase2JS(ctx);
+    }
 
     if (writer != null) {
       return Future.sync(() => htmlRoot.processPhase3(this, writer));
     }
   }
 
-  List getBindingInfo() {
-    var bind = [];
-    bindingInfo.forEach((k, v) {
-      var des = BindObj();
-      des.attr = v.attr;
-      des.val = v.value;
-      bind.add(des);
-    });
-    return bind;
-  }
+
 
   List getSlotTree() {
     TreeSlotBuilder treeSlotBuilder = TreeSlotBuilder();
@@ -645,7 +623,7 @@ class XUIEngine {
     ts.name = slot.slotname ?? (slot.implement ?? slot.xid!);
     if (slot.docId != null) {
       if (slot.slotname == null && docInfo[slot.docId] != null) {
-        ts.name = docInfo[slot.docId]!.name;
+        ts.name = docInfo[slot.docId]!.name ?? "no slot name";
       }
     }
 
@@ -732,189 +710,6 @@ class XUIEngine {
     return ts;
   }
 
-  void processPhase2JS() {
-
-    var dicoObjBind = LinkedHashMap<String, List<XUIBinding>>();
-    var dicoObjType = LinkedHashMap<String, XUIBinding>();
-    StringBuffer jsonBinding = StringBuffer();
-
-    doDicoObjectBinding(dicoObjBind, dicoObjType);
-    processPhase2JSBinding("root", dicoObjBind, jsonBinding);
-
-    XUIProperty? propBinding = getXUIProperty("root", "binding");
-    String lastBinding = "";
-    if (propBinding != null) {
-      lastBinding = propBinding.content.toString();
-    }
-    String templateBinding = "";
-    if (jsonBinding.isNotEmpty) {
-      templateBinding = jsonBinding.toString();
-      XUIConfigManager.printc("---> ************ TMPL *************** " +
-          templateBinding.toString());
-    }
-
-    var newBinding = templateBinding;
-    if (isModeDesign()) {
-      newBinding = generateApplicationStateJS(templateBinding, lastBinding);
-    }
-    if (!isModeDesign() && lastBinding != "") {
-      newBinding = lastBinding;
-    }
-
-    XUIConfigManager.printc(
-        "---> ************ BIND *************** " + newBinding.toString());
-
-    var str =
-        '\$xui.rootdata = { ...\$xui.rootdata ,' + newBinding + '\n\t\t};';
-    StringBuffer buf = NativeInjectText.getcacheText(JS_BINDING)!;    
-    buf.clear();
-    buf.write(str);
-  }
-
-  void doDicoObjectBinding(LinkedHashMap<String, List<XUIBinding>> dicoObjBind,
-      LinkedHashMap<String, XUIBinding> dicoObjType) {
-    this.bindingInfo.forEach((key, bindInfo) {
-      String type = "?";
-
-      SlotInfo? slotInfo = getSlotInfo(bindInfo.xid, bindInfo.xid);
-      if (slotInfo != null) {
-        DocInfo doc = docInfo[slotInfo.docId]!;
-        DocVariables varInfo = DocVariables();
-        for (DocVariables varCmp in doc.variables) {
-          if (varCmp.id == bindInfo.propName) {
-            varInfo = varCmp;
-            break;
-          }
-        }
-
-        type = varInfo.bindType != null ? varInfo.bindType! : "?";
-
-        // XUIConfigManager.printc("/*/*/*/ xid=" +
-        //     bindInfo.xid +
-        //     " bind on {" +
-        //     bindInfo.attr +
-        //     "} as [" +
-        //     type +
-        //     "] doc on " +
-        //     slotInfo.docId! +
-        //     "#" +
-        //     bindInfo.propName);
-      }
-
-      var isBool = false;
-      if (bindInfo.value is bool ||
-          (bindInfo.value == "true" || bindInfo.value == "false")) {
-        isBool = true;
-      }
-      bindInfo.type = isBool ? "bool" : type;
-
-      var path = "root";
-
-      if (bindInfo.attr.contains(".")) {
-        //   gestion de path
-        int niv = 0;
-        var listAttr = bindInfo.attr.split(".");
-        int lastNiv = listAttr.length - 1;
-        //var path=".";
-        listAttr.forEach((element) {
-          var newPath = path + "." + element;
-          // XUIConfigManager.printc("--->" + element);
-          if (niv != lastNiv) {
-            if (dicoObjBind[path] == null) {
-              dicoObjBind[path] = [];
-            }
-
-            bool isArray = false;
-            if (newPath.endsWith("[]")) {
-              newPath = newPath.substring(0, newPath.length - 2);
-              isArray = true;
-            }
-
-            if (!isArray && dicoObjType[newPath] == null) {
-              var newObj = XUIBinding("?", element, "{}", "?");
-              newObj.type = "object";
-              dicoObjBind[path]?.add(newObj);
-              dicoObjType[newPath] = newObj;
-              // XUIConfigManager.printc(
-              //     "---> addObj " + element + " on path " + path);
-            } else {
-              // var type = (dicoObjType[newPath]?.type ?? "?");
-              // XUIConfigManager.printc("---> onObj " +
-              //     element +
-              //     " as [" +
-              //     type +
-              //     "] on path " +
-              //     newPath);
-            }
-          } else {
-            // ajout de l'attribut
-            var newObj = XUIBinding(
-                bindInfo.propName, element, bindInfo.value, bindInfo.xid);
-            newObj.type = bindInfo.type;
-            if (dicoObjBind[path] == null) {
-              dicoObjBind[path] = [];
-            }
-            dicoObjBind[path]?.add(newObj);
-            // XUIConfigManager.printc("---> addAttr " + element + " on " + path);
-          }
-
-          path = newPath;
-          niv++;
-        });
-      } else {
-        // add attribut sur le root '.'
-        if (dicoObjBind[path] == null) {
-          dicoObjBind[path] = [];
-        }
-
-        if (bindInfo.type == "array") {
-          dicoObjType[path + "." + bindInfo.attr] = bindInfo;
-          // XUIConfigManager.printc(
-          //     "---> set array " + bindInfo.attr + " on " + path);
-        } else {
-          // XUIConfigManager.printc(
-          //     "---> set Attr " + bindInfo.attr + " on " + path);
-        }
-        dicoObjBind[path]?.add(bindInfo);
-      }
-    });
-  }
-
-  void processPhase2JSBinding(
-      String objName,
-      LinkedHashMap<String, List<XUIBinding>> dicoObjBind,
-      StringBuffer jsonBinding) {
-    dicoObjBind[objName]?.forEach((bindInfo) {
-      var type = bindInfo.type;
-
-      var v = type == "bool" ? (bindInfo.value) : ('"' + bindInfo.value + '"');
-
-      if (type == "array") {
-        var newjsonBinding = StringBuffer();
-        processPhase2JSBinding(
-            objName + "." + bindInfo.attr, dicoObjBind, newjsonBinding);
-        v = "[{ " + newjsonBinding.toString() + " }]";
-      }
-
-      if ((v == null || v == "") && type == "bool") {
-        v = 'false';
-      }
-
-      if (type == "object") {
-        var newjsonBinding = StringBuffer();
-        processPhase2JSBinding(
-            objName + "." + bindInfo.attr, dicoObjBind, newjsonBinding);
-        v = "{ " + newjsonBinding.toString() + " }";
-      }
-
-      if (type != "item-array") {
-        if (jsonBinding.isNotEmpty) {
-          jsonBinding.write(',');
-        }
-        jsonBinding.write('"' + bindInfo.attr + '": ' + v.toString());
-      }
-    });
-  }
 }
 
 ///------------------------------------------------------------------
@@ -939,7 +734,7 @@ class TreeSlotBuilder {
 class DocInfo {
   late String xid;
   String? componentAs;
-  late String name;
+  String? name;
   late String icon;
   late String desc;
   String? addRemove;

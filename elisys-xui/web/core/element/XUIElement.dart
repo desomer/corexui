@@ -143,61 +143,68 @@ class XUIElementHTML extends XUIElement {
   ///
   dynamic _getValueXUIProperty(
       ParseInfo parseInfo, XUIProperty prop, String tag) {
-    // si v-model ou autre attribut
+
+    //---------------------------------------------------
     if (parseInfo.mode == ParseInfoMode.ATTR &&
         parseInfo.context == "class" &&
         (prop.content == true || prop.content == "true")) {
-      return tag;
+      return tag;      // si class  : le class est le tag  class="[[CLASS]]"
     }
+
+    //---------------------------------------------------
+    var namespace = "main.";
 
     if (prop is XUIPropertyBinding) {
       var name = prop.binding;
       int isArray = name!.lastIndexOf("[]");
       if (isArray > 0) {
         var arrayName = name.substring(0, isArray);
-        name =
-            arrayName.split(".").last + "_item" + name.substring(isArray + 2);
+        name = arrayName.split(".").last + "_item" + name.substring(isArray + 2);
+        namespace="";
       }
 
       if (parseInfo.mode == ParseInfoMode.CONTENT) {
         // si dans un contenu de tag <div>{{binding}}</div>
-        return "{{" + name + "}}";
+        return "{{" + namespace+ name + "}}";
       }
       parseInfo.prefix = "v-bind:";
-      return name;
+      return namespace+name;
     }
 
-    if (tag.startsWith(":")) {
+    //---------------------------------------------------
+    if (tag.startsWith(":")) {   //les variables :varItems
+      // gestion des v-for
       var numVar = 0;
       if (parseInfo.context == "v-for") {
         numVar = 5 - parseInfo.parsebuilder.toString().split(tag).length;
-        // print("tag " +
-        //     tag +
-        //     " c=" +
-        //     prop.content +
-        //     " ctx " +
-        //     parseInfo.context! +
-        //     " nb=" +
-        //     numVar.toString() +
-        //     " mode=" +
-        //     parseInfo.parsebuilder.toString());
       }
 
       var name = prop.content.toString();
-      int isArray = name.lastIndexOf("[]");
-      if (isArray > 0) {
-        var arrayName = name.substring(0, isArray);
+      int mapOnArray = name.lastIndexOf("[]");  // gestion de tableau de tableau
+      if (mapOnArray > 0) {
+        var arrayName = name.substring(0, mapOnArray);
         if (numVar == 1) {  // attribut variable item du v-for
-          name=name.substring(isArray + 3);
+          name=name.substring(mapOnArray + 3);
         } else if (numVar == 2) { // attribut variable idx du v-for
-          name=name.substring(isArray + 3);
+          name=name.substring(mapOnArray + 3);
         } else {
-          name =arrayName.split(".").last + "_item" + name.substring(isArray + 2);
+          // attribut simple
+          name =arrayName.split(".").last + "_item" + name.substring(mapOnArray + 2);
         }
+        return name;
       }
-      return name;
-    }
+      else
+      {
+        if (numVar == 1 || numVar == 2)
+        {
+           namespace="";  //pas de namespace sur variable item et idx du v-for
+        }
 
+        return namespace+name;
+      }
+      
+    }
+    //---------------------------------------------------
     // sinon retour en directe
     return prop.content;
   }
@@ -374,7 +381,7 @@ class XUIElementHTML extends XUIElement {
           //  parseInfo = ParseInfo(c, keyAttr, ParseInfoMode.ATTR);
           //}
 
-          valProp = _processContentPhase3(engine, parseInfo);
+          String valProp = _processContentPhase3(engine, parseInfo);
           bool mustAdd = true;
           bool isBool = false;
           //-----------------------------------------------------------------------------------
@@ -391,6 +398,20 @@ class XUIElementHTML extends XUIElement {
               if (valProp == ";" || valProp == ";;") {
                 valProp = "";
               }
+              var listArg = valProp.split(";");
+              var val = StringBuffer();
+              for (var i = 0; i < listArg.length; i++) {
+                  var v= listArg[i].trim();
+                  if (!v.endsWith(":"))
+                  {
+                    if (val.isNotEmpty)
+                    {
+                      val.write(";");
+                    }
+                    val.write(v);
+                  }
+              }
+              valProp=val.toString();
             }
 
             // transformation par recherche de tag
@@ -399,6 +420,7 @@ class XUIElementHTML extends XUIElement {
             }
 
             if (parseInfo.prefix != null) {
+              mustAdd=true;
               // binding
               if (!keyAttr.startsWith("@") && keyAttr != "v-model") {
                 keyAttr = parseInfo.prefix! + keyAttr;
@@ -409,7 +431,7 @@ class XUIElementHTML extends XUIElement {
           if (mustAdd) {
             // cas du :value="false"   =>  reste en chaine "" pour vuejs sinon en boolean
             if ((valProp == "true" || valProp == "false") &&
-                !(keyAttr.startsWith(":"))) {
+                !(keyAttr.startsWith(":") || keyAttr.startsWith("v-bind:"))) {
               isBool = true;
             }
 
@@ -423,7 +445,7 @@ class XUIElementHTML extends XUIElement {
             }
 
             // analyse des attribut avec du binding
-            engine.dataBindingInfo.parseAttr(this, keyAttr, valProp.toString());
+            //engine.dataBindingInfo.parseAttr(this, keyAttr, valProp.toString());
           }
         } else {
           // attribut boolean
@@ -472,7 +494,7 @@ class XUIElementHTMLText extends XUIElementHTML {
     var cont = _processContentPhase3(engine, parseInfo);
 
     // analyse des attribut avec du binding
-    engine.dataBindingInfo.parseContent(this, cont);
+    //engine.dataBindingInfo.parseContent(this, cont);
 
     if (buffer.trim) {
       buffer.trim = false;

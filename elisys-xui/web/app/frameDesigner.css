@@ -1,5 +1,5 @@
 :root {
-    --width-properties:300px;
+    --width-properties:310px;
 }
 
 /* #app .sk-plane,
@@ -41,10 +41,12 @@ html::-webkit-scrollbar {
 
 .main-container { 
     display: grid; 
-    grid-template-columns: 0px auto var(--width-properties);
-    grid-template-rows: 100%; 
+    grid-template-columns: auto var(--width-properties);
+    grid-template-rows: 40px auto; 
     }
  
+
+ .xui-action-tab {position: absolute; top: 0px; width: var(--width-properties); }
 /* container de l'Iframe */    
 .main-item-2 {
     border: 1px solid #cecece;
@@ -205,9 +207,20 @@ pre > code {
     z-index: 1000;
 }
 
-.iframe-phone {
+.xui-iframe-phone {
     width : 414px !important;
     max-height : 736px;
+}
+
+.xui-frame-full-screen.xui-iframe-phone
+{
+    position : relative !important;
+}
+
+.v-overlay__content
+{
+    /* pour la fermeture au click */
+    display:contents;  
 }
 /******************************************************************************/
 

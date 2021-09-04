@@ -1,10 +1,49 @@
 function waitForXuiLib(key, callback, self) {
-    if ($xui[key] != null) {
+    if ($xuicore[key] != null) {
         callback();
     } else {
         setTimeout(function () { waitForXuiLib(key, callback); }.bind(self), 100);
     }
 };
+
+
+globalThis.requireXUI = (function () {
+    var cache = {};
+
+    async function loadScript(url) {
+        if (url.startsWith("http")) {
+            await fetch(url)
+                .then(response => response.text())
+                .then(txt => {
+                    var fnBody = 'var exports = {};var module = {}\n' + txt + '\nif(module.exports!=null) return module.exports;\nreturn exports;';
+                    cache[url] = (new Function(fnBody)).call({});
+                })
+        }
+    }
+
+    function resolve(module) {
+        //TODO resolve urls
+        return module;
+    }
+
+    async function require(module) {
+        var url = resolve(module);
+        if (!Object.prototype.hasOwnProperty.call(cache, url)) {
+            await loadScript(url);
+        }
+        return cache[url];
+    }
+
+    function requireCache(module) {
+        var url = resolve(module);
+        return cache[url];
+    }
+
+    require.cache = cache;
+    require.resolve = resolve;
+    require.requireCache = requireCache;
+    return require;
+}());
 
 /***************************************************************************************************************/
 
@@ -36,7 +75,7 @@ function getPromise(id) {
     return promise;
 }
 
-$xui.doPromiseJS = (idPromise, ret) => {
+globalThis.doPromiseJS = (idPromise, ret) => {
     if (dicoPromise[idPromise] != null) {
         dicoPromise[idPromise].resolve_ex(ret);
         delete  dicoPromise[idPromise];
