@@ -207,10 +207,12 @@ class XUIBindingManager {
       String objName,
       LinkedHashMap<String, List<XUIBinding>> dicoObjBind,
       StringBuffer jsonBinding) {
-    dicoObjBind[objName]?.forEach((bindInfo) {
-      var type = bindInfo.type;
 
-      var v = type == "bool" ? (bindInfo.value) : ('"' + bindInfo.value + '"');
+
+    dicoObjBind[objName]?.forEach((bindInfo) {
+      var type = bindInfo.type; 
+      var isNotString = (type == "bool" || type == "int");
+      var v = isNotString ? (bindInfo.value) : ('"' + bindInfo.value + '"');
 
       if (type == "array") {
         var newjsonBinding = StringBuffer();
@@ -221,6 +223,10 @@ class XUIBindingManager {
 
       if ((v == null || v == "") && type == "bool") {
         v = 'false';
+      }
+
+      if ((v == null || v == "") && type == "int") {
+        v = '0';
       }
 
       if (type == "object") {
@@ -237,6 +243,14 @@ class XUIBindingManager {
         jsonBinding.write('"' + bindInfo.attr + '": ' + v.toString());
       }
     });
+  }
+
+  //-------------------------------------- RENAME  -----------------------------------------------
+
+  bool remaneVariable(String oldName, String newName)
+  {
+    print("ddddddddddddddddddddddd remane "+oldName + "  =>   "+newName);
+    return true;
   }
 
   // List getBindingInfo() {

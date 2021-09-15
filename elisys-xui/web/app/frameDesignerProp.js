@@ -9,6 +9,11 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         infoFile.action = "style";
     }
 
+    if ($xui.rootdata.activeAction == 2) {
+        var idProp = "AppPropertiesEvent";
+        infoFile.action = "event";
+    }
+    
     let posScroll = -1;
     if ($xui.propertiesDesign != null && xid == $xui.propertiesDesign.xid) {
         posScroll = document.getElementById(idProp).scrollTop;

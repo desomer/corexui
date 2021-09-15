@@ -8,8 +8,9 @@ $xui.initVuejs = (instanceVue) => {
 
   instanceVue.$watch('main.activeAction', function (newValue, oldValue) {
     console.debug('The activeAction name was changed from ' + oldValue + ' to ' + newValue + '!');
-
-    $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    if ($xui.rootdata.activeAction<=2) {
+      $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    }
     
   }, { deep: true });
 

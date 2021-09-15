@@ -143,12 +143,11 @@ class XUIElementHTML extends XUIElement {
   ///
   dynamic _getValueXUIProperty(
       ParseInfo parseInfo, XUIProperty prop, String tag) {
-
     //---------------------------------------------------
     if (parseInfo.mode == ParseInfoMode.ATTR &&
         parseInfo.context == "class" &&
         (prop.content == true || prop.content == "true")) {
-      return tag;      // si class  : le class est le tag  class="[[CLASS]]"
+      return tag; // si class  : le class est le tag  class="[[CLASS]]"
     }
 
     //---------------------------------------------------
@@ -159,20 +158,22 @@ class XUIElementHTML extends XUIElement {
       int isArray = name!.lastIndexOf("[]");
       if (isArray > 0) {
         var arrayName = name.substring(0, isArray);
-        name = arrayName.split(".").last + "_item" + name.substring(isArray + 2);
-        namespace="";
+        name =
+            arrayName.split(".").last + "_item" + name.substring(isArray + 2);
+        namespace = "";
       }
 
       if (parseInfo.mode == ParseInfoMode.CONTENT) {
         // si dans un contenu de tag <div>{{binding}}</div>
-        return "{{" + namespace+ name + "}}";
+        return "{{" + namespace + name + "}}";
       }
       parseInfo.prefix = "v-bind:";
-      return namespace+name;
+      return namespace + name;
     }
 
     //---------------------------------------------------
-    if (tag.startsWith(":")) {   //les variables :varItems
+    if (tag.startsWith(":")) {
+      //les variables :varItems
       // gestion des v-for
       var numVar = 0;
       if (parseInfo.context == "v-for") {
@@ -180,29 +181,29 @@ class XUIElementHTML extends XUIElement {
       }
 
       var name = prop.content.toString();
-      int mapOnArray = name.lastIndexOf("[]");  // gestion de tableau de tableau
+      int mapOnArray = name.lastIndexOf("[]"); // gestion de tableau de tableau
       if (mapOnArray > 0) {
         var arrayName = name.substring(0, mapOnArray);
-        if (numVar == 1) {  // attribut variable item du v-for
-          name=name.substring(mapOnArray + 3);
-        } else if (numVar == 2) { // attribut variable idx du v-for
-          name=name.substring(mapOnArray + 3);
+        if (numVar == 1) {
+          // attribut variable item du v-for
+          name = name.substring(mapOnArray + 3);
+        } else if (numVar == 2) {
+          // attribut variable idx du v-for
+          name = name.substring(mapOnArray + 3);
         } else {
           // attribut simple
-          name =arrayName.split(".").last + "_item" + name.substring(mapOnArray + 2);
+          name = arrayName.split(".").last +
+              "_item" +
+              name.substring(mapOnArray + 2);
         }
         return name;
-      }
-      else
-      {
-        if (numVar == 1 || numVar == 2)
-        {
-           namespace="";  //pas de namespace sur variable item et idx du v-for
+      } else {
+        if (numVar == 1 || numVar == 2) {
+          namespace = ""; //pas de namespace sur variable item et idx du v-for
         }
 
-        return namespace+name;
+        return namespace + name;
       }
-      
     }
     //---------------------------------------------------
     // sinon retour en directe
@@ -367,19 +368,50 @@ class XUIElementHTML extends XUIElement {
   void doAttributPhase3(cst.XUIEngine engine, XUIHtmlBuffer buffer) {
     this.attributes?.entries.forEach((f) {
       var contentAttr = f.value.content;
-      ParseInfo parseInfo = ParseInfo(f.key, null, ParseInfoMode.KEY);
+      var attrName = f.key;
+//print("*******************"+ f.key);
+      ParseInfo parseInfo = ParseInfo(attrName, null, ParseInfoMode.KEY);
       String keyAttr = _processContentPhase3(engine, parseInfo);
+
+      if (keyAttr.startsWith("if:")) {
+        var listArg = keyAttr.split(":");
+        if (listArg[1]=="")
+        {
+           //la condition est vide 
+           return;
+        }
+        keyAttr = listArg[2];
+      }
+
+      if (attrName.startsWith("[[event")) {
+        print("******************* event > " + keyAttr);
+        XUIElementHTML elem = this;
+        if (attrName == "[[event@-1]]") {
+          elem = firstChildNoText()!;
+        }
+
+        elem.propertiesXUI?.forEach((key, value) {
+          if (key.startsWith("@")) {
+            print("******************* event prop id=" +
+                key +
+                "=>" +
+                value.content.toString());
+            buffer.html.write(" " +
+                key +
+                "=\"\$mth('" +
+                value.content +
+                "', ...arguments)\"");
+          }
+        });
+        return;
+      }
 
       var valProp = contentAttr;
 
       if (keyAttr != "" && contentAttr != null) {
         if (contentAttr is String) {
-          ParseInfo parseInfo;
-          //if (keyAttr == "class") {
-          parseInfo = ParseInfo(contentAttr, keyAttr, ParseInfoMode.ATTR);
-          //} else {
-          //  parseInfo = ParseInfo(c, keyAttr, ParseInfoMode.ATTR);
-          //}
+          ParseInfo parseInfo =
+              ParseInfo(contentAttr, keyAttr, ParseInfoMode.ATTR);
 
           String valProp = _processContentPhase3(engine, parseInfo);
           bool mustAdd = true;
@@ -401,17 +433,15 @@ class XUIElementHTML extends XUIElement {
               var listArg = valProp.split(";");
               var val = StringBuffer();
               for (var i = 0; i < listArg.length; i++) {
-                  var v= listArg[i].trim();
-                  if (!v.endsWith(":"))
-                  {
-                    if (val.isNotEmpty)
-                    {
-                      val.write(";");
-                    }
-                    val.write(v);
+                var v = listArg[i].trim();
+                if (!v.endsWith(":")) {
+                  if (val.isNotEmpty) {
+                    val.write(";");
                   }
+                  val.write(v);
+                }
               }
-              valProp=val.toString();
+              valProp = val.toString();
             }
 
             // transformation par recherche de tag
@@ -420,7 +450,7 @@ class XUIElementHTML extends XUIElement {
             }
 
             if (parseInfo.prefix != null) {
-              mustAdd=true;
+              mustAdd = true;
               // binding
               if (!keyAttr.startsWith("@") && keyAttr != "v-model") {
                 keyAttr = parseInfo.prefix! + keyAttr;

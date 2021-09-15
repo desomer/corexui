@@ -33,7 +33,7 @@ const ATTR_MODE_DISPLAY = "modedisplay";
 const ATTR_CONVERT_JSON = "convert-json";
 const ATTR_XUI_IF = "if";
 
-const ATTR_XUI_FORVAR = "forvar";
+const ATTR_XUI_FORVAR = "for-nbvar";
 
 const ATTR_STYLE_SLOT = "style-slot";
 // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart

@@ -171,10 +171,28 @@ class XUIDesignManager {
       for (DocVariables varCmp in design.docInfo?.variables ?? const []) {
 
         bool isStyle = (varCmp.cat=="class" || varCmp.cat=="style" || varCmp.cat=="vstyle");
-        if ( (mode=="design" && isStyle) || (mode=="style" && !isStyle) || varCmp.cat=="config")
+        bool isEvent = (varCmp.cat!=null && varCmp.cat.toString().startsWith("event"));
+
+        if (varCmp.cat=="config")
         {
             continue;
         }
+
+        if ( mode=="design" && (isStyle || isEvent))
+        {
+            continue;
+        }
+
+        if (mode=="style" && !isStyle)
+        {
+            continue;
+        }
+
+        if (mode=="event" && !isEvent)
+        {
+            continue;
+        }
+        
 
         String template =
             await _getJSDesignVariableTemplate(varCmp, fi, ctx, i, design);

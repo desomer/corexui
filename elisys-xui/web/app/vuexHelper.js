@@ -52,6 +52,22 @@ class VuexModuleManager {
         const mixinModules = {
             computed,
             methods: {
+                $mth: function()
+                {
+                    console.debug("mth", arguments, this);
+
+                    var message = {
+                        action: "displayMessage",
+                        value: {
+                            snackbar: true,
+                            text: arguments[0],
+                            timeout: 2000,
+                          }
+                    };
+                    window.parent.postMessage(message, "*");
+
+                    this.$store.dispatch('main/actionName', null, { root: true })
+                },
                 $post: function (action, ev) {
                     console.debug("$post", this, action, ev);
                     this.$store.dispatch(action);
@@ -87,7 +103,7 @@ class VuexModuleManager {
 
     getCode() {
         var result = 
-`globalThis.initialiseWinState = () => {\n`
+`globalThis.initialiseAppState = () => {\n`
         
         result +=
 `const modulesManager = new VuexModuleManager();\n\n`;

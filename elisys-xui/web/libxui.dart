@@ -137,6 +137,17 @@ void saveDesignPropertiesXUI(FileDesignInfo fileInfo, dynamic listDesig) async {
   for (PropInfo item in listDesign) {
     if (item.value != item.value_orig || item.bind != item.bind_orig) {
       designMgr.listXidChanged.add(item.xid);
+
+      if (item.bind != item.bind_orig)
+      {
+        designMgr.xuiEngine!.bindingManager.remaneVariable(item.bind_orig, item.bind);
+      }
+
+      if (item.variable.startsWith(":"))
+      {
+        designMgr.xuiEngine!.bindingManager.remaneVariable(item.value_orig, item.value );
+      }
+
       await designMgr.changeProperty(
           item.xid, item.variable, item.value, item.bind);
     }

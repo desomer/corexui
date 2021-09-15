@@ -1,6 +1,6 @@
 class XUIConfigManager {
 
-    static bool reloaderEnable = true; // configuration avec reloader
+    static bool reloaderEnable = false; // configuration avec reloader
 
     static bool verboseXUIEngine = false;
     static bool verboseTree = false;

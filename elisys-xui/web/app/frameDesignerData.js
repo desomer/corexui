@@ -30,6 +30,8 @@ var json = {
     ListActions : [
         { id:"add"}
     ],
+    messages : [
+    ],
     currentCode : "no code"
 };
 

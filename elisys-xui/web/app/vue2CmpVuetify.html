@@ -161,10 +161,15 @@
         <xui-prop var="position" editor="combo" list='["block","absolute","fixed"]'>position</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+
+        <xui-prop var="routeto" cat="event:route" editor="text">route to (/ ; /route1; /page1/route1)</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
+        <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
     </xui-doc>
 
     <v-btn xid="xui-btn-1" class="[[class]]" -style="[[style]]" [[btn-type]] [[position]] disabled="[[disabled]]"
-        [[size]] color="[[color]]" dark="[[dark]]" light="[[light]]">[[label@1]]
+        [[size]] [[event]] to="[[routeto]]" color="[[color]]" dark="[[dark]]" light="[[light]]">[[label@1]]
     </v-btn>
 
     <!--------------------------  XUI-BTN-ICON-1   ---------------------------->
@@ -176,7 +181,6 @@
 
         <xui-prop var="btn-type" def="icon" editor="combo"
             list='["depressed","outlined","rounded","text","tile","icon","fab"]'>type depressed/outlined/...</xui-prop>
-        <xui-prop var="routeto" editor="text">route to</xui-prop>
 
         <xui-prop var="icon" def="mdi-plus" editor="icon">icon (mdi-xxx)</xui-prop>
         <xui-prop var="color" cat="vstyle" editor="text">color</xui-prop>
@@ -191,8 +195,11 @@
         <xui-prop var="textright" editor="text">text right</xui-prop>
         <xui-prop var="positionicon" editor="combo" list='["left","right"]'>marge text left/right</xui-prop>
 
-        <xui-prop var="event" editor="text">Event (@click='say($event)')</xui-prop>
-
+        <xui-prop var="routeto" cat="event:route" editor="text">route to (/ ; /route1; /page1/route1)</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
+        <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
+        
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
@@ -236,7 +243,7 @@
     </xui-doc>
 
     <v-btn xid="xui-btn-icon-2" [[directive]] class="[[class]]" -style="[[style]]" [[btn-type]] disabled="[[disabled]]" [[size]]
-        [[position]] [[leftright]] [[topbottom]] color="[[color]]" dark="[[dark]]" light="[[light]]">
+        [[position]] [[leftright]] [[topbottom]] color="[[color]]" dark="[[dark]]" light="[[light]]" [[event]]>
         <span xui-if=[[textleft@1]]>[[textleft@2]]</span>
         <v-icon [[positionicon@1]]>[[icon@2]]</v-icon><span xui-if=[[textright@1]]>[[textright@2]]</span>
     </v-btn>

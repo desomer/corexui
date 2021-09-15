@@ -96,7 +96,7 @@
         <xui-prop id="icon">mdi-table-row</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
 
-        <xui-prop var="nb" def="2" editor="int">nb col dans la ligne</xui-prop>
+        <xui-prop var="nb" def="1" editor="int">nb col dans la ligne</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
 
         <xui-prop var="justify" cat="vstyle" editor="combo" 
@@ -117,11 +117,12 @@
         <xui-prop var="cols" editor="text">Larg. de col (1-12/auto)</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var=":varitems" cat="event:model" editor="var" bind-type="array">items var name</xui-prop>
     </xui-doc>
 
     <v-row xid="xui-row-1" class="[[fill-height]] [[class]]" xui-for="idxc" -style="[[style]]" no-gutters
-        align="[[align]]" align-content="[[align-content]]" justify="[[justify]]">
-        <v-col class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]">
+        -align="[[align]]" align-content="[[align-content]]" justify="[[justify]]">
+        <v-col class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]"  if:[[:varitems@-1]]:v-for="([[:varitems@-1]]_item, [[:varitems@-1]]_index) in [[:varitems@-1]]">
             <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" style-slot="height:100%" xui-slot-name="row col [[idxc@3]]">
             </xui-slot>
         </v-col>
@@ -307,8 +308,8 @@
         <xui-prop id="componentAs">container</xui-prop>
 
         <xui-prop var="nb" def="3" editor="int">Nb tab(s)</xui-prop>
-        <xui-prop var="vertical" editor="bool">vertical</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
+        <xui-prop var="vertical" editor="bool">vertical</xui-prop>
         <xui-prop var="tabs-dense" cat="vstyle" editor="bool">dense</xui-prop>
 
         <xui-prop var="color" cat="vstyle" editor="text">color</xui-prop>
@@ -327,6 +328,9 @@
 
         <xui-prop var="height-tabs" def="48px" editor="text">height tabs (48px, 100%)</xui-prop>
 
+        <xui-prop var=":modelTab" cat="event:model" editor="text" bind-type="int">var model</xui-prop>
+        <xui-prop var="@change" cat="event:elem" editor="text">Change</xui-prop>
+
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
@@ -339,6 +343,9 @@
 
         <xui-prop id="name">Tab</xui-prop>
         <xui-prop id="desc">Titre de l'onglet</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@change" cat="event:elem" editor="text">Change</xui-prop>
+        <xui-prop var="ref" cat="event:ref" editor="text">Ref</xui-prop>
     </xui-doc>
 
     <xui-doc xid="v-tab-item:xui-tabs">
@@ -352,8 +359,8 @@
         -style="--xui-tab-h:[[height-tabs]];[[style]]" -style=";2" vertical=[[vertical]] dark="[[dark]]"
         light="[[light]]" color="[[color]]" background-color="[[background-color]]" slider-color="[[slider-color]]"
         icons-and-text="[[icons-and-text]]" show-arrows="[[show-arrows]]" fixed-tabs="[[fixed-tabs]]"
-        centered="[[centered]]" right="[[right]]" center-active="[[center-active]]" xui-for="idx">
-        <v-tab>
+        centered="[[centered]]" right="[[right]]" center-active="[[center-active]]" [[event]] v-model=[[:modelTab]] xui-for="idx">
+        <v-tab [[event@-1]] ref=[[ref@-1]]>
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-[[idx@0+]]" xui-slot-name="tab [[idx@0+]]"></xui-slot>
         </v-tab>
         <!--v-tab-item :transition="false" :reverse-transition="false" eager-->
@@ -498,20 +505,6 @@
             .xui-class-slot-full {
                 height: 100%;
                 width: 100%;
-            }
-
-            .xui-p-relative {
-                position: relative
-            }
-
-            .xui-p-absolute {
-                position: absolute
-            }
-
-            .xui-overflow {
-                overflow: auto;
-                width: 100%;
-                height: 100%;
             }
         </style>
     </xui-design>

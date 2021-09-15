@@ -170,7 +170,34 @@
         </xui-slot>
     </xui-slot>
 
-    <!--------------------------  XUI-ROUTE-template ------------------------------->
+        <!--------------------------  XUI-PAGE-TEMPLATE ------------------------------->
+        <xui-doc xid="xui-page-template">
+            <xui-prop id="name">Page Container</xui-prop>
+            <xui-prop id="icon">mdi-view-day</xui-prop>
+            <xui-prop id="desc">Une session</xui-prop>
+            <xui-prop id="componentAs">container</xui-prop>
+        </xui-doc>
+    
+        <template xid="xui-page-template" xui-for="idxpage" xui-no-dom>
+            <template xid="[[parent-xid]]-[[idxpage@0+]]" xui-no-design id="[[parent-xid]]-[[idxpage@0+]]">
+                <xui-app-1 xui-reloader=true xui-slot-full xid="[[parent-xid]]-content"
+                    xui-slot-name="Page [[idxpage@0+]]">
+                    <xui-route-template xid="page-[[idxpage@0+]]-route" xui-for-nbvar="nbroute@0+"></xui-route-template>
+                </xui-app-1>
+                <!-- les autres route -->
+            </template>
+ 
+        </template>
+
+    <!--------------------------  XUI-ROUTE-TEMPLATE ------------------------------->
+    <xui-doc xid="xui-route-template">
+        <xui-prop id="name">Route Container</xui-prop>
+        <xui-prop id="icon">mdi-view-day</xui-prop>
+        <xui-prop id="desc">Une session</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop var="nbroute" def="0" editor="int">nb route page</xui-prop>
+    </xui-doc>
+
     <xui-doc xid="template:xui-route-template">
         <xui-prop id="name">Route</xui-prop>
         <xui-prop id="icon">mdi-view-day</xui-prop>
@@ -178,140 +205,13 @@
         <xui-prop id="componentAs">container</xui-prop>
     </xui-doc>
 
-    <xui-doc xid="xui-route-template">
-        <xui-prop id="name">Route Container</xui-prop>
-        <xui-prop id="icon">mdi-view-day</xui-prop>
-        <xui-prop id="desc">Une session</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-    </xui-doc>
 
-
-    <template xid="xui-route-template" xui-for="idxroute" xui-no-dom>
-        <template xid="[[parent-xid]]-route-[[idxroute@0+]]" xui-doc-id="xui-route-template-item" id="[[parent-xid]]-[[idxroute@0+]]"
-             xui-slot-name="route template [[idxroute@0+]]">
-            <xui-slot xui-reloader=true xui-slot-full xid="[[parent-xid]]-content-[[idxroute@0+]]"
+    <template xid="xui-route-template" xui-for="idxroute" xui-forvar="nbroute@0+" xui-no-dom  xui-slot-name="Page [[idxpage@0+]] Router"> 
+        <template xid="[[parent-xid]]-[[idxroute@0+]]" id="[[parent-xid]]-[[idxroute@0+]]" xui-no-design>
+            <xui-slot xui-reloader=true xui-slot-full xid="[[parent-xid]]-content"
                 xui-slot-name="route [[idxroute@0+]]">
             </xui-slot>
         </template>
     </template>
-
-
-    <!-------------------------------  SPLIT 1  ------------------------------->
-
-    <xui-doc xid="xui-split-1">
-        <xui-prop id="name">Split</xui-prop>
-        <xui-prop id="icon">mdi-arrow-split-vertical</xui-prop>
-        <xui-prop id="desc">Un split</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-
-        <xui-prop var="column" editor="bool">column</xui-prop>
-        <xui-prop var="sizeA" def="1fr" editor="text">size A (px, fr, %)</xui-prop>
-        <xui-prop var="sizeB" def="1fr" editor="text">size B (px, fr, %)</xui-prop>
-
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-    </xui-doc>
-
-    <xui-doc xid="template:xui-split-1">
-        <xui-prop id="name">Split Cell</xui-prop>
-        <xui-prop id="desc">Contenu du split</xui-prop>
-        <xui-prop id="favorite">container</xui-prop>
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-    </xui-doc>
-
-    <v-xui-split xid="xui-split-1" column="[[column@0]]" sizea="[[sizeA@0]]" sizeb="[[sizeB@0]]" class="[[class@0]]"
-        -style="[[style@0]]">
-        <template v-slot:a>
-            <xui-slot xid="[[parent-xid]]-splitA" xui-slot-name="split A" class="[[class@1]]" -style="[[style@1]]"
-                xui-slot-full xui-reloader=true></xui-slot>
-        </template>
-        <template v-slot:b>
-            <xui-slot xid="[[parent-xid]]-splitB" xui-slot-name="split B" class="[[class@1]]" -style="[[style@1]]"
-                xui-slot-full xui-reloader=true></xui-slot>
-        </template>
-    </v-xui-split>
-
-
-    <!-------------------------------------  V-XUI-SPLIT  ------------------------------------->
-    <xui-design xid="inject-other-header">
-        <script defer src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
-    </xui-design>
-
-    <xui-design xid="xui-script-data">
-        <script xui-no-dom xui-trim-content>
-            $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
-                new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
-                    "vue-xui-split");
-            }
-            );
-        </script>
-    </xui-design>
-
-    <script xid="vue-xui-split" xui-no-dom>
-        export default {
-            template: <template-xui-split xui-convert-json></template-xui-split>,
-            props: ["column", "sizea", "sizeb"],
-            mounted: function () {
-                var sizeA = this.sizea == undefined ? "1fr" : this.sizea;
-                var sizeB = this.sizeb == undefined ? "1fr" : this.sizeb;
-
-                var split = this.$el;
-                var gutter = split.querySelector(':scope>.xui-split-gutter');
-
-                if (this.column == undefined) {
-                    split.style.gridTemplateRows = sizeA + " 5px " + sizeB;
-                    gutter.classList.add("xui-split-gutter-horizontal");
-                    Split({
-                        rowGutters: [{
-                            track: 1,
-                            element: gutter
-                        }]
-                    })
-                }
-                else {
-                    split.style.gridTemplateColumns = sizeA + " 5px " + sizeB;
-                    gutter.classList.add("xui-split-gutter-vertical");
-                    Split({
-                        columnGutters: [{
-                            track: 1,
-                            element: gutter
-                        }]
-                    })
-                }
-            }
-        }
-    </script>
-
-    <div xid="template-xui-split" class="xui-split">
-        <div>
-            <slot name="a"></slot>
-        </div>
-        <div class="xui-split-gutter"></div>
-        <div>
-            <slot name="b"></slot>
-        </div>
-    </div>
-
-    <xui-design xid="inject-style">
-        <style xui-no-dom>
-            .xui-split {
-                display: grid;
-                height: 100%;
-            }
-
-            .xui-split-gutter {
-                background-color: #c7c7c7
-            }
-
-            .xui-split-gutter-horizontal {
-                cursor: row-resize;
-            }
-
-            .xui-split-gutter-vertical {
-                cursor: col-resize;
-            }
-        </style>
-    </xui-design>
 
 </xui-factory>

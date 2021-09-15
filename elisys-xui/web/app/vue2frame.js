@@ -57,13 +57,13 @@ $xui.loadApplicationJS = () => {
 
 	//initStore();
 	//var modulesManager = null;
-	//if (globalThis.initialiseWinState!=null)
+	//if (globalThis.initialiseAppState!=null)
 	//{
-		console.debug("********************* initialiseWinState OK *******************************************");
-		var	modulesManager=globalThis.initialiseWinState();
+	console.debug("********************* initialiseAppState OK *******************************************");
+	var modulesManager = globalThis.initialiseAppState();
 	//}
 	// else {
-	// 	console.debug("********************* error initialiseWinState NOK *******************************************");
+	// 	console.debug("********************* error initialiseAppState NOK *******************************************");
 	// 	modulesManager = new VuexModuleManager();
 	// 	const main = modulesManager.addModule("main", $xui.rootdata);
 	// 	modulesManager.setStore(new Vuex.Store({
@@ -77,7 +77,7 @@ $xui.loadApplicationJS = () => {
 
 
 	$xui.mixinStore = modulesManager.getMixin();
-	$xui.modulesManager=modulesManager;
+	$xui.modulesManager = modulesManager;
 
 	$xui.rootdata = modulesManager.getStore().state.main;
 
@@ -107,7 +107,7 @@ $xui.loadApplicationJS = () => {
 	};
 
 	/*********************************** VUEJS ***********************************/
-	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-rootTemplate", $xui.computeDataBinding);
+	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-rootTemplate");
 
 	/*************************************************************************** */
 	//$xui.rootdata.toto="4444";
@@ -149,31 +149,45 @@ $xui.loadApplicationJS = () => {
 
 function initRouter() {
 
-	const defautRoute = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-route-default", $xui.computeDataBinding);
-	const defautRouteDef = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-route-default-0", $xui.computeDataBinding);
-	const routes = [
-		{
-			path: '/',
-			component: defautRoute,
-			children: [
-				{ path: '', component: defautRouteDef }
-			]
-		},
-		//	vue2CmpMgr.ComponentManager.getRoute('/foo', 'app/frameDesigner.html', 'routeA'),
-		//	vue2CmpMgr.ComponentManager.getRoute('/bar', 'app/frameDesigner.html', 'routeB'),
-	];
+	const routes = [];
+	var idxPage = 0;
+	var pageName = "page-" + idxPage;
 
-	var idx = 0;
-	while (true) {
-		var idTemplate = "xui-route-" + idx;
-		const template = document.querySelector("#" + idTemplate);
-		if (template == null) break;
+	while (document.querySelector("#" + pageName)!=null) {
+		const defautRouteDef = vue2CmpMgr.ComponentManager.getRouteFromTemplate(pageName, pageName + "-route-0");
+		var children = [
+			{ path: '', component: defautRouteDef }
+		]
 
-		console.info("create route <" + idTemplate + "> uri='/route" + idx + "'");
-		const infoRoute = globalThis.vue2CmpMgr.ComponentManager.getComponentFromTemplate(idTemplate, $xui.computeDataBinding);
-		routes[0].children.push({ path: 'route' + idx, component: infoRoute });
-		idx++;
+		var idxRoute = 1;
+		while (true) {
+			var idTemplate = pageName + "-route-" + idxRoute;
+			const page = document.querySelector("#" + pageName);
+			const template = page.content.querySelector("#" + idTemplate);
+			if (template == null) break;
+
+			console.info("create route <" + idTemplate + "> uri='/route" + idxRoute + "'");
+			const infoRoute = globalThis.vue2CmpMgr.ComponentManager.getRouteFromTemplate(pageName, idTemplate);
+			children.push({ path: 'route' + idxRoute, component: infoRoute });
+			idxRoute++;
+		}
+
+		const pageRoute = vue2CmpMgr.ComponentManager.getComponentFromTemplate(pageName);
+		var path = "/";
+		if (idxPage > 0) {
+			path = "/page" + idxPage;
+		}
+		routes.push(
+			{
+				path: path,
+				component: pageRoute,
+				children: children
+			},
+		);
+		idxPage++;
+		pageName = "page-" + idxPage;
 	}
+
 
 	const UnknownRoute = { template: '<div>unknown</div>' };
 	routes.push({ path: '*', component: UnknownRoute });
@@ -270,6 +284,7 @@ function initStore() {
 	console.debug("mixin store", $xui.mixinStore);
 }
 
+//------------------------------------------------------------------------------------------------------
 function initEventRouter() {
 	$xui.router.beforeEach((to, from, next) => {
 		next($xui.routeEnable); // next(false);

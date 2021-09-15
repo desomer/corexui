@@ -1,30 +1,10 @@
 <xui-factory version="1.0">
 
 	<xui-doc xid="page">
-		<xui-prop var="title" editor="text">titre</xui-prop>
-		<xui-prop var="nbroute" def="0" editor="int">nb route page</xui-prop>
-
-		<xui-prop var="colorApp" cat="vstyle" editor="text" link="https://materialdesignicons.com/">color nav global</xui-prop>
-		<xui-prop var="darkApp" cat="vstyle" editor="bool">dark theme</xui-prop>
-
-		<xui-prop var="withSysBar" editor="bool">System bar</xui-prop>
-		<xui-prop var="withAppBar" editor="bool">App bar</xui-prop>
-		<xui-prop var="withFooter" editor="bool">Footer bar</xui-prop>
-		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
-		<xui-prop var="withFloatAction" editor="bool">Floating Action Button</xui-prop>
-		<xui-prop var="fullRoot" editor="bool">Fill height</xui-prop>
-
-
-		<xui-prop var="withLeftNavigation" editor="bool">Left Navigation Drawer</xui-prop>
-		<xui-prop var=":isNavdrawerOpen" editor="text" bind-type="bool">var isNavdrawerOpen</xui-prop>
-
-		<xui-prop var="navPermanent" editor="bool">Nav permanent</xui-prop>
-		<xui-prop var="navTemporary" editor="bool">Force temporary nav on Desktop</xui-prop>
-		<xui-prop var="clipped-left" editor="bool">App bar clipped left</xui-prop>
-		<xui-prop var="inset-left" editor="bool">Footer bar inset (if Nav Drawer)</xui-prop>
+		<xui-prop var="nbpage" def="0" editor="int">nb page</xui-prop>
 		<xui-prop var="binding" cat="config" editor="text">Data Binding</xui-prop>
 
-		<xui-prop id="name">Page</xui-prop>
+		<xui-prop id="name">Application</xui-prop>
 		<xui-prop id="desc">L'application</xui-prop>
 	</xui-doc>
 
@@ -33,25 +13,22 @@
 	<!---------------------------------------------------------------------------------------->
 	<!--  gestion page autonome -->
 	<html xid="frame-vuetify-1" xui-mode="final;design;preview" style="height:100%;" xui-doc-id="page">
+		<head xid="header-vuetify" xui-no-design></head>
 
-	<head xid="header-vuetify" xui-no-design></head>
+		<body xid="body-vuetify" xui-no-design style="height:100%;"></body>
 
-	<body xid="body-vuetify" xui-no-design style="height:100%;"></body>
+		<xui-script-data></xui-script-data>
+		<xui-script-store></xui-script-store>
+		<style id="xui-style" xid="inject-style" xui-no-design></style>
+		<xui-no-dom xid="inject-after-body" xui-no-design></xui-no-dom>
 
-	<xui-script-data></xui-script-data>
-	<xui-script-store></xui-script-store>
-	<style id="xui-style" xid="inject-style" xui-no-design></style>
-	<xui-no-dom xid="inject-after-body" xui-no-design></xui-no-dom>
-
-	<xui-init-designer-js></xui-init-designer-js>
-	<xui-init-vuetify></xui-init-vuetify>
-	<xui-init-designer></xui-init-designer>
-
+		<xui-init-designer-js></xui-init-designer-js>
+		<xui-init-vuetify></xui-init-vuetify>
+		<xui-init-designer></xui-init-designer>
 	</html>
 
 	<!--  gestion du mode changement de template du mode designer -->
 	<xui-slot xid="frame-vuetify-1" xui-mode="template" xui-doc-id="page">
-
 		<body xid="body-vuetify" xui-no-design style="height:100%"></body>
 	</xui-slot>
 
@@ -84,7 +61,7 @@
 		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
 		<script defer src="./app/vuexHelper.js"></script>
 
-		<xui-slot xid="inject-other-header" xui-no-design></xui-slot>
+		<xui-slot xid="inject-other-header" style-slot="display:none" xui-no-design></xui-slot>
 	</xui-design>
 
 	<div xid="viewport-mobile" xui-no-dom>
@@ -94,7 +71,6 @@
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 	</div>
-
 
 	<!------------------------------------- APP VUETIFY ---------------------------------------->
 	<xui-design xid="body-vuetify">
@@ -116,36 +92,52 @@
 			<xui-temporary xid="xui-temporary-slot" xui-no-design></xui-temporary>
 		</template>
 
-		<!-- la route page par defaut -->
-		<template id="xui-route-default">
-			<v-app xid="appcontent-route-0">
-			</v-app>
-		</template>
-
-		<!-- la route secondaire par defaut -->
-		<template id="xui-route-default-0">
-			<vue-content-1 xid="contentpage"></vue-content-1>
-		</template>
-
-		<!-- les autres route -->
-		<xui-route-template xid="xui-route" xui-forvar="nbroute@0+"></xui-route-template>
+		<!-- les pages -->
+		<xui-page-template xid="page" xui-for-nbvar="nbpage@0+"></xui-page-template>
 
 	</xui-design>
 
 	<!------------------------------------- V-APP MAIN CONTENT ---------------------------------------->
-	<xui-design xid="appcontent-route-0" xui-no-design>
-		<vue-systembar-1 xid="systembar" xui-if=[[withSysBar@0+]]></vue-systembar-1>
-		<vue-nav-drawer-1 xid="navdrawerleft" xui-if=[[withLeftNavigation@0+]]></vue-nav-drawer-1>
-		<vue-apptoolbar-1 xid="toolbar" xui-if=[[withAppBar@0+]]></vue-apptoolbar-1>
-		<vue-router-content-1 class="[[fullRoot@0+]]" xid="rooter"></vue-router-content-1>
-		<vue-footer-1 xid="footer" xui-if=[[withFooter@0+]]></vue-footer-1>
-		<vue-bottom-nav-1 xid="bottom-nav" xui-if=[[withBottomNavigation@0+]]></vue-bottom-nav-1>
+	<xui-doc xid="xui-app-1">
+		<xui-prop var="title" editor="text">Page title</xui-prop>
+	
+		<xui-prop var="colorApp" cat="vstyle" editor="text" link="https://materialdesignicons.com/">color nav global</xui-prop>
+		<xui-prop var="darkApp" cat="vstyle" editor="bool">dark theme</xui-prop>
+
+		<xui-prop var="withSysBar" editor="bool">System bar</xui-prop>
+		<xui-prop var="withAppBar" editor="bool">App bar</xui-prop>
+		<xui-prop var="withFooter" editor="bool">Footer bar</xui-prop>
+		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
+		<xui-prop var="withFloatAction" editor="bool">Floating Action Button</xui-prop>
+
+
+		<xui-prop var="withLeftNavigation" editor="bool">Left Navigation Drawer</xui-prop>
+		<xui-prop var=":isNavdrawerOpen" editor="text" cat="event:model" bind-type="bool">var isNavdrawerOpen</xui-prop>
+
+		<xui-prop var="navPermanent" editor="bool">Nav permanent</xui-prop>
+		<xui-prop var="navTemporary" editor="bool">Force temporary nav on Desktop</xui-prop>
+		<xui-prop var="clipped-left" editor="bool">App bar clipped left</xui-prop>
+		<xui-prop var="inset-left" editor="bool">Footer bar inset (if Nav Drawer)</xui-prop>
+
+		<xui-prop id="name">Page</xui-prop>
+		<xui-prop id="desc">La page</xui-prop>
+	</xui-doc>
+
+
+	<v-app xid="xui-app-1" style="width:100vw">
+		<vue-systembar-1 xid="[[parent-xid]]-systembar" xui-if=[[withSysBar@0+]]></vue-systembar-1>
+		<vue-nav-drawer-1 xid="[[parent-xid]]-navdrawerleft" xui-if=[[withLeftNavigation@0+]]></vue-nav-drawer-1>
+		<vue-apptoolbar-1 xid="[[parent-xid]]-toolbar" xui-if=[[withAppBar@0+]]></vue-apptoolbar-1>
+		<vue-router-content-1 xid="[[parent-xid]]-router"></vue-router-content-1>
+		<vue-footer-1 xid="[[parent-xid]]-footer" xui-if=[[withFooter@0+]]></vue-footer-1>
+		<vue-bottom-nav-1 xid="[[parent-xid]]-bottom-nav" xui-if=[[withBottomNavigation@0+]]></vue-bottom-nav-1>
 		<v-fab-transition xui-if=[[withFloatAction@0+]]>
 			<xui-slot style-slot="position:absolute; bottom:20px;  z-index:100" xui-reloader=true
-				xid="main-float-action" xui-slot-name="float action"></xui-slot>
+				xid="[[parent-xid]]-main-float-action" xui-slot-name="float action"></xui-slot>
 		</v-fab-transition>
-	</xui-design>
+	</v-app>
 
+	<!------------------------------------- ROUTER------------------------------------------->
 	<xui-doc xid="vue-router-content-1">
 		<xui-prop id="name">Router</xui-prop>
 		<xui-prop id="desc">Router de la page</xui-prop>
@@ -304,6 +296,8 @@
 
 		<xui-prop id="name">Content</xui-prop>
 		<xui-prop id="desc">Contenu slot</xui-prop>
+
+		<xui-prop var="@before" cat="event:router" editor="text">Before</xui-prop>
 	</xui-doc>
 
 
@@ -430,7 +424,8 @@
 
 
 	<!------------------------------------------------------------------------->
-	<script xid="xui-script-data">			$xui = {};
+	<script xid="xui-script-data">			
+			$xui = {};
 			$xui.rootdata = {};
 			// ----------------------------------------------
 			$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler

@@ -1,34 +1,35 @@
 export class ComponentManager {
 
-    static getComponentFromTemplate(idTemplate, computeDataBinding) {
+    static getComponentFromTemplate(idTemplate) {
         const template = document.querySelector("#" + idTemplate);
         if (template == null)
             return {
-                template: "<div>no template</div>"
+                template: "<div>no template "+idTemplate+"</div>"
             };
         else
           {
-            // if ($xui.disableVuex)
-            // {   // pour que le watch fonctionne
-            //     return {
-            //         template: template.innerHTML,
-            //         data: () => { return $xui.rootdata; },
-            //         methods : $xui.storeAction,
-            //         computed: {
-            //             $xui: () => $xui,  // pour les @click="$xui.doXXX()"
-            //             ...computeDataBinding
-            //         }
-            //     }
-            // }
-            // else {
                 return {
                     template: template.innerHTML,
                     mixins: [$xui.mixinStore],
                 }
-           // }
-
           }
+    }
 
+    static getRouteFromTemplate(idPage, idTemplate) {
+        const page = document.querySelector("#" + idPage);
+        const template = page.content.querySelector("#" + idTemplate);
+        template.remove();
+        if (template == null)
+            return {
+                template: "<div>no template "+idTemplate+"</div>"
+            };
+        else
+          {
+                return {
+                    template: template.innerHTML,
+                    mixins: [$xui.mixinStore],
+                }
+          }
     }
 
     // static getRoute(path, file, xid) {

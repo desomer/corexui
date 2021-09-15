@@ -54,7 +54,12 @@ html::-webkit-scrollbar {
     text-align: center;
 }
 
-#rootFrame { width:100%; height:100%; position:relative; border: 0px; padding: 0px; margin: 0px;}
+#rootFrame { width:100%; height:100%; 
+    position:relative; border: 0px; 
+    padding: 0px; margin: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+}
 
 
 /***************************************************************/
@@ -272,3 +277,7 @@ pre > code {
     resize: none;
     height: 86px;
 }*/
+
+#jsonState .ace_content {
+    background-color: rgb(235 235 235);
+}

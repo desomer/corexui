@@ -72,7 +72,7 @@ export class EventManager {
                 $xui.modeDisplaySelection = true;
 
                 // se repositionne sur l'onglet 0
-                if ($xui.rootdata.activeAction!=0 && $xui.rootdata.activeAction!=1)
+                if ($xui.rootdata.activeAction > 2)
                     $xui.rootdata.activeAction = 0;
 
                 // 250 = delay d'animation des v-tabs
@@ -93,10 +93,10 @@ export class EventManager {
                 if ($xui.dragMoveItem != null) {
                     // gestion de drag entre slot
                     if (data.ctrlKey)
-                     $xui.copyCmpOnDrap(data);
+                        $xui.copyCmpOnDrap(data);
                     else
-                     $xui.moveTo(data);
-                   
+                        $xui.moveTo(data);
+
                 }
             }
             else if (data.action == "ctrlP") {
@@ -127,6 +127,15 @@ export class EventManager {
                 $xui.SelectorManager.unDisplaySelector();
                 $xui.updateDirectProperty(data.value, data.variable, data.xid);
             }
+            else if (data.action == "displayMessage") {
+                $xui.rootdata.messages.push(data.value);
+                this.setTimeout(() => {
+                    var index = $xui.rootdata.messages.indexOf(data.value);
+                    if (index !== -1) {
+                        $xui.rootdata.messages.splice(index, 1);
+                    }
+                }, data.value.timeout);
+            }
             // gestion d'un hot load reloader
             else if (data.action == "get template reloader") {
                 var infoFileCmp = $xui.pageDesignManager.getInfoFile('template');
@@ -143,10 +152,10 @@ export class EventManager {
             }
             else if (data.action == "return getInfoForSelector") {
                 //console.debug("*******>", data);
-                doPromiseJS("getInfoForSelectorOnIFrame"+data.info.idx, data.ret);
+                doPromiseJS("getInfoForSelectorOnIFrame" + data.info.idx, data.ret);
             }
 
-            
+
         });
     }
 }
