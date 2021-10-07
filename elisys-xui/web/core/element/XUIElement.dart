@@ -384,7 +384,7 @@ class XUIElementHTML extends XUIElement {
       }
 
       if (attrName.startsWith("[[event")) {
-        print("******************* event > " + keyAttr);
+        //print("******************* event > " + keyAttr);
         XUIElementHTML elem = this;
         if (attrName == "[[event@-1]]") {
           elem = firstChildNoText()!;
@@ -392,10 +392,10 @@ class XUIElementHTML extends XUIElement {
 
         elem.propertiesXUI?.forEach((key, value) {
           if (key.startsWith("@")) {
-            print("******************* event prop id=" +
-                key +
-                "=>" +
-                value.content.toString());
+            // print("******************* event prop id=" +
+            //     key +
+            //     "=>" +
+            //     value.content.toString());
             buffer.html.write(" " +
                 key +
                 "=\"\$mth('" +

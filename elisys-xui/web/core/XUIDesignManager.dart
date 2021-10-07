@@ -462,7 +462,7 @@ class XUIDesignManager {
               action: "surroundRight",
               type: "flow",
               icon: "mdi-table-row",
-              title: "Add right (surroundRight)");
+              title: "Add flow");
           ret.add(act);
         } else {
           // var ti = (design.docInfo.addRemove ?? "noAddRemove") +

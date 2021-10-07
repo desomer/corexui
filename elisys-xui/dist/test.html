@@ -1,0 +1,229 @@
+<html style="height:100%;">
+
+<head>
+    <title>PWA Designer</title>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+    </meta>
+    <meta name="mobile-web-app-capable" content="yes">
+    </meta>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    </meta>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    </link>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    </link>
+    <link rel="preconnect" href="fonts.googleapis.com">
+    </link>
+    <link rel="dns-prefetch" href="fonts.googleapis.com">
+    </link>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/spinkit@2.0.1/spinkit.min.css">
+    </link>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    </link>
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons"
+        as="style" onload="this.onload=null;this.rel='stylesheet'">
+    </link>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    </link>
+    <script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <template id="tmpRoot">
+        <div id="app">
+            <div><label>test <input v-model='Test1Module.obj.variable'></label>{{ Test1Module.obj.variable }}</div>
+
+            <div><label>variableobjbis <input v-model="Test2Module$_obj_variableBis"></label>{{
+                Test2Module$_obj_variableBis }}</div>
+            <div><label>variablebis <input v-model="Test2Module$_variableBis"></label> {{ Test2Module$_variableBis }}
+            </div>
+
+            <div>{{$store.state.Test2Module.variableBis}}</div>
+            <textarea
+                style="width: 800px; height: 300px; border: 1px solid;">{{$store.state.Test2Module.text}}</textarea>
+
+            <button type="button" @click="$post('main/HOT_RELOAD', $event)">reload</button>
+
+            <div v-for="address in Test1Module$_addresses">
+                <label>ZIP <input v-model="address.zip"></label>
+                <label>Town <input v-model="address.town"></label>
+            </div>
+        </div>
+    </template>
+</body>
+
+<script type="module">
+    import Vuex from "https://cdn.jsdelivr.net/npm/vuex@3.1.2/dist/vuex.esm.browser.min.js";
+    import "./app/vueHelper.js"
+    import "./app/vuexHelper.js"
+
+    //const { get, sync, call } = await require('https://cdn.jsdelivr.net/npm/vuex-pathify@1.5.1/dist/vuex-pathify.min.js');
+
+    globalThis.require = globalThis.requireXUI;
+
+    //const logger = await require('https://cdn.jsdelivr.net/npm/vuex-logger-plugin@1.0.1/index.min.js');
+    await globalThis.require('https://cdn.jsdelivr.net/npm/vuex-map-fields@1.4.1/dist/index.min.js');
+
+
+    const logger = function (store) {
+        store.subscribe(function (event, store) {
+            console.log("%c MUTATION " + event.type + " ", "color: #03A9F4; font-weigth: bold; background-color: #eee", event.payload, store);
+        });
+    };
+
+    Vue.use(Vuex);
+    Vue.config.productionTip = false;
+
+    /***************************************************************************************/
+    const stateTest1Module = {
+        obj: {
+            variable: "ok2"
+        },
+        addresses: [
+            {
+                zip: '12345',
+                town: 'Foo Town',
+            },
+            {
+                zip: '54321',
+                town: 'Bar Town',
+            },
+        ],
+    };
+
+    const stateTest2Module = {
+        variableBis: "vb",
+        obj: {
+            variableBis: "okbis"
+        },
+        text: null
+    };
+
+    const hotReload = (a) => {
+        console.debug("hotReload", a, this);
+
+        const Test2Module = modulesManager.addModule("Test2Module", {
+            variableBis: "hot",
+            obj: {
+                variableBis: "hotbis"
+            }
+        });
+
+        Test2Module.actions =
+        {
+            doSomething() {
+                console.debug("doSomething");
+                mgr.getStore().state.Test1Module.addresses.splice(0, 2);
+            }
+        }
+
+        modulesManager.reload();
+
+        //  var ret = globalThis.store.getters["Test2Module/getField"]("variableBis");
+        //  globalThis.store.commit("Test2Module/updateField", { path: "variableBis", value: "hot12" })
+
+        modulesManager.getStore().dispatch("Test2Module/doSomething");
+
+        console.debug("ret =", modulesManager.getStore().state.Test2Module.variableBis);
+
+    }
+
+    /***************************************************************************************/
+    const moduleManager = new VuexModuleManager();
+    const Test1Module = moduleManager.addModule("Test1Module", stateTest1Module);
+    const Test2Module = moduleManager.addModule("Test2Module", stateTest2Module);
+    const Test3Module = moduleManager.addModule("main", {});
+    moduleManager.addAction("main", "HOT_RELOAD", hotReload.toString());
+
+    Test2Module.state.text = moduleManager.getCode();
+    const code = moduleManager.getCode();    // code avec le code en code
+    eval(code);
+
+    const mgr = globalThis.initialiseAppState();
+
+    /**********************************************************/
+    // const HOT_RELOAD = "HOT_RELOAD";
+    // Test3Module.actions = {
+    //     [HOT_RELOAD]: hotReload   // -> dispatch('Test3Module/hotReload')
+    // };
+
+    // moduleManager.setStore(new Vuex.Store({
+    //     modules: {
+    //         Test1Module,
+    //         Test2Module,
+    //         Test3Module
+    //     },
+    //     plugins: [logger],
+    //     strict: true
+    // }));
+
+    // moduleManager.getStore().registerModule('Test1Module', Test1Module, { preserveState: false })
+    // moduleManager.getStore().registerModule('Test2Module', Test2Module, { preserveState: false })
+    // moduleManager.getStore().registerModule('Test3Module', Test3Module, { preserveState: false })
+
+
+    mgr.getStore().watch((state) => {
+        return state.Test1Module.obj.variable;
+    }, (oldValue, newValue) => {
+        console.log('search string is changing');
+        console.log(oldValue);
+        console.log(newValue);
+    })
+
+
+    const mixinField = {
+        computed: {
+            ...Test1Module.sync(['obj.variable']),
+            ...Test1Module.syncArray(['addresses']),
+            ...Test2Module.sync(["obj.variableBis", "variableBis"]),
+        },
+        methods: {},
+    }
+
+    const idTemplate = "tmpRoot";
+    const template = document.querySelector("#" + idTemplate);
+    template.remove();
+
+    const RootComponent = {
+        template: template.innerHTML,
+        mixins: [mixinField, moduleManager.getMixin()],
+        methods: {},
+        computed: {}
+    };
+
+    globalThis.vueCmp = new Vue({
+        el: '#app',
+        components: { RootComponent },
+        store: mgr.getStore(),
+        template: "<RootComponent ref='root'></RootComponent>",
+    });
+
+    console.debug(vueCmp);
+
+    /**********************************************************/
+
+    const xuideepClone = obj => {
+        if (obj === null) return null;
+        let clone = Object.assign({}, obj);
+        Object.keys(clone).forEach(
+            key =>
+            (clone[key] =
+                typeof obj[key] === 'object' ? deepClone(obj[key]) : obj[key])
+        );
+        if (Array.isArray(obj)) {
+            clone.length = obj.length;
+            return Array.from(clone);
+        }
+        return clone;
+    };
+
+</script>
+
+</html>

@@ -36,7 +36,7 @@
     <!--------------------------  XUI-FOR   ------------------------------->
     <xui-doc xid="xui-for">
         <xui-prop id="name">For</xui-prop>
-        <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
+        <xui-prop id="icon">mdi-content-copy</xui-prop>
         <xui-prop id="desc">Un block</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop id="favorite">listitem</xui-prop>
@@ -46,13 +46,13 @@
     </xui-doc>
 
     <template xid="xui-for" v-for="([[:varItems]]_item, [[:varItems]]_index) in [[:varItems]]">
-        <xui-slot style-slot="height:100%" xid="[[parent-xid]]-for" xui-slot-name="For block"></xui-slot>
+        <xui-slot style-slot="height:100%" xid="[[parent-xid]]-for" xui-slot-name="For slot"></xui-slot>
     </template>
 
     <!--------------------------  XUI-ITERATOR   ------------------------------->
     <xui-doc xid="xui-iterator-1">
         <xui-prop id="name">Iterator</xui-prop>
-        <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
+        <xui-prop id="icon">mdi-reiterate</xui-prop>
         <xui-prop id="desc">Un block</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop id="favorite">listitem</xui-prop>
@@ -61,27 +61,38 @@
         <xui-prop var=":varItems" editor="var" def="items" bind-type="array">items var name</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
 
-        <xui-prop var="classBlock" cat="class" editor="class">class iterable</xui-prop>
-        <xui-prop var="styleBlock" cat="style" def="width:50%" editor="style">style iterable</xui-prop>
-
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
+
+    <xui-doc xid="xui-iterator-1-item">
+        <xui-prop id="name">iterator items</xui-prop>
+        <xui-prop var="width" cat="design" editor="text">width (%, auto)</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="div:xui-iterator-1-item">
+        <xui-prop id="name">iterator slot</xui-prop>
+    </xui-doc>
+
+
+    <div xid="xui-iterator-1-item" -style="width:[[width]];[[style]]" class="[[class]]">
+        <xui-slot xid="[[parent-xid]]-slot" xui-slot-name="iterator slot"></xui-slot>
+    </div>
 
     <div xid="xui-iterator-1"
         class="[[fill-height]] d-flex align-start flex-wrap align-content-start [[class]]"
         -style="[[style]]">
         <template v-for="([[:varItems@1]]_item, [[:varItems@1]]_index) in [[:varItems@1]]">
-            <div -style=[[styleBlock@2]] class="[[classBlock@2]]">
-                <xui-slot xid="[[parent-xid]]-iterator" xui-slot-name="For block"></xui-slot>
-            </div>
+            <xui-iterator-1-item xui-width="100%" xid="[[parent-xid]]-item"></xui-iterator-1-item>
         </template>
     </div>
 
     <!--------------------------  XUI-IF-ELSE   ------------------------------->
     <xui-doc xid="xui-if-else">
         <xui-prop id="name">If elseIf else</xui-prop>
-        <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
+        <xui-prop id="icon">mdi-order-bool-descending-variant</xui-prop>
         <xui-prop id="desc">Un block</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop id="favorite">listitem</xui-prop>
@@ -138,7 +149,6 @@
         </style>
     </xui-design>
 
-
     <!--------------------------  XUI-FLOW   ------------------------------->
     <xui-doc xid="xui-flow">
         <xui-prop id="name">Flow</xui-prop>
@@ -160,141 +170,5 @@
         </xui-slot>
     </xui-slot>
 
-    <!--------------------------  XUI-ROUTE-template ------------------------------->
-    <xui-doc xid="template:xui-route-template">
-        <xui-prop id="name">Route</xui-prop>
-        <xui-prop id="icon">mdi-view-day</xui-prop>
-        <xui-prop id="desc">Une session</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-    </xui-doc>
-
-
-    <template xid="xui-route-template" xui-for="idxroute" xui-no-dom>
-        <template xui-doc-id="xui-route-template-item" id="[[parent-xid]]-[[idxroute@0+]]"
-            xid="[[parent-xid]]-route-[[idxroute@0+]]">
-            <xui-slot xui-reloader=true xui-slot-full xid="[[parent-xid]]-content-[[idxroute@0+]]"
-                xui-slot-name="route [[idxroute@0+]]">
-            </xui-slot>
-        </template>
-    </template>
-
-
-    <!-------------------------------  SPLIT 1  ------------------------------->
-
-    <xui-doc xid="xui-split-1">
-        <xui-prop id="name">Split</xui-prop>
-        <xui-prop id="icon">mdi-arrow-split-vertical</xui-prop>
-        <xui-prop id="desc">Un split</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-
-        <xui-prop var="column" editor="bool">column</xui-prop>
-        <xui-prop var="sizeA" def="1fr" editor="text">size A (px, fr, %)</xui-prop>
-        <xui-prop var="sizeB" def="1fr" editor="text">size B (px, fr, %)</xui-prop>
-
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-    </xui-doc>
-
-    <xui-doc xid="template:xui-split-1">
-        <xui-prop id="name">Split Cell</xui-prop>
-        <xui-prop id="desc">Contenu du split</xui-prop>
-        <xui-prop id="favorite">container</xui-prop>
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-    </xui-doc>
-
-    <v-xui-split xid="xui-split-1" column="[[column@0]]" sizea="[[sizeA@0]]" sizeb="[[sizeB@0]]" class="[[class@0]]"
-        -style="[[style@0]]">
-        <template v-slot:a>
-            <xui-slot xid="[[parent-xid]]-splitA" xui-slot-name="split A" class="[[class@1]]" -style="[[style@1]]"
-                xui-slot-full xui-reloader=true></xui-slot>
-        </template>
-        <template v-slot:b>
-            <xui-slot xid="[[parent-xid]]-splitB" xui-slot-name="split B" class="[[class@1]]" -style="[[style@1]]"
-                xui-slot-full xui-reloader=true></xui-slot>
-        </template>
-    </v-xui-split>
-
-
-    <!-------------------------------------  V-XUI-SPLIT  ------------------------------------->
-    <xui-design xid="inject-other-header">
-        <script defer src="https://unpkg.com/split-grid/dist/split-grid.js"></script>
-    </xui-design>
-
-    <xui-design xid="xui-script-data">
-        <script xui-no-dom xui-trim-content>
-            $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
-                new vue2CmpMgr.ComponentManager().registerVueComponent("v-xui-split", 'app/vue2CmpLayout.html',
-                    "vue-xui-split");
-            }
-            );
-        </script>
-    </xui-design>
-
-    <script xid="vue-xui-split" xui-no-dom>
-        export default {
-            template: <template-xui-split xui-convert-json></template-xui-split>,
-            props: ["column", "sizea", "sizeb"],
-            mounted: function () {
-                var sizeA = this.sizea == undefined ? "1fr" : this.sizea;
-                var sizeB = this.sizeb == undefined ? "1fr" : this.sizeb;
-
-                var split = this.$el;
-                var gutter = split.querySelector(':scope>.xui-split-gutter');
-
-                if (this.column == undefined) {
-                    split.style.gridTemplateRows = sizeA + " 5px " + sizeB;
-                    gutter.classList.add("xui-split-gutter-horizontal");
-                    Split({
-                        rowGutters: [{
-                            track: 1,
-                            element: gutter
-                        }]
-                    })
-                }
-                else {
-                    split.style.gridTemplateColumns = sizeA + " 5px " + sizeB;
-                    gutter.classList.add("xui-split-gutter-vertical");
-                    Split({
-                        columnGutters: [{
-                            track: 1,
-                            element: gutter
-                        }]
-                    })
-                }
-            }
-        }
-    </script>
-
-    <div xid="template-xui-split" class="xui-split">
-        <div>
-            <slot name="a"></slot>
-        </div>
-        <div class="xui-split-gutter"></div>
-        <div>
-            <slot name="b"></slot>
-        </div>
-    </div>
-
-    <xui-design xid="inject-style">
-        <style xui-no-dom>
-            .xui-split {
-                display: grid;
-                height: 100%;
-            }
-
-            .xui-split-gutter {
-                background-color: #c7c7c7
-            }
-
-            .xui-split-gutter-horizontal {
-                cursor: row-resize;
-            }
-
-            .xui-split-gutter-vertical {
-                cursor: col-resize;
-            }
-        </style>
-    </xui-design>
 
 </xui-factory>

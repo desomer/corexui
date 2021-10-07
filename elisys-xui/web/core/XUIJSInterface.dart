@@ -130,14 +130,20 @@ class BindObj {
 @JS()
 @anonymous
 class TreeSlot {
-  external int get id;
-  external set id(int id);
+  external String get id;
+  external set id(String id);
   external String get name;
   external set name(String name);
   external List? get children;
   external set children(List? name);
   external bool get isSlot;
   external set isSlot(bool iss);
+  external String get icon;
+  external set icon(String ic);
+  external String get toPath;
+  external set toPath(String path);
+  external TreeSlot get parent;
+  external set parent(TreeSlot p);
 }
 
 @JS()

@@ -156,12 +156,12 @@
         <xui-prop id="desc">Flows</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop var="nb" def="2" editor="int">nb slot</xui-prop>
-
     </xui-doc>
 
     <xui-doc xid="xui-no-dom:xui-flow">
         <xui-prop id="name">Flow item</xui-prop>
         <xui-prop id="desc">Un Slot</xui-prop>
+        <xui-prop id="icon">mdi-transfer-right</xui-prop>
         <xui-prop id="add-remove">incNb</xui-prop>
     </xui-doc>
 
@@ -170,48 +170,42 @@
         </xui-slot>
     </xui-slot>
 
-        <!--------------------------  XUI-PAGE-TEMPLATE ------------------------------->
-        <xui-doc xid="xui-page-template">
-            <xui-prop id="name">Page Container</xui-prop>
-            <xui-prop id="icon">mdi-view-day</xui-prop>
-            <xui-prop id="desc">Une session</xui-prop>
-            <xui-prop id="componentAs">container</xui-prop>
-        </xui-doc>
-    
-        <template xid="xui-page-template" xui-for="idxpage" xui-no-dom>
-            <template xid="[[parent-xid]]-[[idxpage@0+]]" xui-no-design id="[[parent-xid]]-[[idxpage@0+]]">
-                <xui-app-1 xui-reloader=true xui-slot-full xid="[[parent-xid]]-content"
-                    xui-slot-name="Page [[idxpage@0+]]">
-                    <xui-route-template xid="page-[[idxpage@0+]]-route" xui-for-nbvar="nbroute@0+"></xui-route-template>
-                </xui-app-1>
-                <!-- les autres route -->
-            </template>
- 
-        </template>
+    <!--------------------------  XUI-SLOT   ----------------------------->
+    <div xid="xui-div-slot" class="xui-class-slot"></div>
 
-    <!--------------------------  XUI-ROUTE-TEMPLATE ------------------------------->
-    <xui-doc xid="xui-route-template">
-        <xui-prop id="name">Route Container</xui-prop>
-        <xui-prop id="icon">mdi-view-day</xui-prop>
-        <xui-prop id="desc">Une session</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-        <xui-prop var="nbroute" def="0" editor="int">nb route page</xui-prop>
-    </xui-doc>
+    <xui-design xid="inject-style">
+        <style xui-no-dom>
+            .xui-class-slot-full {
+                height: 100%;
+                width: 100%;
+            }
+        </style>
+    </xui-design>
 
-    <xui-doc xid="template:xui-route-template">
-        <xui-prop id="name">Route</xui-prop>
-        <xui-prop id="icon">mdi-view-day</xui-prop>
-        <xui-prop id="desc">Une session</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-    </xui-doc>
+    <xui-design xid="inject-style" xui-mode="design;template">
+        <style xui-no-dom>
+            .xui-class-slot {
+                border: 1px dashed lightgray;
+                box-sizing: border-box;
+                min-height: 15px;
+                min-width: 15px;
+                text-decoration: underline dotted;
+                font-style: italic;
+                user-select: none;
+                cursor: pointer;
+                opacity: .7;
+                white-space: nowrap;
+                overflow: hidden;
+            }
 
+            .xui-class-slot:hover {
+                border: 1px dashed blue;
+            }
 
-    <template xid="xui-route-template" xui-for="idxroute" xui-forvar="nbroute@0+" xui-no-dom  xui-slot-name="Page [[idxpage@0+]] Router"> 
-        <template xid="[[parent-xid]]-[[idxroute@0+]]" id="[[parent-xid]]-[[idxroute@0+]]" xui-no-design>
-            <xui-slot xui-reloader=true xui-slot-full xid="[[parent-xid]]-content"
-                xui-slot-name="route [[idxroute@0+]]">
-            </xui-slot>
-        </template>
-    </template>
-
+            .xui-class-dragover {
+                border: 1px dashed blue !important;
+            }
+        </style>
+    </xui-design>
+   
 </xui-factory>

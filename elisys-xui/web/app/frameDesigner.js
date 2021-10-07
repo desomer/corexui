@@ -401,6 +401,81 @@ $xui.updateDirectProperty = (value, variable, xid) => {
     }
 }
 
+//--------------------------------------------------------------------------------------------------------
+const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+function getPathTo(pathTo) {
+    var parent = $xui.rootdata.activeSlot[0];
+    var hasRouteDefine = false;
+    do {
+        if (parent.toPath != null) {
+
+            if (parent.toPath.startsWith("router:")) {
+                if (!hasRouteDefine) {
+                    pathTo.unshift(parent.toPath);
+                    hasRouteDefine = true;
+                }
+
+            }
+
+            else {
+                pathTo.unshift(parent.toPath);
+            }
+        }
+        parent = parent.parent;
+    } while (parent != null);
+}
+
+$xui.selectCmp = async () => {
+    console.debug($xui.rootdata.activeSlot);
+
+    if ($xui.rootdata.activeSlot.length>0)
+    {
+        var pathTo = [];
+        getPathTo(pathTo);
+
+        for (const action of pathTo) {
+            if (action.startsWith("router:"))
+            {
+                var url = action.substring(7);
+                await $xui.goToRoute(url);
+            }
+            if (action.startsWith("click:"))
+            {
+                var xid = action.substring(6);
+                await $xui.goToClick(xid);
+            }
+        };
+
+        var xid = $xui.rootdata.activeSlot[0].id;
+        $xui.SelectorManager.displaySelectorByXid(xid, xid, false);
+    }
+}
+
+$xui.goToClick =async (xid) => {
+    var node = document.querySelector("#rootFrame").contentWindow.document.querySelectorAll("[data-xid-slot=" + xid + "]");
+    node[0].click();
+    await pause(300);
+}
+
+$xui.goToRoute =async (url) => {
+    if (url.endsWith("/route0")) {
+        url = url.substring(0, url.length - 7);
+    }
+    if (url.startsWith("/page0")) {
+        url = url.substring(6, url.length);
+    }
+    if (url == "") {
+        url = "/";
+    }
+    var router = document.querySelector("#rootFrame").contentWindow.$xui.router;
+
+    if (router.currentRoute.path != url) {
+        console.debug("route to", url, router.currentRoute.path);
+        router.push(url);
+        await pause(400);
+    }
+}
 
 /***************************************************************************************************************/
 $xui.getUrlApp = () => {

@@ -96,15 +96,15 @@
         <xui-prop id="icon">mdi-table-row</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
 
-        <xui-prop var="nb" def="2" editor="int">nb col dans la ligne</xui-prop>
+        <xui-prop var="nb" def="1" editor="int">nb col dans la ligne</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
 
-        <xui-prop var="justify" editor="combo" 
+        <xui-prop var="justify" cat="vstyle" editor="combo" 
             list='["start", "center", "end", "space-between", "space-around"]'
         > justify (horiz.)</xui-prop>
-        <xui-prop var="align" editor="combo" 
+        <xui-prop var="align" cat="vstyle" editor="combo" 
             list='["start", "center", "end", "baseline", "stretch"]'>align cell (vert.)</xui-prop>
-        <xui-prop var="align-content" editor="combo"
+        <xui-prop var="align-content" cat="vstyle" editor="combo"
             list='["start", "center", "end", "space-between", "space-around", "stretch"]'>align content (vert.)</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
@@ -117,11 +117,12 @@
         <xui-prop var="cols" editor="text">Larg. de col (1-12/auto)</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var=":varitems" cat="event:model" editor="var" bind-type="array">items var name</xui-prop>
     </xui-doc>
 
     <v-row xid="xui-row-1" class="[[fill-height]] [[class]]" xui-for="idxc" -style="[[style]]" no-gutters
-        align="[[align]]" align-content="[[align-content]]" justify="[[justify]]">
-        <v-col class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]">
+        -align="[[align]]" align-content="[[align-content]]" justify="[[justify]]">
+        <v-col class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]"  if:[[:varitems@-1]]:v-for="([[:varitems@-1]]_item, [[:varitems@-1]]_index) in [[:varitems@-1]]">
             <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" style-slot="height:100%" xui-slot-name="row col [[idxc@3]]">
             </xui-slot>
         </v-col>
@@ -137,11 +138,11 @@
         <xui-prop var="nb" def="2" editor="int">nb row dans la colonne</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
 
-        <xui-prop var="justify" editor="combo" list='["start", "center", "end", "space-between", "space-around"]'
+        <xui-prop var="justify" cat="vstyle" editor="combo" list='["start", "center", "end", "space-between", "space-around"]'
         >justify (vert.)</xui-prop>
-        <xui-prop var="align" editor="combo" list='["start", "center", "end", "baseline", "stretch"]'
+        <xui-prop var="align" cat="vstyle" editor="combo" list='["start", "center", "end", "baseline", "stretch"]'
         >align cell (horiz.)</xui-prop>
-        <xui-prop var="align-content" editor="combo"
+        <xui-prop var="align-content" cat="vstyle" editor="combo"
             list='["start", "center", "end", "space-between", "space-around", "stretch"]'
             >align content (horiz.)</xui-prop>
 
@@ -184,8 +185,8 @@
         <xui-prop var="nb" def="2" editor="int">nb de lignes</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
         <xui-prop var="fluid" editor="bool">fluid (fill width)</xui-prop>
-        <xui-prop var="dense" editor="bool">dense gutters</xui-prop>
-        <xui-prop var="no-gutters" editor="bool">no gutters</xui-prop>
+        <xui-prop var="dense" cat="vstyle" editor="bool">dense gutters</xui-prop>
+        <xui-prop var="no-gutters" cat="vstyle" editor="bool">no gutters</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
@@ -196,15 +197,15 @@
         <xui-prop id="desc">Une ligne</xui-prop>
         <xui-prop var="nb" editor="int">nb col dans la ligne</xui-prop>
 
-        <xui-prop var="justify" editor="combo" 
+        <xui-prop var="justify" cat="vstyle" editor="combo" 
         list='["start", "center", "end", "space-between", "space-around"]'
         >justify (horiz.)</xui-prop>
 
-        <xui-prop var="align" editor="combo" 
+        <xui-prop var="align" cat="vstyle" editor="combo" 
         list='["start", "center", "end", "baseline", "stretch"]'
         >align cell (vert.)</xui-prop>
 
-        <xui-prop var="align-content" editor="combo"
+        <xui-prop var="align-content" cat="vstyle" editor="combo"
             list='["start", "center", "end", "space-between", "space-around", "stretch"]'
         >align content (vert.)</xui-prop>
 
@@ -232,13 +233,13 @@
     <xui-slot xid="xui-row-grid-responsive" xui-for="idxc">
         <v-col class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]">
             <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" style-slot="height:100%"
-                xui-slot-name="row [[idxr@5]] col [[idxc@3]]"></xui-slot>
+                xui-slot-name="r[[idxr@5]] c[[idxc@3]]"></xui-slot>
         </v-col>
     </xui-slot>
 
     <xui-design xid="inject-style">
         <style xui-no-dom>
-            .xui-grid2 {
+            .xui-grid {
                 max-width: unset;
             }
         </style>
@@ -307,15 +308,15 @@
         <xui-prop id="componentAs">container</xui-prop>
 
         <xui-prop var="nb" def="3" editor="int">Nb tab(s)</xui-prop>
-        <xui-prop var="vertical" editor="bool">vertical</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
-        <xui-prop var="tabs-dense" editor="bool">dense</xui-prop>
+        <xui-prop var="vertical" editor="bool">vertical</xui-prop>
+        <xui-prop var="tabs-dense" cat="vstyle" editor="bool">dense</xui-prop>
 
-        <xui-prop var="color" editor="text">color</xui-prop>
-        <xui-prop var="background-color" editor="text">background color</xui-prop>
-        <xui-prop var="slider-color" editor="text">slider color</xui-prop>
-        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
-        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+        <xui-prop var="color" cat="vstyle" editor="text">color</xui-prop>
+        <xui-prop var="background-color" cat="vstyle" editor="text">background color</xui-prop>
+        <xui-prop var="slider-color" cat="vstyle" editor="text">slider color</xui-prop>
+        <xui-prop var="dark" cat="vstyle" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="vstyle" editor="bool">on light</xui-prop>
 
         <xui-prop var="icons-and-text" editor="bool">stack icon and text vertically</xui-prop>
         <xui-prop var="show-arrows" editor="bool">show arrows</xui-prop>
@@ -326,6 +327,9 @@
         <xui-prop var="right" editor="bool">right</xui-prop>
 
         <xui-prop var="height-tabs" def="48px" editor="text">height tabs (48px, 100%)</xui-prop>
+
+        <xui-prop var=":modelTab" cat="event:model" editor="text" bind-type="int">var model</xui-prop>
+        <xui-prop var="@change" cat="event:elem" editor="text">Change</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
@@ -339,21 +343,24 @@
 
         <xui-prop id="name">Tab</xui-prop>
         <xui-prop id="desc">Titre de l'onglet</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@change" cat="event:elem" editor="text">Change</xui-prop>
+        <xui-prop var="ref" cat="event:ref" editor="text">Ref</xui-prop>
     </xui-doc>
 
     <xui-doc xid="v-tab-item:xui-tabs">
         <xui-prop id="name">Tab item</xui-prop>
         <xui-prop id="desc">Contenu de l'onglet</xui-prop>
         <xui-prop id="favorite">container</xui-prop>
-        <xui-prop var="colorBgItem" editor="text">background color</xui-prop>
+        <xui-prop var="colorBgItem" cat="vstyle" editor="text">background color</xui-prop>
     </xui-doc>
 
     <v-tabs xid="xui-tabs" class="xui-tabs [[fill-height]] [[tabs-dense]] [[class]]" height="[[height-tabs]]"
         -style="--xui-tab-h:[[height-tabs]];[[style]]" -style=";2" vertical=[[vertical]] dark="[[dark]]"
         light="[[light]]" color="[[color]]" background-color="[[background-color]]" slider-color="[[slider-color]]"
         icons-and-text="[[icons-and-text]]" show-arrows="[[show-arrows]]" fixed-tabs="[[fixed-tabs]]"
-        centered="[[centered]]" right="[[right]]" center-active="[[center-active]]" xui-for="idx">
-        <v-tab>
+        centered="[[centered]]" right="[[right]]" center-active="[[center-active]]" [[event]] v-model=[[:modelTab]] xui-for="idx">
+        <v-tab [[event@-1]] ref=[[ref@-1]]>
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-[[idx@0+]]" xui-slot-name="tab [[idx@0+]]"></xui-slot>
         </v-tab>
         <!--v-tab-item :transition="false" :reverse-transition="false" eager-->
@@ -400,11 +407,11 @@
         <xui-prop id="icon">mdi-drag-horizontal-variant</xui-prop>
 
         <xui-prop var="HeaderDense" def="false" editor="bool">dense</xui-prop>
-        <xui-prop var="HeaderFlat" def="false" editor="bool">flat</xui-prop>
-        <xui-prop var="color" editor="text">color</xui-prop>
-        <xui-prop var="dark" editor="bool">dark</xui-prop>
-        <xui-prop var="light" editor="bool">light</xui-prop>
-        <xui-prop var="src" editor="image">url background image</xui-prop>
+        <xui-prop var="HeaderFlat" cat="vstyle" def="false" editor="bool">flat</xui-prop>
+        <xui-prop var="color" cat="vstyle" editor="text">color</xui-prop>
+        <xui-prop var="dark" cat="vstyle" editor="bool">dark</xui-prop>
+        <xui-prop var="light" cat="vstyle" editor="bool">light</xui-prop>
+        <xui-prop var="src" cat="vstyle" editor="image">url background image</xui-prop>
         <xui-prop var="HeaderHeight" editor="int">Custom height (px)</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
@@ -424,22 +431,25 @@
         <xui-prop id="desc">Une Card</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
 
-        <xui-prop var="height" def="80px" editor="text">Header height (px)</xui-prop>
+        <xui-prop var="height" def="80px" editor="text">Header height (px, auto)</xui-prop>
         <xui-prop var="withTitle" editor="bool">With title</xui-prop>
         <xui-prop var="withAction" editor="bool">With action slot</xui-prop>
 
         <xui-prop var="directive" editor="text">directive</xui-prop>
-        
-        <xui-prop var="classText" cat="class" editor="class">class text block</xui-prop>
-        <xui-prop var="styleText" cat="style" editor="style">style text block</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
 
     </xui-doc>
 
+    <xui-doc xid="CardText">
+        <xui-prop id="name">Card Text</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
     <xui-doc xid="CardContent">
-        <xui-prop id="name">Card content</xui-prop>
+        <xui-prop id="name">Card content slot</xui-prop>
     </xui-doc>
 
     <v-card-title xid="xui-card-title" xui-slot-name="Card Title Container" class="[[class]]" -style="[[style]]"
@@ -447,9 +457,15 @@
         <xui-slot xid="[[parent-xid]]-title" xui-slot-name="Card Title" xui-doc-id="CardTitle"></xui-slot>
     </v-card-title>
 
+    <v-card-text xid="xui-card-text" xui-doc-id="CardText"
+            class="[[class]]" -style="[[style]]">
+            <xui-slot xid="[[parent-xid]]-main" xui-slot-name="Card Content" xui-doc-id="CardContent">
+            </xui-slot>
+    </v-card-text>
+
     <v-card xid="xui-card-1" [[directive]] v-ripple="{ center: false, class: 'black--text' }" xui-for="idxc" class="[[class]]"
         -style="[[style]]">
-            <xui-image-1 xid="[[parent-xid]]-CardImage" xui-slot-name="CardImage" xui-withSlot="false"
+            <xui-image-1 xid="[[parent-xid]]-CardImage" xui-slot-name="CardImage"
                 height="[[height@1]]">
                 <xui-card-title xid="[[parent-xid]]-titlec" xui-if="[[withTitle@2]]">
                 </xui-card-title>
@@ -460,13 +476,7 @@
                 <xui-slot xid="[[parent-xid]]-card-title" xui-slot-name="Card Title"  xui-doc-id="CardTitle"></xui-slot>
             </v-card-title>
         </v-img-->
-
-            <v-card-text
-                class="[[classText@1]]" -style="[[styleText@1]]">
-                <xui-slot xid="[[parent-xid]]-card-main" xui-slot-name="Card Content" xui-doc-id="CardContent">
-                </xui-slot>
-            </v-card-text>
-
+            <xui-card-text xid="[[parent-xid]]-card"></xui-card-text>
             <v-card-actions xui-if="[[withAction@1]]">
                 <xui-slot xid="[[parent-xid]]-card-actions" xui-slot-name="Card Actions" xui-doc-id="CardAction">
                 </xui-slot>
@@ -495,20 +505,6 @@
             .xui-class-slot-full {
                 height: 100%;
                 width: 100%;
-            }
-
-            .xui-p-relative {
-                position: relative
-            }
-
-            .xui-p-absolute {
-                position: absolute
-            }
-
-            .xui-overflow {
-                overflow: auto;
-                width: 100%;
-                height: 100%;
             }
         </style>
     </xui-design>

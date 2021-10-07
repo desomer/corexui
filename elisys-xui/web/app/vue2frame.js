@@ -27,7 +27,7 @@ Vue.use(VueRouter);
 globalThis.vue2CmpMgr = vue2CmpMgr;
 globalThis.Vuex = Vuex;
 
-$xui.rootdata.animationNameEnter = "xui-classes-transition animate__animated animate__fadeInUp";
+$xui.rootdata.animationNameEnter = "animate__animated animate__fadeInUp";
 $xui.rootdata.animationNameExit = "";
 
 $xui.routeEnable = true;
@@ -85,7 +85,7 @@ $xui.loadApplicationJS = () => {
 	initRouter();
 
 	/*********************************** THEME ***********************************/
-	var darkTheme = document.querySelector("#xui-rootTemplate").attributes["dark"];
+	var darkTheme = document.querySelector("#xui-root-template").attributes["dark"];
 	const configVuetify = {
 		theme: {
 			dark: ((darkTheme != null) ? true : false),
@@ -107,7 +107,7 @@ $xui.loadApplicationJS = () => {
 	};
 
 	/*********************************** VUEJS ***********************************/
-	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-rootTemplate");
+	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-root-template");
 
 	/*************************************************************************** */
 	//$xui.rootdata.toto="4444";
@@ -314,12 +314,12 @@ function initEventRouter() {
 		window.scrollTo(0, 0);
 
 		if (to.fullPath == "/") {
-			$xui.rootdata.animationNameEnter = "xui-classes-transition-down"; //"xui-classes-transition animate__animated animate__fadeInUp"
-			$xui.rootdata.animationNameExit = "xui-classes-transition animate__animated animate__fadeOutDown";
+			$xui.rootdata.animationNameEnter = "xui-transition-down animate__animated animate__fadeInUp"; 
+			$xui.rootdata.animationNameExit = "xui-transition animate__animated animate__fadeOutDown";
 		}
 		else {
-			$xui.rootdata.animationNameEnter = "xui-classes-transition animate__animated animate__fadeInUp";
-			$xui.rootdata.animationNameExit = "xui-classes-transition-down";
+			$xui.rootdata.animationNameEnter = "xui-transition animate__animated animate__fadeInUp";
+			$xui.rootdata.animationNameExit = "xui--transition-down animate__animated animate__fadeOutDown";
 		}
 	});
 }

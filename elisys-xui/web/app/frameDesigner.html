@@ -49,16 +49,22 @@ main
 
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2021 v0.7.3 13/08/2021"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2021 v0.7.4 19/09/2021"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
         <xui-prop id="withFooter" val="true"></xui-prop>
         <xui-prop id="navTemporary" val="true"></xui-prop>
-        <xui-prop id=":isNavdrawerOpen" val="isNavdrawerOpen"></xui-prop>
+        <xui-prop id=":isnavdraweropen" val="isNavdrawerOpen"></xui-prop>
         <xui-prop id="binding" val="&quot;isNavdrawerOpen&quot;: false"></xui-prop>
     </xui-design>
 
+    <xui-design xid="page-0-route-0-content">
+        <xui-prop id="fluid" val="true"></xui-prop>
+        <xui-prop id="fill" val="true"></xui-prop>
+        <xui-prop id="start" val="true"></xui-prop>
+        <xui-prop id="no-gutter" val="true"></xui-prop>
+     </xui-design>
 
     <!--  composant editor de class  -->
     <v-dialog xid="xui-class-editor" v-model="main.dialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
@@ -134,7 +140,7 @@ main
         <xui-prop id="dark" val="true"></xui-prop>
     </xui-design>
 
-    <xui-design xid="slot-toolbar-title">
+    <xui-design xid="page-0-content-toolbar-title">
         <span class="xui-path-component">{{main.selectedxui}}</span>
     </xui-design>
 
@@ -297,7 +303,23 @@ main
     </xui-design>
     <xui-design xid="action-tab-tab-item-5">
         <div id="treeCmp" class='barcustom xui-div-scroll-vertical'>
-            <v-treeview dense transition=true :items="main.listSlot"></v-treeview>
+            <v-treeview dense 
+            transition=true 
+            open-all
+            hoverable
+            activatable
+            return-object
+            :items="main.listSlot" 
+            :active.sync="main.activeSlot"
+            :open.sync="main.openSlot"
+            @update:active="$xui.selectCmp()"
+            >
+                <template v-slot:prepend="{ item }">
+                    <v-icon>
+                      {{item.icon}}
+                    </v-icon>
+                  </template>
+            </v-treeview>
         </div>
     </xui-design>
     <xui-design xid="action-tab-tab-item-6">
@@ -317,7 +339,7 @@ main
     </xui-design>
 
     <!--------------------------------------------------------------------------->
-    <xui-design xid="slot-action-header">
+    <xui-design xid="page-0-content-toolbar-action">
         <xui-btn-small @click="$xui.fullScreen()">
             <v-icon>mdi-fullscreen</v-icon>
         </xui-btn-small>
@@ -339,7 +361,7 @@ main
     </xui-design>
 
     <!--------------------------------------------------------------------------->
-    <xui-design xid="slot-footer">
+    <xui-design xid="page-0-content-footer-slot">
         <xui-btn-small @click="$xui.deleteCmp()">
             <v-icon>mdi-delete</v-icon>
         </xui-btn-small>

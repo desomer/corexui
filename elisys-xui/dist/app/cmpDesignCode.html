@@ -1,0 +1,70 @@
+<xui-factory version="1.0">
+   <!------------------------------- ONGLET CODE------------------------------------>
+
+    <xui-design xid="main-tab-tab-item-2">
+        <xui-row-1 xid="code-action"></xui-row-1>  
+        <xui-tabs ref="test" xid="tab-code" style="height:calc(100% - 49px)" class="tab-code fill-height" xui-dark=true xui-height-tabs="35px"
+            xui-nb="3"></xui-tabs>
+    </xui-design>
+
+    <xui-design xid="code-action">   <!------------------------------- BAR D'ACTION ------------------------------------>
+        <xui-prop id="nb" val="4"></xui-prop>
+        <xui-prop id="class" val="mx-3 mt-2 mb-1"></xui-prop>
+     </xui-design>
+
+     <xui-design xid="code-action-col-0">
+        <xui-prop id="cols" val="1"></xui-prop>
+        <xui-btn-icon-1 xid="code-action-btn-export" @click="$xui.downloadPage()"></xui-btn-icon-1>
+     </xui-design>
+
+     <xui-design xid="code-action-col-1">
+        <xui-prop id="cols" val="1"></xui-prop> 
+     </xui-design>
+
+     <xui-design xid="code-action-col-2">
+        <xui-prop id="cols" val="4"></xui-prop>
+        <xui-fileinput-1 xid="code-action-file" @change="$xui.importPage($event)"></xui-fileinput-1>
+     </xui-design>
+
+     <xui-design xid="code-action-file">
+        <xui-prop id="label" val="import file"></xui-prop>
+        <xui-prop id="dense" val="true"></xui-prop>
+        <xui-prop id="hide-detail" val="true"></xui-prop>
+     </xui-design>
+
+
+     <xui-design xid="code-action-btn-export">
+        <xui-prop id="btn-type" val="rounded"></xui-prop>
+        <xui-prop id="icon" val="mdi-download"></xui-prop>
+        <xui-prop id="textright" val="export"></xui-prop>
+        <xui-prop id="positionicon" val="left"></xui-prop>
+     </xui-design>
+
+    <!--------------------------------------------------------------------------->
+    <xui-design xid="tab-code-tab-0"><span> Html </span></xui-design>
+    <xui-design xid="tab-code-tab-item-0">
+        <div class="fill-height">
+            <pre>
+                <code id="xui-code-html" spellcheck="false"></code>
+            </pre>
+        </div>
+    </xui-design>
+
+    <xui-design xid="tab-code-tab-1"><span>XUI</span></xui-design>
+    <xui-design xid="tab-code-tab-item-1">
+        <div class="fill-height">
+            <pre>
+                <code id="xui-code-xui" spellcheck="false"></code>
+            </pre>
+        </div>
+    </xui-design>
+
+    <xui-design xid="tab-code-tab-2"><span>JSON</span></xui-design>
+    <xui-design xid="tab-code-tab-item-2">
+        <div class="fill-height">
+            <pre>
+                <code id="xui-code-json" spellcheck="false"></code>
+            </pre>
+        </div>
+    </xui-design>
+</xui-factory>   

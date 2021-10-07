@@ -48,11 +48,9 @@ const TAG_FACTORY = "xui-factory";
 const TAG_IMPORT = "xui-import";
 const TAG_PROP = "xui-prop";
 const TAG_SLOT = "xui-slot";
-const TAG_DIV_SLOT =
-    "xui-div-slot"; // nom du composant (div) slot dans la class css xui-class-slot
+const TAG_DIV_SLOT = "xui-div-slot"; // nom du composant (div) slot dans la class css xui-class-slot
 
-const XUI_COPYZONE_SLOT =
-    "xui-copyzone-slot"; // pour la recopie (ctrl c , v , x)
+const XUI_COPYZONE_SLOT = "xui-copyzone-slot"; // pour la recopie (ctrl c , v , x)
 const XUI_TEMPORARY_SLOT = "xui-temporary-slot"; // pour le surround
 
 const MODE_ALL = "";
@@ -607,41 +605,60 @@ class XUIEngine {
     });
 
     if (rootSlot != null) {
-      treeSlotBuilder.tree
-          .add(displaySlot(treeSlotBuilder, rootSlot!, 0, null));
+      treeSlotBuilder.tree.add(displaySlot(treeSlotBuilder, rootSlot!, 0, null));
     }
 
     return treeSlotBuilder.tree;
   }
 
-  TreeSlot displaySlot(TreeSlotBuilder treeSlotBuilder, SlotInfo slot, int tab,
+  TreeSlot displaySlot(TreeSlotBuilder treeSlotBuilder, SlotInfo slotInfo, int tab,
       TreeSlot? parent) {
-    var ts = TreeSlot();
-    ts.id = treeSlotBuilder.nb++;
+    var aTreeSlot = TreeSlot();
+
+    treeSlotBuilder.nb++;
+    aTreeSlot.id = slotInfo.xid??treeSlotBuilder.nb.toString(); 
 
     //ts.name = slot.xid+" <"+(slot.slotname??"")+">";
-    ts.name = slot.slotname ?? (slot.implement ?? slot.xid!);
-    if (slot.docId != null) {
-      if (slot.slotname == null && docInfo[slot.docId] != null) {
-        ts.name = docInfo[slot.docId]!.name ?? "no slot name";
+    aTreeSlot.name = slotInfo.slotname ?? (slotInfo.implement ?? slotInfo.xid!);
+    aTreeSlot.icon ="mdi-web";
+
+    if (slotInfo.docId != null) {
+      if (slotInfo.slotname == null && docInfo[slotInfo.docId] != null) {
+        aTreeSlot.name = docInfo[slotInfo.docId]!.name ?? "no slot name";  // affecte le nom du composant si pas de slotName
+        aTreeSlot.icon= docInfo[slotInfo.docId]!.icon ?? "mdi-web";
+      }
+      else
+      {
+        aTreeSlot.icon= (docInfo[slotInfo.docId]?.icon) ?? "mdi-web";
       }
     }
 
-    bool isSlot = slot.implement == TAG_SLOT;
-    bool isFlow = slot.implement == "xui-flow";
+    bool isSlot = slotInfo.implement == TAG_SLOT;
+    bool isFlow = slotInfo.implement == "xui-flow";
     bool isNoDisplay = isSlot || isFlow;
 
-    if (isSlot || isFlow) {
-      ts.name = "#" + ts.name;
+    var pathTo = slotInfo.elementHTML?.propertiesXUI?["topath"];
+    if (pathTo!=null)
+    {
+      var ret = slotInfo.elementHTML!.calculatePropertyXUI(pathTo.content,  null);
+      aTreeSlot.toPath=ret.toString();
+      isNoDisplay=false;
+      isSlot=false;
     }
 
+
+    if (isSlot || isFlow) {
+      aTreeSlot.name = "#" + aTreeSlot.name;
+    }
+
+    //------------------------------------------------
     if (XUIConfigManager.verboseTree) {
       String s = "";
       for (var i = 0; i < tab; i++) {
         s = s + "\t";
       }
 
-      s = s + "# " + slot.xid! + " <" + (slot.slotname ?? "") + ">";
+      s = s + "# " + slotInfo.xid! + " <" + (slotInfo.slotname ?? "") + ">  " + (aTreeSlot.toPath);
       XUIConfigManager.printc(s);
     }
 
@@ -651,7 +668,7 @@ class XUIEngine {
         s = s + "\t";
       }
 
-      String? res = slot.idRessource;
+      String? res = slotInfo.idRessource;
       if (res == null) {
         res = "?";
       } else {
@@ -664,9 +681,9 @@ class XUIEngine {
           "  impl:[" +
           res +
           ":" +
-          (slot.implement ?? "no impl") +
+          (slotInfo.implement ?? "no impl") +
           "]\tdoc:<" +
-          (slot.docId ?? "") +
+          (slotInfo.docId ?? "") +
           "> ";
       XUIConfigManager.printc(s);
 
@@ -674,40 +691,46 @@ class XUIEngine {
       for (var i = 0; i < tab; i++) {
         s = s + "\t";
       }
-      s = s + "  design " + slot.designInfo;
+      s = s + "  design " + slotInfo.designInfo;
       XUIConfigManager.printc(s);
     }
+    //------------------------------------------------
 
-    for (SlotInfo item in slot.children ?? []) {
+    for (SlotInfo item in slotInfo.children ?? []) {
       if (!(item.elementHTML!.hasPropXUIIF() &&
-          !item.elementHTML!.isXUIIF(this))) {
-        var child = displaySlot(treeSlotBuilder, item, tab + 1, ts);
+          !item.elementHTML!.isXUIIF(this)) && slotInfo.xid != XUI_COPYZONE_SLOT) {
 
-        if (isNoDisplay) {
+        var child = displaySlot(treeSlotBuilder, item, tab + 1, aTreeSlot);
+
+        if (isNoDisplay) { // n'affiche pas les slot
           if (parent!.children == null) {
             parent.children = [];
           }
-          child.name = child.name + " (" + ts.name + ")"; //isFlow  ts
+          child.name = child.name + " (" + aTreeSlot.name + ")";    //affecte le nom du slot au enfant
           if (!child.isSlot) {
             parent.children!.add(child);
+            child.parent=parent;
           } else {
             parent.children!.addAll(child.children ?? []);
+            parent.children!.forEach((element) { (element as TreeSlot).parent = parent; });
           }
         } else {
-          if (ts.children == null) {
-            ts.children = [];
+          if (aTreeSlot.children == null) {
+            aTreeSlot.children = [];
           }
           if (!child.isSlot) {
-            ts.children!.add(child);
+            aTreeSlot.children!.add(child);
+            child.parent=aTreeSlot;
           } else {
-            ts.children!.addAll(child.children ?? []);
+            aTreeSlot.children!.addAll(child.children ?? []);
+            aTreeSlot.children!.forEach((element) { (element as TreeSlot).parent = aTreeSlot; });
           }
         }
       }
     }
-    ts.isSlot = isSlot;
+    aTreeSlot.isSlot = isSlot;
 
-    return ts;
+    return aTreeSlot;
   }
 
 }
@@ -735,7 +758,7 @@ class DocInfo {
   late String xid;
   String? componentAs;
   String? name;
-  late String icon;
+  String? icon;
   late String desc;
   String? addRemove;
   List<DocVariables> variables = [];

@@ -191,13 +191,20 @@ export class SelectorManager {
                     let myRegion = null;
                     for (const aNode of listNode) {
                         let elemRect = aNode.getBoundingClientRect();
+                        if (elemRect.width==0 || elemRect.height==0)
+                        {
+                            console.debug("error get rec", elemRect, xid);
+                            continue;
+                        }
+
                         if (myRegion == null)
                             myRegion = new Region2D(elemRect);
                         else
                             myRegion = myRegion.union(new Region2D(elemRect));
                     }
                     //console.debug("displaySelectorByXid 4 ", xid);
-                    this.displaySelectorByPosition(myRegion.getBounds());
+                    if (myRegion!=null)
+                        this.displaySelectorByPosition(myRegion.getBounds());
                 }
                 else if (!found)
                 {

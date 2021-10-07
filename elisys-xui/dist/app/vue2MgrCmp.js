@@ -1,37 +1,51 @@
 export class ComponentManager {
 
-    static getComponentFromTemplate(idTemplate, computeDataBinding) {
+    static getComponentFromTemplate(idTemplate) {
         const template = document.querySelector("#" + idTemplate);
         if (template == null)
             return {
-                template: "<div>no template</div>"
+                template: "<div>no template "+idTemplate+"</div>"
             };
         else
-            return {
-                template: template.innerHTML,
-                data: () => { return $xui.rootdata; },
-                methods : $xui.storeAction,
-                computed: {
-                    $xui: () => $xui,  // pour les @click="$xui.doXXX()"
-                    ...computeDataBinding
+          {
+                return {
+                    template: template.innerHTML,
+                    mixins: [$xui.mixinStore],
                 }
-            }
+          }
     }
 
-    static getRoute(path, file, xid) {
-        return {
-            path: path, component: () => {
-                return new Promise((resolve, reject) => {
-                    console.debug("create route " + path + " to " + xid);
-                    new vue2CmpMgr.ComponentManager().getVueTemplate(file, xid, 'final',
-                        (str) => {
-                            resolve({ template: str });
-                        }
-                    );
-                })
-            }
-        }
+    static getRouteFromTemplate(idPage, idTemplate) {
+        const page = document.querySelector("#" + idPage);
+        const template = page.content.querySelector("#" + idTemplate);
+        template.remove();
+        if (template == null)
+            return {
+                template: "<div>no template "+idTemplate+"</div>"
+            };
+        else
+          {
+                return {
+                    template: template.innerHTML,
+                    mixins: [$xui.mixinStore],
+                }
+          }
     }
+
+    // static getRoute(path, file, xid) {
+    //     return {
+    //         path: path, component: () => {
+    //             return new Promise((resolve, reject) => {
+    //                 console.debug("create route " + path + " to " + xid);
+    //                 new vue2CmpMgr.ComponentManager().getVueTemplate(file, xid, 'final',
+    //                     (str) => {
+    //                         resolve({ template: str });
+    //                     }
+    //                 );
+    //             })
+    //         }
+    //     }
+    // }
 
     getVueTemplate(file, xid, mode, aPromise) {
 
@@ -40,7 +54,7 @@ export class ComponentManager {
                 console.debug("getVueTemplate local ", xid)
                 var infoFileCmp = { file: file, xid: xid, mode: mode };
                 var prom = getPromise("getVueCmp" + xid)
-                $xui.getHtmlFromXUI(infoFileCmp, "getVueCmp" + xid);
+                $xuicore.getHtmlFromXUI(infoFileCmp, "getVueCmp" + xid);
                 prom.then(jsCmp => {
                     console.debug("returnCmpForFile ", jsCmp)
                     aPromise(jsCmp);

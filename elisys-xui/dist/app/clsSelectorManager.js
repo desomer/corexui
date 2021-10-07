@@ -1,7 +1,8 @@
 export class SelectorManager {
-    init() {
 
-        $xui.unDisplaySelector = () => {
+        idxGetInfoForSelectorOnIFrame=0;
+
+        unDisplaySelector() {
             var node = document.getElementById("xui-display-selector");
             if (node != null) {
                 node.style.display = "none";
@@ -11,7 +12,7 @@ export class SelectorManager {
         };
 
         /************************************************************************************ */
-        $xui.displaySelectorByPosition = (position) => {
+        displaySelectorByPosition(position) {
 
             if ($xui.hasPropertiesChanged) {
                 /*******************************************************/
@@ -82,13 +83,26 @@ export class SelectorManager {
             {
                 position.top=0;
             }
+           // var z = 1+(1-$xui.zoom);
+            var z=1 //1.11;  //pour zoom 0.9
+
+
+            position.top=position.top*z;
+            position.left=position.left*z;
+            position.height=position.height*z;
+            position.width=position.width*z;
+            position.mt=position.mt*z;
+            position.ml=position.ml*z;
+            position.mr=position.mr*z;
+            position.mb=position.mb*z;
+
             // ne depasse pas de l'iframe
             var pt =  Math.max(0, position.top);
             var ph =  Math.min((position.top - pt) + position.height, posFrame.height- pt);
 
-            node.style.height = ph + "px";
-            node.style.left = (position.left + posFrame.left) + "px";
+            node.style.left = (position.left+ posFrame.left) + "px";
             node.style.top = (pt + posFrame.top) + "px";
+            node.style.height = ph + "px";
             node.style.width = position.width + "px";
             node.style.display = null;   //affiche la div de selection
 
@@ -106,13 +120,12 @@ export class SelectorManager {
 
             // affiche les action du Node
             $xui.displayAction($xui.propertiesDesign.xid, null);
-
         }
 
-        $xui.idxGetInfoForSelectorOnIFrame=0;
-        $xui.getInfoForSelectorOnIFrame = (selector, parent) => {
-           $xui.idxGetInfoForSelectorOnIFrame++; 
-           var idx = $xui.idxGetInfoForSelectorOnIFrame;
+
+        _getInfoForSelectorOnIFrame(selector, parent) {
+           this.idxGetInfoForSelectorOnIFrame++; 
+           var idx = this.idxGetInfoForSelectorOnIFrame;
            var prom = getPromise("getInfoForSelectorOnIFrame"+idx);
            let winFrame = document.querySelector("#rootFrame").contentWindow;
            winFrame.postMessage({ "action": "getInfoForSelector", "selector": selector, "parent": parent, "idx": idx }, "*");
@@ -122,8 +135,7 @@ export class SelectorManager {
         ///////////////////////////////////////////////
         ////////////////////////////////////////////    A changer
         ///////////////////////////////////////////////
-        /////////////////////////////////////////////
-        $xui.getlistNodeOnIFrame= (xid) => {
+        _getlistNodeOnIFrame(xid) {
             var ret =  null;
             try {
                 ret = document.querySelector("#rootFrame").contentDocument.querySelectorAll("[data-xid-slot=" + xid + "]");
@@ -135,40 +147,40 @@ export class SelectorManager {
 
         /************************************************************************************ */
         // selection par click des properties
-        $xui.displaySelectorByXid = async (xid, xid_slot, noDisplayProp) => {
+        async displaySelectorByXid(xid, xid_slot, noDisplayProp) {
 
-            $xui.unDisplaySelector();
+            this.unDisplaySelector();
 
             // recherche xid simple
-            let elemRect = await $xui.getInfoForSelectorOnIFrame("[data-xid=" + xid + "]");
+            let elemRect = await this._getInfoForSelectorOnIFrame("[data-xid=" + xid + "]");
 
             if (elemRect != null) {
                 //console.debug("displaySelectorByXid 1 ", xid);
-                $xui.displaySelectorByPosition(elemRect);
+                this.displaySelectorByPosition(elemRect);
             }
-
+ 
             if (elemRect == null) {
-                elemRect = await $xui.getInfoForSelectorOnIFrame("[data-xid-slot-" + xid + "=true]");
+                elemRect = await this._getInfoForSelectorOnIFrame("[data-xid-slot-" + xid + "=true]");
                 if (elemRect != null) {
                     //console.debug("displaySelectorByXid 2 ", xid);
-                    $xui.displaySelectorByPosition(elemRect);
+                    this.displaySelectorByPosition(elemRect);
                 }
             }
            
             // recherche xid de slot invisible sur les div enfant => realise un merge des clientRect
             if (elemRect == null) {
-                var listNode = $xui.getlistNodeOnIFrame(xid);
+                var listNode = this._getlistNodeOnIFrame(xid);
                 //console.debug("displaySelectorByXid 31 ", xid, listNode);
                 var found = false;
                 
                 if (listNode != null && listNode.length>0 && listNode.length == listNode[0].parentNode.children.length) {
                     let parent = true;   
-                    elemRect = await $xui.getInfoForSelectorOnIFrame("[data-xid-slot=" + xid + "]", parent);
+                    elemRect = await this._getInfoForSelectorOnIFrame("[data-xid-slot=" + xid + "]", parent);
                     if (elemRect != null) {
                         if (elemRect.width!=0 && elemRect.height!=0)
                         {
                             //console.debug("displaySelectorByXid 32 ", xid);
-                            $xui.displaySelectorByPosition(elemRect);
+                            this.displaySelectorByPosition(elemRect);
                             found=true;
                         }
                     }
@@ -185,7 +197,7 @@ export class SelectorManager {
                             myRegion = myRegion.union(new Region2D(elemRect));
                     }
                     //console.debug("displaySelectorByXid 4 ", xid);
-                    $xui.displaySelectorByPosition(myRegion.getBounds());
+                    this.displaySelectorByPosition(myRegion.getBounds());
                 }
                 else if (!found)
                 {
@@ -199,7 +211,6 @@ export class SelectorManager {
                 setTimeout(() => { $xui.displayPropertiesJS(xid, xid_slot); }, 10);
             }
         }
-    }
 
     /************************************************************************************ */
     // getInfoPositionCmp(targetAction) {

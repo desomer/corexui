@@ -111,14 +111,7 @@ class VuexModuleManager {
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             var stateJson = JSON.stringify(desc.state, undefined, 4);
-            if (stateJson.length>2) {
-                stateJson= stateJson.substring(0, stateJson.length-1);  // retrait de la dernier accolade
-                stateJson=stateJson+" , ...$xui.rootdata }";
-            }
-            else
-            {
-                stateJson="$xui.rootdata";
-            }
+            stateJson=stateJson.substring(0, stateJson.length-1)+" , ...$xui.rootdata }";
             result += `const ${namespace} = modulesManager.addModule("${namespace}", ${stateJson});\n\n`;
             listModule += "\n                " + namespace + ",";
         }

@@ -32,12 +32,13 @@
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <div xid="xui-text-1" class="[[class]]" -style="white-space: pre-line;[[style]]" xui-mode="final;preview">[[text@1]]
-    </div>
+    <div xid="xui-text-1" class="[[class]]" 
+        -style="white-space: pre-line;[[style]]" 
+        xui-mode="final;preview">[[text@1]]</div>
     <div xid="xui-text-1" contenteditable="true" @blur="$xui.updateDirectPropBlur()"
         @focus="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]', true)"
         @input="$xui.updateDirectPropInnerText($event, 'text', '[[xid]]')" class="[[class]]"
-        -style="white-space: pre-wrap;[[style]]" xui-mode="design;template">[[text@1]]</div>
+        -style="white-space: pre-line;[[style]]" xui-mode="design;template">[[text@1]]</div>
 
     <!--------------------------  XUI-TEXTFIELD-1   ---------------------------->
     <xui-doc xid="xui-textfield-1">
@@ -126,6 +127,20 @@
         <v-radio label="[[label@1]]"></v-radio>
     </div>
 
+    <!--------------------------  XUI-SWITCH-1   ---------------------------->
+    <xui-doc xid="xui-switch-1">
+        <xui-prop id="name">switch</xui-prop>
+        <xui-prop id="icon">mdi-toggle-switch</xui-prop>
+        <xui-prop id="desc">switch</xui-prop>
+        <xui-prop id="componentAs">input</xui-prop>
+        <xui-prop var="label" editor="text">label</xui-prop>
+        <xui-prop var="dense" editor="bool">dense</xui-prop>
+    </xui-doc>
+
+    <div xid="xui-switch-1">
+        <v-switch  dense=[[dense@1]] label="[[label@1]]"></v-switch>
+    </div>
+
 
     <!--------------------------  XUI-BTN-1  ---------------------------->
     <xui-doc xid="xui-btn-1">
@@ -135,8 +150,9 @@
         <xui-prop id="componentAs">action</xui-prop>
 
         <xui-prop var="label" editor="text">label</xui-prop>
-        <xui-prop var="btn-type" editor="combo" list='["depressed","outlined","rounded","text","tile","icon","fab"]'>
-            type depressed/outlined/...</xui-prop>
+        <xui-prop var="btn-type" editor="combo" 
+            list='["depressed","outlined","rounded","text","tile","icon","fab"]'
+        >type depressed/outlined/...</xui-prop>
         <xui-prop var="color" cat="style" editor="text">bgcolor</xui-prop>
         <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
         <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
@@ -145,10 +161,15 @@
         <xui-prop var="position" editor="combo" list='["block","absolute","fixed"]'>position</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+
+        <xui-prop var="routeto" cat="event:route" editor="text">route to (/ ; /route1; /page1/route1)</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
+        <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
     </xui-doc>
 
     <v-btn xid="xui-btn-1" class="[[class]]" -style="[[style]]" [[btn-type]] [[position]] disabled="[[disabled]]"
-        [[size]] color="[[color]]" dark="[[dark]]" light="[[light]]">[[label@1]]
+        [[size]] [[event]] to="[[routeto]]" color="[[color]]" dark="[[dark]]" light="[[light]]">[[label@1]]
     </v-btn>
 
     <!--------------------------  XUI-BTN-ICON-1   ---------------------------->
@@ -160,30 +181,31 @@
 
         <xui-prop var="btn-type" def="icon" editor="combo"
             list='["depressed","outlined","rounded","text","tile","icon","fab"]'>type depressed/outlined/...</xui-prop>
-        <xui-prop var="routeto" editor="text">route to</xui-prop>
 
         <xui-prop var="icon" def="mdi-plus" editor="icon">icon (mdi-xxx)</xui-prop>
-        <xui-prop var="color" cat="style" editor="text">color</xui-prop>
-        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
-        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+        <xui-prop var="color" cat="vstyle" editor="text">color</xui-prop>
+        <xui-prop var="dark" cat="vstyle" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="vstyle" editor="bool">on light</xui-prop>
 
-        <xui-prop var="size" editor="combo" list='["large","small","x-small","x-large"]'>size</xui-prop>
+        <xui-prop var="size" cat="vstyle" editor="combo" list='["large","small","x-small","x-large"]'>size</xui-prop>
 
         <xui-prop var="disabled" cat="style" editor="bool">disabled</xui-prop>
 
         <xui-prop var="textleft" editor="text">text left</xui-prop>
         <xui-prop var="textright" editor="text">text right</xui-prop>
         <xui-prop var="positionicon" editor="combo" list='["left","right"]'>marge text left/right</xui-prop>
-        <xui-prop var="position" editor="combo" list='["block","absolute","fixed"]'>position</xui-prop>
 
-        <xui-prop var="event" editor="text">Event (@click='say($event)')</xui-prop>
-
+        <xui-prop var="routeto" cat="event:route" editor="text">route to (/ ; /route1; /page1/route1)</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
+        <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
+        
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
     <v-btn xid="xui-btn-icon-1" to="[[routeto]]" [[event]] class="[[class]]" -style="[[style]]" [[btn-type]]
-        disabled="[[disabled]]" [[size]] [[position]] color="[[color]]" dark="[[dark]]" light="[[light]]">
+        disabled="[[disabled]]" [[size]] color="[[color]]" dark="[[dark]]" light="[[light]]">
         <span xui-if=[[textleft@2]]>[[textleft@2]]</span>
         <v-icon [[positionicon@1]]>[[icon@2]]</v-icon><span xui-if=[[textright@2]]>[[textright@2]]</span>
     </v-btn>
@@ -221,7 +243,7 @@
     </xui-doc>
 
     <v-btn xid="xui-btn-icon-2" [[directive]] class="[[class]]" -style="[[style]]" [[btn-type]] disabled="[[disabled]]" [[size]]
-        [[position]] [[leftright]] [[topbottom]] color="[[color]]" dark="[[dark]]" light="[[light]]">
+        [[position]] [[leftright]] [[topbottom]] color="[[color]]" dark="[[dark]]" light="[[light]]" [[event]]>
         <span xui-if=[[textleft@1]]>[[textleft@2]]</span>
         <v-icon [[positionicon@1]]>[[icon@2]]</v-icon><span xui-if=[[textright@1]]>[[textright@2]]</span>
     </v-btn>
@@ -257,7 +279,8 @@
         <xui-prop var="url" editor="image">image url</xui-prop>
         <xui-prop var="contain" editor="bool">contain</xui-prop>
         <xui-prop var="aspect-ratio" editor="text">aspect ratio (16/9)</xui-prop>
-        <xui-prop var="withSlot" def="true" editor="bool">with Slot</xui-prop>
+        <xui-prop var="withSlot" editor="bool">with Slot</xui-prop>
+        <xui-prop var="transition" editor="text">transition (fade-transition, false)</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
@@ -270,7 +293,7 @@
     </xui-doc>
 
 
-    <v-img xid="xui-image-1" :aspect-ratio="[[aspect-ratio]]" contain=[[contain]] class="[[class]]" -style="[[style]]"
+    <v-img xid="xui-image-1" :aspect-ratio="[[aspect-ratio]]" transition=[[transition]] contain=[[contain]] class="[[class]]" -style="[[style]]"
         src="[[url]]">
         <xui-slot xui-if=[[withSlot@1]] xui-slot-full xid="[[parent-xid]]-image-content" xui-slot-name="Image content">
         </xui-slot>

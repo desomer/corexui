@@ -93,10 +93,10 @@ class XUIBindingManager {
       XUIConfigManager.printc("error" + e.toString());
     }
 
-    XUIConfigManager.printc("---> ************ BIND STORE *************** " +
-        engine.xuiFile.reader.id +
-        "\n" +
-        str);
+    // XUIConfigManager.printc("---> ************ BIND STORE *************** " +
+    //     engine.xuiFile.reader.id +
+    //     "\n" +
+    //     str);
 
     StringBuffer buf = NativeInjectText.getcacheText(JS_BINDING)!;
     buf.clear();
