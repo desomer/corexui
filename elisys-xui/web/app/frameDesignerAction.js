@@ -111,3 +111,7 @@ $xui.displayAction = (xid, xid_slot) => {
 
 }
 /***************************************************************************************************************/
+
+$xui.displayPropActionByXid= (xid, xid_slot) => {
+    console.debug("displayPropActionByXid ", xid);
+};

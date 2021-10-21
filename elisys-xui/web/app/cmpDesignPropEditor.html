@@ -9,10 +9,19 @@
     <!------------------------------------------------------------------------------------->
 
     <xui-slot xid="editor-header">
-        <v-subheader @click='[[selectAction@1]]' class='elevation-2 xui-style-prop'><span class='text-truncate'>[[title@3]]</span><v-spacer></v-spacer>
+        <v-subheader @click='[[selectAction@1]]' class='elevation-5 xui-style-prop'><span class='text-truncate'>[[title@3]]</span><v-spacer></v-spacer>
             <v-icon @click='[[selectActionClick@2]]' dark >mdi-dots-horizontal</v-icon>
         </v-subheader>
         <v-divider></v-divider>
+    </xui-slot> 
+
+    <xui-slot xid="editor-for"> 
+        <v-subheader class='xui-style-prop-for'>
+            <v-icon dark >mdi-reiterate</v-icon>
+            <span class='text-truncate'></span>
+            <v-spacer></v-spacer>
+            <v-icon dark >mdi-dots-horizontal</v-icon>
+        </v-subheader>
     </xui-slot> 
 
     <div xid="editor-text" style="display: inline-flex; width: 100%;">

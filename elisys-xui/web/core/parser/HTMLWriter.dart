@@ -3,6 +3,7 @@ import '../XUIFactory.dart';
 import '../element/XUIElement.dart';
 
 class HTMLWriter {
+
   String toHTMLString(XUIResource xuiFile) {
     XUIHtmlBuffer buf = XUIHtmlBuffer();
     buf.html.writeln('<xui-factory version="1.0">');
@@ -55,8 +56,6 @@ class HTMLWriter {
         buf.addTab();
         buf.html.writeln('</xui-design>');
         buf.html.writeln('');
-
-
 
       }
     });

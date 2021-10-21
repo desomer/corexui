@@ -447,7 +447,7 @@ $xui.selectCmp = async () => {
             }
         };
 
-        var xid = $xui.rootdata.activeSlot[0].id;
+        var xid = $xui.rootdata.activeSlot[0];
         $xui.SelectorManager.displaySelectorByXid(xid, xid, false);
     }
 }

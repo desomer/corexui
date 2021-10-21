@@ -63,7 +63,7 @@ class XUIBindingManager {
     doDicoObjectBinding(dicoObjBind, dicoObjType);
     processPhase2JSBinding("root", dicoObjBind, jsonBinding);
 
-    XUIProperty? propBinding = engine.getXUIProperty("root", "binding");
+    XUIProperty? propBinding = engine.getXUIPropertyFromDesign("root", "binding");
     String PropMock = "";
     if (propBinding != null) {
       PropMock = propBinding.content.toString();

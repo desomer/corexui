@@ -32,11 +32,12 @@ abstract class XUIElement {
   }
 }
 
+
 ///***************************************************************
 class XUIElementHTML extends XUIElement {
   static XUIElement notElem = XUIElementHTML();
-  XUIElementHTML? parent;
 
+  XUIElementHTML? parent;
   XUIElementXUI? originElemXUI;
   List<XUIComponent>? implementBy;
   List<XUIDesign>? designBy;
@@ -177,7 +178,7 @@ class XUIElementHTML extends XUIElement {
       // gestion des v-for
       var numVar = 0;
       if (parseInfo.context == "v-for") {
-        numVar = 5 - parseInfo.parsebuilder.toString().split(tag).length;
+        numVar = 5 - parseInfo.parsebuilder.toString().split(tag).length; 
       }
 
       var name = prop.content.toString();
@@ -198,9 +199,15 @@ class XUIElementHTML extends XUIElement {
         }
         return name;
       } else {
+
         if (numVar == 1 || numVar == 2) {
           namespace = ""; //pas de namespace sur variable item et idx du v-for
         }
+
+        // if (numVar == 3) {
+        //   // affecte la variable de for pour afficher le designer
+        //   this.propertiesXUI![PROP_FOR_VAR]=new XUIProperty(name);
+        // }
 
         return namespace + name;
       }
@@ -261,7 +268,7 @@ class XUIElementHTML extends XUIElement {
 
       if (!isRoot && engine.isModeDesign() && hasTagReloader) {
         isReloader = true;
-        doAddReloaderPhase3(engine, buffer);
+        _doAddReloaderPhase3(engine, buffer);
       }
 
       buffer.trim = (this.propertiesXUI != null &&
@@ -269,8 +276,7 @@ class XUIElementHTML extends XUIElement {
 
       if (!isReloader) {
         // gestion des no-dom
-
-        doChildrenPhase3(engine, buffer);
+        _doChildrenPhase3(engine, buffer);
       }
       // pas de tag hmtl ajouté dans la page
       return;
@@ -280,7 +286,7 @@ class XUIElementHTML extends XUIElement {
     buffer.html.write('<' + this.tag!);
 
     // gestion des attributs
-    doAttributPhase3(engine, buffer);
+    _doAttributPhase3(engine, buffer);
 
     buffer.html.write('>');
 
@@ -292,23 +298,8 @@ class XUIElementHTML extends XUIElement {
     if (hasChildrenNoText) buffer.html.write('\n');
 
     buffer.tab(1);
-    doChildrenPhase3(engine, buffer);
+    _doChildrenPhase3(engine, buffer);
     buffer.tab(-1);
-
-    // if (this.tag=="script")
-    // {
-    //   print("script************************");
-    // }
-
-    // var b = buffer.html.toString();
-
-    // if (true || (hasChildren && b.lastIndexOf("   ")>0))
-    // {
-    //   print("tab "+buffer.idxTab.toString());
-    //   buffer.tab(-2);
-    //  // buffer.addTab();
-    //   buffer.tab(2);
-    // }
 
     if (hasChildrenNoText) {
       buffer.addTab();
@@ -320,37 +311,9 @@ class XUIElementHTML extends XUIElement {
     }
   }
 
-  bool isXUIIF(cst.XUIEngine engine) {
-    var ifContent = this.propertiesXUI![ATTR_XUI_IF]!.content;
-    ParseInfo parseInfo = ParseInfo(ifContent, null, ParseInfoMode.ATTR);
-    var valIf = _processContentPhase3(engine, parseInfo);
-    if (valIf == "" || valIf == "false") {
-      // xui-if a false
-      return false;
-    }
-    return true;
-  }
+  /////////////////////////////////////////////////////////////////////////////////////////////
 
-  bool hasPropXUIIF() {
-    return this.propertiesXUI != null &&
-        this.propertiesXUI!.containsKey(ATTR_XUI_IF);
-  }
-
-  bool _hasPropConvertJSON() {
-    return this.propertiesXUI != null &&
-        this.propertiesXUI!.containsKey(ATTR_CONVERT_JSON);
-  }
-
-  String getForVar() {
-    if (this.propertiesXUI != null &&
-        this.propertiesXUI!.containsKey(ATTR_XUI_FORVAR)) {
-      return this.propertiesXUI![ATTR_XUI_FORVAR]!.content;
-    } else {
-      return "nb";
-    }
-  }
-
-  void doAddReloaderPhase3(cst.XUIEngine engine, XUIHtmlBuffer buffer) {
+  void _doAddReloaderPhase3(cst.XUIEngine engine, XUIHtmlBuffer buffer) {
     var xid = this.originElemXUI!.xid;
     ParseInfo parseInfo = ParseInfo(xid, null, ParseInfoMode.ATTR);
     var xidCal = _processContentPhase3(engine, parseInfo);
@@ -365,11 +328,12 @@ class XUIElementHTML extends XUIElement {
         "\"></v-xui-reloader>");
   }
 
-  void doAttributPhase3(cst.XUIEngine engine, XUIHtmlBuffer buffer) {
+
+  void _doAttributPhase3(cst.XUIEngine engine, XUIHtmlBuffer buffer) {
     this.attributes?.entries.forEach((f) {
       var contentAttr = f.value.content;
       var attrName = f.key;
-//print("*******************"+ f.key);
+      //print("*******************"+ f.key);
       ParseInfo parseInfo = ParseInfo(attrName, null, ParseInfoMode.KEY);
       String keyAttr = _processContentPhase3(engine, parseInfo);
 
@@ -392,10 +356,6 @@ class XUIElementHTML extends XUIElement {
 
         elem.propertiesXUI?.forEach((key, value) {
           if (key.startsWith("@")) {
-            // print("******************* event prop id=" +
-            //     key +
-            //     "=>" +
-            //     value.content.toString());
             buffer.html.write(" " +
                 key +
                 "=\"\$mth('" +
@@ -492,19 +452,43 @@ class XUIElementHTML extends XUIElement {
     });
   }
 
-  void doChildrenPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
+  void _doChildrenPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {
     this.children?.forEach((c) {
       (c as XUIElementHTML).processPhase3(engine, buffer);
-
-      // if (c is XUIElementHTMLText) {
-      //       c.processPhase3(engine, buffer);
-      // } else {
-      //   (c as XUIElementHTML).processPhase3(engine, buffer);
-      // }
     });
   }
-}
 
+  bool isXUIIF(cst.XUIEngine engine) {
+    var ifContent = this.propertiesXUI![ATTR_XUI_IF]!.content;
+    ParseInfo parseInfo = ParseInfo(ifContent, null, ParseInfoMode.ATTR);
+    var valIf = _processContentPhase3(engine, parseInfo);
+    if (valIf == "" || valIf == "false") {
+      // xui-if a false
+      return false;
+    }
+    return true;
+  }
+
+  bool hasPropXUIIF() {
+    return this.propertiesXUI != null &&
+        this.propertiesXUI!.containsKey(ATTR_XUI_IF);
+  }
+
+  bool _hasPropConvertJSON() {
+    return this.propertiesXUI != null &&
+        this.propertiesXUI!.containsKey(ATTR_CONVERT_JSON);
+  }
+
+  String getForVar() {
+    if (this.propertiesXUI != null &&
+        this.propertiesXUI!.containsKey(ATTR_XUI_FORVAR)) {
+      return this.propertiesXUI![ATTR_XUI_FORVAR]!.content;
+    } else {
+      return "nb";
+    }
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 class XUIElementHTMLText extends XUIElementHTML {
   StringBuffer? content;
 

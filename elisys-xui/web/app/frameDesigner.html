@@ -305,10 +305,10 @@ main
         <div id="treeCmp" class='barcustom xui-div-scroll-vertical'>
             <v-treeview dense 
             transition=true 
-            open-all
+            :open-all="main.expandAll"
+            ref="treeCmp"
             hoverable
             activatable
-            return-object
             :items="main.listSlot" 
             :active.sync="main.activeSlot"
             :open.sync="main.openSlot"

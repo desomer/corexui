@@ -14,6 +14,7 @@ import 'core/XUIEngine.dart';
 import 'core/XUIFactory.dart';
 import 'core/XUIJSInterface.dart';
 
+import 'core/XUISlotTreeManager.dart';
 import 'core/element/XUIElement.dart';
 import 'core/element/XUIProperty.dart';
 import 'core/parser/HTMLWriter.dart';
@@ -87,11 +88,11 @@ Future initPageXUI(FileDesignInfo fileInfo) async {
 
   var options = Options(mode: fileInfo.mode);
   XUIProperty? propBinding =
-      designManager.getXUIEngine().getXUIProperty("root", "binding");
+      designManager.getXUIEngine().getXUIPropertyFromDesign("root", "binding");
   String? lastBinding = propBinding?.content;
 
   //options.binding = designManager.getXUIEngine().getBindingInfo();
-  options.treeSlot = designManager.getXUIEngine().getSlotTree();
+  options.treeSlot = new XUISlotTreeManager(designManager.getXUIEngine()).getSlotTree();
   options.dataState = "{" + (lastBinding ?? "") + "}";
 
   loadPageJS(str, options);
@@ -501,7 +502,7 @@ Future _reloadTemplate(FileDesignInfo fileInfo) async {
   options.action = fileInfo.action;
 
   //options.binding = designMgr.getXUIEngine().getBindingInfo();
-  options.treeSlot = designMgr.getXUIEngine().getSlotTree();
+  options.treeSlot = new XUISlotTreeManager(designMgr.getXUIEngine()).getSlotTree();
 
   changePageJS(options);
 }

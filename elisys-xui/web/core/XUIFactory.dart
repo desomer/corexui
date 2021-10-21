@@ -246,7 +246,8 @@ class XUIModel implements Comparable<XUIModel> {
     elemXUI.propertiesXUI![key] = XUIProperty(value);
   }
 
-  void _processPropertiesPhase1AndBind( XUIElementHTML elemHtml, XUIEngine engine) {
+  void _processPropertiesPhase1AndBind(
+      XUIElementHTML elemHtml, XUIEngine engine) {
     if (elemXUI.propertiesXUI != null) {
       elemXUI.propertiesXUI!.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
@@ -266,8 +267,6 @@ class XUIModel implements Comparable<XUIModel> {
       });
     }
   }
-
-
 
   //////////////////////////////////////////// PHASE 2 //////////////////////////////////////////
 
@@ -329,6 +328,12 @@ class XUIModel implements Comparable<XUIModel> {
       slotInfo.elementHTML = elemHtml;
       slotInfo.implement = elemHtml.implementBy?.first.elemXUI.xid;
       slotInfo.docId = getDocumentationID(elemHtml);
+      String? hasFor = elemHtml.propertiesXUI?[":varitems"]?.content;
+      if (hasFor != null)
+        slotInfo.mapTag["for"] = hasFor;
+      else
+        slotInfo.mapTag.remove("for");
+
       slotInfo.designInfo = "no design";
       if (elemHtml.designBy != null) {
         slotInfo.designInfo = "(" + elemHtml.designBy!.length.toString() + ")";

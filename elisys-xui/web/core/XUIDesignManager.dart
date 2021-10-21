@@ -45,13 +45,8 @@ class XUIDesignManager {
   /// generation de l'arbre XUIElementHTML avec bufferHtml
   Future<String?> getHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
-
-    //  if (xid == null) {
-    //    return null;
-    //  }
-
     var bufferHtml = XUIHtmlBuffer();
-    await getXUIEngine().toHTMLString(bufferHtml, xid, ctx);
+    await getXUIEngine().processPhases(bufferHtml, xid, ctx);
     return Future.value(bufferHtml.html.toString());
   }
 
@@ -59,12 +54,7 @@ class XUIDesignManager {
   /// generation de l'arbre XUIElementHTML sans buffer html
   Future initHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
-
-    // if (xid == null) {
-    //   return;
-    // }
-
-    await getXUIEngine().toHTMLString(null, xid, ctx);
+    await getXUIEngine().processPhases(null, xid, ctx);
   }
 
   ///------------------------------------------------------------------------------------------
@@ -147,7 +137,8 @@ class XUIDesignManager {
   }
 
   ///------------------------------------------------------------------------------------------
-  Future<JSDesignInfo> getJSDesignInfo(String id, String idslot, String mode) async {
+  Future<JSDesignInfo> getJSDesignInfo(
+      String id, String idslot, String mode) async {
     var ret = JSDesignInfo();
     var designs = getXUIEngine().getDesignInfo(id, idslot, true);
     ret.xid = id;
@@ -160,39 +151,55 @@ class XUIDesignManager {
     var ctx = XUIContext(fi.mode);
     ctx.setCause("getJSDesignInfo");
 
+    //------------------------------------------------------------------
+    // calcul du path pour le fil d'ariane
+    var idxFor = designs.length;
+    var hasFor = -1;
+    designs.reversed.forEach((design) {
+      if (ret.bufPath.length > 0) ret.bufPath.write(" > ");
+      ret.bufPath.write(design.docInfo?.name ?? design.slotInfo.docId);
+
+      if (design.slotInfo.mapTag["for"] != null) {
+        hasFor = idxFor;
+      }
+      idxFor--;
+    });
+    //------------------------------------------------------------------
+
+    int nbCmp = 0;
     int i = 0;
     // boucle sur l'ensemble des couches de widget
     for (var design in designs) {
       //------------------------------------------------------------------
+      if (nbCmp == 0 && hasFor >= 0) {
+        await _getJSDesignFor(fi, design, ctx, ret);
+      }
       // gestion de l'entete
       await _getJSDesignHeader(fi, design, ctx, ret);
       //------------------------------------------------------------------
       // gestion des variable du composant du widget
       for (DocVariables varCmp in design.docInfo?.variables ?? const []) {
+        bool isStyle = (varCmp.cat == "class" ||
+            varCmp.cat == "style" ||
+            varCmp.cat == "vstyle");
+        bool isEvent =
+            (varCmp.cat != null && varCmp.cat.toString().startsWith("event"));
 
-        bool isStyle = (varCmp.cat=="class" || varCmp.cat=="style" || varCmp.cat=="vstyle");
-        bool isEvent = (varCmp.cat!=null && varCmp.cat.toString().startsWith("event"));
-
-        if (varCmp.cat=="config")
-        {
-            continue;
+        if (varCmp.cat == "config") {
+          continue;
         }
 
-        if ( mode=="design" && (isStyle || isEvent))
-        {
-            continue;
+        if (mode == "design" && (isStyle || isEvent)) {
+          continue;
         }
 
-        if (mode=="style" && !isStyle)
-        {
-            continue;
+        if (mode == "style" && !isStyle) {
+          continue;
         }
 
-        if (mode=="event" && !isEvent)
-        {
-            continue;
+        if (mode == "event" && !isEvent) {
+          continue;
         }
-        
 
         String template =
             await _getJSDesignVariableTemplate(varCmp, fi, ctx, i, design);
@@ -201,17 +208,43 @@ class XUIDesignManager {
         _getJSDesignVariableData(varCmp, design, ret, i);
         i++;
       }
+      nbCmp++;
       // fin de template
+      ret.bufTemplate.write("</div>");
+
+      if (nbCmp == hasFor) {
+        ret.bufTemplate.write("</div>");
+      }
+    }
+
+    if (nbCmp < 3) {
       ret.bufTemplate.write("</div>");
     }
 
-    // calcul du path pour le fil d'ariane
-    designs.reversed.forEach((design) {
-      if (ret.bufPath.length > 0) ret.bufPath.write(" > ");
-      ret.bufPath.write(design.docInfo?.name ?? design.slotInfo.docId);
-    });
-
     return ret;
+  }
+
+  Future _getJSDesignFor(FileDesignInfo fi, DesignInfo design, XUIContext ctx,
+      JSDesignInfo ret) async {
+    var keyCache = 'editor-for';
+    var template = cacheTemplateEditor[keyCache];
+
+    if (template == null) {
+      fi.xid = 'editor-for';
+
+      XUIComponent cmp =
+          await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
+
+      template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
+
+      if (XUIConfigManager.verboseEditor) {
+        XUIConfigManager.printc("****<" + keyCache + ">=>" + template!);
+      }
+      cacheTemplateEditor[keyCache] = template!;
+    }
+
+    ret.bufTemplate.write(template);
+    ret.bufTemplate.write("<div class='xui-class-for'>");
   }
 
   void _getJSDesignVariableData(
@@ -341,8 +374,8 @@ class XUIDesignManager {
 
       XUIComponent cmp =
           await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
-      cmp.addProperties(
-          "selectAction", "\$xui.SelectorManager.displaySelectorByXid('##xid##', '##xid##')");
+      cmp.addProperties("selectAction",
+          "\$xui.SelectorManager.displaySelectorByXid('##xid##', '##xid##')");
 
       cmp.addProperties("selectActionClick",
           "\$xui.displayPropActionByXid('##xid##', '##xid##')");

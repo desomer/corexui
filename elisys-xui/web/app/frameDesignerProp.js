@@ -71,7 +71,7 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
                         document.getElementById(idProp).scrollTop = posScroll;
                     }
                     // gestion de la selection sur le mouseover
-                    var listOver = document.querySelectorAll("#" + idProp + ">.xui-over-prop-xid");
+                    var listOver = document.querySelectorAll("#" + idProp + " .xui-over-prop-xid");
                     $xui.lastPropOver = null;
 
                     listOver.forEach((aDivOver) => {

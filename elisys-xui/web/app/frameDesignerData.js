@@ -22,6 +22,7 @@ var json = {
     listSlot : [],
     activeSlot : [],
     openSlot : [],
+    expandAll : false,
     
     routeEnable : true,
     jsonEditorDataSrc : "template",   // ou mock

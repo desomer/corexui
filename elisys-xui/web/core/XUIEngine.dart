@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'XUIBindingManager.dart';
 import 'XUIConfigManager.dart';
 import 'XUIFactory.dart';
-import 'XUIJSInterface.dart';
 import 'element/XUIElement.dart';
 import 'element/XUIProperty.dart';
 import 'native/register.dart';
@@ -31,8 +30,8 @@ const ATTR_TRIM_CONTENT = "trim-content";
 const ATTR_MODE_DISPLAY = "modedisplay";
 
 const ATTR_CONVERT_JSON = "convert-json";
-const ATTR_XUI_IF = "if";
 
+const ATTR_XUI_IF = "if";
 const ATTR_XUI_FORVAR = "for-nbvar";
 
 const ATTR_STYLE_SLOT = "style-slot";
@@ -52,6 +51,8 @@ const TAG_DIV_SLOT = "xui-div-slot"; // nom du composant (div) slot dans la clas
 
 const XUI_COPYZONE_SLOT = "xui-copyzone-slot"; // pour la recopie (ctrl c , v , x)
 const XUI_TEMPORARY_SLOT = "xui-temporary-slot"; // pour le surround
+
+//const PROP_FOR_VAR = "PROP_FOR_VAR";
 
 const MODE_ALL = "";
 const MODE_FINAL = "final";
@@ -426,19 +427,69 @@ class XUIEngine {
 
     await xuiFile.parseXUIFile();
     xuiFile.generateDocumentation(this);
-
-    //dynamic obj = xuiFile.getObject();
-
-    //final yamld = toYamlString(obj);
-    //print("initialize ${reader.id} ok");
-    //print(yamld.toString());
-
     return Future.value();
+  }
+
+
+  processPhases(XUIHtmlBuffer? writer, String xid, XUIContext ctx) async {
+    xuiFile.context = ctx;
+    if (writer == null) {
+      XUIConfigManager.printc("toHTMLString for only init XUI xid=" + xid);
+    } else {
+      if (XUIConfigManager.verboseInitXUI) {
+        XUIConfigManager.printc("toHTMLString for generate html xid=" + xid);
+      }
+    }
+
+    var listCmp = xuiFile.searchComponent(xid);
+    if (listCmp == null) {
+      throw "xid inconnu $xid";
+    }
+
+    XUIComponent root = listCmp.sort(ctx).first;
+
+    XUIElementHTML htmlRoot = XUIElementHTML();
+    if (isModeDesign() || XUIConfigManager.forceSlotInfo) {
+      htmlRoot.attributes ??= HashMap<String, XUIProperty>();
+      htmlRoot.attributes!["data-" + ATTR_XID] = XUIProperty(xid);
+      htmlRoot.originElemXUI = root.elemXUI;
+    }
+
+    if (isModeDesign()) {
+      mapSlotInfo.clear(); // vide le slot info contruit dans la Phase2
+      bindingManager.bindingInfo.clear();
+    }
+
+    await root.processPhase1(this, htmlRoot);
+    await root.processPhase2(this, htmlRoot, null);
+
+    if (XUIConfigManager.verboseXUIEngine) {
+      XUIConfigManager.printc(
+          "-- mapSlotInfo " + mapSlotInfo.length.toString());
+      XUIConfigManager.printc("-- docInfo " + docInfo.length.toString());
+      XUIConfigManager.printc(
+          "-- components " + xuiFile.components.length.toString());
+      XUIConfigManager.printc(
+          "-- designs " + xuiFile.designs.length.toString());
+      XUIConfigManager.printc(
+          "-- documentation " + xuiFile.documentation.length.toString());
+      XUIConfigManager.printc("-- binding " + bindingManager.bindingInfo.length.toString());
+      XUIConfigManager.printc(
+          "-- listImport " + xuiFile.listImport.length.toString());
+    }
+
+    if (ctx.cause != "getHtmlFromXUI" && ctx.cause != "getJSDesignInfo") {
+      bindingManager.processPhase2JS(ctx);
+    }
+
+    if (writer != null) {
+      return Future.sync(() => htmlRoot.processPhase3(this, writer));
+    }
   }
 
   ///------------------------------------------------------------------------------------
   /// change une property de design
-  XUIProperty? getXUIProperty(String xid, String variable) {
+  XUIProperty? getXUIPropertyFromDesign(String xid, String variable) {
     var listDesign = xuiFile.designs[xid];
     if (listDesign == null) {
       return null;
@@ -521,218 +572,6 @@ class XUIEngine {
         xuiFile.context.mode != MODE_PREVIEW;
   }
 
-  toHTMLString(XUIHtmlBuffer? writer, String xid, XUIContext ctx) async {
-    xuiFile.context = ctx;
-    if (writer == null) {
-      XUIConfigManager.printc("toHTMLString for only init XUI xid=" + xid);
-    } else {
-      if (XUIConfigManager.verboseInitXUI) {
-        XUIConfigManager.printc("toHTMLString for generate html xid=" + xid);
-      }
-    }
-
-    var listCmp = xuiFile.searchComponent(xid);
-    if (listCmp == null) {
-      //dynamic obj = ObjectWriter().toObjects(xuiFile);
-
-      //final yamld = toYamlString(obj);
-      //XUIConfigManager.printc("xid inconnu $xid\n" + yamld.toString());
-
-      throw "xid inconnu $xid";
-    }
-
-    XUIComponent root = listCmp.sort(ctx).first;
-
-    XUIElementHTML htmlRoot = XUIElementHTML();
-    if (isModeDesign() || XUIConfigManager.forceSlotInfo) {
-      htmlRoot.attributes ??= HashMap<String, XUIProperty>();
-      htmlRoot.attributes!["data-" + ATTR_XID] = XUIProperty(xid);
-      htmlRoot.originElemXUI = root.elemXUI;
-    }
-
-    if (isModeDesign()) {
-      mapSlotInfo.clear(); // vide le slot info contruit dans la Phase2
-      bindingManager.bindingInfo.clear();
-    }
-
-    await root.processPhase1(this, htmlRoot);
-    await root.processPhase2(this, htmlRoot, null);
-
-    if (XUIConfigManager.verboseXUIEngine) {
-      XUIConfigManager.printc(
-          "-- mapSlotInfo " + mapSlotInfo.length.toString());
-      XUIConfigManager.printc("-- docInfo " + docInfo.length.toString());
-      XUIConfigManager.printc(
-          "-- components " + xuiFile.components.length.toString());
-      XUIConfigManager.printc(
-          "-- designs " + xuiFile.designs.length.toString());
-      XUIConfigManager.printc(
-          "-- documentation " + xuiFile.documentation.length.toString());
-      XUIConfigManager.printc("-- binding " + bindingManager.bindingInfo.length.toString());
-      XUIConfigManager.printc(
-          "-- listImport " + xuiFile.listImport.length.toString());
-    }
-
-    if (ctx.cause != "getHtmlFromXUI" && ctx.cause != "getJSDesignInfo") {
-      bindingManager.processPhase2JS(ctx);
-    }
-
-    if (writer != null) {
-      return Future.sync(() => htmlRoot.processPhase3(this, writer));
-    }
-  }
-
-
-
-  List getSlotTree() {
-    TreeSlotBuilder treeSlotBuilder = TreeSlotBuilder();
-
-    // init les childs
-    mapSlotInfo.forEach((key, SlotInfo child) {
-      child.children = null;
-    });
-
-    // reconstruit l'arborescence
-    SlotInfo? rootSlot;
-    mapSlotInfo.forEach((key, SlotInfo child) {
-      var parentID = child.parentXid;
-      if (parentID != null) {
-        mapSlotInfo[parentID]?.children = mapSlotInfo[parentID]?.children ?? [];
-        mapSlotInfo[parentID]?.children!.add(child);
-      } else {
-        rootSlot = child;
-      }
-    });
-
-    if (rootSlot != null) {
-      treeSlotBuilder.tree.add(displaySlot(treeSlotBuilder, rootSlot!, 0, null));
-    }
-
-    return treeSlotBuilder.tree;
-  }
-
-  TreeSlot displaySlot(TreeSlotBuilder treeSlotBuilder, SlotInfo slotInfo, int tab,
-      TreeSlot? parent) {
-    var aTreeSlot = TreeSlot();
-
-    treeSlotBuilder.nb++;
-    aTreeSlot.id = slotInfo.xid??treeSlotBuilder.nb.toString(); 
-
-    //ts.name = slot.xid+" <"+(slot.slotname??"")+">";
-    aTreeSlot.name = slotInfo.slotname ?? (slotInfo.implement ?? slotInfo.xid!);
-    aTreeSlot.icon ="mdi-web";
-
-    if (slotInfo.docId != null) {
-      if (slotInfo.slotname == null && docInfo[slotInfo.docId] != null) {
-        aTreeSlot.name = docInfo[slotInfo.docId]!.name ?? "no slot name";  // affecte le nom du composant si pas de slotName
-        aTreeSlot.icon= docInfo[slotInfo.docId]!.icon ?? "mdi-web";
-      }
-      else
-      {
-        aTreeSlot.icon= (docInfo[slotInfo.docId]?.icon) ?? "mdi-web";
-      }
-    }
-
-    bool isSlot = slotInfo.implement == TAG_SLOT;
-    bool isFlow = slotInfo.implement == "xui-flow";
-    bool isNoDisplay = isSlot || isFlow;
-
-    var pathTo = slotInfo.elementHTML?.propertiesXUI?["topath"];
-    if (pathTo!=null)
-    {
-      var ret = slotInfo.elementHTML!.calculatePropertyXUI(pathTo.content,  null);
-      aTreeSlot.toPath=ret.toString();
-      isNoDisplay=false;
-      isSlot=false;
-    }
-
-
-    if (isSlot || isFlow) {
-      aTreeSlot.name = "#" + aTreeSlot.name;
-    }
-
-    //------------------------------------------------
-    if (XUIConfigManager.verboseTree) {
-      String s = "";
-      for (var i = 0; i < tab; i++) {
-        s = s + "\t";
-      }
-
-      s = s + "# " + slotInfo.xid! + " <" + (slotInfo.slotname ?? "") + ">  " + (aTreeSlot.toPath);
-      XUIConfigManager.printc(s);
-    }
-
-    if (XUIConfigManager.verboseTreeImpl) {
-      String s = "";
-      for (var i = 0; i < tab; i++) {
-        s = s + "\t";
-      }
-
-      String? res = slotInfo.idRessource;
-      if (res == null) {
-        res = "?";
-      } else {
-        int i = res.lastIndexOf("/");
-        int j = res.lastIndexOf(".");
-        res = res.substring(i + 1, j);
-      }
-
-      s = s +
-          "  impl:[" +
-          res +
-          ":" +
-          (slotInfo.implement ?? "no impl") +
-          "]\tdoc:<" +
-          (slotInfo.docId ?? "") +
-          "> ";
-      XUIConfigManager.printc(s);
-
-      s = "";
-      for (var i = 0; i < tab; i++) {
-        s = s + "\t";
-      }
-      s = s + "  design " + slotInfo.designInfo;
-      XUIConfigManager.printc(s);
-    }
-    //------------------------------------------------
-
-    for (SlotInfo item in slotInfo.children ?? []) {
-      if (!(item.elementHTML!.hasPropXUIIF() &&
-          !item.elementHTML!.isXUIIF(this)) && slotInfo.xid != XUI_COPYZONE_SLOT) {
-
-        var child = displaySlot(treeSlotBuilder, item, tab + 1, aTreeSlot);
-
-        if (isNoDisplay) { // n'affiche pas les slot
-          if (parent!.children == null) {
-            parent.children = [];
-          }
-          child.name = child.name + " (" + aTreeSlot.name + ")";    //affecte le nom du slot au enfant
-          if (!child.isSlot) {
-            parent.children!.add(child);
-            child.parent=parent;
-          } else {
-            parent.children!.addAll(child.children ?? []);
-            parent.children!.forEach((element) { (element as TreeSlot).parent = parent; });
-          }
-        } else {
-          if (aTreeSlot.children == null) {
-            aTreeSlot.children = [];
-          }
-          if (!child.isSlot) {
-            aTreeSlot.children!.add(child);
-            child.parent=aTreeSlot;
-          } else {
-            aTreeSlot.children!.addAll(child.children ?? []);
-            aTreeSlot.children!.forEach((element) { (element as TreeSlot).parent = aTreeSlot; });
-          }
-        }
-      }
-    }
-    aTreeSlot.isSlot = isSlot;
-
-    return aTreeSlot;
-  }
-
 }
 
 ///------------------------------------------------------------------
@@ -743,15 +582,14 @@ class SlotInfo {
   String? docId;
   String? idRessource;
   String? implement;
+  var mapTag = HashMap<String, String>();
+
+
   late String designInfo;
-  // chaine caractere des info de design (NB + nom des fichier)
+  // chaine caractere des info de design (NB + nom des fichier) utiliser par XUIConfigManager.verboseTreeImpl
+
   XUIElementHTML? elementHTML;
   List<SlotInfo>? children;
-}
-
-class TreeSlotBuilder {
-  List<TreeSlot> tree = [];
-  int nb = 0;
 }
 
 class DocInfo {
