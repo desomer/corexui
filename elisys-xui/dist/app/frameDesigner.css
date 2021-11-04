@@ -61,7 +61,12 @@ html::-webkit-scrollbar {
     transform: translateY(-50%);
 }
 
-
+.xui-class-for {
+    border: 1px solid #f05400;
+    border-bottom-width: 3px;
+    margin: 0px 2px 1px 1px;
+    box-shadow: 4px -2px 19px -4px #f05400;
+}
 /***************************************************************/
 
 pre, code {
@@ -180,6 +185,17 @@ pre > code {
 /**********************   entete de propriété  **************************/
 .xui-style-prop {    
     background: #565656;
+    height: 24px;
+    color: white !important;
+    padding: 0px 5px;
+    cursor : pointer;
+}
+
+.xui-style-prop-for {    
+    box-shadow: -2px 5px 13px 4px rgb(0 0 0 / 75%) !important;
+    margin: 5px 0px 0px 0px;
+    background: #ff59008a;
+    width: 80px;
     height: 24px;
     color: white !important;
     padding: 0px 5px;

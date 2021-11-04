@@ -3,14 +3,14 @@ export class PageDesignManager {
     codeHtml = null;
     codeXUIdata = null;
     codeXUI = null;
-    //db = null;
+
 
     getInfoFile(mode) {
         return {
             fileID: window.$xui.rootdata.frameName,
-            file: 'app/' + window.$xui.rootdata.frameName + '.html',
+            file: `app/${window.$xui.rootdata.frameTemplate}.html`,
             xid: 'root',
-            mode: mode,
+            mode,
             jsonBinding: JSON.stringify($xui.rootdata.jsonEditorData)
         };
     }
@@ -141,12 +141,31 @@ export class PageDesignManager {
         //     )
         //     .then((ret) => console.log(ret))
 
-        var ret = await client.query(
-            q.Get(
-                q.Match(q.Index('filexuiById'), $xui.rootdata.frameName)
+        var ret = null;
+        
+        
+        try {
+            ret=  await client.query(
+                q.Get(
+                    q.Match(q.Index('filexuiById'), $xui.rootdata.frameName)
+                )
             )
-        )
-        console.log("ret=", ret);
+        } catch (error) {
+            console.log("ret error =", error);
+            if (error.requestResult.statusCode==404)
+            {
+                ret= await client.query(
+                    q.Create(
+                        q.Collection('Filexui'),
+                        { data: { id: $xui.rootdata.frameName, html:"new" } },
+                    )
+                    )
+            }
+        }
+
+ 
+
+        console.log("ret db =", ret);
 
         ret = await client.query(
             q.Update(
@@ -155,7 +174,7 @@ export class PageDesignManager {
             )
         )
 
-        console.log("ret=", ret);
+        console.log("re save=", ret);
         $xui.rootdata.snackbar_text = "deploy terminated";
         $xui.rootdata.snackbar_timeout = 2000;
         $xui.rootdata.snackbar = true;

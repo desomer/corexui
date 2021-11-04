@@ -165,11 +165,11 @@ window.addEventListener('resize', function (event) {
 const iterateJSON = (src, dest, funct, functArray) => {
     const entries = Object.entries(src).map(([key, value]) =>
         Array.isArray(value) ? [key, value.map(e => {
-            functArray(value, e);
             var nt = null;
             if (Array.isArray(dest[key])) {
                 nt = dest[key][0];
             }
+            functArray(value, dest[key], e);
             iterateJSON(e, nt, funct, functArray)
         })]
             : typeof value === 'object'
@@ -183,7 +183,7 @@ const iterateJSON = (src, dest, funct, functArray) => {
 
 window.addEventListener('message', function (e) {
     var data = e.data;
-    if (data.action!="getInfoForSelector") {
+    if (data.action != "getInfoForSelector") {
         console.debug("--- CORE --- message ", data);
     }
     if (data.action == "changeConfig") {
@@ -192,32 +192,47 @@ window.addEventListener('message', function (e) {
     else if (data.action == "changeTemplate") {
 
         var hasChangeBinding = false;
+        var hasChangeValue = false;
 
-        if (data.param.jsonBinding != null) {  // change uniquement le json du template
+        if (/*data.param.action == "reload-json" &&*/ data.param.listReloader == null && data.param.jsonBinding != null) {  // change uniquement le json du template
             var jsonBinding = data.param.jsonBinding;
             var jsonTemplate = data.param.jsonTemplate;
 
-            iterateJSON(jsonTemplate, $xui.rootdata,
+            iterateJSON(jsonBinding, $xui.rootdata,
                 (k, v, dest) => {
-                    //console.log("k=", k, " v=", v);
-                    if (dest==null || dest[k] == null) {
+                    console.log("k=", k, " v=", v);
+                    if (dest == null || dest[k] == null) {
                         hasChangeBinding = true;
                     }
+                    if (dest != null && dest[k] != v) {
+                        hasChangeValue = true;    
+                    }
                     return v;
-                }, (a, i) => {
-                    //console.log("---- array=", a, "  i=", i);
+                }, (a, dest, i) => {
+                    console.log("---- array=", a, " array dest=", dest, "  i=", i);
+                    if (dest==null)
+                    {
+                        hasChangeBinding = true;
+                    }
+                    else
+                    {
+
+                    }
                     return i;
                 });
 
+            if (hasChangeBinding || hasChangeValue || data.param.action == "reload-json") {
+               // if (hasChangeBinding || hasChangeValue)
+                    $xui.rootdata = jsonBinding;
+            }
 
-            $xui.rootdata=jsonBinding;
             $xui.modulesManager.addModule("main", $xui.rootdata);
             $xui.modulesManager.reload();
 
-            console.debug("***************** iframe store reload ", hasChangeBinding, data.param.jsonBinding);
+            console.debug("***************** iframe store reload ", hasChangeBinding, hasChangeValue, data.param.jsonBinding);
         }
 
-        if (data.param.action == "reload-json") {  
+        if (data.param.action == "reload-json") {
             if (hasChangeBinding)
                 data.param.listReloader = null;  // recharge tout
             else
@@ -256,7 +271,7 @@ window.addEventListener('message', function (e) {
             window.parent.postMessage(message, "*");
         }
 
-        $xui.routeEnable=oldrouteEnable;
+        $xui.routeEnable = oldrouteEnable;
 
     }
     else if (data.action == "doChangeComponent") {

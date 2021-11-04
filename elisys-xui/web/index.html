@@ -14,10 +14,10 @@
       <link rel="preload" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
-      <link rel="preload" href="./app/vue2frame.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
+      <link rel="preload" href="./app/vue/vue2frame.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
       <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
-      <script defer src="./app/vuexHelper.js"></script>
+      <script defer src="./app/vue/vuexHelper.js"></script>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="app/frameDesigner.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
    </head>
@@ -25,279 +25,287 @@
       <div id="app">
          <div class="sk-plane" style="margin: 40vh auto"></div>
       </div>
-      <template id="xui-rootTemplate">
-         <transition :duration="300" name="custom-classes-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
+      <template id="xui-root-template">
+         <transition :duration="600" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
             <router-view ref="routermain"></router-view>
          </transition>
       </template>
       <template id="page-0">
          <v-app style="width:100vw">
             <template id="page-0-route-0">
-               <v-tabs class="fill-height main-tab xui-tabs  tabs-dense  xui-class-slot-full" vertical dark v-model="main.activeTab">
-                  <v-tab>
-                     <v-icon>mdi-square-edit-outline</v-icon>
-                  </v-tab>
-                  <v-tab-item eager>
-                     <v-tabs class="fill-height xui-tabs" height="35px" style="--xui-tab-h:35px;" dark>
-                        <v-tab>
-                           <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
-                           <span style="margin-left: 5px;">Page {{main.frameName}}</span>
-                        </v-tab>
-                        <v-tab-item eager>
-                           <div class="main-container fill-height">
-                              <div class="main-item main-item-0">
-                                 <v-toolbar height="38" dark>
-                                    <v-radio-group v-model="main.jsonEditorDataSrc" row class="pt-6">
-                                       <div class="v-radio">
-                                          <v-radio label="Initial" value="template"></v-radio>
-                                       </div>
-                                       <div class="v-radio">
-                                          <v-radio label="Mock" value="mock"></v-radio>
-                                       </div>
-                                    </v-radio-group>
-                                    <v-spacer></v-spacer>
-                                    <div class="pt-6">
-                                       <div>
-                                          <v-switch dense label="route enable" v-model="main.routeEnable"></v-switch>
-                                       </div>
-                                    </div>
-                                 </v-toolbar>
-                              </div>
-                              <div class="main-item main-item-1"></div>
-                              <div class="main-item main-item-2">
-                                 <iframe id="rootFrame"></iframe>
-                              </div>
-                              <div class="main-item main-item-3">
-                                 <v-overlay :value="main.saveLayout" style="height: 100%;position: relative;">
-                                    <v-btn>Save in progress</v-btn>
-                                 </v-overlay>
-                                 <v-tabs class="xui-action-tab fill-height xui-tabs  tabs-dense" height="35px" style="--xui-tab-h:35px;" dark v-model="main.activeAction">
-                                    <v-tab>
-                                       <v-icon>mdi-layers-triple</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager>
-                                       <div id="AppPropertiesSetting"></div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-palette-swatch</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager>
-                                       <div id="AppPropertiesStyle"></div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-lightning-bolt</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager>
-                                       <div id="AppPropertiesEvent"></div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-database-import</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager>
-                                       <div id="AppPropertiesBinding"></div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-plus-box-multiple</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager>
-                                       <div id="AppComponents"></div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-file-tree</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager>
-                                       <div id="treeCmp" class="barcustom xui-div-scroll-vertical">
-                                          <v-treeview dense transition :items="main.listSlot"></v-treeview>
-                                       </div>
-                                    </v-tab-item>
-                                    <v-tab>
-                                       <v-icon>mdi-chevron-right-box</v-icon>
-                                    </v-tab>
-                                    <v-tab-item eager>
-                                       <div>CLI coming soon...</div>
-                                    </v-tab-item>
-                                 </v-tabs>
-                              </div>
-                           </div>
-                        </v-tab-item>
-                        <v-tab>
-                           <v-icon>mdi-palette</v-icon>
-                           <span>Style</span>
-                        </v-tab>
-                        <v-tab-item eager>
-                           <div>Coming soon...</div>
-                        </v-tab-item>
-                        <v-tab>
-                        </v-tab>
-                        <v-tab-item eager>
-                        </v-tab-item>
-                     </v-tabs>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-database</v-icon>
-                  </v-tab>
-                  <v-tab-item eager>
-                     <v-tabs class="xui-tabs fill-height" dark height="32px" style="--xui-tab-h:32px;">
-                        <v-tab>
-                           <v-icon>mdi-view-module</v-icon>
-                           <span class="ml-3">Module main</span>
-                        </v-tab>
-                        <v-tab-item eager>
-                           <v-tabs class="xui-tabs fill-height" height="32px" style="--xui-tab-h:32px;">
-                              <v-tab>
-                                 <v-icon>mdi-database</v-icon>
-                                 <span class="ml-3">State</span>
-                              </v-tab>
-                              <v-tab-item eager>
-                                 <v-row style="height:40px" no-gutters>
-                                    <v-col cols="12">
-                                       <v-radio-group row v-model="main.jsonEditorDataSrc" class="ml-4 mt-1">
-                                          <div class="v-radio"></div>
-                                          <v-radio label="Initial" value="template"></v-radio>
-                                          <div style="width:42vw"></div>
+               <v-container fluid fill-height align-start pa-0>
+                  <v-tabs class="fill-height main-tab xui-tabs  tabs-dense" vertical dark v-model="main.activeTab">
+                     <v-tab>
+                        <v-icon>mdi-square-edit-outline</v-icon>
+                     </v-tab>
+                     <v-tab-item eager>
+                        <v-tabs class="fill-height xui-tabs" height="35px" style="--xui-tab-h:35px;" dark>
+                           <v-tab>
+                              <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
+                              <span style="margin-left: 5px;">Page {{main.frameName}}</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div class="main-container fill-height">
+                                 <div class="main-item main-item-0">
+                                    <v-toolbar height="38" dark>
+                                       <v-radio-group v-model="main.jsonEditorDataSrc" row class="pt-6">
+                                          <div class="v-radio">
+                                             <v-radio label="Initial" value="template"></v-radio>
+                                          </div>
                                           <div class="v-radio">
                                              <v-radio label="Mock" value="mock"></v-radio>
                                           </div>
                                        </v-radio-group>
-                                    </v-col>
-                                 </v-row>
-                                 <v-row style="height:calc(100% - 40px)" no-gutters>
-                                    <v-col cols="6" id="jsonState">
-                                       <v-jsoneditor ref="jsonEditor" v-model="main.jsonEditorData" :options="main.jsonEditorOptions" :plus="false" height="100%"></v-jsoneditor>
-                                    </v-col>
-                                    <v-col cols="6">
-                                       <v-jsoneditor style="height: calc(100% - 25px);" ref="jsonEditor2" v-model="main.jsonEditorDataMock" :options="main.jsonEditorOptionsCode" :plus="false" height="100%"></v-jsoneditor>
-                                    </v-col>
-                                 </v-row>
-                              </v-tab-item>
-                              <v-tab>
-                                 <v-icon>mdi-state-machine</v-icon>
-                                 <span class="ml-3">ACTION</span>
-                              </v-tab>
-                              <v-tab-item eager>
-                                 <v-row class="fill-height" no-gutters>
-                                    <v-col cols="3">
-                                       <v-list class="fill-height elevation-2" subheader dense>
-                                          <v-list-item-group>
-                                             <template v-for="(ListActions_item, ListActions_index) in main.ListActions">
-                                                <div class="mx-1 mt-1">
-                                                   <v-btn class="rounded-lg  text-capitalize" style="width:100%" rounded>
-                                                      <v-icon left>mdi-flash</v-icon>
-                                                      <span>{{ListActions_item.id}}</span>
-                                                   </v-btn>
-                                                </div>
-                                             </template>
-                                          </v-list-item-group>
-                                       </v-list>
-                                    </v-col>
-                                    <v-col>
-                                       <div class="fill-height">
-                                          <pre>
-                                             <code id="xui-code-js" spellcheck></code>
-                                          </pre>
+                                       <v-spacer></v-spacer>
+                                       <div class="pt-6">
+                                          <div>
+                                             <v-switch dense label="route enable" v-model="main.routeEnable"></v-switch>
+                                          </div>
                                        </div>
-                                    </v-col>
-                                 </v-row>
-                              </v-tab-item>
-                              <v-tab>
-                                 <v-icon>mdi-database-import</v-icon>
-                                 <span class="ml-3">MUTATION</span>
-                              </v-tab>
-                              <v-tab-item eager></v-tab-item>
-                              <v-tab>
-                                 <v-icon>mdi-calculator-variant</v-icon>
-                                 <span class="ml-3">GETTER</span>
-                              </v-tab>
-                              <v-tab-item eager></v-tab-item>
-                              <v-tab>
-                                 <v-icon>mdi-head-cog-outline</v-icon>
-                                 <span class="ml-3">PROCESS</span>
-                              </v-tab>
-                              <v-tab-item eager></v-tab-item>
-                           </v-tabs>
-                        </v-tab-item>
-                     </v-tabs>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-code-tags</v-icon>
-                  </v-tab>
-                  <v-tab-item eager>
-                     <v-row class="mx-3 mt-2 mb-1" no-gutters>
-                        <v-col cols="1">
-                           <v-btn @click="$xui.downloadPage()" rounded>
-                              <v-icon left>mdi-download</v-icon>
-                              <span>export</span>
-                           </v-btn>
-                        </v-col>
-                        <v-col cols="1">
-                        </v-col>
-                        <v-col cols="4">
-                           <v-file-input @change="$xui.importPage($event)" small-chips truncate-length="15" dense hide-details label="import file"></v-file-input>
-                        </v-col>
-                        <v-col>
-                        </v-col>
-                     </v-row>
-                     <v-tabs ref="test" style="height:calc(100% - 49px);--xui-tab-h:35px;" class="tab-code fill-height xui-tabs" height="35px" dark>
-                        <v-tab>
-                           <span> Html </span>
-                        </v-tab>
-                        <v-tab-item eager>
-                           <div class="fill-height">
-                              <pre>
-                                 <code id="xui-code-html" spellcheck></code>
-                              </pre>
-                           </div>
-                        </v-tab-item>
-                        <v-tab>
-                           <span>XUI</span>
-                        </v-tab>
-                        <v-tab-item eager>
-                           <div class="fill-height">
-                              <pre>
-                                 <code id="xui-code-xui" spellcheck></code>
-                              </pre>
-                           </div>
-                        </v-tab-item>
-                        <v-tab>
-                           <span>JSON</span>
-                        </v-tab>
-                        <v-tab-item eager>
-                           <div class="fill-height">
-                              <pre>
-                                 <code id="xui-code-json" spellcheck></code>
-                              </pre>
-                           </div>
-                        </v-tab-item>
-                     </v-tabs>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-api</v-icon>
-                  </v-tab>
-                  <v-tab-item eager>
-                     <div id="editorContent">
-                        <vue-editor v-model="main.contentEditor"></vue-editor>
-                     </div>
-                     <div id="resultContent">
-                        <div v-html="main.contentEditor"></div>
-                     </div>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-apps</v-icon>
-                  </v-tab>
-                  <v-tab-item eager>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-image-multiple-outline</v-icon>
-                  </v-tab>
-                  <v-tab-item eager>
-                  </v-tab-item>
-                  <v-tab>
-                     <v-icon>mdi-border-inside</v-icon>
-                  </v-tab>
-                  <v-tab-item eager>
-                     <div class="ma-10" id="qrcode">QRCode PWA</div>
-                  </v-tab-item>
-               </v-tabs>
+                                    </v-toolbar>
+                                 </div>
+                                 <div class="main-item main-item-1"></div>
+                                 <div class="main-item main-item-2">
+                                    <iframe id="rootFrame"></iframe>
+                                 </div>
+                                 <div class="main-item main-item-3">
+                                    <v-overlay :value="main.saveLayout" style="height: 100%;position: relative;">
+                                       <v-btn>Save in progress</v-btn>
+                                    </v-overlay>
+                                    <v-tabs class="xui-action-tab fill-height xui-tabs  tabs-dense" height="35px" style="--xui-tab-h:35px;" dark v-model="main.activeAction">
+                                       <v-tab>
+                                          <v-icon>mdi-layers-triple</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="AppPropertiesSetting"></div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-palette-swatch</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="AppPropertiesStyle"></div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-lightning-bolt</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="AppPropertiesEvent"></div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-database-import</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="AppPropertiesBinding"></div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-plus-box-multiple</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="AppComponents"></div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-file-tree</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div id="treeCmp" class="barcustom xui-div-scroll-vertical">
+                                             <v-treeview dense transition :open-all="main.expandAll" ref="treeCmp" hoverable return-object activatable :items="main.listSlot" :active.sync="main.activeSlot" :open.sync="main.openSlot" @update:active="$xui.selectCmp()">
+                                                <template v-slot:prepend="{ item }">
+                                                   <v-icon>
+                      {{item.icon}}
+                    </v-icon>
+                                                </template>
+                                             </v-treeview>
+                                          </div>
+                                       </v-tab-item>
+                                       <v-tab>
+                                          <v-icon>mdi-chevron-right-box</v-icon>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <div>CLI coming soon...</div>
+                                       </v-tab-item>
+                                    </v-tabs>
+                                 </div>
+                              </div>
+                           </v-tab-item>
+                           <v-tab>
+                              <v-icon>mdi-palette</v-icon>
+                              <span>Style</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div>Coming soon...</div>
+                           </v-tab-item>
+                           <v-tab>
+                           </v-tab>
+                           <v-tab-item eager>
+                           </v-tab-item>
+                        </v-tabs>
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-database</v-icon>
+                     </v-tab>
+                     <v-tab-item eager>
+                        <v-tabs class="xui-tabs fill-height" dark height="32px" style="--xui-tab-h:32px;">
+                           <v-tab>
+                              <v-icon>mdi-view-module</v-icon>
+                              <span class="ml-3">Module main</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <v-tabs class="xui-tabs fill-height" height="32px" style="--xui-tab-h:32px;">
+                                 <v-tab>
+                                    <v-icon>mdi-database</v-icon>
+                                    <span class="ml-3">State</span>
+                                 </v-tab>
+                                 <v-tab-item eager>
+                                    <v-row style="height:40px" no-gutters>
+                                       <v-col cols="12">
+                                          <v-radio-group row v-model="main.jsonEditorDataSrc" class="ml-4 mt-1">
+                                             <div class="v-radio"></div>
+                                             <v-radio label="Initial" value="template"></v-radio>
+                                             <div style="width:42vw"></div>
+                                             <div class="v-radio">
+                                                <v-radio label="Mock" value="mock"></v-radio>
+                                             </div>
+                                          </v-radio-group>
+                                       </v-col>
+                                    </v-row>
+                                    <v-row style="height:calc(100% - 40px)" no-gutters>
+                                       <v-col cols="6" id="jsonState">
+                                          <v-jsoneditor ref="jsonEditor" v-model="main.jsonEditorData" :options="main.jsonEditorOptions" :plus="false" height="100%"></v-jsoneditor>
+                                       </v-col>
+                                       <v-col cols="6">
+                                          <v-jsoneditor style="height: calc(100% - 25px);" ref="jsonEditor2" v-model="main.jsonEditorDataMock" :options="main.jsonEditorOptionsCode" :plus="false" height="100%"></v-jsoneditor>
+                                       </v-col>
+                                    </v-row>
+                                 </v-tab-item>
+                                 <v-tab>
+                                    <v-icon>mdi-state-machine</v-icon>
+                                    <span class="ml-3">ACTION</span>
+                                 </v-tab>
+                                 <v-tab-item eager>
+                                    <v-row class="fill-height" no-gutters>
+                                       <v-col cols="3">
+                                          <v-list class="fill-height elevation-2" subheader dense>
+                                             <v-list-item-group>
+                                                <template v-for="(ListActions_item, ListActions_index) in main.ListActions">
+                                                   <div class="mx-1 mt-1">
+                                                      <v-btn class="rounded-lg  text-capitalize" style="width:100%" rounded>
+                                                         <v-icon left>mdi-flash</v-icon>
+                                                         <span>{{ListActions_item.id}}</span>
+                                                      </v-btn>
+                                                   </div>
+                                                </template>
+                                             </v-list-item-group>
+                                          </v-list>
+                                       </v-col>
+                                       <v-col>
+                                          <div class="fill-height">
+                                             <pre>
+                                                <code id="xui-code-js" spellcheck></code>
+                                             </pre>
+                                          </div>
+                                       </v-col>
+                                    </v-row>
+                                 </v-tab-item>
+                                 <v-tab>
+                                    <v-icon>mdi-database-import</v-icon>
+                                    <span class="ml-3">MUTATION</span>
+                                 </v-tab>
+                                 <v-tab-item eager></v-tab-item>
+                                 <v-tab>
+                                    <v-icon>mdi-calculator-variant</v-icon>
+                                    <span class="ml-3">GETTER</span>
+                                 </v-tab>
+                                 <v-tab-item eager></v-tab-item>
+                                 <v-tab>
+                                    <v-icon>mdi-head-cog-outline</v-icon>
+                                    <span class="ml-3">PROCESS</span>
+                                 </v-tab>
+                                 <v-tab-item eager></v-tab-item>
+                              </v-tabs>
+                           </v-tab-item>
+                        </v-tabs>
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-code-tags</v-icon>
+                     </v-tab>
+                     <v-tab-item eager>
+                        <v-row class="mx-3 mt-2 mb-1" no-gutters>
+                           <v-col cols="1">
+                              <v-btn @click="$xui.downloadPage()" rounded>
+                                 <v-icon left>mdi-download</v-icon>
+                                 <span>export</span>
+                              </v-btn>
+                           </v-col>
+                           <v-col cols="1">
+                           </v-col>
+                           <v-col cols="4">
+                              <v-file-input @change="$xui.importPage($event)" small-chips truncate-length="15" dense hide-details label="import file"></v-file-input>
+                           </v-col>
+                           <v-col>
+                           </v-col>
+                        </v-row>
+                        <v-tabs ref="test" style="height:calc(100% - 49px);--xui-tab-h:35px;" class="tab-code fill-height xui-tabs" height="35px" dark>
+                           <v-tab>
+                              <span> Html </span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div class="fill-height">
+                                 <pre>
+                                    <code id="xui-code-html" spellcheck></code>
+                                 </pre>
+                              </div>
+                           </v-tab-item>
+                           <v-tab>
+                              <span>XUI</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div class="fill-height">
+                                 <pre>
+                                    <code id="xui-code-xui" spellcheck></code>
+                                 </pre>
+                              </div>
+                           </v-tab-item>
+                           <v-tab>
+                              <span>JSON</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <div class="fill-height">
+                                 <pre>
+                                    <code id="xui-code-json" spellcheck></code>
+                                 </pre>
+                              </div>
+                           </v-tab-item>
+                        </v-tabs>
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-api</v-icon>
+                     </v-tab>
+                     <v-tab-item eager>
+                        <div id="editorContent">
+                           <vue-editor v-model="main.contentEditor"></vue-editor>
+                        </div>
+                        <div id="resultContent">
+                           <div v-html="main.contentEditor"></div>
+                        </div>
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-apps</v-icon>
+                     </v-tab>
+                     <v-tab-item eager>
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-image-multiple-outline</v-icon>
+                     </v-tab>
+                     <v-tab-item eager>
+                     </v-tab-item>
+                     <v-tab>
+                        <v-icon>mdi-border-inside</v-icon>
+                     </v-tab>
+                     <v-tab-item eager>
+                        <div class="ma-10" id="qrcode">QRCode PWA</div>
+                     </v-tab-item>
+                  </v-tabs>
+               </v-container>
             </template>
             <v-overlay z-index="6" opacity="0.7" :value="main.overlay">
                <div style="width: 100%;height: 100%;z-index:1" @click="$xui.modePreview()"></div>
@@ -358,8 +366,6 @@
                 {{ item.text }}
             </v-snackbar>
             </div>
-            <v-navigation-drawer v-model="main.isNavdrawerOpen" temporary app>
-            </v-navigation-drawer>
             <v-app-bar app dark height="32" color="#ff5900">
                <v-app-bar-nav-icon @click.stop="main.isNavdrawerOpen = !main.isNavdrawerOpen"></v-app-bar-nav-icon>
                <v-toolbar-title>
@@ -384,8 +390,10 @@
                   <v-icon>mdi-application-export</v-icon>
                </v-btn>
             </v-app-bar>
+            <v-navigation-drawer v-model="main.isNavdrawerOpen" temporary app>
+            </v-navigation-drawer>
             <v-main>
-               <transition :duration="300" name="custom-classes-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
+               <transition :duration="600" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
                   <router-view ref="routerview"></router-view>
                </transition>
             </v-main>
@@ -428,7 +436,7 @@
                   <v-icon>mdi-database-export-outline</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2021 v0.7.3 13/08/2021</span>
+               <span>&copy;&nbsp;Elisys 2021 v0.7.6 26/10/2021</span>
             </v-footer>
          </v-app>
       </template>
@@ -828,35 +836,13 @@
                 font-size: 0.9rem;
             }
         
-            .xui-tabs:not(.v-tabs--vertical)>.v-tabs-items {
-                height: calc(100% - var(--xui-tab-h, 48px));
-                background-color: unset !important;
-            }
-
-            .xui-tabs>.v-tabs-items {
-                background-color: unset !important;
-            }
-
-            .xui-tabs.tabs-dense>*>*>*>.v-tab {
-                min-width: 0px;
-                padding: 0px 10px;
-            }
-
-            .xui-tabs>.v-tabs-items>.v-window__container {
-                height: 100% !important
-            }
-
-            .xui-tabs>.v-tabs-items>.v-window__container>.v-window-item {
-                height: 100%
+            .xui-session {
+                display: block;
             }
         
             .xui-class-slot-full {
                 height: 100%;
                 width: 100%;
-            }
-        
-            .xui-session {
-                display: block;
             }
            </style>
    <script defer src="app/clsHelper.js"></script>
@@ -876,7 +862,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/qrcode-js-package@1.0.4/qrcode.min.js"></script>
    <script type="module">
-		import "./app/vue2frame.js";
+		import "./app/vue/vue2frame.js";
 		$xui.loadApplicationJS();
 	
         $xui.initVuejs($xui.vuejs);

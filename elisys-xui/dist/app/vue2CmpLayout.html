@@ -156,12 +156,12 @@
         <xui-prop id="desc">Flows</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop var="nb" def="2" editor="int">nb slot</xui-prop>
-
     </xui-doc>
 
     <xui-doc xid="xui-no-dom:xui-flow">
         <xui-prop id="name">Flow item</xui-prop>
         <xui-prop id="desc">Un Slot</xui-prop>
+        <xui-prop id="icon">mdi-transfer-right</xui-prop>
         <xui-prop id="add-remove">incNb</xui-prop>
     </xui-doc>
 
@@ -170,5 +170,42 @@
         </xui-slot>
     </xui-slot>
 
+    <!--------------------------  XUI-SLOT   ----------------------------->
+    <div xid="xui-div-slot" class="xui-class-slot"></div>
 
+    <xui-design xid="inject-style">
+        <style xui-no-dom>
+            .xui-class-slot-full {
+                height: 100%;
+                width: 100%;
+            }
+        </style>
+    </xui-design>
+
+    <xui-design xid="inject-style" xui-mode="design;template">
+        <style xui-no-dom>
+            .xui-class-slot {
+                border: 1px dashed lightgray;
+                box-sizing: border-box;
+                min-height: 15px;
+                min-width: 15px;
+                text-decoration: underline dotted;
+                font-style: italic;
+                user-select: none;
+                cursor: pointer;
+                opacity: .7;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .xui-class-slot:hover {
+                border: 1px dashed blue;
+            }
+
+            .xui-class-dragover {
+                border: 1px dashed blue !important;
+            }
+        </style>
+    </xui-design>
+   
 </xui-factory>

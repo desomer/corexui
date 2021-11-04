@@ -352,11 +352,12 @@
         <xui-prop id="name">Tab item</xui-prop>
         <xui-prop id="desc">Contenu de l'onglet</xui-prop>
         <xui-prop id="favorite">container</xui-prop>
+        <xui-prop id="icon">mdi-tab-unselected</xui-prop>
         <xui-prop var="colorBgItem" cat="vstyle" editor="text">background color</xui-prop>
     </xui-doc>
 
     <v-tabs xid="xui-tabs" class="xui-tabs [[fill-height]] [[tabs-dense]] [[class]]" height="[[height-tabs]]"
-        -style="--xui-tab-h:[[height-tabs]];[[style]]" -style=";2" vertical=[[vertical]] dark="[[dark]]"
+        -style="--xui-tab-h:[[height-tabs]];[[style]]" vertical=[[vertical]] dark="[[dark]]"
         light="[[light]]" color="[[color]]" background-color="[[background-color]]" slider-color="[[slider-color]]"
         icons-and-text="[[icons-and-text]]" show-arrows="[[show-arrows]]" fixed-tabs="[[fixed-tabs]]"
         centered="[[centered]]" right="[[right]]" center-active="[[center-active]]" [[event]] v-model=[[:modelTab]] xui-for="idx">
@@ -367,37 +368,10 @@
         <v-tab-item eager -style="background-color:[[colorBgItem@-1]]">
             <!-- eager  desactive le lazyloading -->
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-item-[[idx@0+]]" style-slot="height:100%"
-                xui-slot-name="tab content [[idx@0+]]">
+                xui-slot-name="tab content [[idx@0+]]" xui-topath="click:[[parent-xid]]-tab-[[idx@0+]]">
             </xui-slot>
         </v-tab-item>
     </v-tabs>
-
-    <xui-design xid="inject-style">
-        <style xui-no-dom>
-            .xui-tabs:not(.v-tabs--vertical)>.v-tabs-items {
-                height: calc(100% - var(--xui-tab-h, 48px));
-                background-color: unset !important;
-            }
-
-            .xui-tabs>.v-tabs-items {
-                background-color: unset !important;
-            }
-
-            .xui-tabs.tabs-dense>*>*>*>.v-tab {
-                min-width: 0px;
-                padding: 0px 10px;
-            }
-
-            .xui-tabs>.v-tabs-items>.v-window__container {
-                height: 100% !important
-            }
-
-            .xui-tabs>.v-tabs-items>.v-window__container>.v-window-item {
-                height: 100%
-            }
-        </style>
-    </xui-design>
-
 
     <!-------------------------------- V-TOOLBAR ---------------------------->
     <xui-doc xid="xui-toolbar-1">
@@ -443,9 +417,10 @@
     </xui-doc>
 
     <xui-doc xid="CardText">
-        <xui-prop id="name">Card Text</xui-prop>
+        <xui-prop id="name">Card content</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop id="icon">mdi-content-duplicate</xui-prop>
     </xui-doc>
 
     <xui-doc xid="CardContent">
@@ -495,44 +470,14 @@
         <xui-prop var=":varItems" editor="var" def="items" bind-type="array">items var name</xui-prop>
     </xui-doc>
 
-    <v-treeview xid="xui-treeview" dense :open-all="true" :transition="true" :items="[[:varItems]]"></v-treeview>
+    <v-treeview xid="xui-treeview" dense :open-all="true" :transition="true" :items="[[:varItems]]">
+        <template v-slot:prepend="{ item }">
+            <v-icon>
+              mdi-account
+            </v-icon>
+          </template>
+    </v-treeview>
 
-    <!--------------------------  XUI-SLOT   ----------------------------->
-    <div xid="xui-div-slot" class="xui-class-slot"></div>
 
-    <xui-design xid="inject-style">
-        <style xui-no-dom>
-            .xui-class-slot-full {
-                height: 100%;
-                width: 100%;
-            }
-        </style>
-    </xui-design>
-
-    <xui-design xid="inject-style" xui-mode="design;template">
-        <style xui-no-dom>
-            .xui-class-slot {
-                border: 1px dashed lightgray;
-                box-sizing: border-box;
-                min-height: 15px;
-                min-width: 15px;
-                text-decoration: underline dotted;
-                font-style: italic;
-                user-select: none;
-                cursor: pointer;
-                opacity: .7;
-                white-space: nowrap;
-                overflow: hidden;
-            }
-
-            .xui-class-slot:hover {
-                border: 1px dashed blue;
-            }
-
-            .xui-class-dragover {
-                border: 1px dashed blue !important;
-            }
-        </style>
-    </xui-design>
 
 </xui-factory>

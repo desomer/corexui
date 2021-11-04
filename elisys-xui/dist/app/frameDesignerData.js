@@ -20,6 +20,10 @@ var json = {
     snackbar_timeout: 3000,
 
     listSlot : [],
+    activeSlot : [],
+    openSlot : [],
+    expandAll : false,
+    
     routeEnable : true,
     jsonEditorDataSrc : "template",   // ou mock
     jsonEditorData : {},

@@ -4,8 +4,8 @@ var json = {
     pasteDisabled: true,
     undoDisabled: true,
     redoDisabled: true,
+    frameTemplate:"template/frameTest1",
     frameName:"frame1",
-
     activeTab: 0,
     activeAction: 0,
     contentEditor: '',
@@ -40,4 +40,3 @@ var json = {
 };
 
 $xui.rootdata = { ...$xui.rootdata, ...json };
-//$xui.disableVuex = true;

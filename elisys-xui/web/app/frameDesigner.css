@@ -43,7 +43,7 @@ html::-webkit-scrollbar {
     display: grid; 
     grid-template-columns: auto var(--width-properties);
     grid-template-rows: 40px auto; 
-    }
+}
  
 
  .xui-action-tab {position: absolute; top: 0px; width: var(--width-properties); }
@@ -219,7 +219,10 @@ pre > code {
     display: none;
 }
 
-
+#xui-display-selector-popup > .v-list
+{
+    padding: 0;
+}
 /******************************************************************************/
 .xui-frame-full-screen {
     position : fixed !important;

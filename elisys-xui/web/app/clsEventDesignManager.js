@@ -13,14 +13,14 @@ export class EventManager {
 
     initBuild() {
         window.addEventListener('message', function (e) {
-            var data = e.data;
+            const data = e.data;
             if (data.action == "getCmpForFile") {
-                var act = "returnCmpForFile_" + data.infoFileCmp.file + "_" + data.infoFileCmp.xid;
-                var prom = getPromise(act)
-                waitForXuiLib("getHtmlFromXUI", function () {
+                const act = `returnCmpForFile_${data.infoFileCmp.file}_${data.infoFileCmp.xid}`;
+                const prom = getPromise(act);
+                waitForXuiLib("getHtmlFromXUI", () => {
                     $xuicore.getHtmlFromXUI(data.infoFileCmp, act);
                     prom.then(jsCmp => {
-                        document.querySelector("#rootFrame").contentWindow.postMessage({ "action": act, jsCmp: jsCmp }, "*");
+                        document.querySelector("#rootFrame").contentWindow.postMessage({ "action": act, jsCmp }, "*");
                     });
                 }, this);
 
@@ -33,7 +33,7 @@ export class EventManager {
         $xui.dragStart = (item, e) => {
             $xui.dragItem = item;
             $xui.dragMoveItem = null;
-            e.dataTransfer.setData('text/plain', "add cmp " + item.xid);
+            e.dataTransfer.setData('text/plain', `add cmp ${item.xid}`);
             $xui.SelectorManager.unDisplaySelector();
         }
 
@@ -41,11 +41,11 @@ export class EventManager {
         $xui.dragMoveStart = (e) => {
             $xui.dragMoveItem = $xui.propertiesDesign;
             $xui.dragItem = null;
-            e.dataTransfer.setData('text/plain', "move " + $xui.propertiesDesign.xid);
+            e.dataTransfer.setData('text/plain', `move ${$xui.propertiesDesign.xid}`);
         }
 
         // gestion de la fermeture par ctrl Q
-        document.addEventListener("keydown", function (event) {
+        document.addEventListener("keydown", (event) => {
 
             if (event.ctrlKey && event.keyCode == 80) {    // ctrl + P
                 // mode preview  : gestion de l'ouverture par ctrl P
@@ -56,7 +56,7 @@ export class EventManager {
 
         });
 
-        window.addEventListener('pointerup', function (e) {
+        window.addEventListener('pointerup', (e) => {
             if (e.button == 0) {
                 $xui.closePopup();
             }
@@ -64,7 +64,7 @@ export class EventManager {
 
         // gestion des evenements entre le designer et l'iframe
         window.addEventListener('message', function (e) {
-            var data = e.data;
+            const data = e.data;
             if (data.action == "select") {
                 $xui.closePopup();
                 //this.console.debug("message select ", data);
@@ -130,7 +130,7 @@ export class EventManager {
             else if (data.action == "displayMessage") {
                 $xui.rootdata.messages.push(data.value);
                 this.setTimeout(() => {
-                    var index = $xui.rootdata.messages.indexOf(data.value);
+                    const index = $xui.rootdata.messages.indexOf(data.value);
                     if (index !== -1) {
                         $xui.rootdata.messages.splice(index, 1);
                     }
@@ -138,9 +138,9 @@ export class EventManager {
             }
             // gestion d'un hot load reloader
             else if (data.action == "get template reloader") {
-                var infoFileCmp = $xui.pageDesignManager.getInfoFile('template');
+                const infoFileCmp = $xui.pageDesignManager.getInfoFile('template');
                 infoFileCmp.partXID = data.xid;
-                var prom = getPromise("getVueCmp")
+                const prom = getPromise("getVueCmp");
                 $xuicore.getHtmlFromXUI(infoFileCmp, "getVueCmp");
                 prom.then(template => {
                     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "doChangeComponent", "xid": data.xid, "template": template }, "*");
@@ -152,7 +152,7 @@ export class EventManager {
             }
             else if (data.action == "return getInfoForSelector") {
                 //console.debug("*******>", data);
-                doPromiseJS("getInfoForSelectorOnIFrame" + data.info.idx, data.ret);
+                doPromiseJS(`getInfoForSelectorOnIFrame${data.info.idx}`, data.ret);
             }
 
 

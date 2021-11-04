@@ -240,10 +240,15 @@
         <xui-prop var="directive" editor="text">directive</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" def="z-index:100;  bottom:0px" editor="style">style</xui-prop>
+
+        <xui-prop var="routeto" cat="event:route" editor="text">route to (/ ; /route1; /page1/route1)</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
+        <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
     </xui-doc>
 
     <v-btn xid="xui-btn-icon-2" [[directive]] class="[[class]]" -style="[[style]]" [[btn-type]] disabled="[[disabled]]" [[size]]
-        [[position]] [[leftright]] [[topbottom]] color="[[color]]" dark="[[dark]]" light="[[light]]" [[event]]>
+        [[position]] [[leftright]] [[topbottom]] color="[[color]]" dark="[[dark]]" light="[[light]]" [[event]] to="[[routeto]]">
         <span xui-if=[[textleft@1]]>[[textleft@2]]</span>
         <v-icon [[positionicon@1]]>[[icon@2]]</v-icon><span xui-if=[[textright@1]]>[[textright@2]]</span>
     </v-btn>

@@ -67,6 +67,12 @@ $xui.initVuejs = (instanceVue) => {
       $xui.refreshAction('showCode')   // affiche le code et le xui
     }
 
+    if (newValue == 4) {
+        setTimeout(() => {
+          $xui.router.push("/page1");
+        }, 1000);
+    }
+
     if (newValue == 6) {
       // onglet SEO
       document.getElementById("qrcode").querySelectorAll('*').forEach(n => n.remove());
@@ -75,6 +81,8 @@ $xui.initVuejs = (instanceVue) => {
 
   }, { deep: true });
 
+
+  /******************************************************************************* */  
   instanceVue.$watch('main.selectedClass', function (newValue, oldValue) {
     console.debug('The selectedClass name was changed from ' + oldValue + ' to ' + newValue + '!');
   }, { deep: true });

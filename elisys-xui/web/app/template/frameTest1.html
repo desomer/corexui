@@ -1,0 +1,150 @@
+<xui-factory version="1.0">
+    <xui-import xui-path="app/vue/vue2frame.html"></xui-import>
+    <xui-import xui-path="app/vue/vue2CmpLayoutVuetify.html"></xui-import>
+    <xui-import xui-path="app/vue/vue2CmpLayout.html"></xui-import>
+    <xui-import xui-path="app/vue/vue2CmpVuetify.html"></xui-import>
+ 
+    <frame-vuetify-1 xid="root"></frame-vuetify-1>
+ 
+    <xui-design xid="root">
+       <xui-prop id="nbpage" val="2"></xui-prop>
+       <xui-prop id="nbroute" val="1"></xui-prop>
+       <xui-prop id="footerHeight" val="48"></xui-prop>
+       <xui-prop id="binding" val="&quot;liste&quot;:[{&quot;size&quot;:&quot;6&quot;,&quot;desc&quot;:&quot;titre&quot;,&quot;image&quot;:&quot;https:&#47;&#47;images.unsplash.com&#47;photo-1633284718969-ad7c9708a4e4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1331&amp;q=80&quot;},{&quot;size&quot;:&quot;6&quot;,&quot;image&quot;:&quot;https:&#47;&#47;images.unsplash.com&#47;photo-1634320494885-4e627328d883?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=774&amp;q=80&quot;},{&quot;size&quot;:&quot;12&quot;,&quot;image&quot;:&quot;https:&#47;&#47;images.unsplash.com&#47;photo-1633284718969-ad7c9708a4e4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1331&amp;q=80&quot;},{&quot;size&quot;:&quot;6&quot;,&quot;image&quot;:&quot;https:&#47;&#47;images.unsplash.com&#47;photo-1634320494885-4e627328d883?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=774&amp;q=80&quot;}],&quot;test&quot;:false,&quot;titre&quot;:&quot;titre ffff&quot;"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content">
+       <xui-prop id=":isnavdraweropen" val="test"></xui-prop>
+       <xui-prop id="withAppBar" val="true"></xui-prop>
+       <xui-prop id="withBottomNavigation" val="true"></xui-prop>
+       <xui-prop id="withLeftNavigation" val="true"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-toolbar-title">
+       <xui-title-1 xid="page-0-content-toolbar-title-title-1_16336304296237"></xui-title-1>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-toolbar-title-title-1_16336304296237">
+       <xui-prop id="text" val="titre" binding="titre"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-toolbar-action">
+       <xui-btn-icon-1 xid="page-0-content-toolbar-action-btn-icon-1_163363054853442"></xui-btn-icon-1>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-toolbar-action-btn-icon-1_163363054853442">
+       <xui-prop id="btn-type" val="icon"></xui-prop>
+       <xui-prop id="icon" val="mdi-cart"></xui-prop>
+       <xui-prop id="@click" val="tttt"></xui-prop>
+       <xui-prop id="@contextmenu" val="bbnb"></xui-prop>
+       <xui-prop id="routeto" val="&#47;page1"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-navdrawerleft-slot">
+       <xui-list xid="page-0-content-navdrawerleft-slot-list_163363077949889"></xui-list>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-navdrawerleft-slot-list_163363077949889">
+       <xui-prop id="nb" val="3"></xui-prop>
+       <xui-prop id="tile" val="false"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="xui-copyzone-slot">
+       <xui-list-item-1 xid="xui-copyzone-slot-list-item-1_163363082960541"></xui-list-item-1>
+    </xui-design>
+ 
+    <xui-design xid="xui-copyzone-slot-list-item-1_163363082960541">
+       <xui-prop id="withAvatar" val="true"></xui-prop>
+       <xui-prop id="withIconEnd" val="true"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="xui-copyzone-slot-list-item-1_163363082960541-title">
+       <xui-prop id="text" val="ok"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot">
+       <xui-row-1 xid="page-0-route-0-content-slot-row-1_163363090095351"></xui-row-1>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1_163363090095351">
+       <xui-prop id="nb" val="1"></xui-prop>
+       <xui-prop id="class" val="mb-3"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1_163363090095351-col-0">
+       <xui-prop id="cols" val="6" binding="liste[].size"></xui-prop>
+       <xui-prop id=":varitems" val="liste"></xui-prop>
+       <xui-card-1 xid="page-0-route-0-content-slot-row-1-card-1_16338099852508"></xui-card-1>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1-card-1_16338099852508">
+       <xui-prop id="height" val="auto"></xui-prop>
+       <xui-prop id="class" val="mt-3 ml-2 mr-2"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1-card-1_16338099852508-CardImage">
+       <xui-prop id="url" val="https:&#47;&#47;images.unsplash.com&#47;photo-1633284718969-ad7c9708a4e4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1331&amp;q=80" binding="liste[].image"></xui-prop>
+       <xui-prop id="aspect-ratio" val="3&#47;4"></xui-prop>
+       <xui-prop id="transition" val="False"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content">
+       <xui-prop id="no-gutter" val="true"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-bottom-nav-slot-btn-icon-1_163450556532066">
+       <xui-prop id="btn-type" val="icon"></xui-prop>
+       <xui-prop id="icon" val="mdi-plus"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-bottom-nav-slot">
+       <xui-flow xid="page-0-content-bottom-nav-slot-flow_163450558577545"></xui-flow>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-bottom-nav-slot-flow_163450558577545">
+       <xui-prop id="nb" val="2"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-bottom-nav-slot-flow_163450558577545-col-0">
+       <xui-btn-icon-1 xid="page-0-content-bottom-nav-slot-btn-icon-1_163450556532066"></xui-btn-icon-1>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-bottom-nav-slot-flow_163450558577545-col-1">
+       <xui-btn-icon-1 xid="page-0-content-bottom-nav-slot-flow-btn-icon-1_163450559010395"></xui-btn-icon-1>
+    </xui-design>
+ 
+    <xui-design xid="page-0-content-bottom-nav-slot-flow-btn-icon-1_163450559010395">
+       <xui-prop id="btn-type" val="icon"></xui-prop>
+       <xui-prop id="icon" val="mdi-cog"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1-card-1_16338099852508-card-main">
+       <xui-grid-responsive xid="page-0-route-0-content-slot-row-1-card-1-grid-responsive_163479884448240"></xui-grid-responsive>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1-card-1-grid-responsive_163479884448240">
+       <xui-prop id="nb" val="2"></xui-prop>
+       <xui-prop id="fill-height" val="true"></xui-prop>
+       <xui-prop id="fluid" val="true"></xui-prop>
+       <xui-prop id="no-gutters" val="true"></xui-prop>
+       <xui-prop id="class" val="pa-0 "></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1-card-1_16338099852508-card">
+       <xui-prop id="class" val="pa-0 "></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1-card-1-grid-responsive_163479884448240-row-0">
+       <xui-prop id="nb" val="1"></xui-prop>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1-card-1-grid-responsive_163479884448240-row-0-col-0">
+       <xui-title-1 xid="page-0-route-0-content-slot-row-1-card-1-grid-responsive-title-1_16347991113549"></xui-title-1>
+    </xui-design>
+ 
+    <xui-design xid="page-0-route-0-content-slot-row-1-card-1-grid-responsive-title-1_16347991113549">
+       <xui-prop id="text" val="Desc" binding="liste[].desc"></xui-prop>
+    </xui-design>
+ 
+ </xui-factory>
+  

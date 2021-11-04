@@ -140,8 +140,8 @@ class TreeSlot {
   external set isSlot(bool iss);
   external String get icon;
   external set icon(String ic);
-  external String get toPath;
-  external set toPath(String path);
+  external String? get toPath;
+  external set toPath(String? path);
   external TreeSlot get parent;
   external set parent(TreeSlot p);
 }

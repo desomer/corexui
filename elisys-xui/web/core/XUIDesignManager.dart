@@ -232,8 +232,8 @@ class XUIDesignManager {
     if (template == null) {
       fi.xid = 'editor-for';
 
-      XUIComponent cmp =
-          await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
+      // XUIComponent cmp =
+      //     await getDesignManager(fi)._getXUIComponent(ctx, fi.file, fi.xid);
 
       template = await getDesignManager(fi).getHtml(ctx, fi.file, fi.xid);
 

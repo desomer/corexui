@@ -21,20 +21,76 @@
     border-radius: 5px;
 }
 
-/****************************************************/
 
-.xui-classes-transition {
+
+.v-main__wrap {
+    background-color: inherit;  /* recupére la couleur du v-main pour les animations du routeur*/
+}
+
+/****************************************************/
+/* .xui-class-transition-leave-to
+{
+    --animate-duration: 300ms;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 0;
+    background-color: inherit; 
+}
+
+.xui-class-transition-enter-to
+{
     --animate-duration: 300ms;
     position: absolute;
     top: 0px;
     left: 0px;
     z-index: 3;
+    background-color: inherit; 
+} */
+
+.xui-transition {
+    --animate-duration: 300ms;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 100;
+    background-color: inherit; 
 }
 
-.xui-classes-transition-down
- {
+.xui-transition-down
+{
+    --animate-duration: 300ms;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: inherit; 
     z-index: 0;
 }
+
+/****************************************************/
+.xui-tabs:not(.v-tabs--vertical)>.v-tabs-items {
+    height: calc(100% - var(--xui-tab-h, 48px));
+    background-color: unset !important;
+}
+
+.xui-tabs>.v-tabs-items {
+    background-color: unset !important;
+}
+
+.xui-tabs.tabs-dense>*>*>*>.v-tab {
+    min-width: 0px;
+    padding: 0px 10px;
+}
+
+.xui-tabs>.v-tabs-items>.v-window__container {
+    height: 100% !important
+}
+
+.xui-tabs>.v-tabs-items>.v-window__container>.v-window-item {
+    height: 100%
+}
+
+/****************************************************/
 
 .clickAnimation {
     transition-duration: 100ms;

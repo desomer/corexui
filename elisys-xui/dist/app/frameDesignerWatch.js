@@ -8,15 +8,26 @@ $xui.initVuejs = (instanceVue) => {
 
   instanceVue.$watch('main.activeAction', function (newValue, oldValue) {
     console.debug('The activeAction name was changed from ' + oldValue + ' to ' + newValue + '!');
-    if ($xui.rootdata.activeAction<=2) {
+    if ($xui.rootdata.activeAction <= 2) {
       $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     }
-    
+    if ($xui.rootdata.activeAction == 5) {
+
+      if (!$xui.rootdata.expandAll) {
+        // expandAll le prtemliere fois
+        $xui.rootdata.expandAll = true;
+        $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.treeCmp.updateAll($xui.rootdata.expandAll)
+      }
+
+      // affecte le composant selectionné
+      $xui.rootdata.activeSlot.length=0;
+      $xui.rootdata.activeSlot.push($xui.propertiesDesign.xid);
+
+    }
   }, { deep: true });
 
   instanceVue.$watch('main.jsonEditorDataSrc', function (newValue, oldValue) {
-    if ($xui.rootdata.activeTab==0)
-    {
+    if ($xui.rootdata.activeTab == 0) {
       $xui.refreshAction('template:reload-json')   // recharge le json
       $xui.doStoreOnNextReload = true;
     }
@@ -34,11 +45,11 @@ $xui.initVuejs = (instanceVue) => {
     setTimeout(() => {
       $xui.SelectorManager.unDisplaySelector();
     }, 500);
- 
- 
+
+
     if (newValue == 0 && oldValue == 1) {
       // retour de l'onglet jsonEditor
-      var ctrlStr = $xui.rootdata.jsonEditorDataSrc+"#"+JSON.stringify($xui.rootdata.jsonEditorDataMock);
+      var ctrlStr = $xui.rootdata.jsonEditorDataSrc + "#" + JSON.stringify($xui.rootdata.jsonEditorDataMock);
       if ($xui.lastEditorAppStateValue != ctrlStr) {
         $xui.refreshAction('template:reload-json')   // recharge le json
         $xui.doStoreOnNextReload = true;
@@ -46,7 +57,7 @@ $xui.initVuejs = (instanceVue) => {
     }
 
     if (newValue == 1) {
-      $xui.lastEditorAppStateValue = $xui.rootdata.jsonEditorDataSrc+"#"+JSON.stringify($xui.rootdata.jsonEditorDataMock);
+      $xui.lastEditorAppStateValue = $xui.rootdata.jsonEditorDataSrc + "#" + JSON.stringify($xui.rootdata.jsonEditorDataMock);
 
       $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
     }
@@ -107,9 +118,8 @@ class DesignClassManager {
         else if (classDesc.type == "list" && classDesc.sel) {
           classDesc.sel = true;
           var v = classDesc.value + (classDesc.value != "" ? "-" : "") + classDesc.vl;
-          if (v.startsWith("rounded") && v.endsWith("-md"))
-          {
-              v=v.substring(0,v.length-3);
+          if (v.startsWith("rounded") && v.endsWith("-md")) {
+            v = v.substring(0, v.length - 3);
           }
           text = text + v + " "
         }
@@ -141,8 +151,8 @@ class DesignClassManager {
     listTag.forEach(tag => {
       a: for (const catDesc of listDesignClass) {
         for (const classDesc of catDesc.listClass) {
-          if (classDesc.type == "list" && tag.startsWith("rounded") && tag==classDesc.value) {
-            tag=tag+"-md";
+          if (classDesc.type == "list" && tag.startsWith("rounded") && tag == classDesc.value) {
+            tag = tag + "-md";
           }
 
           if (classDesc.type == "check" && classDesc.value == tag) {
@@ -155,7 +165,7 @@ class DesignClassManager {
             classDesc.sel = true;
             var lenTag = classDesc.value.length;
             classDesc.vl = tag.substring(lenTag + 1);
-            classDesc.vlold=classDesc.vl;
+            classDesc.vlold = classDesc.vl;
             catDesc.open = true;
             catDesc.nbint++;
             break a;
@@ -163,7 +173,7 @@ class DesignClassManager {
           else if (classDesc.type == "list" && classDesc.value == "" && classDesc.list.indexOf(tag) >= 0) {
             classDesc.sel = true;
             classDesc.vl = tag;
-            classDesc.vlold=classDesc.vl;
+            classDesc.vlold = classDesc.vl;
             catDesc.open = true;
             catDesc.nbint++;
             break a;

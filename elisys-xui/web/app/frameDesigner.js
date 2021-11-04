@@ -19,7 +19,7 @@ import("./clsPageDesignManager.js").then((module) => {
 
     waitForXuiLib("initPageXUI", function () {
         $xui.doPromiseJS = doPromiseJS;
-        var infoFile = $xui.pageDesignManager.getInfoFile("design");
+        const infoFile = $xui.pageDesignManager.getInfoFile("design");
         $xuicore.initPageXUI(infoFile);
     }, this);
 });
@@ -52,11 +52,11 @@ $xui.changePageJS = (param) => {
 
 
 $xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
-    var jsonTemplate = $xui.parseJson("{" + StateTemplate + "}");
-    var jsonStateProp = $xui.parseJson("{" + StateInProperty + "}");
+    const jsonTemplate = $xui.parseJson(`{${StateTemplate}}`);
+    const jsonStateProp = $xui.parseJson(`{${StateInProperty}}`);
     var ret = null;
 
-    Object.keys($xui.rootdata.jsonEditorData).forEach(function (key) {
+    Object.keys($xui.rootdata.jsonEditorData).forEach((key) => {
         delete $xui.rootdata.jsonEditorData[key];
     });
     Object.assign($xui.rootdata.jsonEditorData, jsonTemplate);
@@ -86,7 +86,7 @@ $xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
 /******************************************************************************** */
 // gestion des button refresh et export de la page
 $xui.refreshAction = (mode) => {
-    var infoFile = $xui.pageDesignManager.getInfoFile(mode);
+    const infoFile = $xui.pageDesignManager.getInfoFile(mode);
 
     if (mode == "template:reload") {
         infoFile.mode = "template";
@@ -150,7 +150,7 @@ let mapAction = {
 $xui.setCurrentAction = (actionName) => {
 
     if (currentAction != null)
-        throw (new SpecifiedError("action déjà en cours " + actionName + " => " + lastAction));
+        throw (new SpecifiedError(`action déjà en cours ${actionName} => ${lastAction}`));
 
     var actionDec = mapAction[actionName];
     if (actionDec != null) {
@@ -171,7 +171,7 @@ $xui.setCurrentAction = (actionName) => {
     lastActionDate = Date.now();
     lastAction = actionName;
     currentAction = actionName;
-    console.debug("START ACTION ------- " + actionName + " ---------")
+    console.debug(`START ACTION ------- ${actionName} ---------`)
     var selectionMode = "root"
     var undisplaySelector = true;
     var reselect = $xui.modeDisplaySelection;
@@ -202,7 +202,7 @@ $xui.setCurrentAction = (actionName) => {
     prom.then(() => {
         $xui.rootdata.saveLayout = false;
         currentAction = null;
-        console.debug("END changePageFinish ------ " + actionName + " ------")
+        console.debug(`END changePageFinish ------ ${actionName} ------`)
         if (selectionMode == "current") {
             if (reselect)
                 $xui.modeDisplaySelection = true;
@@ -227,7 +227,7 @@ $xui.setCurrentAction = (actionName) => {
         else if (selectionMode == "current") {
             $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);   // reaffecte le nouveau mapping
         }
-        console.debug("END changePage ------ " + actionName + " ------")
+        console.debug(`END changePage ------ ${actionName} ------`)
     }
     );
 
@@ -447,7 +447,7 @@ $xui.selectCmp = async () => {
             }
         };
 
-        var xid = $xui.rootdata.activeSlot[0];
+        var xid = $xui.rootdata.activeSlot[0].id;
         $xui.SelectorManager.displaySelectorByXid(xid, xid, false);
     }
 }

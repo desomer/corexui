@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class XUIProperty {
   dynamic content;
 
@@ -38,7 +40,11 @@ class XUIProperty {
   }
 
   String toHTML(String k) {
-    return '<xui-prop id="${k}" val="${content.toString()}"></xui-prop>';
+    HtmlEscape htmlEscape = const HtmlEscape();
+
+    var val = htmlEscape.convert(content.toString());
+
+    return '<xui-prop id="${k}" val="${val}"></xui-prop>';
   }
 }
 
@@ -51,7 +57,11 @@ class XUIPropertyBinding extends XUIProperty {
   }
 
   String toHTML(String k) {
-    return '<xui-prop id="${k}" val="${content.toString()}" binding="${binding.toString()}"></xui-prop>';
+    HtmlEscape htmlEscape = const HtmlEscape();
+
+    var val = htmlEscape.convert(content.toString());
+
+    return '<xui-prop id="${k}" val="${val}" binding="${binding.toString()}"></xui-prop>';
   }
 }
 

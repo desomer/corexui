@@ -89,7 +89,7 @@ class XUISlotTreeManager {
           " <" +
           (slotInfo.slotname ?? "") +
           ">  " +
-          (aTreeSlot.toPath);
+          (aTreeSlot.toPath ?? "no path");
       XUIConfigManager.printc(s);
     }
 

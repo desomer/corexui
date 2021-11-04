@@ -56,12 +56,12 @@
 		<link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style"
 			onload="this.onload=null;this.rel='stylesheet'">
 		<!--  https://animate.style/ --->
-		<link rel="preload" href="./app/vue2frame.css" as="style"
+		<link rel="preload" href="./app/vue/vue2frame.css" as="style"
 			onload="this.onload=null;this.rel='stylesheet'">
 
 		<script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
-		<script defer src="./app/vuexHelper.js"></script>
+		<script defer src="./app/vue/vuexHelper.js"></script>
 
 		<xui-slot xid="inject-other-header" style-slot="display:none" xui-no-design></xui-slot>
 	</xui-design>
@@ -519,7 +519,7 @@
 
 	<!--------------------------------------------------------------------------------------->
 	<script type="module" xid="xui-init-vuetify">
-		import "./app/vue2frame.js";
+		import "./app/vue/vue2frame.js";
 		$xui.loadApplicationJS();
 	</script>
 
@@ -528,7 +528,7 @@
 	<xui-slot xid="xui-init-designer-js" xui-mode="final"></xui-slot>
 
 	<script type="module" xid="xui-init-designer-js" xui-mode="design">
-		import "./app/vue2frameDesigner.js";
+		import "./app/vue/vue2frameDesigner.js";
 	</script>
 
 	<script xid="xui-init-designer" xui-mode="preview">

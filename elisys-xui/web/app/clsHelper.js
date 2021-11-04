@@ -6,16 +6,16 @@ function waitForXuiLib(key, callback, self) {
     }
 };
 
-
+// ANCHOR requireXUI  
 globalThis.requireXUI = (function () {
-    var cache = {};
+    const cache = {};
 
     async function loadScript(url) {
         if (url.startsWith("http")) {
             await fetch(url)
                 .then(response => response.text())
                 .then(txt => {
-                    var fnBody = 'var exports = {};var module = {}\n' + txt + '\nif(module.exports!=null) return module.exports;\nreturn exports;';
+                    const fnBody = `var exports = {};var module = {}\n${txt}\nif(module.exports!=null) return module.exports;\nreturn exports;`;
                     cache[url] = (new Function(fnBody)).call({});
                 })
         }
@@ -47,7 +47,7 @@ globalThis.requireXUI = (function () {
 
 /***************************************************************************************************************/
 
-var dicoPromise = {};
+const dicoPromise = {};
 
 function getPromise(id) {
 
@@ -70,7 +70,7 @@ function getPromise(id) {
         dicoPromise[id] = promise;
 
     if (Object.keys(dicoPromise).length>10)
-     console.debug("nb promise "+Object.keys(dicoPromise).length, dicoPromise);
+     console.debug(`nb promise ${Object.keys(dicoPromise).length}`, dicoPromise);
 
     return promise;
 }
