@@ -260,7 +260,7 @@ class XUIModel implements Comparable<XUIModel> {
           // n'affecte pas le XID car gerer par attribut xid  => affecte tous les autres
           XUIProperty p = prop.value;
 
-          engine.bindingManager.processPropertiesBinding(prop, this);
+          engine.bindingManager.processPropertiesBinding(prop, this, elemHtml);
 
           elemHtml.propertiesXUI![prop.key] = p;
         }
@@ -328,6 +328,7 @@ class XUIModel implements Comparable<XUIModel> {
       slotInfo.elementHTML = elemHtml;
       slotInfo.implement = elemHtml.implementBy?.first.elemXUI.xid;
       slotInfo.docId = getDocumentationID(elemHtml);
+      
       String? hasFor = elemHtml.propertiesXUI?[":varitems"]?.content;
       if (hasFor != null)
         slotInfo.mapTag["for"] = hasFor;

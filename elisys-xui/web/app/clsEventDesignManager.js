@@ -148,7 +148,7 @@ export class EventManager {
             }
             else if (data.action == "reloader finish") {
                 // lancer par les v-xui-reloader  ou aprés un rechargement global du body
-                doPromiseJS("changePageFinish");
+                doPromiseJS("AfterChangeSelectByXid");
             }
             else if (data.action == "return getInfoForSelector") {
                 //console.debug("*******>", data);

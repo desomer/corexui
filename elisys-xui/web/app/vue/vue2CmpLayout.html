@@ -42,52 +42,12 @@
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
 
-        <xui-prop var=":varItems" editor="var" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var=":varitems" editor="var" def="items" bind-type="array">items var name</xui-prop>
     </xui-doc>
 
-    <template xid="xui-for" v-for="([[:varItems]]_item, [[:varItems]]_index) in [[:varItems]]">
+    <template xid="xui-for" v-for="([[:varitems]]_item, [[:varitems]]_index) in [[:varitems]]">
         <xui-slot style-slot="height:100%" xid="[[parent-xid]]-for" xui-slot-name="For slot"></xui-slot>
     </template>
-
-    <!--------------------------  XUI-ITERATOR   ------------------------------->
-    <xui-doc xid="xui-iterator-1">
-        <xui-prop id="name">Iterator</xui-prop>
-        <xui-prop id="icon">mdi-reiterate</xui-prop>
-        <xui-prop id="desc">Un block</xui-prop>
-        <xui-prop id="componentAs">container</xui-prop>
-        <xui-prop id="favorite">listitem</xui-prop>
-        <xui-prop id="exclude">container</xui-prop>
-
-        <xui-prop var=":varItems" editor="var" def="items" bind-type="array">items var name</xui-prop>
-        <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
-
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-    </xui-doc>
-
-    <xui-doc xid="xui-iterator-1-item">
-        <xui-prop id="name">iterator items</xui-prop>
-        <xui-prop var="width" cat="design" editor="text">width (%, auto)</xui-prop>
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
-        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-    </xui-doc>
-
-    <xui-doc xid="div:xui-iterator-1-item">
-        <xui-prop id="name">iterator slot</xui-prop>
-    </xui-doc>
-
-
-    <div xid="xui-iterator-1-item" -style="width:[[width]];[[style]]" class="[[class]]">
-        <xui-slot xid="[[parent-xid]]-slot" xui-slot-name="iterator slot"></xui-slot>
-    </div>
-
-    <div xid="xui-iterator-1"
-        class="[[fill-height]] d-flex align-start flex-wrap align-content-start [[class]]"
-        -style="[[style]]">
-        <template v-for="([[:varItems@1]]_item, [[:varItems@1]]_index) in [[:varItems@1]]">
-            <xui-iterator-1-item xui-width="100%" xid="[[parent-xid]]-item"></xui-iterator-1-item>
-        </template>
-    </div>
 
     <!--------------------------  XUI-IF-ELSE   ------------------------------->
     <xui-doc xid="xui-if-else">
@@ -98,7 +58,7 @@
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
 
-        <xui-prop var=":varItems" editor="text" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var=":varitems" editor="text" def="items" bind-type="array">items var name</xui-prop>
         <xui-prop var=":varName" editor="text" def="item" bind-type="item-array">item var name</xui-prop>
     </xui-doc>
 

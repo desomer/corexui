@@ -409,11 +409,11 @@
         <xui-prop var="withTitle" editor="bool">With title</xui-prop>
         <xui-prop var="withAction" editor="bool">With action slot</xui-prop>
 
-        <xui-prop var="directive" editor="text">directive</xui-prop>
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-
+        <xui-prop var="routeto" cat="event:route" editor="text">route to (/ ; /route1; /page1/route1)</xui-prop>
     </xui-doc>
 
     <xui-doc xid="CardText">
@@ -438,7 +438,7 @@
             </xui-slot>
     </v-card-text>
 
-    <v-card xid="xui-card-1" [[directive]] v-ripple="{ center: false, class: 'black--text' }" xui-for="idxc" class="[[class]]"
+    <v-card xid="xui-card-1" [[directive]] v-ripple="{ center: false, class: 'black--text' }" to="[[routeto]]" class="[[class]]"
         -style="[[style]]">
             <xui-image-1 xid="[[parent-xid]]-CardImage" xui-slot-name="CardImage"
                 height="[[height@1]]">
@@ -467,10 +467,10 @@
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
 
-        <xui-prop var=":varItems" editor="var" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var=":varitems" editor="var" def="items" bind-type="array">items var name</xui-prop>
     </xui-doc>
 
-    <v-treeview xid="xui-treeview" dense :open-all="true" :transition="true" :items="[[:varItems]]">
+    <v-treeview xid="xui-treeview" dense :open-all="true" :transition="true" :items="[[:varitems]]">
         <template v-slot:prepend="{ item }">
             <v-icon>
               mdi-account

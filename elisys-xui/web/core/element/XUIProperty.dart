@@ -51,6 +51,7 @@ class XUIProperty {
 ///--------------------------------------------------------------------
 class XUIPropertyBinding extends XUIProperty {
   String? binding;
+  String? cacheBinding;
 
   XUIPropertyBinding(v, b) : super(v) {
     this.binding = b;

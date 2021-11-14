@@ -224,17 +224,12 @@
                         },
                         { sel: false, type: 'divider' },
                         {
-                            sel: false, text: 'size', value: 'text', type: 'list', vl: '1', list:
-                                ['h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                                    'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'button', 'caption', 'overline']
-                        },
-                        {
                             sel: false, text: 'Style', value: '', type: 'list', vl: '1', list:
                                 ['font-regular', 'font-italic']
                         },
                         {
-                            sel: false, text: 'decoration', value: 'text', type: 'list', vl: '1', list:
-                                ['decoration-none', 'decoration-overline', 'decoration-underline', 'decoration-line-through']
+                            sel: false, text: 'decoration', value: 'text-decoration', type: 'list', vl: '1', list:
+                                ['none', 'overline', 'underline', 'line-through']
                         },
                         {
                             sel: false, text: 'weight', value: '', type: 'list', vl: '1', list:
@@ -245,6 +240,11 @@
                         {
                             sel: false, text: 'alignment', value: '', type: 'list', vl: '1', list:
                                 ['text-left', 'text-center', 'text-right', 'text-justify'],
+                        },
+                        {
+                            sel: false, text: 'size', value: 'text', type: 'list', vl: '1', list:
+                                ['h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                                    'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'button', 'caption', 'overline']
                         },
                         { sel: false, type: 'divider' },
                         { sel: false, type: 'check', text: 'text no wrap', value: 'text-no-wrap' },
@@ -287,7 +287,7 @@
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
                         console.debug("save class", aProperty);
-                        aProperty.value = new DesignClassManager().getClassTextFromSeletor(aProperty.value, $xui.rootdata.listCatClass);
+                        aProperty.value = new DesignClassManager().getClassTextFromSelector(aProperty.value, $xui.rootdata.listCatClass);
                         $xui.hasPropertiesChanged = true;
                         $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
                     }

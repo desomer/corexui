@@ -3,7 +3,7 @@ export class SelectorManager {
         idxGetInfoForSelectorOnIFrame=0;
 
         unDisplaySelector() {
-            var node = document.getElementById("xui-display-selector");
+            let node = document.getElementById("xui-display-selector");
             if (node != null) {
                 node.style.display = "none";
                 node = document.getElementById("xui-display-selector-margin");
@@ -23,7 +23,7 @@ export class SelectorManager {
             }
 
             /*******************************************************/
-            var node = document.getElementById("xui-display-selector");
+            let node = document.getElementById("xui-display-selector"); 
             if (node == null) {
                 /************************************************* */
                 // le node selector draggable
@@ -32,7 +32,7 @@ export class SelectorManager {
                 node.classList.add("xui-style-selector");
 
                 node.setAttribute("draggable", true);
-                node.addEventListener("dragstart", function (event) { $xui.dragMoveStart(event); }, false);
+                node.addEventListener("dragstart", (event) => { $xui.dragMoveStart(event); }, false);
 
                 node.addEventListener("click", (e) => {
                     e.currentTarget.style.display = "none";   // retire sur le click
@@ -45,7 +45,7 @@ export class SelectorManager {
 
                 /************************************************* */
                 // le node action
-                var nodeAction = document.createElement("div");
+                const nodeAction = document.createElement("div");
                 nodeAction.id = "xui-display-selector-action";
                 node.appendChild(nodeAction);
 
@@ -75,7 +75,7 @@ export class SelectorManager {
             }
 
             var nodeMargin = document.getElementById("xui-display-selector-margin");
-            var posFrame = rootFrame.getBoundingClientRect();
+            const posFrame = rootFrame.getBoundingClientRect(); 
             //console.debug(position);
 
             // si survole page (root) = affiche la totalité de la page (même si scroll)
@@ -84,7 +84,7 @@ export class SelectorManager {
                 position.top=0;
             }
            // var z = 1+(1-$xui.zoom);
-            var z=1 //1.11;  //pour zoom 0.9
+            const z=1; //1.11;  //pour zoom 0.9
 
 
             position.top=position.top*z;
@@ -97,20 +97,20 @@ export class SelectorManager {
             position.mb=position.mb*z;
 
             // ne depasse pas de l'iframe
-            var pt =  Math.max(0, position.top);
-            var ph =  Math.min((position.top - pt) + position.height, posFrame.height- pt);
+            const pt =  Math.max(0, position.top);
+            const ph =  Math.min((position.top - pt) + position.height, posFrame.height- pt);
 
-            node.style.left = (position.left+ posFrame.left) + "px";
-            node.style.top = (pt + posFrame.top) + "px";
-            node.style.height = ph + "px";
-            node.style.width = position.width + "px";
+            node.style.left = `${position.left+ posFrame.left}px`;
+            node.style.top = `${pt + posFrame.top}px`;
+            node.style.height = `${ph}px`;
+            node.style.width = `${position.width}px`;
             node.style.display = null;   //affiche la div de selection
 
             if (position.hasMargin) {
-                nodeMargin.style.height = position.height + (position.mt + position.mb) + "px";
-                nodeMargin.style.left = (position.left + posFrame.left - position.ml) + "px";
-                nodeMargin.style.top = (position.top + posFrame.top - position.mt) + "px";
-                nodeMargin.style.width = position.width + (position.mr + position.ml) + "px";
+                nodeMargin.style.height = `${position.height + (position.mt + position.mb)}px`;
+                nodeMargin.style.left = `${position.left + posFrame.left - position.ml}px`;
+                nodeMargin.style.top = `${position.top + posFrame.top - position.mt}px`;
+                nodeMargin.style.width = `${position.width + (position.mr + position.ml)}px`;
                 nodeMargin.style.display = null;   //affiche la div de selection
             }
             else {
@@ -125,8 +125,8 @@ export class SelectorManager {
 
         _getInfoForSelectorOnIFrame(selector, parent) {
            this.idxGetInfoForSelectorOnIFrame++; 
-           var idx = this.idxGetInfoForSelectorOnIFrame;
-           var prom = getPromise("getInfoForSelectorOnIFrame"+idx);
+           const idx = this.idxGetInfoForSelectorOnIFrame;
+           const prom = getPromise(`getInfoForSelectorOnIFrame${idx}`);
            let winFrame = document.querySelector("#rootFrame").contentWindow;
            winFrame.postMessage({ "action": "getInfoForSelector", "selector": selector, "parent": parent, "idx": idx }, "*");
            return prom;
@@ -136,11 +136,11 @@ export class SelectorManager {
         ////////////////////////////////////////////    A changer
         ///////////////////////////////////////////////
         _getlistNodeOnIFrame(xid) {
-            var ret =  null;
+            let ret =  null;
             try {
-                ret = document.querySelector("#rootFrame").contentDocument.querySelectorAll("[data-xid-slot=" + xid + "]");
+                ret = document.querySelector("#rootFrame").contentDocument.querySelectorAll(`[data-xid-slot=${xid}]`);
             } catch (error) {
-                alert("getlistNodeOnIFrame on error" + error);
+                alert(`getlistNodeOnIFrame on error${error}`);
             }
             return ret;
         }
@@ -152,7 +152,7 @@ export class SelectorManager {
             this.unDisplaySelector();
 
             // recherche xid simple
-            let elemRect = await this._getInfoForSelectorOnIFrame("[data-xid=" + xid + "]");
+            let elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid=${xid}]`);
 
             if (elemRect != null) {
                 //console.debug("displaySelectorByXid 1 ", xid);
@@ -160,7 +160,7 @@ export class SelectorManager {
             }
  
             if (elemRect == null) {
-                elemRect = await this._getInfoForSelectorOnIFrame("[data-xid-slot-" + xid + "=true]");
+                elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid-slot-${xid}=true]`);
                 if (elemRect != null) {
                     //console.debug("displaySelectorByXid 2 ", xid);
                     this.displaySelectorByPosition(elemRect);
@@ -169,13 +169,13 @@ export class SelectorManager {
            
             // recherche xid de slot invisible sur les div enfant => realise un merge des clientRect
             if (elemRect == null) {
-                var listNode = this._getlistNodeOnIFrame(xid);
+                const listNode = this._getlistNodeOnIFrame(xid);
                 //console.debug("displaySelectorByXid 31 ", xid, listNode);
-                var found = false;
+                let found = false;
                 
                 if (listNode != null && listNode.length>0 && listNode.length == listNode[0].parentNode.children.length) {
                     let parent = true;   
-                    elemRect = await this._getInfoForSelectorOnIFrame("[data-xid-slot=" + xid + "]", parent);
+                    elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid-slot=${xid}]`, parent);
                     if (elemRect != null) {
                         if (elemRect.width!=0 && elemRect.height!=0)
                         {

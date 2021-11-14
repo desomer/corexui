@@ -64,7 +64,7 @@ $xui.doActionPopup = (actionId) => {
 
     if (actionId.action == "addFlow") {
         $xui.setCurrentAction("addCmp");
-        addCmpXID($xui.propertiesDesign.xidSlot, "xui-flow");
+        $xui.addCmpXID($xui.propertiesDesign.xidSlot, "xui-flow");
         console.debug("doActionPopup addFlow OK");
         return true;
     }
@@ -74,7 +74,7 @@ $xui.doActionPopup = (actionId) => {
         let cmp = { xid: 'xui-flow' };
         const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
         const currentXid = info.parentXid;
-        const template = "<xui-design xid=\"" + currentXid + "\"><" + cmp.xid + " xid=\"" + newXid + "\"></" + cmp.xid + "></xui-design>";
+        const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
         $xuicore.surroundDesignXUI(infoFile, $xui.propertiesDesign.xid, template, newXid);
         return true;
     }

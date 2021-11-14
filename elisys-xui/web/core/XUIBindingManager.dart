@@ -4,6 +4,7 @@ import 'XUIConfigManager.dart';
 import 'XUIEngine.dart';
 import 'XUIFactory.dart';
 import 'XUIJSInterface.dart';
+import 'element/XUIElement.dart';
 import 'element/XUIProperty.dart';
 import 'native/register.dart';
 
@@ -14,14 +15,14 @@ class XUIBindingManager {
   XUIBindingManager(this.engine);
 
   void processPropertiesBinding(
-      MapEntry<String, XUIProperty> prop, XUIModel model) {
+      MapEntry<String, XUIProperty> prop, XUIModel model, XUIElementHTML elemHtml) {
     XUIProperty p = prop.value;
 
     if (prop.key.startsWith(":")) {
       // gestion du v-for    :items
       var propB = XUIPropertyBinding("", prop.value.content);
       var pme = MapEntry<String, XUIProperty>(prop.key, propB);
-      _addXUIBinding(pme, model);
+      _addXUIBinding(pme, model, elemHtml);
     }
 
     if (p.content is String && p.content.startsWith("{{") == true) {
@@ -30,29 +31,42 @@ class XUIBindingManager {
       varName = varName.substring(0, varName.length - 2);
       var propB = XUIPropertyBinding("", varName);
       var pme = MapEntry<String, XUIProperty>(prop.key, propB);
-      _addXUIBinding(pme, model);
+      _addXUIBinding(pme, model, elemHtml);
     }
 
     if (p is XUIPropertyBinding) {
-      _addXUIBinding(prop, model);
+      _addXUIBinding(prop, model, elemHtml);
     }
   }
 
-  void _addXUIBinding(MapEntry<String, XUIProperty> prop, XUIModel model) {
+  void _addXUIBinding(MapEntry<String, XUIProperty> prop, XUIModel model, XUIElementHTML elemHtml) {
     XUIPropertyBinding p = prop.value as XUIPropertyBinding;
+
+    var name = p.binding!;
+    int isArray = name.lastIndexOf("[]");
+
+    if (isArray<=0) {
+        String? varitems = elemHtml.searchPropertyXUI(":varitems@1+", 0,  ParseInfo(p, null, ParseInfoMode.PROP));
+        if (varitems!=null)
+        {
+          varitems=varitems.substring(varitems.indexOf(".")+1);
+          name= varitems+ "[]."+name;
+          print("-------------- varitems --------------> " + name);
+        }
+    }
 
     if (XUIConfigManager.verboseBinding) {
       XUIConfigManager.printc("Prop key [" +
           prop.key.toString() +
           "] on var binding [" +
-          p.binding! +
+          name +
           "] xid=" +
           model.elemXUI.xid.toString());
     }
 
     // affecte le binding pour la creation du JSON de binding
-    bindingInfo[p.binding!] =
-        XUIBinding(prop.key, p.binding!, p.content, model.elemXUI.xid!);
+    bindingInfo[name] =
+        XUIBinding(prop.key, name, p.content, model.elemXUI.xid!);
   }
 
   void processPhase2JS(XUIContext ctx) {

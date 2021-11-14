@@ -119,9 +119,16 @@ class XUIElementHTML extends XUIElement {
       if (atScope == "-1") {
         return firstChildNoText()!.searchPropertyXUI(tag, 0, parseInfo);
       }
-      if (atScope == "0+") {
+      else if (atScope == "0+") {
         return searchPropertyXUI(tag, -2, parseInfo);
       }
+      else if (atScope == "1+") {
+        if (parent!=null)
+          return parent!.searchPropertyXUI(tag, -2, parseInfo);
+        else
+          return null;
+      }
+
       int scope = int.tryParse(atScope) ?? 0;
       return searchPropertyXUI(tag, scope, parseInfo);
     } else if (deep == -1) {
@@ -155,8 +162,28 @@ class XUIElementHTML extends XUIElement {
     var namespace = "main.";
 
     if (prop is XUIPropertyBinding) {
-      var name = prop.binding;
-      int isArray = name!.lastIndexOf("[]");
+
+  //  parseInf =
+  //           ParseInfo(prop, parseInfoOptional.context, ParseInfoMode.PROP);
+  //     } else {
+  //       parseInf = ParseInfo(prop, null, ParseInfoMode.PROP);
+  //     }
+      
+      var name = prop.binding!;
+      int isArray = name.lastIndexOf("[]");
+
+      if (isArray<=0) {
+          String? varitems = searchPropertyXUI(":varitems@1+", 0, parseInfo);
+          if (varitems!=null)
+          {
+            varitems=varitems.substring(varitems.indexOf(".")+1);  // retrait du scope
+            name= varitems+ "[]."+name;
+            isArray = name.lastIndexOf("[]");
+            prop.cacheBinding=name;
+            print("-------------- varitems map --------------> " + name);
+          }
+      }
+      
       if (isArray > 0) {
         var arrayName = name.substring(0, isArray);
         name =
@@ -182,7 +209,7 @@ class XUIElementHTML extends XUIElement {
       }
 
       var name = prop.content.toString();
-      int mapOnArray = name.lastIndexOf("[]"); // gestion de tableau de tableau
+      int mapOnArray = name.lastIndexOf("[]"); // gestion de TABLEAU de TABLEAU
       if (mapOnArray > 0) {
         var arrayName = name.substring(0, mapOnArray);
         if (numVar == 1) {
@@ -526,9 +553,9 @@ class XUIElementHTMLText extends XUIElementHTML {
 
 /// provient d'un provider interne
 abstract class XUIElementNative extends XUIElementXUI {
-  Future<XUIModel> doProcessPhase1(
+  Future doProcessPhase1(
       XUIEngine engine, XUIElementHTML html) async {
-    return Future.value(null);
+    return null;
   }
 
   Future doProcessPhase2(XUIEngine engine, XUIElementHTML html) async {

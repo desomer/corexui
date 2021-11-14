@@ -36,6 +36,7 @@ main
     <xui-import xui-path="app/cmpDesignBindEditor.html"></xui-import>
     <xui-import xui-path="app/cmpDesignCode.html"></xui-import>
     <xui-import xui-path="app/cmpDesignState.html"></xui-import>
+    <xui-import xui-path="app/frameDesignerMain.html"></xui-import>
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
 
@@ -47,20 +48,8 @@ main
         <xui-prop id="binding" val="&quot;isNavdrawerOpen&quot;: false"></xui-prop>
     </xui-design>
 
-    <xui-design xid="page-0-content">
-        <xui-prop id="title" val="PWA Designer"></xui-prop>
-        <xui-prop id="nbroute" val="1"></xui-prop>
-
-        <xui-prop id="colorApp" val="#ff5900"></xui-prop>
-        <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2021 v0.7.6 26/10/2021"></xui-prop>
-
-        <xui-prop id="withAppBar" val="true"></xui-prop>
-        <xui-prop id="withLeftNavigation" val="true"></xui-prop>
-        <xui-prop id="withFooter" val="true"></xui-prop>
-        <xui-prop id="navTemporary" val="true"></xui-prop>
-        <xui-prop id=":isnavdraweropen" val="isNavdrawerOpen"></xui-prop>
-    </xui-design>
+    <!----------------------------------------------------------------------------------->
+ 
 
     <!----------------------------------------------------------------------------------->
     <xui-design xid="page-1-content">
@@ -69,31 +58,16 @@ main
 
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2021 v0.8.0 14/11/2021"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
+        <xui-prop id="withFooter" val="true"></xui-prop>
         <xui-prop id="navTemporary" val="true"></xui-prop>
         <xui-prop id=":isnavdraweropen" val="isNavdrawerOpen"></xui-prop>
     </xui-design>
 
-    <xui-design xid="page-1-content-toolbar">
-        <xui-prop id="headerHeight" val="32"></xui-prop>
-        <xui-prop id="dark" val="true"></xui-prop>
-    </xui-design>
-
-    <xui-design xid="page-1-content-toolbar-action">
-        <xui-btn-icon-1 xid="page-1-content-toolbar-action-btn-icon-1_163579265326231"></xui-btn-icon-1>
-    </xui-design>
-  
-    <xui-design xid="page-1-content-toolbar-action-btn-icon-1_163579265326231">
-        <xui-prop id="btn-type" val="icon"></xui-prop>
-        <xui-prop id="icon" val="mdi-backspace"></xui-prop>
-        <xui-prop id="routeto" val="&#47;"></xui-prop>
-    </xui-design>
-
-    <!----------------------------------------------------------------------------------->
-
-    <xui-design xid="page-0-route-0-content">
+    <xui-design xid="page-1-route-0-content">
         <xui-prop id="fluid" val="true"></xui-prop>
         <xui-prop id="fill" val="true"></xui-prop>
         <xui-prop id="start" val="true"></xui-prop>
@@ -164,22 +138,22 @@ main
     </div>
 
     <!--------------------------------------------------------------------------->
-    <xui-design xid="page-0-content-toolbar">
+    <xui-design xid="page-1-content-toolbar">
         <xui-prop id="headerHeight" val="32"></xui-prop>
         <xui-prop id="dark" val="true"></xui-prop>
     </xui-design>
 
-    <xui-design xid="page-0-content-footer" style="padding-top: 1px;">
+    <xui-design xid="page-1-content-footer" style="padding-top: 1px;">
         <xui-prop id="footerHeight" val="32"></xui-prop>
         <xui-prop id="dark" val="true"></xui-prop>
     </xui-design>
 
-    <xui-design xid="page-0-content-toolbar-title">
+    <xui-design xid="page-1-content-toolbar-title">
         <span class="xui-path-component">{{main.selectedxui}}</span>
     </xui-design>
 
     <!--------------------------------------------------------------------------->
-    <xui-design xid="page-0-content">
+    <xui-design xid="page-1-content">
         <v-overlay z-index=6 opacity=0.7 :value="main.overlay"><div style="width: 100%;height: 100%;z-index:1" @click="$xui.modePreview()"></div></v-overlay>
         <xui-snackbar-dialog></xui-snackbar-dialog>
         <xui-popup-action></xui-popup-action>
@@ -196,7 +170,7 @@ main
         </div>
     </xui-design>
 
-    <xui-design xid="page-0-route-0-content">
+    <xui-design xid="page-1-route-0-content">
         <xui-tabs xid="main-tab" xui-nb="7" xui-vertical=true xui-tabs-dense=true xui-dark=true
             class="fill-height main-tab">
         </xui-tabs>
@@ -374,7 +348,7 @@ main
     </xui-design>
 
     <!--------------------------------------------------------------------------->
-    <xui-design xid="page-0-content-toolbar-action">
+    <xui-design xid="page-1-content-toolbar-action">
         <xui-btn-small @click="$xui.fullScreen()">
             <v-icon>mdi-fullscreen</v-icon>
         </xui-btn-small>
@@ -396,7 +370,7 @@ main
     </xui-design>
 
     <!--------------------------------------------------------------------------->
-    <xui-design xid="page-0-content-footer-slot">
+    <xui-design xid="page-1-content-footer-slot">
         <xui-btn-small @click="$xui.deleteCmp()">
             <v-icon>mdi-delete</v-icon>
         </xui-btn-small>
@@ -472,7 +446,7 @@ main
 
         <script defer src="app/frameDesigner.js"></script>
         <script defer src="app/frameDesignerProp.js"></script>
-        <script defer src="app/frameDesignerAction.js"></script>
+        <script defer src="app/frameDesignerPopupAction.js"></script>
 
         <script defer src="https://cdn.jsdelivr.net/npm/v-jsoneditor@1.4.2/dist/v-jsoneditor.min.js"></script>
 

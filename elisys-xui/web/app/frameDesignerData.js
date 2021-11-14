@@ -1,4 +1,12 @@
 var json = {
+
+
+    listeTemplate: [
+        { name: "Empty", frameName:"frame1", frameTemplate:"template/frameEmpty", size : 2},
+        { name: "e-Commerce", frameName:"frame1", frameTemplate:"template/frameTest1", size : 2},
+        { name: "Blog", frameName:"frame1", frameTemplate:"template/frameTest2", size : 2},
+    ],
+
     isDesignFrame: true,
     selectedxui: "PWA Generator",
     pasteDisabled: true,

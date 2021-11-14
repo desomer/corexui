@@ -77,16 +77,27 @@ class NativeSlot extends XUIElementNative {
     // affecte l'identifiant xid du slot sur le parent si le parent en a pas
     int nbChild = html.getNbChildNoText();
     int nbChildNoSlot = 0;
+    var isFlow = html.originElemXUI!=null && html.originElemXUI!.tag == "xui-flow";
+    var isFlowParent = html.parent!=null && html.parent!.originElemXUI!=null && html.parent!.originElemXUI!.tag == "xui-flow";
+
     html.children?.forEach((childHtml) {
 
       // affecte le nom du slot sur les enfants si doit etre accessible (avoir un slot xid)
       if (isModeDesign && isSlotButNotCopyzone) {
         childHtml.attributes ??= HashMap<String, XUIProperty>();
-
         // affecte le xid-slot sur les enfant non slot
         if (childHtml is! XUIElementHTMLText) {
+
           if (childHtml.tag != TAG_NO_DOM) {
-            childHtml.attributes!["data-" + ATTR_XID_SLOT] = XUIProperty(xidCal);
+            var xidSlot = xidCal.toString();
+            if (isFlowParent && (childHtml as XUIElementHTML).originElemXUI!.tag!=TAG_DIV_SLOT)
+              {
+                  xidSlot  = xidCal.toString().substring(0 , xidCal.toString().lastIndexOf("-"));
+                  xidSlot  = xidSlot.toString().substring(0 , xidSlot.toString().lastIndexOf("-"));
+                  //print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee "+ xidSlot + " tag " + (html.originElemXUI!.tag??"") +  " p.tag=" + ((childHtml as XUIElementHTML).originElemXUI!.tag??""));
+              }
+
+            childHtml.attributes!["data-" + ATTR_XID_SLOT] = XUIProperty(xidSlot);
             nbChildNoSlot++;
           }
         }
@@ -110,14 +121,14 @@ class NativeSlot extends XUIElementNative {
       }
     });
 
-    if (isModeDesign && xidCal!=null && (nbChildNoSlot == 0)) {
+    if (isModeDesign && xidCal!=null && (nbChildNoSlot == 0) && !isFlow) {
       //recherche un parent affichable pour gerer la selection des slot (displaySelectorByXid)
       var p = html.parent;
       while (p != null) {
-        if (p.tag != null && !p.tag!.startsWith("xui")) {
-          p.attributes ??= HashMap<String, XUIProperty>();
-          p.attributes!["data-" + ATTR_XID_SLOT + "-" + xidCal] =
-              XUIProperty(true);
+        if (p.tag != null && !(p.tag!.startsWith("xui"))) {
+           p.attributes ??= HashMap<String, XUIProperty>();
+           p.attributes!["data-" + ATTR_XID_SLOT + "-" + xidCal] =
+               XUIProperty(true);
           break;
         }
         p = p.parent;

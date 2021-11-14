@@ -21,7 +21,6 @@ export class PageDesignManager {
     }
 
     loadPage(html, param) {
-        // console.debug("load", html);
         document.querySelector("#rootFrame").srcdoc = html;
 
         this.codeHtml = html;
@@ -34,24 +33,21 @@ export class PageDesignManager {
         setTimeout(() => {
             $xui.displayComponents("", "");
             $xui.displayPropertiesJS("root", "root")
-        }, 100);
+        }, 200);
 
-        var name = this.getPageId();
-        var version = localStorage.getItem('xui_version_' + name);
+        const name = this.getPageId();
+        const version = localStorage.getItem(`xui_version_${name}`);
         if (version != null) {
             $xui.rootdata.undoDisabled = false;
-            var versionMax = localStorage.getItem('xui_version_max_' + name);
-            if (versionMax != null) {
-                if (parseInt(versionMax) > parseInt(version)) {
-                    $xui.rootdata.redoDisabled = false;
-                }
+            const versionMax = localStorage.getItem(`xui_version_max_${name}`);
+            if (versionMax != null && parseInt(versionMax) > parseInt(version)) {
+                $xui.rootdata.redoDisabled = false;
             }
         }
     }
 
 
     changePageOnFrame(param) {
-        //console.debug("change page", param);
 
         $xui.SelectorManager.unDisplaySelector();
 
@@ -93,7 +89,7 @@ export class PageDesignManager {
         }
 
         if (param.action == "clear") {
-            doPromiseJS("changePageFinish");
+            doPromiseJS("AfterChangeSelectByXid");
         }
 
         if (param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")
@@ -117,8 +113,8 @@ export class PageDesignManager {
     }
 
     async export() {
-        var q = faunadb.query;
-        var client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
+        const q = faunadb.query;
+        const client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
 
         // client.query(
         // q.Get(q.Ref(q.Collection('Filexui'), '252953488011559426'))
@@ -141,9 +137,8 @@ export class PageDesignManager {
         //     )
         //     .then((ret) => console.log(ret))
 
-        var ret = null;
-        
-        
+        let ret = null;
+         
         try {
             ret=  await client.query(
                 q.Get(
@@ -181,17 +176,17 @@ export class PageDesignManager {
     }
 
     store() {
-        var name = this.getPageId();
-        var version = localStorage.getItem('xui_version_' + name);
+        const name = this.getPageId();
+        let version = localStorage.getItem(`xui_version_${name}`);
         if (version == null)
             version = "0";
 
-        var ver = parseInt(version);
+        let ver = parseInt(version);
 
-        localStorage.setItem('xui_data_' + name + '_' + ver, this.codeXUIdata);
+        localStorage.setItem(`xui_data_${name}_${ver}`, this.codeXUIdata);
         ver++;
-        localStorage.setItem('xui_version_' + name, "" + ver);
-        localStorage.setItem('xui_version_max_' + name, "" + ver);
+        localStorage.setItem(`xui_version_${name}`, `${ver}`);
+        localStorage.setItem(`xui_version_max_${name}`, `${ver}`);
 
         $xui.rootdata.redoDisabled = true;
         $xui.rootdata.undoDisabled = false;
@@ -207,7 +202,7 @@ export class PageDesignManager {
     }
 
     loadCode() {
-        var codeElem = document.querySelector("#xui-code-html");
+        const codeElem = document.querySelector("#xui-code-html");
         if (codeElem != null) {
             const code = Prism.highlight(this.codeHtml, Prism.languages.html, 'html');
             codeElem.innerHTML = code;
@@ -215,7 +210,7 @@ export class PageDesignManager {
     }
 
     loadCodeJson() {
-        var codeElem = document.querySelector("#xui-code-json");
+        const codeElem = document.querySelector("#xui-code-json");
         if (codeElem != null) {
             const code = Prism.highlight(this.codeXUIdata, Prism.languages.json, 'json');
             codeElem.innerHTML = code;
@@ -223,7 +218,7 @@ export class PageDesignManager {
     }
 
     loadCodeXUI() {
-        var codeElem = document.querySelector("#xui-code-xui");
+        const codeElem = document.querySelector("#xui-code-xui");
         if (codeElem != null) {
             const code = Prism.highlight(this.codeXUI, Prism.languages.html, 'html');
             codeElem.innerHTML = code;
@@ -231,27 +226,28 @@ export class PageDesignManager {
     }
 
     undo() {
-        var name = this.getPageId();
-        var version = localStorage.getItem('xui_version_' + name);
+        const name = this.getPageId();
+        let version = localStorage.getItem(`xui_version_${name}`);
         if (version == null)
             version = "0";
 
-        var ver = parseInt(version);
+        let ver = parseInt(version);
         if (ver > 0)
             ver--;
 
-        localStorage.setItem('xui_version_' + name, "" + ver);
+        localStorage.setItem(`xui_version_${name}`, `${ver}`);
         $xui.refreshAction("template:reload");
         $xui.rootdata.redoDisabled = false;
     }
 
     redo() {
-        var name = this.getPageId();
-        var versionMax = localStorage.getItem('xui_version_max_' + name);
-        var version = localStorage.getItem('xui_version_' + name);
+        const name = this.getPageId();
+        const versionMax = localStorage.getItem(`xui_version_max_${name}`);
+        const version = localStorage.getItem(`xui_version_${name}`);
 
-        var ver = parseInt(version);
-        var verMax = parseInt(versionMax);
+        let ver = parseInt(version);
+        const verMax = parseInt(versionMax);
+        
         if (ver < verMax) {
             ver++;
         }
@@ -259,7 +255,7 @@ export class PageDesignManager {
             $xui.rootdata.redoDisabled = true;
         }
 
-        localStorage.setItem('xui_version_' + name, "" + ver);
+        localStorage.setItem(`xui_version_${name}`, `${ver}`);
         $xui.refreshAction("template:reload");
     }
 

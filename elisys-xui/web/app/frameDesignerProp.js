@@ -5,12 +5,12 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
     infoFile.action = "design";
 
     if ($xui.rootdata.activeAction == 1) {
-        var idProp = "AppPropertiesStyle";
+        idProp = "AppPropertiesStyle";
         infoFile.action = "style";
     }
 
     if ($xui.rootdata.activeAction == 2) {
-        var idProp = "AppPropertiesEvent";
+        idProp = "AppPropertiesEvent";
         infoFile.action = "event";
     }
     
@@ -39,8 +39,8 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         }
 
         $xui.rootDataProperties = { data: $xui.propertiesDesign.json };
-        var template = "<div id='" + idProp + "' class='barcustom xui-div-scroll-vertical'>" + $xui.propertiesDesign.template + "</div>";
-        var tmpCompiled = compileTemplate(template);
+        const template = `<div id='${idProp}' class='barcustom xui-div-scroll-vertical'>${$xui.propertiesDesign.template}</div>`;
+        const tmpCompiled = compileTemplate(template);
 
         if ($xui.vuejsAppPropertiesSetting != null) {
             $xui.vuejsAppPropertiesSetting.$destroy();
@@ -48,12 +48,12 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         $xui.vuejsAppPropertiesSetting = new Vue({
             render: tmpCompiled.render,
             staticRenderFns: tmpCompiled.staticRenderFns,
-            el: '#' + idProp,
+            el: `#${idProp}`,
             vuetify: new Vuetify(),
             data: $xui.rootDataProperties,
             watch: {
                 $data: {
-                    handler: function (val, oldVal) {
+                    handler(val, oldVal) {
                         //console.log("watch properties", val, this.$data)
                         $xui.hasPropertiesChanged = true;
                     },
@@ -61,17 +61,17 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
                 }
             },
             computed: {
-                $xui: function () {
+                $xui() {
                     return window.$xui;
                 }
             },
-            mounted: function () {
-                this.$nextTick(function () {
+            mounted() {
+                this.$nextTick(() => {
                     if (posScroll >= 0) {
                         document.getElementById(idProp).scrollTop = posScroll;
                     }
                     // gestion de la selection sur le mouseover
-                    var listOver = document.querySelectorAll("#" + idProp + " .xui-over-prop-xid");
+                    var listOver = document.querySelectorAll(`#${idProp} .xui-over-prop-xid`);
                     $xui.lastPropOver = null;
 
                     listOver.forEach((aDivOver) => {
@@ -107,7 +107,6 @@ $xui.displayComponents = (xid, xid_slot) => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
 
     $xui.propertiesComponent = $xuicore.getComponentsXUI(infoFile, xid, xid_slot);
-    //console.debug("displayComponents", $xui.propertiesComponent);
 
     /************************************************************ */
     if ($xui.vuejsAppCmpSetting != null) {
@@ -121,7 +120,7 @@ $xui.displayComponents = (xid, xid_slot) => {
         $xui.vuejsAppCmpSetting.$destroy();
     }
     $xui.vuejsAppCmpSetting = new Vue({
-        template: "<div id='AppComponents' class='xui-div-scroll-vertical barcustom'>" + $xui.propertiesComponent.template + "</div>",
+        template: `<div id='AppComponents' class='xui-div-scroll-vertical barcustom'>${$xui.propertiesComponent.template}</div>`,
         el: '#AppComponents',
         vuetify: new Vuetify(),
         data: $xui.rootDataComponents,
