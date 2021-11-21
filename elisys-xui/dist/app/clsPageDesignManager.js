@@ -3,14 +3,14 @@ export class PageDesignManager {
     codeHtml = null;
     codeXUIdata = null;
     codeXUI = null;
-    //db = null;
+
 
     getInfoFile(mode) {
         return {
             fileID: window.$xui.rootdata.frameName,
-            file: 'app/' + window.$xui.rootdata.frameName + '.html',
+            file: `app/${window.$xui.rootdata.frameTemplate}.html`,
             xid: 'root',
-            mode: mode,
+            mode,
             jsonBinding: JSON.stringify($xui.rootdata.jsonEditorData)
         };
     }
@@ -21,7 +21,6 @@ export class PageDesignManager {
     }
 
     loadPage(html, param) {
-        // console.debug("load", html);
         document.querySelector("#rootFrame").srcdoc = html;
 
         this.codeHtml = html;
@@ -34,24 +33,21 @@ export class PageDesignManager {
         setTimeout(() => {
             $xui.displayComponents("", "");
             $xui.displayPropertiesJS("root", "root")
-        }, 100);
+        }, 200);
 
-        var name = this.getPageId();
-        var version = localStorage.getItem('xui_version_' + name);
+        const name = this.getPageId();
+        const version = localStorage.getItem(`xui_version_${name}`);
         if (version != null) {
             $xui.rootdata.undoDisabled = false;
-            var versionMax = localStorage.getItem('xui_version_max_' + name);
-            if (versionMax != null) {
-                if (parseInt(versionMax) > parseInt(version)) {
-                    $xui.rootdata.redoDisabled = false;
-                }
+            const versionMax = localStorage.getItem(`xui_version_max_${name}`);
+            if (versionMax != null && parseInt(versionMax) > parseInt(version)) {
+                $xui.rootdata.redoDisabled = false;
             }
         }
     }
 
 
     changePageOnFrame(param) {
-        //console.debug("change page", param);
 
         $xui.SelectorManager.unDisplaySelector();
 
@@ -93,7 +89,7 @@ export class PageDesignManager {
         }
 
         if (param.action == "clear") {
-            doPromiseJS("changePageFinish");
+            doPromiseJS("AfterChangeSelectByXid");
         }
 
         if (param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")
@@ -117,8 +113,8 @@ export class PageDesignManager {
     }
 
     async export() {
-        var q = faunadb.query;
-        var client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
+        const q = faunadb.query;
+        const client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
 
         // client.query(
         // q.Get(q.Ref(q.Collection('Filexui'), '252953488011559426'))
@@ -141,12 +137,30 @@ export class PageDesignManager {
         //     )
         //     .then((ret) => console.log(ret))
 
-        var ret = await client.query(
-            q.Get(
-                q.Match(q.Index('filexuiById'), $xui.rootdata.frameName)
+        let ret = null;
+         
+        try {
+            ret=  await client.query(
+                q.Get(
+                    q.Match(q.Index('filexuiById'), $xui.rootdata.frameName)
+                )
             )
-        )
-        console.log("ret=", ret);
+        } catch (error) {
+            console.log("ret error =", error);
+            if (error.requestResult.statusCode==404)
+            {
+                ret= await client.query(
+                    q.Create(
+                        q.Collection('Filexui'),
+                        { data: { id: $xui.rootdata.frameName, html:"new" } },
+                    )
+                    )
+            }
+        }
+
+ 
+
+        console.log("ret db =", ret);
 
         ret = await client.query(
             q.Update(
@@ -155,24 +169,24 @@ export class PageDesignManager {
             )
         )
 
-        console.log("ret=", ret);
+        console.log("re save=", ret);
         $xui.rootdata.snackbar_text = "deploy terminated";
         $xui.rootdata.snackbar_timeout = 2000;
         $xui.rootdata.snackbar = true;
     }
 
     store() {
-        var name = this.getPageId();
-        var version = localStorage.getItem('xui_version_' + name);
+        const name = this.getPageId();
+        let version = localStorage.getItem(`xui_version_${name}`);
         if (version == null)
             version = "0";
 
-        var ver = parseInt(version);
+        let ver = parseInt(version);
 
-        localStorage.setItem('xui_data_' + name + '_' + ver, this.codeXUIdata);
+        localStorage.setItem(`xui_data_${name}_${ver}`, this.codeXUIdata);
         ver++;
-        localStorage.setItem('xui_version_' + name, "" + ver);
-        localStorage.setItem('xui_version_max_' + name, "" + ver);
+        localStorage.setItem(`xui_version_${name}`, `${ver}`);
+        localStorage.setItem(`xui_version_max_${name}`, `${ver}`);
 
         $xui.rootdata.redoDisabled = true;
         $xui.rootdata.undoDisabled = false;
@@ -188,7 +202,7 @@ export class PageDesignManager {
     }
 
     loadCode() {
-        var codeElem = document.querySelector("#xui-code-html");
+        const codeElem = document.querySelector("#xui-code-html");
         if (codeElem != null) {
             const code = Prism.highlight(this.codeHtml, Prism.languages.html, 'html');
             codeElem.innerHTML = code;
@@ -196,7 +210,7 @@ export class PageDesignManager {
     }
 
     loadCodeJson() {
-        var codeElem = document.querySelector("#xui-code-json");
+        const codeElem = document.querySelector("#xui-code-json");
         if (codeElem != null) {
             const code = Prism.highlight(this.codeXUIdata, Prism.languages.json, 'json');
             codeElem.innerHTML = code;
@@ -204,7 +218,7 @@ export class PageDesignManager {
     }
 
     loadCodeXUI() {
-        var codeElem = document.querySelector("#xui-code-xui");
+        const codeElem = document.querySelector("#xui-code-xui");
         if (codeElem != null) {
             const code = Prism.highlight(this.codeXUI, Prism.languages.html, 'html');
             codeElem.innerHTML = code;
@@ -212,27 +226,28 @@ export class PageDesignManager {
     }
 
     undo() {
-        var name = this.getPageId();
-        var version = localStorage.getItem('xui_version_' + name);
+        const name = this.getPageId();
+        let version = localStorage.getItem(`xui_version_${name}`);
         if (version == null)
             version = "0";
 
-        var ver = parseInt(version);
+        let ver = parseInt(version);
         if (ver > 0)
             ver--;
 
-        localStorage.setItem('xui_version_' + name, "" + ver);
+        localStorage.setItem(`xui_version_${name}`, `${ver}`);
         $xui.refreshAction("template:reload");
         $xui.rootdata.redoDisabled = false;
     }
 
     redo() {
-        var name = this.getPageId();
-        var versionMax = localStorage.getItem('xui_version_max_' + name);
-        var version = localStorage.getItem('xui_version_' + name);
+        const name = this.getPageId();
+        const versionMax = localStorage.getItem(`xui_version_max_${name}`);
+        const version = localStorage.getItem(`xui_version_${name}`);
 
-        var ver = parseInt(version);
-        var verMax = parseInt(versionMax);
+        let ver = parseInt(version);
+        const verMax = parseInt(versionMax);
+        
         if (ver < verMax) {
             ver++;
         }
@@ -240,7 +255,7 @@ export class PageDesignManager {
             $xui.rootdata.redoDisabled = true;
         }
 
-        localStorage.setItem('xui_version_' + name, "" + ver);
+        localStorage.setItem(`xui_version_${name}`, `${ver}`);
         $xui.refreshAction("template:reload");
     }
 

@@ -111,6 +111,7 @@
 		<xui-prop var="withBottomNavigation" editor="bool">Bottom Navigation</xui-prop>
 		<xui-prop var="withFloatAction" editor="bool">Floating Action Button</xui-prop>
 
+		<xui-prop var="nbCond" editor="int">nb conditional slot</xui-prop>
 
 		<xui-prop var="withLeftNavigation" editor="bool">Left Navigation Drawer</xui-prop>
 		<xui-prop var=":isnavdraweropen" editor="text" cat="event:model" bind-type="bool">var isNavdrawerOpen</xui-prop>
@@ -144,14 +145,19 @@
 			<xui-slot style-slot="position:absolute; bottom:20px; z-index:10" xui-reloader=true
 				xid="[[parent-xid]]-main-float-action" xui-slot-name="float action"></xui-slot>
 		</v-fab-transition>
+		<xui-cond-1 xid="[[parent-xid]]-cond"></xui-cond-1>
 	</v-app>
+
+	<template xid="xui-cond-1" xui-for="idxconditional" xui-for-nbvar="nbCond@1">
+		<xui-slot style-slot="position:absolute; bottom:50vh; right:50vw; z-index:10" xid="[[parent-xid]]-conditional-[[idxconditional@2]]" 
+		 xui-slot-name="cond [[idxconditional@2]]"></xui-slot>
+	</template>
 
 	<!--------------------------  XUI-PAGE-TEMPLATE ------------------------------->
 	<xui-doc xid="xui-page-template">
 		<xui-prop id="name">Pages Container</xui-prop>
 		<xui-prop id="icon">mdi-view-day</xui-prop>
 		<xui-prop id="desc">Une session</xui-prop>
-		<!-- <xui-prop id="componentAs">container</xui-prop> -->
 	</xui-doc>
 
 	<template xid="xui-page-template" xui-for="idxpage" xui-no-dom>
@@ -170,7 +176,6 @@
         <xui-prop id="name">Routes Container</xui-prop>
         <xui-prop id="icon">mdi-view-day</xui-prop>
         <xui-prop id="desc">Une session</xui-prop>
-        <!-- <xui-prop id="componentAs">container</xui-prop> -->
         <xui-prop var="nbroute" def="1" editor="int">nb route page</xui-prop>
     </xui-doc> 
 
@@ -178,12 +183,11 @@
         <xui-prop id="name">Route</xui-prop>
         <xui-prop id="icon">mdi-book-open-page-variant-outline</xui-prop>
         <xui-prop id="desc">Une Route</xui-prop>
-        <!-- <xui-prop id="componentAs">container</xui-prop> -->
         <xui-prop var="@before" cat="event:router" editor="text">Before route</xui-prop>
     </xui-doc>
 
 
-    <template xid="xui-route-template" xui-for="idxroute" xui-forvar="nbroute@0+" xui-no-dom> 
+    <template xid="xui-route-template" xui-for="idxroute" xui-forvar-xxx="nbroute@0+" xui-no-dom> 
         <xui-route 
 			xid="[[parent-xid]]-[[idxroute@0+]]" 
 			id="[[parent-xid]]-[[idxroute@0+]]" 

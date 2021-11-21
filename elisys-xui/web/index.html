@@ -834,6 +834,24 @@
            </script>
    <script>
  // ------ ici le store vuex dynamique ---------;
+        globalThis.initialiseAppState = () => {
+        const modulesManager = new VuexModuleManager();
+
+        const main = modulesManager.addModule("main", {
+            "isNavdrawerOpen": false
+         , ...$xui.rootdata });
+
+        main.actions={}
+        modulesManager.setStore(new Vuex.Store({
+                modules : {
+                        main,
+                },
+                plugins : [$xui.logger],
+                strict : true
+        }));
+
+        return modulesManager;
+        }
    </script>
    <style id="xui-style">
 

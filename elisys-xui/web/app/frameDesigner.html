@@ -40,17 +40,13 @@ main
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
 
-    <!--  composant small btn d'action  -->
-    <v-btn xid="xui-btn-small" small class="xui-btn-action"></v-btn>
-
     <xui-design xid="root">
         <xui-prop id="nbpage" val="2"></xui-prop>
         <xui-prop id="binding" val="&quot;isNavdrawerOpen&quot;: false"></xui-prop>
     </xui-design>
 
     <!----------------------------------------------------------------------------------->
- 
-
+    <!---------------------------PAGE DESIGNER  ----------------------------------------->
     <!----------------------------------------------------------------------------------->
     <xui-design xid="page-1-content">
         <xui-prop id="title" val="PWA Designer"></xui-prop>
@@ -73,6 +69,9 @@ main
         <xui-prop id="start" val="true"></xui-prop>
         <xui-prop id="no-gutter" val="true"></xui-prop>
      </xui-design>
+
+    <!--  composant small btn d'action  -->
+    <v-btn xid="xui-btn-small" small class="xui-btn-action"></v-btn>
 
     <!--  composant editor de class  -->
     <v-dialog xid="xui-class-editor" v-model="main.dialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
@@ -238,8 +237,15 @@ main
                  </v-toolbar>
             </div>
             <div class="main-item main-item-1"></div>
+
+            <div class="main-item main-item-4">
+                <v-toolbar height="38" dark> 
+                    <v-checkbox class="mt-5" label="Dialog" value2="displayDialog"></v-checkbox>
+                </v-toolbar>
+            </div>
+            <div class="main-item main-item-5"></div>
             <div class="main-item main-item-2">
-                <iframe id='rootFrame'>
+                <iframe id='rootFrame' title="page">
                 </iframe>
             </div>
             <div class="main-item main-item-3">
@@ -290,7 +296,7 @@ main
         <v-icon>mdi-file-tree</v-icon>
     </xui-design>
     <xui-design xid="action-tab-tab-6">
-        <v-icon>mdi-chevron-right-box</v-icon>
+        <v-icon>mdi-console</v-icon>
     </xui-design>
 
 

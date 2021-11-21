@@ -478,6 +478,38 @@
           </template>
     </v-treeview>
 
+    <!--------------------------dialog   --------------------->
+    <xui-doc xid="xui-dialog">
+        <xui-prop id="name">Dialog</xui-prop>
+        <xui-prop id="icon">mdi-card-bulleted-outline</xui-prop>
+        <xui-prop id="desc">Un Dialog</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
 
+        <xui-prop var=":varactive" editor="var" def="showDialog" bind-type="bool">show var name</xui-prop>
+
+    </xui-doc>
+
+    <v-dialog xid="xui-dialog" v-model="[[:varactive]]"  max-width="290">
+       <!--fullscreen hide-overlay persistent scrollable width    transition="dialog-bottom-transition"-->
+       <xui-slot xid="[[parent-xid]]-slot" xui-reloader=true xui-slot-name="Dialog slot" xui-doc-id="DialogSlot"></xui-slot>
+    </v-dialog>
+
+    <!-------------------------- snackbar   --------------------->
+    <xui-doc xid="xui-snackbar">
+        <xui-prop id="name">Snackbar</xui-prop>
+        <xui-prop id="icon">mdi-dock-bottom</xui-prop>
+        <xui-prop id="desc">Un Snackbar</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var=":varactive" editor="var" def="showSnackbar" bind-type="bool">show var name</xui-prop>
+    </xui-doc>
+
+    <v-snackbar xid="xui-snackbar" v-model="[[:varactive]]" :timeout="-1">
+       <xui-slot xid="[[parent-xid]]-slot" xui-reloader=true xui-slot-name="Snackbar slot" xui-doc-id="SnackbarSlot"></xui-slot>
+    </v-snackbar>
 
 </xui-factory>

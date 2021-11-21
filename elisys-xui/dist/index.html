@@ -1,7 +1,7 @@
 <html style="height:100%;">
    <head>
       <meta charset="utf-8"></meta>
-      <title>PWA Designer</title>
+      <title>[title]</title>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover"></meta>
       <meta name="mobile-web-app-capable" content="yes"></meta>
       <meta name="apple-mobile-web-app-capable" content="yes"></meta>
@@ -14,10 +14,10 @@
       <link rel="preload" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
-      <link rel="preload" href="./app/vue2frame.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
+      <link rel="preload" href="./app/vue/vue2frame.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
       <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
-      <script defer src="./app/vuexHelper.js"></script>
+      <script defer src="./app/vue/vuexHelper.js"></script>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="app/frameDesigner.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
    </head>
@@ -33,6 +33,48 @@
       <template id="page-0">
          <v-app style="width:100vw">
             <template id="page-0-route-0">
+               <v-container fluid>
+                  <v-row class="mb-3" no-gutters>
+                     <v-col v-bind:cols="listeTemplate_item.size" v-for="(listeTemplate_item, listeTemplate_index) in main.listeTemplate">
+                        <v-card @click='$xui.doInitPage(listeTemplate_item)' v-ripple="{ center: false, class: 'black--text' }" class="mt-3 ml-2 mr-2">
+                           <v-img height="200px">
+                           </v-img>
+                           <v-card-text>
+                              <v-row fluid>
+
+            {{listeTemplate_item.name}}
+                                             <v-spacer></v-spacer>
+                                 <v-btn icon>
+                                    <v-icon>mdi-chevron-right</v-icon>
+                                 </v-btn>
+                              </v-row>
+                           </v-card-text>
+                        </v-card>
+                     </v-col>
+                  </v-row>
+               </v-container>
+            </template>
+            <v-app-bar app dark height="32" color="#ff5900">
+               <v-app-bar-nav-icon @click.stop="main.isNavdrawerOpen = !main.isNavdrawerOpen"></v-app-bar-nav-icon>
+               <v-toolbar-title>
+               </v-toolbar-title>
+               <v-spacer></v-spacer>
+               <v-btn to="/page1" icon>
+                  <v-icon>mdi-chevron-right</v-icon>
+               </v-btn>
+            </v-app-bar>
+            <v-navigation-drawer v-model="main.isNavdrawerOpen" temporary app>
+            </v-navigation-drawer>
+            <v-main style="background-color:white">
+               <transition :duration="600" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
+                  <router-view ref="routerview"></router-view>
+               </transition>
+            </v-main>
+         </v-app>
+      </template>
+      <template id="page-1">
+         <v-app style="width:100vw">
+            <template id="page-1-route-0">
                <v-container fluid fill-height align-start pa-0>
                   <v-tabs class="fill-height main-tab xui-tabs  tabs-dense" vertical dark v-model="main.activeTab">
                      <v-tab>
@@ -42,7 +84,7 @@
                         <v-tabs class="fill-height xui-tabs" height="35px" style="--xui-tab-h:35px;" dark>
                            <v-tab>
                               <v-icon style="font-size:18px">mdi-monitor-screenshot</v-icon>
-                              <span style="margin-left: 5px;">Page {{main.frameName}}</span>
+                              <span style="margin-left: 5px;">Design {{main.frameName}}</span>
                            </v-tab>
                            <v-tab-item eager>
                               <div class="main-container fill-height">
@@ -319,7 +361,7 @@
             </v-btn>
                </template>
             </v-snackbar>
-            <div id="xui-display-selector-popup" class="xui-popup-class" style="position:absolute;top:100px;left: 100px;">
+            <div id="xui-display-selector-popup" class="xui-popup-class" style="position:absolute; top:100px; left: 100px;">
                <v-list dense>
                   <v-list-item v-for="(itemPopup, j) in main.listPopupAdd" :key="j" @click="$xui.doActionPopup(itemPopup)">
                      <v-list-item-icon>
@@ -392,7 +434,7 @@
             </v-app-bar>
             <v-navigation-drawer v-model="main.isNavdrawerOpen" temporary app>
             </v-navigation-drawer>
-            <v-main>
+            <v-main style="background-color:white">
                <transition :duration="600" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
                   <router-view ref="routerview"></router-view>
                </transition>
@@ -436,7 +478,7 @@
                   <v-icon>mdi-database-export-outline</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>&copy;&nbsp;Elisys 2021 v0.7.6 26/10/2021</span>
+               <span>&copy;&nbsp;Elisys 2021 v0.8.0 14/11/2021</span>
             </v-footer>
          </v-app>
       </template>
@@ -672,17 +714,12 @@
                         },
                         { sel: false, type: 'divider' },
                         {
-                            sel: false, text: 'size', value: 'text', type: 'list', vl: '1', list:
-                                ['h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                                    'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'button', 'caption', 'overline']
-                        },
-                        {
                             sel: false, text: 'Style', value: '', type: 'list', vl: '1', list:
                                 ['font-regular', 'font-italic']
                         },
                         {
-                            sel: false, text: 'decoration', value: 'text', type: 'list', vl: '1', list:
-                                ['decoration-none', 'decoration-overline', 'decoration-underline', 'decoration-line-through']
+                            sel: false, text: 'decoration', value: 'text-decoration', type: 'list', vl: '1', list:
+                                ['none', 'overline', 'underline', 'line-through']
                         },
                         {
                             sel: false, text: 'weight', value: '', type: 'list', vl: '1', list:
@@ -693,6 +730,11 @@
                         {
                             sel: false, text: 'alignment', value: '', type: 'list', vl: '1', list:
                                 ['text-left', 'text-center', 'text-right', 'text-justify'],
+                        },
+                        {
+                            sel: false, text: 'size', value: 'text', type: 'list', vl: '1', list:
+                                ['h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                                    'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'button', 'caption', 'overline']
                         },
                         { sel: false, type: 'divider' },
                         { sel: false, type: 'check', text: 'text no wrap', value: 'text-no-wrap' },
@@ -735,7 +777,7 @@
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
                         console.debug("save class", aProperty);
-                        aProperty.value = new DesignClassManager().getClassTextFromSeletor(aProperty.value, $xui.rootdata.listCatClass);
+                        aProperty.value = new DesignClassManager().getClassTextFromSelector(aProperty.value, $xui.rootdata.listCatClass);
                         $xui.hasPropertiesChanged = true;
                         $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
                     }
@@ -850,7 +892,7 @@
    <script defer src="app/frameDesignerError.js"></script>
    <script defer src="app/frameDesigner.js"></script>
    <script defer src="app/frameDesignerProp.js"></script>
-   <script defer src="app/frameDesignerAction.js"></script>
+   <script defer src="app/frameDesignerPopupAction.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/v-jsoneditor@1.4.2/dist/v-jsoneditor.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>
@@ -862,7 +904,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/qrcode-js-package@1.0.4/qrcode.min.js"></script>
    <script type="module">
-		import "./app/vue2frame.js";
+		import "./app/vue/vue2frame.js";
 		$xui.loadApplicationJS();
 	
         $xui.initVuejs($xui.vuejs);

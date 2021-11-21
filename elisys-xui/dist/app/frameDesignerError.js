@@ -19,19 +19,19 @@ window.addEventListener('error', function (e) {
 
 })
 
-window.onerror = function (msg, url, lineNo, columnNo, error) {
+window.onerror = (msg, url, lineNo, columnNo, error) => {
     console.log("***************error reporting OK ********************");
-    var string = msg.toLowerCase();
-    var substring = "script error";
-    if (string.indexOf(substring) > -1) {
+    const string = msg.toLowerCase();
+    const substring = "script error";
+    if (string.includes(substring)) {
         alert('Script Error: See Browser Console for Detail');
     } else {
-        var message = [
-            'XUI reporting Message: ' + msg,
-            'URL: ' + url,
-            'Line: ' + lineNo,
-            'Column: ' + columnNo,
-            'Error object: ' + JSON.stringify(error)
+        const message = [
+            `XUI reporting Message: ${msg}`,
+            `URL: ${url}`,
+            `Line: ${lineNo}`,
+            `Column: ${columnNo}`,
+            `Error object: ${JSON.stringify(error)}`
         ].join(' - ');
 
         alert(message);
@@ -64,5 +64,15 @@ function captureError(e) {
 //    wrapErrors(function () {
 //    --------
 //    })();
+
+// Create a custom error
+var SpecifiedError = function SpecifiedError(message) {
+    this.name = 'SpecifiedError';
+    this.message = message || '';
+    this.stack = (new Error()).stack;
+};
+
+SpecifiedError.prototype = new Error();
+SpecifiedError.prototype.constructor = SpecifiedError;
 
 console.log("***************start reporting OK ********************");

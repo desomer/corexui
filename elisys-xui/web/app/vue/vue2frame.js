@@ -60,7 +60,7 @@ $xui.loadApplicationJS = () => {
 	//if (globalThis.initialiseAppState!=null)
 	//{
 	console.debug("********************* initialiseAppState OK *******************************************");
-	var modulesManager = globalThis.initialiseAppState();
+	const modulesManager = globalThis.initialiseAppState();
 	//}
 	// else {
 	// 	console.debug("********************* error initialiseAppState NOK *******************************************");

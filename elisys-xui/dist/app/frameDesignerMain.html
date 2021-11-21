@@ -1,0 +1,62 @@
+<xui-factory version="1.0">
+
+    <xui-design xid="page-0-content">
+        <xui-prop id="title" val="PWA Designer"></xui-prop>
+        <xui-prop id="nbroute" val="1"></xui-prop>
+
+        <xui-prop id="colorApp" val="#ff5900"></xui-prop>
+        <xui-prop id="colorBg" val="white"></xui-prop>
+
+        <xui-prop id="withAppBar" val="true"></xui-prop>
+        <xui-prop id="withLeftNavigation" val="true"></xui-prop>
+        <xui-prop id="navTemporary" val="true"></xui-prop>
+        <xui-prop id=":isnavdraweropen" val="isNavdrawerOpen"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="page-0-content-toolbar">
+        <xui-prop id="headerHeight" val="32"></xui-prop>
+        <xui-prop id="dark" val="true"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="page-0-content-toolbar-action">
+        <xui-btn-icon-1 xid="page-0-content-toolbar-action-btn-icon-1_163579265326231"></xui-btn-icon-1>
+    </xui-design>
+  
+    <xui-design xid="page-0-content-toolbar-action-btn-icon-1_163579265326231">
+        <xui-prop id="btn-type" val="icon"></xui-prop>
+        <xui-prop id="icon" val="mdi-chevron-right"></xui-prop>
+        <xui-prop id="routeto" val="/page1"></xui-prop>
+    </xui-design>
+
+    <xui-design xid="page-0-route-0-content-slot">
+        <xui-row-1 xid="page-0-route-0-content-slot-row-1_163363090095351"></xui-row-1>
+     </xui-design>
+  
+     <xui-design xid="page-0-route-0-content-slot-row-1_163363090095351">
+        <xui-prop id="nb" val="1"></xui-prop>
+        <xui-prop id="class" val="mb-3"></xui-prop>
+     </xui-design>
+  
+     <xui-design xid="page-0-route-0-content-slot-row-1_163363090095351-col-0">
+        <xui-prop id="cols" val="6" binding="listeTemplate[].size"></xui-prop>
+        <xui-prop id=":varitems" val="listeTemplate"></xui-prop>
+        <xui-card-1 xid="page-0-route-0-content-slot-row-1-card-1_16338099852508"></xui-card-1>
+     </xui-design>
+  
+     <xui-design xid="page-0-route-0-content-slot-row-1-card-1_16338099852508">
+        <xui-prop id="height" val="200px"></xui-prop>
+        <xui-prop id="class" val="mt-3 ml-2 mr-2"></xui-prop>
+        <xui-prop id="directive" val="@click='$xui.doInitPage(listeTemplate_item)'"></xui-prop>
+     </xui-design>
+
+     <xui-design xid="page-0-route-0-content-slot-row-1-card-1_16338099852508-card-main">
+         <v-row fluid>
+            {{listeTemplate_item.name}}
+            <v-spacer></v-spacer>
+            <v-btn icon >
+                <v-icon>mdi-chevron-right</v-icon>
+            </v-btn>
+         </v-row>
+     </xui-design>
+
+</xui-factory>

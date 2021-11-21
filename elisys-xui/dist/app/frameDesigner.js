@@ -17,46 +17,41 @@ window.$xui.config.traceReselect = false
 import("./clsPageDesignManager.js").then((module) => {
     $xui.pageDesignManager = new module.PageDesignManager();
 
-    waitForXuiLib("initPageXUI", function () {
+    waitForXuiLib("initPageXUI", () => {
         $xui.doPromiseJS = doPromiseJS;
-        var infoFile = $xui.pageDesignManager.getInfoFile("design");
-        $xuicore.initPageXUI(infoFile);
     }, this);
 });
-/****************************************************************************************/
+
 import("./clsEventDesignManager.js").then((module) => {
     new module.EventManager().init();
 });
 
 import("./clsSelectorManager.js").then((module) => {
-    //new module.SelectorManager().init();
     $xui.SelectorManager=new module.SelectorManager();
 });
 
 /****************************************************************************************/
-$xui.isModePreview = false;
-$xui.modeDisplaySelection = false;
-/******************************************************************************** */
+$xui.doInitPage = (pageInfo) => {
+    console.debug("pageInfo = ", pageInfo);
 
-// charge la page global aprés le retour du XUIEngine
-$xui.loadPageJS = (html, options) => {
-    console.debug("loadPageJS binding ---- ", options);
-    $xui.pageDesignManager.loadPage(html, options);
-};
+    $xui.rootdata.frameName=pageInfo.frameName;
+    $xui.rootdata.frameTemplate=pageInfo.frameTemplate;
 
-// change une partie de la page aprés le retour du XUIEngine
-$xui.changePageJS = (param) => {
-    $xui.pageDesignManager.changePageOnFrame(param);
-    doPromiseJS("changePage");
-};
+    $xui.router.push("/page1");
 
+    setTimeout(() => {
+        const infoFile = $xui.pageDesignManager.getInfoFile("design");
+        $xuicore.initPageXUI(infoFile);
+    }, 100);
+}
 
+/****************************************************************************************/
 $xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
-    var jsonTemplate = $xui.parseJson("{" + StateTemplate + "}");
-    var jsonStateProp = $xui.parseJson("{" + StateInProperty + "}");
+    const jsonTemplate = $xui.parseJson(`{${StateTemplate}}`);
+    const jsonStateProp = $xui.parseJson(`{${StateInProperty}}`);
     var ret = null;
 
-    Object.keys($xui.rootdata.jsonEditorData).forEach(function (key) {
+    Object.keys($xui.rootdata.jsonEditorData).forEach((key) => {
         delete $xui.rootdata.jsonEditorData[key];
     });
     Object.assign($xui.rootdata.jsonEditorData, jsonTemplate);
@@ -82,11 +77,23 @@ $xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
     return ret.substring(1, ret.length - 1);
 };
 
+/****************************************************************************************/
+// charge la page global aprés le retour du XUIEngine
+$xui.loadPageJS = (html, options) => {
+    console.debug("loadPageJS binding ---- ", options);
+    $xui.pageDesignManager.loadPage(html, options);
+};
+
+// change une partie de la page aprés le retour du XUIEngine
+$xui.changePageJS = (param) => {
+    $xui.pageDesignManager.changePageOnFrame(param);
+    doPromiseJS("AfterChangeDisplayProperties");
+};
 
 /******************************************************************************** */
 // gestion des button refresh et export de la page
 $xui.refreshAction = (mode) => {
-    var infoFile = $xui.pageDesignManager.getInfoFile(mode);
+    const infoFile = $xui.pageDesignManager.getInfoFile(mode);
 
     if (mode == "template:reload") {
         infoFile.mode = "template";
@@ -112,28 +119,12 @@ $xui.refreshAction = (mode) => {
     $xuicore.refreshPageXUI(infoFile);
 };
 
-$xui.fullScreen = () => {
-    $xui.SelectorManager.unDisplaySelector();
-    window.document.documentElement.requestFullscreen();
-}
-
-$xui.modePreview = () => {
-    $xui.isModePreview = !$xui.isModePreview;
-    document.querySelector("#rootFrame").classList.toggle("xui-frame-full-screen");
-    $xui.refreshAction($xui.isModePreview ? "preview" : "design");
-    $xui.rootdata.overlay = $xui.isModePreview;
-}
-
-$xui.modePhone = () => {
-    document.querySelector("#rootFrame").classList.toggle("xui-iframe-phone");
-}
-
-
 /************************************************* LES ACTIONS ***************************************************/
 
 let lastActionDate = Date.now();
 let lastAction = null;
 let currentAction = null;
+
 let mapAction = {
     "clearAll": { text: "create new page", timeout: 1000 },
     "addCmp": { text: "add component", timeout: 500 },
@@ -145,14 +136,16 @@ let mapAction = {
     "saveProperties": {},
     "moveTo": {}
 }
+$xui.isModePreview = false;
+$xui.modeDisplaySelection = false;
 
 
 $xui.setCurrentAction = (actionName) => {
 
     if (currentAction != null)
-        throw (new SpecifiedError("action déjà en cours " + actionName + " => " + lastAction));
+        throw (new SpecifiedError(`action déjà en cours ${actionName} => ${lastAction}`));
 
-    var actionDec = mapAction[actionName];
+    const actionDec = mapAction[actionName];
     if (actionDec != null) {
         if (actionDec.text != null) {
             $xui.rootdata.snackbar_text = actionDec.text;
@@ -171,10 +164,10 @@ $xui.setCurrentAction = (actionName) => {
     lastActionDate = Date.now();
     lastAction = actionName;
     currentAction = actionName;
-    console.debug("START ACTION ------- " + actionName + " ---------")
-    var selectionMode = "root"
-    var undisplaySelector = true;
-    var reselect = $xui.modeDisplaySelection;
+    console.debug(`START ACTION ------- ${actionName} ---------`)
+    let selectionMode = "root";
+    let undisplaySelector = true;
+    let reselect = $xui.modeDisplaySelection;
 
     /**************************/
     if (actionName == "addCmp")
@@ -198,11 +191,12 @@ $xui.setCurrentAction = (actionName) => {
     //     => lancement des reloader sur l'iframe  par le PageDesignManager.changePageJS 
     // puis  <changePageFinish>   (apres le modif sur iframe)  : retour de l'iframe
 
-    var prom = getPromise("changePageFinish");
+    var prom = getPromise("AfterChangeSelectByXid");
     prom.then(() => {
         $xui.rootdata.saveLayout = false;
         currentAction = null;
-        console.debug("END changePageFinish ------ " + actionName + " ------")
+
+        console.debug(`END changePageFinish ------ ${actionName} ------`)
         if (selectionMode == "current") {
             if (reselect)
                 $xui.modeDisplaySelection = true;
@@ -219,7 +213,7 @@ $xui.setCurrentAction = (actionName) => {
         }
     });
 
-    var prom = getPromise("changePage");
+    var prom = getPromise("AfterChangeDisplayProperties");
     prom.then(() => {
         if (selectionMode == "root") {
             $xui.displayPropertiesJS("root", "root");   // reaffecte le nouveau mapping sur la page
@@ -227,7 +221,7 @@ $xui.setCurrentAction = (actionName) => {
         else if (selectionMode == "current") {
             $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);   // reaffecte le nouveau mapping
         }
-        console.debug("END changePage ------ " + actionName + " ------")
+        console.debug(`END changePage ------ ${actionName} ------`)
     }
     );
 
@@ -242,6 +236,15 @@ $xui.clearAll = () => {
     $xui.refreshAction("template:clearAll");
 }
 
+$xui.updateDirectProperty = (value, variable, xid) => {
+    console.debug("updateDirectProperty", value, variable, xid, $xui.rootDataProperties);
+    for (const aProp of $xui.rootDataProperties.data) {
+        if (aProp.xid == xid && aProp.variable == variable) {
+            aProp.value = value;
+        }
+    }
+}
+
 $xui.deleteCmp = () => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
     let info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
@@ -254,7 +257,7 @@ $xui.deleteCmp = () => {
             $xuicore.changeNbChildXUI(infoFile, info.xid, "delete");
             return true
         }
-        console.debug("deleteCmp slot impossible " + $xui.propertiesDesign.xid + " -> " + info.docId);
+        console.debug(`deleteCmp slot impossible ${$xui.propertiesDesign.xid} -> ${info.docId}`);
         return false;
     }
     else {
@@ -314,16 +317,15 @@ $xui.pasteTo = () => {
     $xui.setCurrentAction("pasteTo");
 
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
-    var info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    const info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xuicore.moveDesignXUI(infoFile, null, info.xid);
-    // $xui.rootdata.pasteDisabled = true;
 }
 
 $xui.moveTo = (data) => {
     $xui.setCurrentAction("moveTo");
 
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
-    var info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    const info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xuicore.moveDesignXUI(infoFile, info.xid, data.xid_slot);
 }
 
@@ -338,31 +340,31 @@ $xui.redo = () => {
 };
 
 
-/**************************************************************************************** */
 
-/**************************************************************************************** */
 $xui.addCmp = (cmp) => {
     $xui.setCurrentAction("addCmp");
     console.debug("addCmp", cmp, $xui.propertiesComponent);
-    addCmpXID($xui.propertiesComponent.xid, cmp.xid);
+    $xui.addCmpXID($xui.propertiesComponent.xid, cmp.xid);
 }
 
+
+/**************************************************************************************** */
+///---------------------------------------------------------------------------------------
 /// ajoute un composant
-function addCmpXID(xidDest, idCmp) {
+$xui.addCmpXID = (xidDest, idCmp) => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
     const newXid = $xui.getNewXid(xidDest, idCmp);
-    const template = "<xui-design xid=\"" + xidDest + "\"><" + idCmp + " xid=\"" + newXid + "\"></" + idCmp + "></xui-design>";
+    const template = `<xui-design xid="${xidDest}"><${idCmp} xid="${newXid}"></${idCmp}></xui-design>`;
     $xuicore.addDesignXUI(infoFile, xidDest, template, true, false);
 }
 
-///---------------------------------------------------------------------------------------
 $xui.getNewXid = (xidParent, nameCmp) => {
-    var d = new Date().getTime();
+    let d = new Date().getTime();
     d += (parseInt(Math.random() * 100)).toString();
 
-    var idxUUID = xidParent.indexOf("_");
-    var pxid = idxUUID == -1 ? xidParent : (xidParent.substring(0, idxUUID));
-    var ret = pxid + "-" + nameCmp.replace("xui-", "") + "_" + d;
+    const idxUUID = xidParent.indexOf("_");
+    const pxid = idxUUID == -1 ? xidParent : (xidParent.substring(0, idxUUID));
+    const ret = `${pxid}-${nameCmp.replace("xui-", "")}_${d}`;
     return ret;
 }
 
@@ -392,21 +394,11 @@ $xui.saveProperties = () => {
 }
 
 //--------------------------------------------------------------------------------------------------------
-$xui.updateDirectProperty = (value, variable, xid) => {
-    console.debug("updateDirectProperty", value, variable, xid, $xui.rootDataProperties);
-    for (const aProp of $xui.rootDataProperties.data) {
-        if (aProp.xid == xid && aProp.variable == variable) {
-            aProp.value = value;
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-function getPathTo(pathTo) {
-    var parent = $xui.rootdata.activeSlot[0];
-    var hasRouteDefine = false;
+function initPathTo(pathTo) {
+    let parent = $xui.rootdata.activeSlot[0];
+    let hasRouteDefine = false;
     do {
         if (parent.toPath != null) {
 
@@ -431,13 +423,13 @@ $xui.selectCmp = async () => {
 
     if ($xui.rootdata.activeSlot.length>0)
     {
-        var pathTo = [];
-        getPathTo(pathTo);
+        const pathTo = [];
+        initPathTo(pathTo);
 
         for (const action of pathTo) {
             if (action.startsWith("router:"))
             {
-                var url = action.substring(7);
+                const url = action.substring(7);
                 await $xui.goToRoute(url);
             }
             if (action.startsWith("click:"))
@@ -453,7 +445,7 @@ $xui.selectCmp = async () => {
 }
 
 $xui.goToClick =async (xid) => {
-    var node = document.querySelector("#rootFrame").contentWindow.document.querySelectorAll("[data-xid-slot=" + xid + "]");
+    const node = document.querySelector("#rootFrame").contentWindow.document.querySelectorAll(`[data-xid-slot=${xid}]`);
     node[0].click();
     await pause(300);
 }
@@ -468,7 +460,7 @@ $xui.goToRoute =async (url) => {
     if (url == "") {
         url = "/";
     }
-    var router = document.querySelector("#rootFrame").contentWindow.$xui.router;
+    const router = document.querySelector("#rootFrame").contentWindow.$xui.router;
 
     if (router.currentRoute.path != url) {
         console.debug("route to", url, router.currentRoute.path);
@@ -478,12 +470,29 @@ $xui.goToRoute =async (url) => {
 }
 
 /***************************************************************************************************************/
+$xui.fullScreen = () => {
+    $xui.SelectorManager.unDisplaySelector();
+    window.document.documentElement.requestFullscreen();
+}
+
+$xui.modePreview = () => {
+    $xui.isModePreview = !$xui.isModePreview;
+    document.querySelector("#rootFrame").classList.toggle("xui-frame-full-screen");
+    $xui.refreshAction($xui.isModePreview ? "preview" : "design");
+    $xui.rootdata.overlay = $xui.isModePreview;
+}
+
+$xui.modePhone = () => {
+    document.querySelector("#rootFrame").classList.toggle("xui-iframe-phone");
+}
+
+
 $xui.getUrlApp = () => {
-    var origin = window.location.origin;
-     if (origin=="null")
+    let origin = window.location.origin;
+    if (origin=="null")
         origin=window.parent.location.origin;
 
-   return origin+ '/load.html?id=' + $xui.rootdata.frameName;
+   return `${origin}/load.html?id=${$xui.rootdata.frameName}`;
 }
 
 $xui.sendInTab = () => {
@@ -496,19 +505,18 @@ $xui.deploy = () => {
 
 
 $xui.downloadPage = () => {
-
-    var file = new File([$xui.pageDesignManager.codeXUIdata], "export.txt", { type: "text/plain;charset=utf-8" });
+    const file = new File([$xui.pageDesignManager.codeXUIdata], "export.txt", { type: "text/plain;charset=utf-8" });
     FileSaver.saveAs(file);
 }
 
 $xui.importPage = (file) => {
     console.debug(file);
-    var reader = new FileReader();
-    reader.onload = function (event) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
         $xui.pageDesignManager.clearAll();
         $xui.pageDesignManager.codeXUIdata = event.target.result;
         $xui.pageDesignManager.store();
-        var infoFile = $xui.pageDesignManager.getInfoFile("design");
+        const infoFile = $xui.pageDesignManager.getInfoFile("design");
         $xuicore.initPageXUI(infoFile);
         $xui.rootdata.activeTab = 0;
     }
@@ -517,8 +525,8 @@ $xui.importPage = (file) => {
 
 
 /***************************************************************************************************************/
-var pageIcon = null;
-var pageImage = null;
+let pageIcon = null;
+let pageImage = null;
 
 $xui.openTabUrl = (url) => {
     if (url == "pageIcon") {
@@ -533,16 +541,12 @@ $xui.openTabUrl = (url) => {
     }
 };
 
-/***************************************************************************************************************/
-
-
 
 /***************************************************************************************************************/
 function compileTemplate(template) {
     return Vue.compile(template);
 }
 
-/***************************************************************************************************************/
 
 $xui.parseJson = (str) => {
     try {
@@ -552,14 +556,6 @@ $xui.parseJson = (str) => {
     }
 }
 
-// Create a custom error
-var SpecifiedError = function SpecifiedError(message) {
-    this.name = 'SpecifiedError';
-    this.message = message || '';
-    this.stack = (new Error()).stack;
-};
 
-SpecifiedError.prototype = new Error();
-SpecifiedError.prototype.constructor = SpecifiedError;
 
 

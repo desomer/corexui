@@ -60,7 +60,7 @@ $xui.loadApplicationJS = () => {
 	//if (globalThis.initialiseAppState!=null)
 	//{
 	console.debug("********************* initialiseAppState OK *******************************************");
-	var modulesManager = globalThis.initialiseAppState();
+	const modulesManager = globalThis.initialiseAppState();
 	//}
 	// else {
 	// 	console.debug("********************* error initialiseAppState NOK *******************************************");
@@ -193,7 +193,16 @@ function initRouter() {
 	routes.push({ path: '*', component: UnknownRoute });
 
 	$xui.router = new VueRouter({
-		routes // short for `routes: routes`
+		routes, // short for `routes: routes`
+		scrollBehavior_disable (to, from, savedPosition) {
+			console.debug("scrollBehavior", to, from, savedPosition);
+			return { x: 0, y: 0 };
+			// if (savedPosition) {
+			//   return savedPosition
+			// } else {
+			//   return { x: 0, y: 0 }
+			// }
+		  }
 	})
 
 	initEventRouter();
@@ -328,10 +337,10 @@ function initDirective() {
 	console.debug("*** add directive ***");
 	Vue.directive('bottomnavigationhideonscroll', {
 		// Quand l'élément lié est inséré dans le DOM...
-		inserted: function (el, binding) {
+		inserted(el, binding) {
 			var lastScroll = 0;
 			var bottomIsShow = true;
-			window.addEventListener('scroll', function (e) {
+			window.addEventListener('scroll', (e) => {
 				//console.debug(window.scrollY);
 
 				if (!bottomIsShow && lastScroll > window.scrollY) // remonte
@@ -340,7 +349,9 @@ function initDirective() {
 					el.style.transform = "none";
 					bottomIsShow = true;
 				}
-				else if (window.scrollY > document.body.scrollHeight - document.body.offsetHeight - 30) { // tous en bas
+				else if (window.scrollY > document.body.scrollHeight - document.body.offsetHeight - 30) 
+				{ 
+					// tous en bas
 					var el = document.querySelector(".v-bottom-navigation");
 					el.style.transform = "none";
 					bottomIsShow = true;
@@ -356,13 +367,14 @@ function initDirective() {
 	});
 
 
+	// gestion de la direcvtive       v-pressanimation="{link:'/page1'}"  
 	Vue.directive('pressanimation', {
 		// Quand l'élément lié est inséré dans le DOM...
-		inserted: function (el, binding) {
+		inserted(el, binding) {
 			// L'élément prend le focus
 			console.debug("------------------------------v-pressAnimation", el, binding);
 			el.classList.add('clickAnimation');
-			el.addEventListener('click', function () {
+			el.addEventListener('click', () => {
 				if (el.classList.contains('clickAnimationPress')) {
 					el.classList.remove('clickAnimationPress');
 				} else {
