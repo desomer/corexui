@@ -1,7 +1,7 @@
 $xui.displayPropertiesJS = (xid, xid_slot) => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
 
-    var idProp = "AppPropertiesSetting";
+    let idProp = "AppPropertiesSetting";
     infoFile.action = "design";
 
     if ($xui.rootdata.activeAction == 1) {
@@ -71,7 +71,7 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
                         document.getElementById(idProp).scrollTop = posScroll;
                     }
                     // gestion de la selection sur le mouseover
-                    var listOver = document.querySelectorAll(`#${idProp} .xui-over-prop-xid`);
+                    const listOver = document.querySelectorAll(`#${idProp} .xui-over-prop-xid`);
                     $xui.lastPropOver = null;
 
                     listOver.forEach((aDivOver) => {
@@ -125,10 +125,17 @@ $xui.displayComponents = (xid, xid_slot) => {
         vuetify: new Vuetify(),
         data: $xui.rootDataComponents,
         computed: {
-            $xui: function () {
+            $xui() {
                 return window.$xui;
             }
         }
     });
 
+}
+/***************************************************************************************************************/
+$xui.getCodeEventXUI= () =>
+{
+    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const ret = $xuicore.getEventMethodsXUI(infoFile);
+    return ret;
 }

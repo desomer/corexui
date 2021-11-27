@@ -1,7 +1,7 @@
 globalThis.$xui.generateApplicationStoreJS = (state) =>
 {
-    var jsonState = JSON.parse("{" + state + "}");
-    var modulesManager = new $xui.VuexModuleManager();
+    const jsonState = JSON.parse(`{${state}}`);
+    const modulesManager = new $xui.VuexModuleManager();
 	const main = modulesManager.addModule("main", jsonState);
     return modulesManager.getCode();
 }
@@ -41,7 +41,7 @@ class VuexModuleManager {
 
     getMixin() {
 
-        var computed = {};
+        const computed = {};
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             computed[namespace] = function () {
@@ -49,7 +49,7 @@ class VuexModuleManager {
             }
         }
 
-        const mixinModules = {
+        return {
             computed,
             methods: {
                 $mth: function()
@@ -74,8 +74,6 @@ class VuexModuleManager {
                 }
             },
         }
-
-        return mixinModules;
     }
 
     reload() {

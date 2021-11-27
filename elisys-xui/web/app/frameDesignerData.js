@@ -39,9 +39,7 @@ var json = {
     jsonEditorOptions : { mode: 'code', onEditable:() => {return false;} },
     jsonEditorOptionsCode : { mode: 'code' },
 
-    ListActions : [
-        { id:"add"}
-    ],
+    ListActions : [],    // liste des actions
     messages : [
     ],
     currentCode : "no code"

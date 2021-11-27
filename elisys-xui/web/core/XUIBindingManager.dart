@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 
 import 'XUIConfigManager.dart';
 import 'XUIEngine.dart';
@@ -9,8 +10,10 @@ import 'element/XUIProperty.dart';
 import 'native/register.dart';
 
 class XUIBindingManager {
+
   XUIEngine engine;
   var bindingInfo = LinkedHashMap<String, XUIBinding>();
+  var eventInfo  = LinkedHashMap<String, XUIBindingEvent>();
 
   XUIBindingManager(this.engine);
 
@@ -278,4 +281,12 @@ class XUIBindingManager {
   //   return bind;
   // }
 
+
+ //-------------------------------------- EVENT TO METHOD  -----------------------------------------------
+ void addEventMethod( XUIBindingEvent eventMth)
+ {
+
+    eventInfo[eventMth.name]=eventMth;
+    print("******* EVENT ++++ " + eventMth.eventName+ " on " + eventMth.xid + " execute method " + eventMth.name);
+ } 
 }

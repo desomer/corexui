@@ -1,7 +1,7 @@
 globalThis.$xui.generateApplicationStoreJS = (state) =>
 {
-    var jsonState = JSON.parse("{" + state + "}");
-    var modulesManager = new $xui.VuexModuleManager();
+    const jsonState = JSON.parse(`{${state}}`);
+    const modulesManager = new $xui.VuexModuleManager();
 	const main = modulesManager.addModule("main", jsonState);
     return modulesManager.getCode();
 }
@@ -41,7 +41,7 @@ class VuexModuleManager {
 
     getMixin() {
 
-        var computed = {};
+        const computed = {};
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             computed[namespace] = function () {
@@ -52,11 +52,10 @@ class VuexModuleManager {
         const mixinModules = {
             computed,
             methods: {
-                $mth: function()
-                {
+                $mth() {
                     console.debug("mth", arguments, this);
 
-                    var message = {
+                    const message = {
                         action: "displayMessage",
                         value: {
                             snackbar: true,
@@ -68,7 +67,8 @@ class VuexModuleManager {
 
                     this.$store.dispatch('main/actionName', null, { root: true })
                 },
-                $post: function (action, ev) {
+
+                $post(action, ev) {
                     console.debug("$post", this, action, ev);
                     this.$store.dispatch(action);
                 }
@@ -102,35 +102,31 @@ class VuexModuleManager {
 
 
     getCode() {
-        var result = 
-`globalThis.initialiseAppState = () => {\n`
+        let result = `globalThis.initialiseAppState = () => {\n`;
         
-        result +=
-`const modulesManager = new VuexModuleManager();\n\n`;
-        var listModule = "";
+        result +=`const modulesManager = new VuexModuleManager();\n\n`;
+        let listModule = "";
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             var stateJson = JSON.stringify(desc.state, undefined, 4);
             if (stateJson.length>2) {
                 stateJson= stateJson.substring(0, stateJson.length-1);  // retrait de la dernier accolade
-                stateJson=stateJson+" , ...$xui.rootdata }";
+                stateJson+=" , ...$xui.rootdata }";
             }
             else
             {
                 stateJson="$xui.rootdata";
             }
             result += `const ${namespace} = modulesManager.addModule("${namespace}", ${stateJson});\n\n`;
-            listModule += "\n                " + namespace + ",";
+            listModule += `\n                ${namespace},`;
         }
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
-            result +=
-`${namespace}.actions={`;
+            result +=`${namespace}.actions={`;
             for (const [nameAction, code] of Object.entries(desc.actions)) {
-            result += `\n  ${nameAction} : ${code}\n`;
+                result += `\n  ${nameAction} : ${code}\n`;
             }
-            result +=
-`}\n`;
+            result +=`}\n`;
         }
 
         result +=

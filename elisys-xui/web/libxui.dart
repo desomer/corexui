@@ -65,6 +65,12 @@ external set _getComponentsXUI(
 external set _getActionsXUI(
     dynamic Function(FileDesignInfo, String, String, String) f);
 
+
+
+@JS('getEventMethodsXUI')
+external set _getEventMethodsXUI(
+    dynamic Function(FileDesignInfo) f);
+
 /// retourne les properties
 @JS('getDesignPropertiesXUI')
 external set _getDesignPropertiesXUI(
@@ -517,6 +523,17 @@ dynamic getActionsXUI(
   return designManager.getActionsPopup(ctx, id, idSlot, action);
 }
 
+dynamic getEventMethodsXUI(FileDesignInfo fileInfo) {
+  print("-------------- getEventMethodsXUI ----------------   " + fileInfo.fileID);
+  var designManager = _getDesignManager(fileInfo);
+  var listEvent = [];
+  designManager.getXUIEngine().bindingManager.eventInfo.forEach((key, value) 
+    { 
+        listEvent.add(value);
+    });
+  return listEvent;
+}
+
 void main() async {
   _refreshPageXUI = allowInterop(refreshPageXUI);
   _addDesignXUI = allowInterop(addDesignXUI);
@@ -534,6 +551,7 @@ void main() async {
   _deleteDesignXUI = allowInterop(deleteDesignXUI);
   _initPageXUI = allowInterop(initPageXUI);
   _getActionsXUI = allowInterop(getActionsXUI);
+  _getEventMethodsXUI = allowInterop(getEventMethodsXUI);
 }
 
 XUIDesignManager _getDesignManager(FileDesignInfo fileInfo) {

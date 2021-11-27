@@ -474,6 +474,7 @@ class XUIEngine {
       XUIConfigManager.printc(
           "-- documentation " + xuiFile.documentation.length.toString());
       XUIConfigManager.printc("-- binding " + bindingManager.bindingInfo.length.toString());
+      XUIConfigManager.printc("-- event" + bindingManager.eventInfo.length.toString());
       XUIConfigManager.printc(
           "-- listImport " + xuiFile.listImport.length.toString());
     }

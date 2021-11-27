@@ -12,6 +12,8 @@ import 'XUIActionManager.dart';
 import 'XUIConfigManager.dart';
 import 'element/XUIProperty.dart';
 
+
+
 class XUIDesignManager {
   XUIEngine? xuiEngine;
   static final lock = Lock(); // gestion du lock car multiple iFrame

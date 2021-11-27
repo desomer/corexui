@@ -47,6 +47,7 @@ class XUIBinding {
   XUIBinding(this.propName, this.attr, this.value, this.xid);
 }
 
+
 ///------------------------------------------------------------------
 ///
 /// gestion des designs ou des components

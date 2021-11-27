@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'XUIElement.dart';
+import '../element/XUIElement.dart';
 
 class XUIParseJSDataBinding {
 

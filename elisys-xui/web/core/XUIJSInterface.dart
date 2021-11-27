@@ -129,6 +129,17 @@ class BindObj {
 
 @JS()
 @anonymous
+class XUIBindingEvent {
+   external String xid;
+   external String eventName;
+   external String name;
+   external String? code; 
+
+   external factory XUIBindingEvent({String xid, String eventName, String name});
+}
+
+@JS()
+@anonymous
 class TreeSlot {
   external String get id;
   external set id(String id);

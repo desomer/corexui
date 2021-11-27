@@ -27,7 +27,9 @@ function onChangeMainTab(instanceVue) {
     if (newValue == 1) {
       $xui.lastEditorAppStateValue = `${$xui.rootdata.jsonEditorDataSrc}#${JSON.stringify($xui.rootdata.jsonEditorDataMock)}`;
 
+      // reaffiche l'initial State de l'application
       $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
+      $xui.rootdata.ListActions=$xui.getCodeEventXUI();
     }
 
     if (newValue == 2) {

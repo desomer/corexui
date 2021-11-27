@@ -9,7 +9,7 @@ export class SelectorManager {
                 node = document.getElementById("xui-display-selector-margin");
                 node.style.display = "none";
             }
-        };
+        }
 
         /************************************************************************************ */
         displaySelectorByPosition(position) {
@@ -59,8 +59,6 @@ export class SelectorManager {
                 // var nodePopup = document.createElement("div");
                 // nodePopup.id = "xui-display-selector-popup";
                 // document.body.appendChild(nodePopup);
-
-
                 /************************************************* */
                 // le node margin
                 var nodeMargin = document.createElement("div");
@@ -218,23 +216,4 @@ export class SelectorManager {
                 setTimeout(() => { $xui.displayPropertiesJS(xid, xid_slot); }, 10);
             }
         }
-
-    /************************************************************************************ */
-    // getInfoPositionCmp(targetAction) {
-    //     let elemRect = targetAction.getBoundingClientRect();
-    //     let s = document.querySelector("#rootFrame").contentWindow.getComputedStyle(targetAction);
-
-    //     let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
-
-    //     var ret = {
-    //         hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
-    //         height: elemRect.height,
-    //         width: elemRect.width,
-    //         left: elemRect.left,
-    //         top: elemRect.top,
-    //         ...margin
-    //     };
-
-    //     return ret;
-    // }
 }
