@@ -106,6 +106,10 @@ $xui.initVuejs = (instanceVue) => {
     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeConfig", "param": { routeEnable: newValue } }, "*");
   });
 
+  instanceVue.$watch('main.actionEnable', (newValue, oldValue) => {
+    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeConfig", "param": { actionEnable: newValue } }, "*");
+  });
+
   instanceVue.$watch('main.selectedClass', function (newValue, oldValue) {
     console.debug(`The selectedClass name was changed from ${oldValue} to ${newValue}!`);
   }, { deep: true });

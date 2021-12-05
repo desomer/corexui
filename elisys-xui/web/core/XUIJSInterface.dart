@@ -114,8 +114,8 @@ class Options {
   // external set binding(List binding);
   external List get treeSlot;
   external set treeSlot(List tree);
-  external String get dataState;
-  external set dataState(String data);
+  external String get appConfig;
+  external set appConfig(String data);
 }
 
 @JS()

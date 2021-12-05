@@ -8,6 +8,7 @@ var json = {
     ],
 
     isDesignFrame: true,
+
     selectedxui: "PWA Generator",
     pasteDisabled: true,
     undoDisabled: true,
@@ -33,7 +34,10 @@ var json = {
     expandAll : false,
     
     routeEnable : true,
+    actionEnable: true,
+    isModePhone : false,
     jsonEditorDataSrc : "template",   // ou mock
+    
     jsonEditorData : {},
     jsonEditorDataMock : {},
     jsonEditorOptions : { mode: 'code', onEditable:() => {return false;} },

@@ -187,7 +187,12 @@ window.addEventListener('message', (e) => {
             break;
 
         case "changeConfig":
-            $xui.routeEnable = data.param.routeEnable;  // autorisation de changement de root
+            if ('routeEnable' in data.param) {
+                 $xui.routeEnable = data.param.routeEnable;  // autorisation de changement de root
+            }
+            if ('actionEnable' in data.param) {
+                $xui.actionEnable = data.param.actionEnable;  // autorisation de changement de root
+             }
             break;
 
         case "changeTemplate":

@@ -93,13 +93,17 @@ Future initPageXUI(FileDesignInfo fileInfo) async {
   String? str = await designManager.getHtml(ctx, fileInfo.file, fileInfo.xid);
 
   var options = Options(mode: fileInfo.mode);
-  XUIProperty? propBinding =
-      designManager.getXUIEngine().getXUIPropertyFromDesign("root", "binding");
-  String? lastBinding = propBinding?.content;
+
+  // XUIProperty? propBinding =
+  //     designManager.getXUIEngine().getXUIPropertyFromDesign("root", "binding");
+  // String? lastBinding = propBinding?.content;
 
   //options.binding = designManager.getXUIEngine().getBindingInfo();
   options.treeSlot = new XUISlotTreeManager(designManager.getXUIEngine()).getSlotTree();
-  options.dataState = "{" + (lastBinding ?? "") + "}";
+  //options.dataState = "{" + (lastBinding ?? "") + "}";
+
+  XUIProperty? propConfig =  designManager.getXUIEngine().getXUIPropertyFromDesign("root", "appConfig");
+  options.appConfig=propConfig?.content?.toString() ?? "";
 
   loadPageJS(str, options);
 }

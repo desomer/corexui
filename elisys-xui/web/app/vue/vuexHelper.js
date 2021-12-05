@@ -88,7 +88,10 @@ class VuexModuleManager {
                     };
                     window.parent.postMessage(message, "*");
 
-                    this.$store.dispatch(`main/${arguments[0]}`, null, { root: true })
+                    if ($xui.actionEnable) {
+                        this.$store.dispatch(`main/${arguments[0]}`, null, { root: true })
+                    }
+ 
                 },
                 $post(action, ev) {
                     console.debug("$post", this, action, ev);

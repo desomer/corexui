@@ -224,15 +224,16 @@ main
                 <v-toolbar height="38" dark>
                     <v-radio-group v-model="main.jsonEditorDataSrc" row class="pt-6">
                        <div class="v-radio">
-                          <v-radio label="Initial" value="template"></v-radio>
+                          <v-radio label="Initial data" value="template"></v-radio>
                        </div>
                        <div class="v-radio">
-                          <v-radio label="Mock" value="mock"></v-radio>
+                          <v-radio label="Mock data" value="mock"></v-radio>
                        </div>
                     </v-radio-group>
                     <v-spacer></v-spacer>
                     <div class="pt-6">
-                       <div>
+                       <div style="display: flex;">
+                          <v-switch dense label="action enable" v-model="main.actionEnable" class="mr-3"></v-switch>
                           <v-switch dense label="route enable" v-model="main.routeEnable" ></v-switch>
                        </div>
                     </div>

@@ -20,14 +20,15 @@ export class PageDesignManager {
         return window.$xui.rootdata.frameName;
     }
 
-    loadPage(html, param) {
+    loadPage(html, option) {
         document.querySelector("#rootFrame").srcdoc = html;
 
         this.codeHtml = html;
 
-        if (param != null) {
+        if (option != null) {
             $xui.rootdata.listSlot.length = 0;
-            $xui.rootdata.listSlot.push(...param.treeSlot);
+            $xui.rootdata.listSlot.push(...option.treeSlot);
+            this.initConfigApp(option);
         }
 
         setTimeout(() => {
@@ -46,6 +47,22 @@ export class PageDesignManager {
         }
     }
 
+
+    initConfigApp(option) {
+        if (option.appConfig != null && option.appConfig != "") {
+            const appConfig = JSON.parse(option.appConfig);
+            if (appConfig.isModePhone) {
+                $xui.modePhone();
+            }
+            
+            setTimeout(() => {
+                $xui.rootdata.jsonEditorDataSrc = appConfig.dataSrc;
+                $xui.rootdata.routeEnable = appConfig.routeEnable;
+                $xui.rootdata.actionEnable = appConfig.actionEnable;
+            }, 500);  // attente page afficher
+
+        }
+    }
 
     changePageOnFrame(param) {
 
@@ -92,8 +109,11 @@ export class PageDesignManager {
             doPromiseJS("AfterChangeSelectByXid");
         }
 
-        if (param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")
+        if (param.action != "showCode" && param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")
+        {
+            console.debug("save cause", param);
             this.store(); // save un nouvelle version
+        }
 
         if ($xui.doStoreOnNextReload) {
             this.store(); // save un nouvelle version

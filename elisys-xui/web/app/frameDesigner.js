@@ -381,6 +381,23 @@ $xui.getNewXid = (xidParent, nameCmp) => {
 
 $xui.saveProperties = () => {
     $xui.setCurrentAction("saveProperties");
+ 
+
+    const config = {   
+        routeEnable : $xui.rootdata.routeEnable,
+        actionEnable: $xui.rootdata.actionEnable,
+        isModePhone : $xui.rootdata.isModePhone,
+        dataSrc : $xui.rootdata.jsonEditorDataSrc
+    }
+
+    $xui.propertiesDesign.json.push(
+    {
+        xid : "root",
+        variable : `appConfig`,
+        value : JSON.stringify(config),
+        bind : "@"
+    });
+
     console.debug("saveProperties", $xui.propertiesDesign.json);
 
     $xui.hasPropertiesChanged = false;
@@ -478,6 +495,7 @@ $xui.modePreview = () => {
 
 $xui.modePhone = () => {
     document.querySelector("#rootFrame").classList.toggle("xui-iframe-phone");
+    $xui.rootdata.isModePhone =  document.querySelector("#rootFrame").classList.contains("xui-iframe-phone");
 }
 
 

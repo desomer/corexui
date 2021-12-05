@@ -159,10 +159,6 @@ $xui.highlighter = (code) => {
 }
 
 $xui.saveCodeAction = () => {
-    // $xui.setCurrentAction("saveProperties");
-    // console.debug("saveProperties", $xui.propertiesDesign.json);
-
-    // $xui.hasPropertiesChanged = false;
 
     const idx = $xui.rootdata.currentCodeIdx;
     $xui.rootdata.currentCodeXid= $xui.rootdata.ListActions[idx].xid;
@@ -184,14 +180,5 @@ $xui.saveCodeAction = () => {
 
     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeJS", "param": { actions: $xui.rootdata.ListActions } }, "*");
 
-
-    // const js = $xui.rootdata.currentCode +
-    // "\n//# sourceURL=dynamicScript-"+ $xui.rootdata.ListActions[idx].name +".js;";
-    // addCode(js); // Right now! Debuggable!
-
 }
 
-    // // Dynamically evaluate JavaScript-as-string in the browser
-    // function addCode(js){
-    //     eval(js);
-    //   }

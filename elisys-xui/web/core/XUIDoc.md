@@ -45,3 +45,6 @@ eval d'import
 
 css to json
     https://codepen.io/Cdca12/pen/xJOEqd
+
+copieer clloer excel
+https://jsfiddle.net/mowglisanu/zmhg5rwo/

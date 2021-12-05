@@ -31,13 +31,15 @@ $xui.rootdata.animationNameEnter = "animate__animated animate__fadeInUp";
 $xui.rootdata.animationNameExit = "";
 
 $xui.routeEnable = true;
+$xui.actionEnable = true;
+
 $xui.info={};
 
 $xui.loadApplicationJS = () => {
 
-	$xui.logger = function (store) {
-		store.subscribe(function (event, store) {
-			console.log("%c MUTATION " + event.type + " ", "color: #03A9F4; font-weigth: bold; background-color: #eee", event.payload, store);
+	$xui.logger = (store) => {
+		store.subscribe((event, store) => {
+			console.log(`%c MUTATION ${event.type} `, "color: #03A9F4; font-weigth: bold; background-color: #eee", event.payload, store);
 		});
 	};
 
@@ -50,7 +52,7 @@ $xui.loadApplicationJS = () => {
 		/********************** creation des composants une seule fois xui/vuejs  *****************/
 		initDirective();
 
-		var listFunctCreateCmp = $xui.initComponentVuejs;
+		const listFunctCreateCmp = $xui.initComponentVuejs;
 		for (const functCreateCmp of listFunctCreateCmp) {
 			functCreateCmp();
 		}

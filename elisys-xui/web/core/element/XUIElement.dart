@@ -451,6 +451,11 @@ class XUIElementHTML extends XUIElement {
               isBool = true;
             }
 
+            if (keyAttr=="v-bind:value")
+            {
+              keyAttr="v-model";
+            }
+
             buffer.html.write(" ");
             buffer.html.write(keyAttr);
 
