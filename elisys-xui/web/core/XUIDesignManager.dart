@@ -449,7 +449,7 @@ class XUIDesignManager {
                 action: "addFlow",
                 type: "flow",
                 icon: "mdi-table-row",
-                title: "Add flow");
+                title: "Add flow right");
             ret.add(act);
           }
           ObjectAction act = ObjectAction(
@@ -488,7 +488,7 @@ class XUIDesignManager {
               action: "addFlow",
               type: "flow",
               icon: "mdi-table-row",
-              title: "Add flow");
+              title: "Add flow right");
           ret.add(act);
         } else if (idx == 1 && !isSlot) {
           // ajoute un slot
@@ -497,7 +497,7 @@ class XUIDesignManager {
               action: "surroundRight",
               type: "flow",
               icon: "mdi-table-row",
-              title: "Add flow");
+              title: "Add flow right");
           ret.add(act);
         } else {
           // var ti = (design.docInfo.addRemove ?? "noAddRemove") +

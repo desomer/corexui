@@ -9,14 +9,13 @@ import '../element/XUIProperty.dart';
 ///------------------------------------------------------------------
 class NativeSlot extends XUIElementNative {
   NativeSlot() {
-    this.xid = TAG_SLOT;
+    xid = TAG_SLOT;
   }
   @override
-  Future<XUIModel> doProcessPhase1(
-      XUIEngine engine, XUIElementHTML html) async {
-    var root = XUIElementXUI();
+  Future<XUIModel> doProcessPhase1(XUIEngine engine, XUIElementHTML html) async {
+    final root = XUIElementXUI();
     root.tag = TAG_NO_DOM;
-    Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));
+    final Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));
     return f;
   }
 
@@ -26,6 +25,7 @@ class NativeSlot extends XUIElementNative {
     String? slotName;
     bool isFull = false;
 
+    // ignore: avoid_function_literals_in_foreach_calls
     html.propertiesXUI?.entries.forEach((f) {
       if (f.key.toLowerCase() == ATTR_SLOT_NAME) {
         slotName = f.value.content.toString();
@@ -42,17 +42,17 @@ class NativeSlot extends XUIElementNative {
       }
     }
 
-    var isModeDesign = engine.isModeDesign() || XUIConfigManager.forceSlotInfo;
-    var xidCal;
+    final isModeDesign = engine.isModeDesign() || XUIConfigManager.forceSlotInfo;
+    String? xidCal;
     if (isModeDesign && html.originElemXUI != null) {
       xidCal = html.calculatePropertyXUI(html.originElemXUI!.xid, null);
     }
 
-    var isSlotButNotCopyzone = xidCal != XUI_COPYZONE_SLOT;
+    final isSlotButNotCopyzone = xidCal != XUI_COPYZONE_SLOT;
 
     // si mode design => creer un slot visible si pas d'enfant sauf XUI_COPYZONE_SLOT
     if (isModeDesign && html.children == null && isSlotButNotCopyzone) {
-      var newChild = XUIElementXUI()..tag = TAG_DIV_SLOT;
+      final newChild = XUIElementXUI()..tag = TAG_DIV_SLOT;
       newChild.children = [];
       newChild.children!.add(XUIElementText()..content = StringBuffer(slotName.toString()));
 
@@ -75,10 +75,10 @@ class NativeSlot extends XUIElementNative {
     }
 
     // affecte l'identifiant xid du slot sur le parent si le parent en a pas
-    int nbChild = html.getNbChildNoText();
+    final int nbChild = html.getNbChildNoText();
     int nbChildNoSlot = 0;
-    var isFlow = html.originElemXUI!=null && html.originElemXUI!.tag == "xui-flow";
-    var isFlowParent = html.parent!=null && html.parent!.originElemXUI!=null && html.parent!.originElemXUI!.tag == "xui-flow";
+    final isFlow = html.originElemXUI!=null && html.originElemXUI!.tag == "xui-flow";
+    final isFlowParent = html.parent!=null && html.parent!.originElemXUI!=null && html.parent!.originElemXUI!.tag == "xui-flow";
 
     html.children?.forEach((childHtml) {
 
@@ -93,11 +93,11 @@ class NativeSlot extends XUIElementNative {
             if (isFlowParent && (childHtml as XUIElementHTML).originElemXUI!.tag!=TAG_DIV_SLOT)
               {
                   xidSlot  = xidCal.toString().substring(0 , xidCal.toString().lastIndexOf("-"));
-                  xidSlot  = xidSlot.toString().substring(0 , xidSlot.toString().lastIndexOf("-"));
+                  xidSlot  = xidSlot.substring(0 , xidSlot.lastIndexOf("-"));
                   //print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee "+ xidSlot + " tag " + (html.originElemXUI!.tag??"") +  " p.tag=" + ((childHtml as XUIElementHTML).originElemXUI!.tag??""));
               }
 
-            childHtml.attributes!["data-" + ATTR_XID_SLOT] = XUIProperty(xidSlot);
+            childHtml.attributes!["data-$ATTR_XID_SLOT"] = XUIProperty(xidSlot);
             nbChildNoSlot++;
           }
         }
@@ -113,6 +113,7 @@ class NativeSlot extends XUIElementNative {
           if (childHtml.attributes!["class"] == null) {
             childHtml.attributes!["class"] = XUIProperty("xui-class-slot-full");
           } else {
+            // ignore: require_trailing_commas
             childHtml.attributes!["class"] = XUIProperty(
                 (childHtml.attributes!["class"]!.content + " xui-class-slot-full")
                     .trim());
@@ -125,10 +126,9 @@ class NativeSlot extends XUIElementNative {
       //recherche un parent affichable pour gerer la selection des slot (displaySelectorByXid)
       var p = html.parent;
       while (p != null) {
-        if (p.tag != null && !(p.tag!.startsWith("xui"))) {
+        if (p.tag != null && !p.tag!.startsWith("xui")) {
            p.attributes ??= HashMap<String, XUIProperty>();
-           p.attributes!["data-" + ATTR_XID_SLOT + "-" + xidCal] =
-               XUIProperty(true);
+           p.attributes!["data-$ATTR_XID_SLOT-$xidCal"] = XUIProperty(true);
           break;
         }
         p = p.parent;
@@ -138,20 +138,19 @@ class NativeSlot extends XUIElementNative {
     return Future.value();
   }
 
-  void _addAttributClassStyle(
-      String attr, XUIElementHTML html, XUIElement newChild, String sep) {
+  void _addAttributClassStyle(String attr, XUIElementHTML html, XUIElement newChild, String sep) {
     if (html.originElemXUI?.attributes != null &&
         html.originElemXUI!.attributes![attr] != null) {
       newChild.attributes ??= HashMap<String, XUIProperty>();
 
       String val;
       if (newChild.attributes![attr] == null) {
-        val = html.originElemXUI!.attributes![attr]!.content;
+        val = html.originElemXUI!.attributes![attr]!.content as String;
         newChild.attributes![attr] = XUIProperty(val);
       } else {
-        val = newChild.attributes![attr]!.content +
+        val = newChild.attributes![attr]!.content.toString() +
             sep +
-            html.originElemXUI!.attributes![attr]!.content;
+            html.originElemXUI!.attributes![attr]!.content.toString();
         newChild.attributes![attr]!.content=val;
       }
     }
@@ -161,35 +160,35 @@ class NativeSlot extends XUIElementNative {
 ///------------------------------------------------------------------
 class NativeInjectFile extends XUIElementNative {
   // dictionnaire de cache de fichier
-  var cacheText = {};
+  Map<String, StringBuffer> cacheText = {};
 
   NativeInjectFile() {
-    this.xid = "xui-inject";
+    xid = "xui-inject";
   }
 
   @override
   Future<XUIModel> doProcessPhase1(
       XUIEngine engine, XUIElementHTML html) async {
-    var root = XUIElementXUI();
+    final root = XUIElementXUI();
     root.tag = TAG_NO_DOM;
 
-    var aText = XUIElementText();
-    var idResource = html.originElemXUI!.propertiesXUI!["path"]!.content;
+    final aText = XUIElementText();
+    final String idResource = html.originElemXUI!.propertiesXUI!["path"]!.content as String;
 
     if (cacheText[idResource] == null) {
-      cacheText[idResource] =
-          await engine.xuiFile.reader.provider.getResourceFutur(idResource);
+      cacheText[idResource] = await engine.xuiFile.reader.provider.getResourceFutur(idResource) as StringBuffer;
     }
 
-    aText.content = cacheText[idResource];
+    aText.content = cacheText[idResource]!;
 
     root.children ??= []..add(aText);
 
-    Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));
+    final Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));
     return f;
   }
 }
 
+// ignore: constant_identifier_names
 const JS_BINDING="data-binding";
 
 ///------------------------------------------------------------------

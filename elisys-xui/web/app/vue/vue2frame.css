@@ -90,6 +90,11 @@
     height: 100%
 }
 
+/*************** Pas en maj pour les btn *******************/
+.text-transform-none {
+    text-transform:none !important
+}
+
 /****************************************************/
 
 .clickAnimation {

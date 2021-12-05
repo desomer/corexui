@@ -1,3 +1,4 @@
+// ignore_for_file: file_names
 import 'dart:collection';
 //import 'package:yamlicious/yamlicious.dart';
 import 'XUIBindingManager.dart';

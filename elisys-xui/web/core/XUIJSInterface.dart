@@ -18,7 +18,7 @@ external void doPromiseJS(idPromise, ret);
 external String generateApplicationStateJS(template, last);
 
 @JS()
-external String generateApplicationStoreJS(state);
+external String generateApplicationStoreJS(state, action);
 
 
 @JS()

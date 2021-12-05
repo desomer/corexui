@@ -31,6 +31,7 @@ $xui.rootdata.animationNameEnter = "animate__animated animate__fadeInUp";
 $xui.rootdata.animationNameExit = "";
 
 $xui.routeEnable = true;
+$xui.info={};
 
 $xui.loadApplicationJS = () => {
 
@@ -374,12 +375,13 @@ function initDirective() {
 			// L'élément prend le focus
 			console.debug("------------------------------v-pressAnimation", el, binding);
 			el.classList.add('clickAnimation');
-			el.addEventListener('click', () => {
+			el.addEventListener('click', (e) => {
 				if (el.classList.contains('clickAnimationPress')) {
 					el.classList.remove('clickAnimationPress');
 				} else {
 					el.classList.add('clickAnimationPress');
 					setTimeout(() => {
+						console.debug(e);
 						el.classList.remove('clickAnimationPress');
 						$xui.router.push(binding.value.link);
 					}, 100);

@@ -1,4 +1,4 @@
-
+// ignore_for_file: file_names
 import 'package:html/dom.dart';
 
 import '../XUIConfigManager.dart';
@@ -16,7 +16,7 @@ class HTMLReader extends XUIReader {
  @override
  Future parseFile(XMLElemReader elemReader) async {
 
-    var text = await provider.getResourceFutur(id);
+    var text = await provider.getResourceFutur(id as String);
 
     text = text.replaceAll("<html", "<xui-escape-html");
     text = text.replaceAll("</html", "</xui-escape-html");

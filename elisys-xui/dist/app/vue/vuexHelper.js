@@ -1,4 +1,4 @@
-globalThis.$xui.generateApplicationStoreJS = (state) =>
+globalThis.$xui.generateApplicationStoreJS = (state, actions) =>
 {
     const jsonState = JSON.parse(`{${state}}`);
     const modulesManager = new $xui.VuexModuleManager();

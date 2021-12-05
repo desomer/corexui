@@ -42,7 +42,10 @@ var json = {
     ListActions : [],    // liste des actions
     messages : [
     ],
-    currentCode : "no code"
+    currentCode : "no code",
+    currentCodeName : "",
+    currentCodeIdx : -1,
+    currentCodeXid : ""
 };
 
 $xui.rootdata = { ...$xui.rootdata, ...json };

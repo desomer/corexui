@@ -1,3 +1,4 @@
+// ignore_for_file: file_names
 import 'dart:collection';
 import 'dart:math';
 
@@ -19,8 +20,7 @@ class XUIActionManager {
   Future changeProperty(
       String xid, String variable, dynamic value, String? bind) async {
     if (XUIConfigManager.verboseChange) {
-      XUIConfigManager.printc(
-          "changeProperty ${xid} a changer l'attribut <${variable}> par <${value}>  bind ${bind}");
+      XUIConfigManager.printc('changeProperty $xid a changer lattribut <$variable> par <$value>  bind $bind');
     }
 
     var listDesign = engine.xuiFile.designs[xid];
@@ -29,11 +29,22 @@ class XUIActionManager {
       listDesign = engine.xuiFile.designs[xid];
     }
 
-    var xuiDesign = listDesign!.sort(engine.xuiFile.context).first;
+    final xuiDesign = listDesign!.sort(engine.xuiFile.context).first;
+
+    if (bind=="@")
+    {
+      var elemXui = xuiDesign.elemXUI;
+      if (elemXui.propertiesXUI![variable] == null) {  
+            elemXui.propertiesXUI![variable] = XUIProperty(null);
+      }
+      elemXui.propertiesXUI![variable]!.content = value;
+      return Future.value();
+    }
 
     List<DesignInfo> designs = engine.getDesignInfo(xid, xid, false);
     for (var design in designs) {
       DocInfo? doc = design.docInfo;
+
       if (doc != null && doc.variables.isNotEmpty) {
         for (var aVariable in doc.variables) {
           if (aVariable.id == variable) {
@@ -125,11 +136,11 @@ class XUIActionManager {
   /// ajoute un nouveau composant  (html)
   ///     affecte les valeurs par defaut
   Future<XUIElementXUI> addDesign(String? xid, String html) async {
-    var reader =
-        HTMLReader(engine.xuiFile.reader.id, engine.xuiFile.reader.provider);
-    XUIResource res = XUIResource(reader, engine.xuiFile.context);
+    final reader =
+        HTMLReader(engine.xuiFile.reader.id as String, engine.xuiFile.reader.provider);
+    final XUIResource res = XUIResource(reader, engine.xuiFile.context);
 
-    XUIElementXUI xuidesign = await reader.parseString(html, res);
+    final XUIElementXUI xuidesign = await reader.parseString(html, res) as XUIElementXUI;
 
     if (xid != null) {
       xuidesign.xid = xid;

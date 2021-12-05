@@ -174,13 +174,10 @@ export class SelectorManager {
                 if (listNode != null && listNode.length>0 && listNode.length == listNode[0].parentNode.children.length) {
                     let parent = true;   
                     elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid-slot=${xid}]`, parent);
-                    if (elemRect != null) {
-                        if (elemRect.width!=0 && elemRect.height!=0)
-                        {
-                            //console.debug("displaySelectorByXid 32 ", xid);
-                            this.displaySelectorByPosition(elemRect);
-                            found=true;
-                        }
+                    if (elemRect != null && (elemRect.width!=0 && elemRect.height!=0)) {
+                        //console.debug("displaySelectorByXid 32 ", xid);
+                        this.displaySelectorByPosition(elemRect);
+                        found=true;
                     }
                 } 
                 
@@ -188,7 +185,7 @@ export class SelectorManager {
                     // gestion des d'intersection des region des enfants
                     let myRegion = null;
                     for (const aNode of listNode) {
-                        let elemRect = aNode.getBoundingClientRect();
+                        elemRect = aNode.getBoundingClientRect();
                         if (elemRect.width==0 || elemRect.height==0)
                         {
                             console.debug("error get rec", elemRect, xid);

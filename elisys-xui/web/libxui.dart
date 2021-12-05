@@ -526,12 +526,7 @@ dynamic getActionsXUI(
 dynamic getEventMethodsXUI(FileDesignInfo fileInfo) {
   print("-------------- getEventMethodsXUI ----------------   " + fileInfo.fileID);
   var designManager = _getDesignManager(fileInfo);
-  var listEvent = [];
-  designManager.getXUIEngine().bindingManager.eventInfo.forEach((key, value) 
-    { 
-        listEvent.add(value);
-    });
-  return listEvent;
+  return designManager.getXUIEngine().bindingManager.getEventMethodsXUI();
 }
 
 void main() async {

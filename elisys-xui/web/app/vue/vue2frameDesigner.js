@@ -26,19 +26,7 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
                         {
                             template: `<div style="display:${this.modedisplay}">${e.template}</div>`,
                             mixins: [$xui.mixinStore],
-
-                            // data: function () {
-                            //     return $xui.rootdata;
-                            // },
-                            // computed: {
-                            //     $xui: function () {
-                            //         return window.$xui;
-                            //     },
-                            //     ...$xui.storeDataBinding
-                            // },
-                            // methods: $xui.storeAction
                         }
-
                     );
                     this.componentToReload = newId;   // change le contenu du composant  id = componentToReload
 
@@ -74,8 +62,6 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
 }
 );
 /***********************************************************************************/
-
-
 document.addEventListener('dragenter', (e) => {
     const slotDroppable = e.target.closest('.xui-class-slot');
     if (slotDroppable) {
@@ -131,7 +117,7 @@ document.addEventListener('pointerup', function (e) {
     let s = getComputedStyle(targetAction);
     let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
 
-    var message = {
+    const message = {
         action: "select",
         xid: targetAction.dataset.xid,
         xid_slot: targetAction.dataset.xidSlot,
@@ -148,15 +134,15 @@ document.addEventListener('pointerup', function (e) {
     window.parent.postMessage(message, "*");
 });
 
-document.addEventListener('scroll', function (event) {
-    var message = {
+document.addEventListener('scroll', (event) => {
+    const message = {
         action: "unselect",
     };
     window.parent.postMessage(message, "*");
 });
 
-window.addEventListener('resize', function (event) {
-    var message = {
+window.addEventListener('resize', (event) => {
+    const message = {
         action: "unselect",
     };
     window.parent.postMessage(message, "*");
@@ -189,6 +175,16 @@ window.addEventListener('message', (e) => {
     }
 
     switch (data.action) {
+
+        case "changeJS":
+            console.debug("changeJS ", data, $xui.modulesManager);
+            const module = "main";
+            for (const mth of data.param.actions) {
+                const m = `(ev) => {\n${mth.code}\n};`;
+                $xui.modulesManager.addAction(module, mth.name, `${m}\n//# sourceURL=${module}-${mth.name}.js;`);
+            }
+            $xui.modulesManager.reload();
+            break;
 
         case "changeConfig":
             $xui.routeEnable = data.param.routeEnable;  // autorisation de changement de root
@@ -336,7 +332,7 @@ $xui.updateDirectPropValue = (value, variable, xid) => {
 }
 
 $xui.getInfoForSelector = (selector, parent) => {
-    var targetAction = document.querySelector(selector)
+    let targetAction = document.querySelector(selector);
     if (targetAction == null) return null;
     if (parent)
         targetAction = targetAction.parentNode;
@@ -346,9 +342,9 @@ $xui.getInfoForSelector = (selector, parent) => {
 
     let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
 
-    var ret = {
-        selector: selector,
-        parent: parent,
+    const ret = {
+        selector,
+        parent,
         hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
         height: elemRect.height,
         width: elemRect.width,

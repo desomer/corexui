@@ -139,3 +139,59 @@ $xui.getCodeEventXUI= () =>
     const ret = $xuicore.getEventMethodsXUI(infoFile);
     return ret;
 }
+
+$xui.loadCodeAction = (idx) => {
+      if ($xui.rootdata.currentCodeIdx>=0)  
+      {
+        $xui.saveCodeAction();
+      }
+
+      if (idx<0)
+        return;
+
+      $xui.rootdata.currentCodeName = `function ${$xui.rootdata.ListActions[idx].name}()`;
+      $xui.rootdata.currentCode= $xui.rootdata.ListActions[idx].code;
+      $xui.rootdata.currentCodeIdx = idx;
+}
+
+$xui.highlighter = (code) => {
+    return Prism.highlight(code, Prism.languages.js, "js");
+}
+
+$xui.saveCodeAction = () => {
+    // $xui.setCurrentAction("saveProperties");
+    // console.debug("saveProperties", $xui.propertiesDesign.json);
+
+    // $xui.hasPropertiesChanged = false;
+
+    const idx = $xui.rootdata.currentCodeIdx;
+    $xui.rootdata.currentCodeXid= $xui.rootdata.ListActions[idx].xid;
+    
+    const code = $xui.rootdata.ListActions[idx].code;
+    if (code==$xui.rootdata.currentCode)
+        return;
+
+    const jsonProp = [{
+        xid : $xui.rootdata.ListActions[idx].xid,
+        variable : `#${$xui.rootdata.ListActions[idx].eventName}`,
+        value : $xui.rootdata.currentCode,
+        bind : "@"
+    }];
+
+    $xui.rootdata.ListActions[idx].code = $xui.rootdata.currentCode;
+    $xuicore.saveDesignPropertiesXUI($xui.pageDesignManager.getInfoFile("template"), jsonProp);
+    $xui.rootdata.currentCodeIdx=-1;
+
+    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeJS", "param": { actions: $xui.rootdata.ListActions } }, "*");
+
+
+    // const js = $xui.rootdata.currentCode +
+    // "\n//# sourceURL=dynamicScript-"+ $xui.rootdata.ListActions[idx].name +".js;";
+    // addCode(js); // Right now! Debuggable!
+
+}
+
+    // // Dynamically evaluate JavaScript-as-string in the browser
+    // function addCode(js){
+    //     eval(js);
+    //   }

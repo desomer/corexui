@@ -301,3 +301,23 @@ pre > code {
 #jsonState .ace_content {
     background-color: rgb(235 235 235);
 }
+
+.js-editor {
+    /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
+    /* height:calc(100% - 100px) !important;*/
+
+   /* background: #2d2d2d;
+    color: #ccc;*/
+
+    /* you must provide font-family font-size line-height. Example:*/
+    font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 5px;
+    border: 1px solid lightgrey;
+  }
+
+/* optional class for removing the outline */
+.prism-editor__textarea:focus {
+    outline: none;
+}

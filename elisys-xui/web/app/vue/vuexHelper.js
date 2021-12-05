@@ -1,8 +1,18 @@
-globalThis.$xui.generateApplicationStoreJS = (state) =>
+globalThis.$xui.generateApplicationStoreJS = (state, actions) =>
 {
+
     const jsonState = JSON.parse(`{${state}}`);
     const modulesManager = new $xui.VuexModuleManager();
 	const main = modulesManager.addModule("main", jsonState);
+
+    const module = "main";
+    for (const mth of actions) {
+        console.debug("/*/*/**/*/*/*/*/*/ add mth", mth);
+        const m = `(p) => {\n${mth.code}\n//# sourceURL=${module}-${mth.name}.js;\n}`;
+        //const code = `${m}\n//# sourceURL=${module}-${mth.name}.js;`;
+        modulesManager.modulesDesc[module].actions[mth.name]=m;
+    }
+
     return modulesManager.getCode();
 }
 
@@ -52,11 +62,23 @@ class VuexModuleManager {
         return {
             computed,
             methods: {
-                $mth: function()
-                {
+                $mth() {
                     console.debug("mth", arguments, this);
 
-                    var message = {
+                    if (arguments[1].type=="click") {
+                        let elem = arguments[1].target;
+                        const targetAction = elem.closest("[data-for-idx]");
+                        //console.debug("targetAction", targetAction);
+                        if (targetAction!=null) {
+                            const forMap = targetAction.parentElement.dataset.forMap;
+                            const forIdx = Number.parseInt(targetAction.dataset.forIdx, 10);
+                            $xui.info[forMap]=forIdx;
+                        }
+                    }
+
+
+
+                    const message = {
                         action: "displayMessage",
                         value: {
                             snackbar: true,
@@ -66,9 +88,9 @@ class VuexModuleManager {
                     };
                     window.parent.postMessage(message, "*");
 
-                    this.$store.dispatch('main/actionName', null, { root: true })
+                    this.$store.dispatch(`main/${arguments[0]}`, null, { root: true })
                 },
-                $post: function (action, ev) {
+                $post(action, ev) {
                     console.debug("$post", this, action, ev);
                     this.$store.dispatch(action);
                 }
@@ -100,50 +122,42 @@ class VuexModuleManager {
 
 
     getCode() {
-        var result = 
-`globalThis.initialiseAppState = () => {\n`
+        let result = `globalThis.initialiseAppState = () => {\n`;
         
-        result +=
-`const modulesManager = new VuexModuleManager();\n\n`;
-        var listModule = "";
+        result += `const modulesManager = new VuexModuleManager();\n\n`;
+        let listModule = "";
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             var stateJson = JSON.stringify(desc.state, undefined, 4);
             if (stateJson.length>2) {
                 stateJson= stateJson.substring(0, stateJson.length-1);  // retrait de la dernier accolade
-                stateJson=stateJson+" , ...$xui.rootdata }";
+                stateJson+=" , ...$xui.rootdata }";
             }
             else
             {
                 stateJson="$xui.rootdata";
             }
             result += `const ${namespace} = modulesManager.addModule("${namespace}", ${stateJson});\n\n`;
-            listModule += "\n                " + namespace + ",";
+            listModule += `\n\t\t\t\t\t\t${namespace},`;
         }
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
-            result +=
-`${namespace}.actions={`;
+            result +=`${namespace}.actions={`;
             for (const [nameAction, code] of Object.entries(desc.actions)) {
-            result += `\n  ${nameAction} : ${code}\n`;
+            result += `\n  ${nameAction} : ${code},`;
             }
-            result +=
-`}\n`;
+            result +=`}\n\n`;
         }
 
         result +=
-`modulesManager.setStore(new Vuex.Store({
-        modules : {${listModule}
-        },
-        plugins : [$xui.logger],
-        strict : true
-}));\n`;
-
+            `modulesManager.setStore(new Vuex.Store({
+                    modules : {${listModule}
+                    },
+                    plugins : [$xui.logger],
+                    strict : true
+            }));\n`;
         
-        result += 
-`
-return modulesManager;
-}\n`;
+        result += `return modulesManager;\n}\n`;
         return this.indentString(result, 8);
     }
 

@@ -47,7 +47,6 @@ class XUIBinding {
   XUIBinding(this.propName, this.attr, this.value, this.xid);
 }
 
-
 ///------------------------------------------------------------------
 ///
 /// gestion des designs ou des components
@@ -250,6 +249,7 @@ class XUIModel implements Comparable<XUIModel> {
   void _processPropertiesPhase1AndBind(
       XUIElementHTML elemHtml, XUIEngine engine) {
     if (elemXUI.propertiesXUI != null) {
+      bool withAttributPhase2 = false;
       elemXUI.propertiesXUI!.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
 
@@ -261,11 +261,22 @@ class XUIModel implements Comparable<XUIModel> {
           // n'affecte pas le XID car gerer par attribut xid  => affecte tous les autres
           XUIProperty p = prop.value;
 
-          engine.bindingManager.processPropertiesBinding(prop, this, elemHtml);
+          bool hasEvent = engine.bindingManager
+              .processPropertiesBindingPhase1(prop, this, elemHtml);
+          if (hasEvent) withAttributPhase2 = true;
 
           elemHtml.propertiesXUI![prop.key] = p;
         }
       });
+
+      if (withAttributPhase2) {
+        elemHtml.propertiesXUI!.entries.forEach((prop) {
+          if (prop.key.toLowerCase() != cst.ATTR_XID) {
+            engine.bindingManager
+                .processPropertiesBindingPhase2(prop, elemHtml);
+          }
+        });
+      }
     }
   }
 
@@ -329,7 +340,7 @@ class XUIModel implements Comparable<XUIModel> {
       slotInfo.elementHTML = elemHtml;
       slotInfo.implement = elemHtml.implementBy?.first.elemXUI.xid;
       slotInfo.docId = getDocumentationID(elemHtml);
-      
+
       String? hasFor = elemHtml.propertiesXUI?[":varitems"]?.content;
       if (hasFor != null)
         slotInfo.mapTag["for"] = hasFor;

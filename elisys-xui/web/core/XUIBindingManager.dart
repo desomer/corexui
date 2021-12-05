@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:convert';
 
 import 'XUIConfigManager.dart';
 import 'XUIEngine.dart';
@@ -10,15 +9,14 @@ import 'element/XUIProperty.dart';
 import 'native/register.dart';
 
 class XUIBindingManager {
-
   XUIEngine engine;
   var bindingInfo = LinkedHashMap<String, XUIBinding>();
-  var eventInfo  = LinkedHashMap<String, XUIBindingEvent>();
+  var eventInfo = LinkedHashMap<String, XUIBindingEvent>();
 
   XUIBindingManager(this.engine);
 
-  void processPropertiesBinding(
-      MapEntry<String, XUIProperty> prop, XUIModel model, XUIElementHTML elemHtml) {
+  bool processPropertiesBindingPhase1(MapEntry<String, XUIProperty> prop,
+      XUIModel model, XUIElementHTML elemHtml) {
     XUIProperty p = prop.value;
 
     if (prop.key.startsWith(":")) {
@@ -26,6 +24,11 @@ class XUIBindingManager {
       var propB = XUIPropertyBinding("", prop.value.content);
       var pme = MapEntry<String, XUIProperty>(prop.key, propB);
       _addXUIBinding(pme, model, elemHtml);
+    }
+
+    if (prop.key.startsWith("@")) {
+      //print("******************* event > " + keyAttr);
+      return true;
     }
 
     if (p.content is String && p.content.startsWith("{{") == true) {
@@ -40,22 +43,32 @@ class XUIBindingManager {
     if (p is XUIPropertyBinding) {
       _addXUIBinding(prop, model, elemHtml);
     }
+
+    return false;
   }
 
-  void _addXUIBinding(MapEntry<String, XUIProperty> prop, XUIModel model, XUIElementHTML elemHtml) {
+  void processPropertiesBindingPhase2(
+      MapEntry<String, XUIProperty> prop, XUIElementHTML elemHtml) {
+    if (prop.key.startsWith("@")) {
+      elemHtml.doAddEventPhase2(engine, prop.key, prop.value);
+    }
+  }
+
+  void _addXUIBinding(MapEntry<String, XUIProperty> prop, XUIModel model,
+      XUIElementHTML elemHtml) {
     XUIPropertyBinding p = prop.value as XUIPropertyBinding;
 
     var name = p.binding!;
     int isArray = name.lastIndexOf("[]");
 
-    if (isArray<=0) {
-        String? varitems = elemHtml.searchPropertyXUI(":varitems@1+", 0,  ParseInfo(p, null, ParseInfoMode.PROP));
-        if (varitems!=null)
-        {
-          varitems=varitems.substring(varitems.indexOf(".")+1);
-          name= varitems+ "[]."+name;
-          print("-------------- varitems --------------> " + name);
-        }
+    if (isArray <= 0) {
+      String? varitems = elemHtml.searchPropertyXUI(
+          ":varitems@1+", 0, ParseInfo(p, null, ParseInfoMode.PROP));
+      if (varitems != null) {
+        varitems = varitems.substring(varitems.indexOf(".") + 1);
+        name = varitems + "[]." + name;
+        print("-------------- varitems --------------> " + name);
+      }
     }
 
     if (XUIConfigManager.verboseBinding) {
@@ -72,6 +85,14 @@ class XUIBindingManager {
         XUIBinding(prop.key, name, p.content, model.elemXUI.xid!);
   }
 
+  dynamic getEventMethodsXUI() {
+    var listEvent = [];
+    engine.bindingManager.eventInfo.forEach((key, value) {
+      listEvent.add(value);
+    });
+    return listEvent;
+  }
+
   void processPhase2JS(XUIContext ctx) {
     var dicoObjBind = LinkedHashMap<String, List<XUIBinding>>();
     var dicoObjType = LinkedHashMap<String, XUIBinding>();
@@ -80,7 +101,8 @@ class XUIBindingManager {
     doDicoObjectBinding(dicoObjBind, dicoObjType);
     processPhase2JSBinding("root", dicoObjBind, jsonBinding);
 
-    XUIProperty? propBinding = engine.getXUIPropertyFromDesign("root", "binding");
+    XUIProperty? propBinding =
+        engine.getXUIPropertyFromDesign("root", "binding");
     String PropMock = "";
     if (propBinding != null) {
       PropMock = propBinding.content.toString();
@@ -105,7 +127,7 @@ class XUIBindingManager {
     var str = "";
 
     try {
-      str = generateApplicationStoreJS(newBinding);
+      str = generateApplicationStoreJS(newBinding, getEventMethodsXUI());
     } catch (e) {
       XUIConfigManager.printc("error" + e.toString());
     }
@@ -224,10 +246,8 @@ class XUIBindingManager {
       String objName,
       LinkedHashMap<String, List<XUIBinding>> dicoObjBind,
       StringBuffer jsonBinding) {
-
-
     dicoObjBind[objName]?.forEach((bindInfo) {
-      var type = bindInfo.type; 
+      var type = bindInfo.type;
       var isNotString = (type == "bool" || type == "int");
       var v = isNotString ? (bindInfo.value) : ('"' + bindInfo.value + '"');
 
@@ -264,29 +284,23 @@ class XUIBindingManager {
 
   //-------------------------------------- RENAME  -----------------------------------------------
 
-  bool remaneVariable(String oldName, String newName)
-  {
-    print("ddddddddddddddddddddddd remane "+oldName + "  =>   "+newName);
+  bool remaneVariable(String oldName, String newName) {
+    print("ddddddddddddddddddddddd remane " + oldName + "  =>   " + newName);
     return true;
   }
 
-  // List getBindingInfo() {
-  //   var bind = [];
-  //   bindingInfo.forEach((k, v) {
-  //     var des = BindObj();
-  //     des.attr = v.attr;
-  //     des.val = v.value;
-  //     bind.add(des);
-  //   });
-  //   return bind;
-  // }
+  //-------------------------------------- EVENT TO METHOD  -----------------------------------------------
+  void addEventMethod(XUIElement elem, XUIBindingEvent eventMth) {
+    eventInfo[eventMth.name] = eventMth;
 
+    XUIProperty? propCode = elem.propertiesXUI?["#" + eventMth.eventName];
+    eventMth.code = propCode?.content ?? "";
 
- //-------------------------------------- EVENT TO METHOD  -----------------------------------------------
- void addEventMethod( XUIBindingEvent eventMth)
- {
-
-    eventInfo[eventMth.name]=eventMth;
-    print("******* EVENT ++++ " + eventMth.eventName+ " on " + eventMth.xid + " execute method " + eventMth.name);
- } 
+    print("******* EVENT ++++ " +
+        eventMth.eventName +
+        " on " +
+        eventMth.xid +
+        " execute method " +
+        eventMth.name);
+  }
 }

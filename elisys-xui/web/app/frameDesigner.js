@@ -213,7 +213,7 @@ $xui.setCurrentAction = (actionName) => {
         }
     });
 
-    var prom = getPromise("AfterChangeDisplayProperties");
+    prom = getPromise("AfterChangeDisplayProperties");
     prom.then(() => {
         if (selectionMode == "root") {
             $xui.displayPropertiesJS("root", "root");   // reaffecte le nouveau mapping sur la page
@@ -272,12 +272,11 @@ $xui.copyCmp = () => {
         console.debug("copyCmp slot impossible");
         return false;
     }
-    else {
-        $xui.setCurrentAction("copyCmp");
-        $xuicore.copyDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
-        $xui.rootdata.pasteDisabled = false;
-        return true;
-    }
+    
+    $xui.setCurrentAction("copyCmp");
+    $xuicore.copyDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
+    $xui.rootdata.pasteDisabled = false;
+    return true;
 }
 
 $xui.copyCmpOnDrap = (data) => {
@@ -285,19 +284,15 @@ $xui.copyCmpOnDrap = (data) => {
         console.debug("copyCmp slot impossible");
         return false;
     }
-    else {
-        $xui.setCurrentAction("copyCmp");
-        $xuicore.copyDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
-        $xui.rootdata.pasteDisabled = false;
 
-        setTimeout(() => {
-            let infoFile = $xui.pageDesignManager.getInfoFile("template");
-            $xuicore.moveDesignXUI(infoFile, null, data.xid_slot);
-        }, 100);
-
-
-        return true;
-    }
+    $xui.setCurrentAction("copyCmp");
+    $xuicore.copyDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
+    $xui.rootdata.pasteDisabled = false;
+    setTimeout(() => {
+        let infoFile = $xui.pageDesignManager.getInfoFile("template");
+        $xuicore.moveDesignXUI(infoFile, null, data.xid_slot);
+    }, 100);
+    return true;
 }
 
 $xui.cutCmp = () => {
@@ -305,12 +300,11 @@ $xui.cutCmp = () => {
         console.debug("cutCmp slot impossible");
         return false;
     }
-    else {
-        $xui.setCurrentAction("cutCmp");
-        $xuicore.cutDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
-        $xui.rootdata.pasteDisabled = false;
-        return true;
-    }
+
+    $xui.setCurrentAction("cutCmp");
+    $xuicore.cutDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
+    $xui.rootdata.pasteDisabled = false;
+    return true;
 }
 
 $xui.pasteTo = () => {

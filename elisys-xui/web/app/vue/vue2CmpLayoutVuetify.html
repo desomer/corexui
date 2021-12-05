@@ -118,11 +118,14 @@
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
         <xui-prop var=":varitems" cat="event:model" editor="var" bind-type="array">items var name</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
+        <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
     </xui-doc>
 
     <v-row xid="xui-row-1" class="[[fill-height]] [[class]]" xui-for="idxc" -style="[[style]]" no-gutters
-        -align="[[align]]" align-content="[[align-content]]" justify="[[justify]]">
-        <v-col class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]"  if:[[:varitems@-1]]:v-for="([[:varitems@-1]]_item, [[:varitems@-1]]_index) in [[:varitems@-1]]">
+        -align="[[align]]" align-content="[[align-content]]" justify="[[justify]]" if:[[:varitems@-2]]:data-for-map="[[:varitems@-2]]">
+        <v-col [[event@-1]] class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]" if:[[:varitems@-1]]:v-bind:data-for-idx=[[:varitems@-1]]_index if:[[:varitems@-1]]:v-for="([[:varitems@-1]]_item, [[:varitems@-1]]_index) in [[:varitems@-1]]">
             <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" style-slot="height:100%" xui-slot-name="row col [[idxc@3]]">
             </xui-slot>
         </v-col>

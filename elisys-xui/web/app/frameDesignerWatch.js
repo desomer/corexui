@@ -10,6 +10,17 @@ function onChangeMainTab(instanceVue) {
     }, 500);
 
 
+    if (oldValue == 1)
+    {
+      if ($xui.rootdata.currentCodeIdx>=0)
+      {
+        $xui.saveCodeAction();
+      }
+      $xui.rootdata.currentCode="no code";
+      $xui.rootdata.currentCodeName="";
+      $xui.rootdata.currentCodeIdx=-1;
+    }
+
     if (newValue == 0 && oldValue == 1) {
       // retour de l'onglet jsonEditor
       const ctrlStr = `${$xui.rootdata.jsonEditorDataSrc}#${JSON.stringify($xui.rootdata.jsonEditorDataMock)}`;
@@ -30,6 +41,12 @@ function onChangeMainTab(instanceVue) {
       // reaffiche l'initial State de l'application
       $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
       $xui.rootdata.ListActions=$xui.getCodeEventXUI();
+      $xui.rootdata.currentCode="no code";
+      $xui.rootdata.currentCodeName="";
+      $xui.rootdata.currentCodeIdx=-1;
+      const idxSelected = $xui.rootdata.ListActions.findIndex(element => element.xid == $xui.rootdata.currentCodeXid);
+      $xui.loadCodeAction(idxSelected);
+
     }
 
     if (newValue == 2) {

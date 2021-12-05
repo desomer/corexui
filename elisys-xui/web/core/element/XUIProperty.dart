@@ -1,23 +1,24 @@
+// ignore_for_file: file_names
 import 'dart:convert';
 
 class XUIProperty {
   dynamic content;
 
   XUIProperty(v) {
-    this.content = v;
+    content = v;
   }
 
-  static parse(ParseInfo parseInfo, Function action) {
+  static void parse(ParseInfo parseInfo, Function action) {
     int idx = 0;
     while ((idx = _parseNext(parseInfo, idx, action)) >= 0) {}
   }
 
   static int _parseNext(ParseInfo parseInfo, int idx, Function action) {
-    String parse = parseInfo.parsebuilder.toString();
-    String startTag = "[[";
-    String endTag = "]]";
+    final String parse = parseInfo.parsebuilder.toString();
+    const String startTag = "[[";
+    const String endTag = "]]";
 
-    int next = parse.indexOf(startTag, idx);
+    final int next = parse.indexOf(startTag, idx);
 
     int nextEnd = next;
     if (next >= 0) {
@@ -26,8 +27,8 @@ class XUIProperty {
 
     if (next >= 0 && nextEnd > 0) {
       parseInfo.nbTag++;
-      String strStart = parse.substring(0, next);
-      String strEnd = parse.substring(nextEnd + 2, parse.length);
+      final String strStart = parse.substring(0, next);
+      final String strEnd = parse.substring(nextEnd + 2, parse.length);
       String tag = parse.substring(next + 2, nextEnd);
       tag = action(tag).toString();
       parseInfo.parsebuilder.clear();
@@ -40,11 +41,11 @@ class XUIProperty {
   }
 
   String toHTML(String k) {
-    HtmlEscape htmlEscape = const HtmlEscape();
+    const HtmlEscape htmlEscape = HtmlEscape();
 
-    var val = htmlEscape.convert(content.toString());
+    final val = htmlEscape.convert(content.toString());
 
-    return '<xui-prop id="${k}" val="${val}"></xui-prop>';
+    return '<xui-prop id="$k" val="$val"></xui-prop>';
   }
 }
 
@@ -54,15 +55,16 @@ class XUIPropertyBinding extends XUIProperty {
   String? cacheBinding;
 
   XUIPropertyBinding(v, b) : super(v) {
-    this.binding = b;
+    binding = b as String?;
   }
 
+  @override
   String toHTML(String k) {
-    HtmlEscape htmlEscape = const HtmlEscape();
+    const HtmlEscape htmlEscape =  HtmlEscape();
 
-    var val = htmlEscape.convert(content.toString());
+    final val = htmlEscape.convert(content.toString());
 
-    return '<xui-prop id="${k}" val="${val}" binding="${binding.toString()}"></xui-prop>';
+    return '<xui-prop id="$k" val="$val" binding="${binding.toString()}"></xui-prop>';
   }
 }
 
@@ -78,9 +80,7 @@ class ParseInfo {
   String? prefix;  //  ajoute un prefix à l'attribut   (ex : v-bind:)
 
 
-  ParseInfo(content, String? context, ParseInfoMode mode) {
+  ParseInfo(content, this.context, this.mode) {
     parsebuilder = StringBuffer(content.toString());
-    this.context = context;
-    this.mode = mode;
   }
 }
