@@ -25,15 +25,15 @@ class XUIHtmlBuffer {
 
 ///------------------------------------------------------------------
 class XUIComponent extends XUIModel {
-  XUIComponent(e, m) : super(e, m);
+  XUIComponent(e, m) : super(e, m, 0);
 }
 
 class XUIDesign extends XUIModel {
-  XUIDesign(e, m) : super(e, m);
+  XUIDesign(e, m, p) : super(e, m, p);
 }
 
 class XUIChild extends XUIModel {
-  XUIChild(e, m) : super(e, m);
+  XUIChild(e, m) : super(e, m, 0);
 }
 
 /// gestion du binding
@@ -58,7 +58,7 @@ class XUIModel implements Comparable<XUIModel> {
   String? mode; // final, template, design, etc...
   bool use = false;
 
-  XUIModel(this.elemXUI, this.mode);
+  XUIModel(this.elemXUI, this.mode, this.priority);
 
   Future processPhase1(XUIEngine engine, XUIElementHTML elemHtml) async {
     var tag = elemXUI.tag;
@@ -270,6 +270,7 @@ class XUIModel implements Comparable<XUIModel> {
       });
 
       if (withAttributPhase2) {
+        // passe aprés l'affectation de properties pour avec avoir l'ensemble de properties
         elemHtml.propertiesXUI!.entries.forEach((prop) {
           if (prop.key.toLowerCase() != cst.ATTR_XID) {
             engine.bindingManager
@@ -277,6 +278,7 @@ class XUIModel implements Comparable<XUIModel> {
           }
         });
       }
+
     }
   }
 
@@ -284,12 +286,21 @@ class XUIModel implements Comparable<XUIModel> {
 
   Future processPhase2(
       XUIEngine engine, XUIElementHTML elemHtml, String? parentXId) async {
-    // gestion appel des native
+
     if (elemHtml.implementBy != null) {
       for (var cmp in elemHtml.implementBy!) {
+        // gestion appel des native
         if (cmp.elemXUI is XUIElementNative) {
           await (cmp.elemXUI as XUIElementNative)
               .doProcessPhase2(engine, elemHtml);
+        }
+
+        var hasJSonValidator = engine.bindingManager.afterJsonValidator[cmp.elemXUI.xid];
+        if (hasJSonValidator!=null)
+        {
+          String xid = elemHtml.originElemXUI?.xid as String;
+          //print(">>>>>>>>>>>>>>>>>>>>>>>>>>>><" + cmp.elemXUI.xid! + "=> " + xid!);
+          engine.bindingManager.validatorInfo[xid]=XUIBinding(cmp.elemXUI.xid!, "","", xid);
         }
       }
     }
@@ -298,7 +309,8 @@ class XUIModel implements Comparable<XUIModel> {
     bool addSlotInfo = false;
     if (elemHtml.attributes != null && elemHtml is! XUIElementHTMLText) {
       // recherche les info de slot designable
-      slotInfo.xid = elemHtml.attributes!["data-" + ATTR_XID]?.content;
+      var xid = elemHtml.attributes!["data-" + ATTR_XID]?.content;
+      slotInfo.xid = xid;
 
       if (slotInfo.xid != null) {
         addSlotInfo = true;

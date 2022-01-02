@@ -1,15 +1,15 @@
 $xui.displayPropertiesJS = (xid, xid_slot) => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
 
-    var idProp = "AppPropertiesSetting";
+    let idProp = "AppPropertiesSetting";
     infoFile.action = "design";
 
-    if ($xui.rootdata.activeAction == 1) {
+    if ($xui.rootdata.idxTabProperties == 1) {
         idProp = "AppPropertiesStyle";
         infoFile.action = "style";
     }
 
-    if ($xui.rootdata.activeAction == 2) {
+    if ($xui.rootdata.idxTabProperties == 2) {
         idProp = "AppPropertiesEvent";
         infoFile.action = "event";
     }
@@ -66,39 +66,43 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
                 }
             },
             mounted() {
-                this.$nextTick(() => {
-                    if (posScroll >= 0) {
-                        document.getElementById(idProp).scrollTop = posScroll;
-                    }
-                    // gestion de la selection sur le mouseover
-                    var listOver = document.querySelectorAll(`#${idProp} .xui-over-prop-xid`);
-                    $xui.lastPropOver = null;
-
-                    listOver.forEach((aDivOver) => {
-                        aDivOver.addEventListener('mouseover', (e) => {
-                            if ($xui.lastPropOver != aDivOver.id) {
-                                $xui.lastPropOver = aDivOver.id;
-                                $xui.SelectorManager.displaySelectorByXid(aDivOver.id, aDivOver.id, true);
-                            }
-                        });
-                        aDivOver.addEventListener('mouseleave', (e) => {
-                            // pas de sauvegarde ni de selection si au dessus d'une list de combobox
-                            if (e.toElement != null && e.toElement.closest('.v-select-list') != null)
-                                return;
-
-                            $xui.lastPropOver = null;
-                            // lance aussi la sauvegarde
-                            $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xid, true);
-                            if (!$xui.modeDisplaySelection)
-                                $xui.SelectorManager.unDisplaySelector();
-                        });
-                    });
-                })
+                this.$nextTick(doMouveOverProperties(posScroll, idProp))
             }
         });
     });
 
     return prom;
+}
+
+function doMouveOverProperties(posScroll, idProp)  { 
+    return () => {
+        if (posScroll >= 0) {
+            document.getElementById(idProp).scrollTop = posScroll;
+        }
+        // gestion de la selection sur le mouseover
+        const listOver = document.querySelectorAll(`#${idProp} .xui-over-prop-xid`);
+        $xui.lastPropOver = null;
+
+        listOver.forEach((aDivOver) => {
+            aDivOver.addEventListener('mouseover', (e) => {
+                if ($xui.lastPropOver != aDivOver.id) {
+                    $xui.lastPropOver = aDivOver.id;
+                    $xui.SelectorManager.displaySelectorByXid(aDivOver.id, aDivOver.id, true);
+                }
+            });
+            aDivOver.addEventListener('mouseleave', (e) => {
+                // pas de sauvegarde ni de selection si au dessus d'une list de combobox
+                if (e.toElement != null && e.toElement.closest('.v-select-list') != null)
+                    return;
+
+                $xui.lastPropOver = null;
+                // lance aussi la sauvegarde
+                $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xid, true);
+                if (!$xui.modeDisplaySelection)
+                    $xui.SelectorManager.unDisplaySelector();
+            });
+        });
+    };
 }
 
 /***************************************************************************************************************/
@@ -125,10 +129,70 @@ $xui.displayComponents = (xid, xid_slot) => {
         vuetify: new Vuetify(),
         data: $xui.rootDataComponents,
         computed: {
-            $xui: function () {
+            $xui() {
                 return window.$xui;
             }
         }
     });
 
 }
+/***************************************************************************************************************/
+$xui.getCodeEventXUI= () =>
+{
+    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const ret = $xuicore.getEventMethodsXUI(infoFile);
+    return ret;
+}
+
+$xui.loadCodeAction = (idx) => {
+      if ($xui.rootdata.currentCodeIdx>=0)  
+      {
+        $xui.saveCodeAction();
+      }
+
+      if (idx<0)
+        return;
+
+      $xui.rootdata.currentCodeName = `function ${$xui.rootdata.ListActions[idx].name}()`;
+      $xui.rootdata.currentCode= $xui.rootdata.ListActions[idx].code;
+      $xui.rootdata.currentCodeIdx = idx;
+
+      let listAct = document.querySelectorAll(".xui-btn-code");
+      let i = 0;
+      listAct.forEach((elem) => {
+        elem.classList.remove('xui-btn-code-selected');
+        if (i==idx)
+        {
+            elem.classList.add('xui-btn-code-selected');
+        }
+        i++;
+      });
+
+}
+
+// $xui.highlighter = (code) => Prism.highlight(code, Prism.languages.js, "js");
+
+$xui.saveCodeAction = () => {
+
+    const idx = $xui.rootdata.currentCodeIdx;
+    $xui.rootdata.currentCodeXid= $xui.rootdata.ListActions[idx].xid;
+    
+    const code = $xui.rootdata.ListActions[idx].code;
+    if (code==$xui.rootdata.currentCode)
+        return;
+
+    const jsonProp = [{
+        xid : $xui.rootdata.ListActions[idx].xid,
+        variable : `#${$xui.rootdata.ListActions[idx].eventName}`,
+        value : $xui.rootdata.currentCode,
+        bind : "@"
+    }];
+
+    $xui.rootdata.ListActions[idx].code = $xui.rootdata.currentCode;
+    $xuicore.saveDesignPropertiesXUI($xui.pageDesignManager.getInfoFile("template"), jsonProp);
+    $xui.rootdata.currentCodeIdx=-1;
+
+    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeJS", "param": { actions: $xui.rootdata.ListActions } }, "*");
+
+}
+

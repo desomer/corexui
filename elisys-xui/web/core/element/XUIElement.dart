@@ -118,6 +118,12 @@ class XUIElementHTML extends XUIElement {
       return p!.calculatePropertyXUI(p.originElemXUI!.xid, parseInfo);
     }
 
+    if (tag.contains("|")) {
+        final atTag = tag.split("|");
+        tag = atTag[0];
+        parseInfo.orTag=atTag[1];
+    }
+
     // gestion de la recherche sur des enfant (@-1) ou les parents (@0+)
     if (tag.contains("@")) {
       final atTag = tag.split("@");
@@ -147,6 +153,17 @@ class XUIElementHTML extends XUIElement {
       // par defaut uniquement dans himself (@0)
       // ignore: parameter_assignments
       deep = 0;
+    }
+
+    if (tag.startsWith("index:"))
+    {
+      tag=tag.substring(6);
+      parseInfo.tagPrefix="index";
+    }
+    if (tag.startsWith("item:"))
+    {
+      tag=tag.substring(5);
+      parseInfo.tagPrefix="item";
     }
 
     final XUIProperty? prop = propertiesXUI == null ? null : propertiesXUI![tag];
@@ -187,7 +204,7 @@ class XUIElementHTML extends XUIElement {
             isArray = name.lastIndexOf("[]");
             prop.cacheBinding=name;
             // ignore: avoid_print
-            print("-------------- varitems map --------------> $name");
+            //print("-------------- varitems map --------------> $name");
           }
       }
       
@@ -205,7 +222,10 @@ class XUIElementHTML extends XUIElement {
       return namespace + name;
     }
 
+
+    //print("tag "+ tag);
     //---------------------------------------------------
+  
     if (tag.startsWith(":")) {
       //les variables :varItems
       // gestion des v-for
@@ -214,9 +234,13 @@ class XUIElementHTML extends XUIElement {
         numVar = 5 - parseInfo.parsebuilder.toString().split(tag).length; 
       }
 
-      if (parseInfo.context == "v-bind:data-for-idx")
+      if (parseInfo.tagPrefix=="index")   // pour les for
       {
         numVar=2;
+      }
+      if (parseInfo.tagPrefix=="item")  // pour les treeview et le datatable
+      {
+        numVar=1;
       }
 
       var name = prop.content.toString();
@@ -257,7 +281,13 @@ class XUIElementHTML extends XUIElement {
   dynamic _processContentPhase3(XUIEngine engine, ParseInfo parseInfo) {
     try {
       XUIProperty.parse(parseInfo, (String tag) {
-        final ret = searchPropertyXUI(tag, -1, parseInfo);
+        var ret = searchPropertyXUI(tag, -1, parseInfo);
+        if (ret==null && parseInfo.orTag!=null)
+        {
+          var t = parseInfo.orTag!;
+          parseInfo.orTag=null;
+          ret = searchPropertyXUI(t, -1, parseInfo);
+        }
 
         return ret ?? (parseInfo.mode == ParseInfoMode.CONTENT ? doPropPlaceHolder(tag): "");
       });

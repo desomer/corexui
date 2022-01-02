@@ -138,7 +138,25 @@ class XUIDesignManager {
     return ret;
   }
 
-  ///------------------------------------------------------------------------------------------
+   ///------------------------------------------------------------------------------------------
+   JSDesignInfo getJSDesignValue(String id, String idslot, int deep)
+   {
+    var ret = JSDesignInfo();
+    var designs = getXUIEngine().getDesignInfo(id, idslot, true);
+    ret.xid = id;
+    ret.xidSlot = idslot;
+    int i = 0;
+    var range = designs.getRange(0, deep);
+    for (var design in range) {
+        for (DocVariables varCmp in design.docInfo?.variables ?? const []) {
+          _getJSDesignVariableData(varCmp, design, ret, i);
+          i++;
+        }
+    }
+    return ret;
+   }
+
+
   Future<JSDesignInfo> getJSDesignInfo(
       String id, String idslot, String mode) async {
     var ret = JSDesignInfo();
@@ -157,14 +175,32 @@ class XUIDesignManager {
     // calcul du path pour le fil d'ariane
     var idxFor = designs.length;
     var hasFor = -1;
+    var startPath = 0;
+    var idx = 0;
+    const nb = 10;
+    if (idxFor>nb)
+    {
+       startPath=idxFor-nb-1;
+    }
     designs.reversed.forEach((design) {
-      if (ret.bufPath.length > 0) ret.bufPath.write(" > ");
-      ret.bufPath.write(design.docInfo?.name ?? design.slotInfo.docId);
+      if (idx==startPath && idx>0) {
+        TreeSlot aSlot = TreeSlot();
+        aSlot.name = "...";
+        aSlot.id=design.slotInfo.xid!;
+        ret.listPath.add(aSlot);
+      }
+      else if (idx>=startPath) {
+        TreeSlot aSlot = TreeSlot();
+        aSlot.name = design.docInfo?.name ?? design.slotInfo.docId!;
+        aSlot.id=design.slotInfo.xid!;
+        ret.listPath.add(aSlot);
+      }
 
       if (design.slotInfo.mapTag["for"] != null) {
         hasFor = idxFor;
       }
       idxFor--;
+      idx++;
     });
     //------------------------------------------------------------------
 
@@ -499,6 +535,15 @@ class XUIDesignManager {
               icon: "mdi-table-row",
               title: "Add flow right");
           ret.add(act);
+
+          act = ObjectAction(
+              xid: design.slotInfo.xid!,
+              action: "surroundBadge",
+              type: "surround",
+              icon: "mdi-checkbox-blank-badge-outline",
+              title: "Add badge");
+          ret.add(act);
+
         } else {
           // var ti = (design.docInfo.addRemove ?? "noAddRemove") +
           //     "|" +
@@ -540,7 +585,7 @@ class XUIDesignManager {
 class JSDesignInfo {
   late String xid;
   late String xidSlot;
-  var bufPath = StringBuffer();
+  List<TreeSlot> listPath = [] ;
   var bufData = StringBuffer();
   var bufTemplate = StringBuffer();
 }

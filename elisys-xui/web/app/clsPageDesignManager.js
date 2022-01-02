@@ -11,7 +11,7 @@ export class PageDesignManager {
             file: `app/${window.$xui.rootdata.frameTemplate}.html`,
             xid: 'root',
             mode,
-            jsonBinding: JSON.stringify($xui.rootdata.jsonEditorData)
+            jsonBinding: JSON.stringify($xui.rootdata.stateData)
         };
     }
 
@@ -20,22 +20,29 @@ export class PageDesignManager {
         return window.$xui.rootdata.frameName;
     }
 
+    /** premier chargement de la page en full */
     loadPage(html, option) {
         document.querySelector("#rootFrame").srcdoc = html;
 
         this.codeHtml = html;
 
+        setTimeout(() => {
+            $xui.displayComponents("", "");
+            $xui.displayPropertiesJS("page-0-route-0-content-slot", "page-0-route-0-content-slot");
+        }, 200);
+
         if (option != null) {
             $xui.rootdata.listSlot.length = 0;
             $xui.rootdata.listSlot.push(...option.treeSlot);
-            this.initConfigApp(option);
+            const prom = getPromise("OnPageReady");
+            prom.then(()=> { 
+                this.initConfigApp(option); 
+                $xui.rootdata.overlayEvent=true;
+                $xui.rootdata.overlay=false;
+            });
         }
 
-        setTimeout(() => {
-            $xui.displayComponents("", "");
-            $xui.displayPropertiesJS("root", "root")
-        }, 200);
-
+        // activation des button undo et redo
         const name = this.getPageId();
         const version = localStorage.getItem(`xui_version_${name}`);
         if (version != null) {
@@ -50,17 +57,21 @@ export class PageDesignManager {
 
     initConfigApp(option) {
         if (option.appConfig != null && option.appConfig != "") {
-            const appConfig = JSON.parse(option.appConfig);
+            const appConfig = JSON.parse(option.appConfig); 
             if (appConfig.isModePhone) {
                 $xui.modePhone();
             }
             
-            setTimeout(() => {
-                $xui.rootdata.jsonEditorDataSrc = appConfig.dataSrc;
-                $xui.rootdata.routeEnable = appConfig.routeEnable;
-                $xui.rootdata.actionEnable = appConfig.actionEnable;
-            }, 500);  // attente page afficher
+            $xui.rootdata.stateDataSource = appConfig.dataSrc;
+            $xui.rootdata.routeEnable = appConfig.routeEnable;
+            $xui.rootdata.actionEnable = appConfig.actionEnable;
 
+        }
+        else
+        {
+            $xui.rootdata.stateDataSource = "template";
+            $xui.rootdata.routeEnable = true;
+            $xui.rootdata.actionEnable = true;
         }
     }
 
@@ -68,12 +79,12 @@ export class PageDesignManager {
 
         $xui.SelectorManager.unDisplaySelector();
 
-        param.jsonTemplate = $xui.rootdata.jsonEditorData;
-        if ($xui.rootdata.jsonEditorDataSrc == "mock") {
-            param.jsonBinding = $xui.rootdata.jsonEditorDataMock;
+        param.jsonTemplate = $xui.rootdata.stateData;
+        if ($xui.rootdata.stateDataSource == "mock") {
+            param.jsonBinding = $xui.rootdata.stateDataMock;
         }
         else {
-            param.jsonBinding = $xui.rootdata.jsonEditorData;
+            param.jsonBinding = $xui.rootdata.stateData;
         }
 
         if (param.mode == "template") {
@@ -95,8 +106,8 @@ export class PageDesignManager {
         this.codeXUIdata = param.xuidata;
         this.codeXUI = param.xuifile;
 
-        console.debug("binding ---- ", param.binding);
-        console.debug("treeSlot ---- ", param.treeSlot);
+        //console.debug("binding ---- ", param.binding);
+        //console.debug("treeSlot ---- ", param.treeSlot);
 
         $xui.rootdata.listSlot.length = 0;
         $xui.rootdata.listSlot.push(...param.treeSlot);
@@ -123,7 +134,7 @@ export class PageDesignManager {
             }, 500);
         }
 
-        if ($xui.rootdata.activeTab == 2)  // si onglet 2 actif
+        if ($xui.rootdata.idxTabMain == $xui.MainTabEnum.CODE)  // si onglet 2 actif
         {
             this.loadCode();   // affiche le code du mode (template, preview, final )
             this.loadCodeXUI();

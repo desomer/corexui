@@ -19,6 +19,7 @@
 /*********************barcustom  pour la zone d'action ************************/
 .barcustom::-webkit-scrollbar {
     width: 10px;
+    height : 10px;
 }
 
 .barcustom::-webkit-scrollbar-track {
@@ -42,13 +43,14 @@ html::-webkit-scrollbar {
 .main-container { 
     display: grid; 
     grid-template-columns: auto var(--width-properties);
-    grid-template-rows: 40px auto; 
+    grid-template-rows: 40px 40px auto; 
 }
  
 
- .xui-action-tab {position: absolute; top: 0px; width: var(--width-properties); }
-/* container de l'Iframe */    
-.main-item-2 {
+.xui-action-tab {position: absolute; top: 0px; width: var(--width-properties); }
+
+/* container de l'Iframe    */    
+.root-frame-center {
     border: 1px solid #cecece;
     background-color: #c1c1c1;
     text-align: center;
@@ -91,10 +93,9 @@ pre > code {
 }
 
 /********************** style editor de property ************************/
-.xui-div-scroll-vertical {
-    /*background-color: #565656;  //dark */
+/* .xui-div-scroll-vertical {
     overflow-y: scroll; overflow-x: hidden; height: 100%;
-}
+} */
 
 .xui-editor-action-btn
 {
@@ -297,6 +298,41 @@ pre > code {
     height: 86px;
 }*/
 
-#jsonState .ace_content {
+.jsonState .ace_content {
     background-color: rgb(235 235 235);
+}
+
+.js-editor {
+    /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
+    /* height:calc(100% - 100px) !important;*/
+
+   /* background: #2d2d2d;
+    color: #ccc;*/
+
+    /* you must provide font-family font-size line-height. Example:*/
+    font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 5px;
+    border: 1px solid lightgrey;
+  }
+
+/* optional class for removing the outline */
+.prism-editor__textarea:focus {
+    outline: none;
+}
+
+.xui-btn-code
+{
+    padding: 0px 35px 0px 0px;
+}
+
+.xui-btn-code-selected
+{
+    padding: 0px 0px 0px 35px !important;
+}
+
+.xui-btn-code-selected >.v-btn
+{
+    color: rgb(255, 89, 0);
 }

@@ -12,6 +12,8 @@ class XUIBindingManager {
   XUIEngine engine;
   var bindingInfo = LinkedHashMap<String, XUIBinding>();
   var eventInfo = LinkedHashMap<String, XUIBindingEvent>();
+  var afterJsonValidator = LinkedHashMap<String, StringBuffer>();
+  var validatorInfo = LinkedHashMap<String, XUIBinding>();
 
   XUIBindingManager(this.engine);
 
@@ -67,7 +69,7 @@ class XUIBindingManager {
       if (varitems != null) {
         varitems = varitems.substring(varitems.indexOf(".") + 1);
         name = varitems + "[]." + name;
-        print("-------------- varitems --------------> " + name);
+        //print("-------------- varitems --------------> " + name);
       }
     }
 
@@ -103,6 +105,8 @@ class XUIBindingManager {
 
     XUIProperty? propBinding =
         engine.getXUIPropertyFromDesign("root", "binding");
+
+
     String PropMock = "";
     if (propBinding != null) {
       PropMock = propBinding.content.toString();
@@ -111,8 +115,8 @@ class XUIBindingManager {
     String templateBinding = "";
     if (jsonBinding.isNotEmpty) {
       templateBinding = jsonBinding.toString();
-      XUIConfigManager.printc("---> ************ TMPL *************** " +
-          templateBinding.toString());
+      // XUIConfigManager.printc("---> ************ TMPL *************** " +
+      //     templateBinding.toString());
     }
 
     var newBinding = templateBinding;
@@ -124,10 +128,9 @@ class XUIBindingManager {
           PropMock; // toujour la valeur de la property mok si pas en mode design
     }
 
-    var str = "";
-
+    var store = "";
     try {
-      str = generateApplicationStoreJS(newBinding, getEventMethodsXUI());
+      store = generateApplicationStoreJS(newBinding, getEventMethodsXUI());
     } catch (e) {
       XUIConfigManager.printc("error" + e.toString());
     }
@@ -139,7 +142,8 @@ class XUIBindingManager {
 
     StringBuffer buf = NativeInjectText.getcacheText(JS_BINDING)!;
     buf.clear();
-    buf.write(str);
+    // affecte le js du store
+    buf.write(store);
   }
 
   //**************************************************************************************** */
@@ -150,7 +154,10 @@ class XUIBindingManager {
 
       SlotInfo? slotInfo = engine.getSlotInfo(bindInfo.xid, bindInfo.xid);
       if (slotInfo != null) {
-        DocInfo doc = engine.docInfo[slotInfo.docId]!;
+        DocInfo? doc = engine.docInfo[slotInfo.docId];
+        if (doc==null)
+          throw new Exception("documentation introuvable " + (slotInfo.docId??"NR") + " sur xid "+ bindInfo.xid);
+
         DocVariables varInfo = DocVariables();
         for (DocVariables varCmp in doc.variables) {
           if (varCmp.id == bindInfo.propName) {
@@ -296,11 +303,11 @@ class XUIBindingManager {
     XUIProperty? propCode = elem.propertiesXUI?["#" + eventMth.eventName];
     eventMth.code = propCode?.content ?? "";
 
-    print("******* EVENT ++++ " +
-        eventMth.eventName +
-        " on " +
-        eventMth.xid +
-        " execute method " +
-        eventMth.name);
+    // print("******* EVENT ++++ " +
+    //     eventMth.eventName +
+    //     " on " +
+    //     eventMth.xid +
+    //     " execute method " +
+    //     eventMth.name);
   }
 }

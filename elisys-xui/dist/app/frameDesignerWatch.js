@@ -1,8 +1,8 @@
 
 
 function onChangeMainTab(instanceVue) {
-  instanceVue.$watch('main.activeTab', (newValue, oldValue) => {
-    console.debug(`The activeTab name was changed from ${oldValue} to ${newValue}!`);
+  instanceVue.$watch('main.idxTabMain', (newValue, oldValue) => {
+    console.debug(`The idxTabMain name was changed from ${oldValue} to ${newValue}!`);
 
     $xui.SelectorManager.unDisplaySelector();
     setTimeout(() => {
@@ -10,9 +10,20 @@ function onChangeMainTab(instanceVue) {
     }, 500);
 
 
+    if (oldValue == 1)
+    {
+      if ($xui.rootdata.currentCodeIdx>=0)
+      {
+        $xui.saveCodeAction();
+      }
+      $xui.rootdata.currentCode="no code";
+      $xui.rootdata.currentCodeName="";
+      $xui.rootdata.currentCodeIdx=-1;
+    }
+
     if (newValue == 0 && oldValue == 1) {
       // retour de l'onglet jsonEditor
-      const ctrlStr = `${$xui.rootdata.jsonEditorDataSrc}#${JSON.stringify($xui.rootdata.jsonEditorDataMock)}`;
+      const ctrlStr = `${$xui.rootdata.stateDataSource}#${JSON.stringify($xui.rootdata.stateDataMock)}`;
       if ($xui.lastEditorAppStateValue != ctrlStr) {
         $xui.refreshAction('template:reload-json'); // recharge le json
         $xui.doStoreOnNextReload = true;
@@ -25,9 +36,17 @@ function onChangeMainTab(instanceVue) {
     }
 
     if (newValue == 1) {
-      $xui.lastEditorAppStateValue = `${$xui.rootdata.jsonEditorDataSrc}#${JSON.stringify($xui.rootdata.jsonEditorDataMock)}`;
+      $xui.lastEditorAppStateValue = `${$xui.rootdata.stateDataSource}#${JSON.stringify($xui.rootdata.stateDataMock)}`;
 
-      $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.jsonEditorData);
+      // reaffiche l'initial State de l'application
+      $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.stateData);
+      $xui.rootdata.ListActions=$xui.getCodeEventXUI();
+      $xui.rootdata.currentCode="no code";
+      $xui.rootdata.currentCodeName="";
+      $xui.rootdata.currentCodeIdx=-1;
+      const idxSelected = $xui.rootdata.ListActions.findIndex(element => element.xid == $xui.rootdata.currentCodeXid);
+      $xui.loadCodeAction(idxSelected);
+
     }
 
     if (newValue == 2) {
@@ -39,7 +58,8 @@ function onChangeMainTab(instanceVue) {
     if (newValue == 6) {
       // onglet SEO
       document.getElementById("qrcode").querySelectorAll('*').forEach(n => n.remove());
-      new QRCode(document.getElementById("qrcode"), $xui.getUrlApp());
+      $xui.rootdata.urlApp = $xui.getUrlApp();
+      new QRCode(document.getElementById("qrcode"), $xui.rootdata.urlApp);
     }
 
   }, { deep: true });
@@ -47,24 +67,23 @@ function onChangeMainTab(instanceVue) {
 
 //---------------------------------------------------------------------------------------
 function onChangeRightPanelTab(instanceVue) {
-  instanceVue.$watch('main.activeAction', (newValue, oldValue) => {
+  instanceVue.$watch('main.idxTabProperties', (newValue, oldValue) => {
 
-    console.debug(`The activeAction name was changed from ${oldValue} to ${newValue}!`);
-    if ($xui.rootdata.activeAction <= 2) {
+    console.debug(`The idxTabProperties name was changed from ${oldValue} to ${newValue}!`);
+    if ($xui.rootdata.idxTabProperties <= 2) {
       $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     }
 
-    if ($xui.rootdata.activeAction == 5) {
+    if ($xui.rootdata.idxTabProperties == 5) {
 
-      if (!$xui.rootdata.expandAll) {
+      if (!$xui.rootdata.expandAllCmp) {
         // expandAll le prtemliere fois
-        $xui.rootdata.expandAll = true;
-        $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.treeCmp.updateAll($xui.rootdata.expandAll);
+        $xui.rootdata.expandAllCmp = true;
+        $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.treeCmp.updateAll($xui.rootdata.expandAllCmp);
       }
 
       // affecte le composant selectionné
-      $xui.rootdata.activeSlot.length = 0;
-      $xui.rootdata.activeSlot.push($xui.propertiesDesign.xid);
+      $xui.SelectorManager.displayInTree();
 
     }
   }, { deep: true });
@@ -76,15 +95,26 @@ $xui.initVuejs = (instanceVue) => {
   onChangeRightPanelTab(instanceVue);
   onChangeMainTab(instanceVue);
 
-  instanceVue.$watch('main.jsonEditorDataSrc', function (newValue, oldValue) {
-    if ($xui.rootdata.activeTab == 0) {
+  $xui.router.afterEach((to, from) => {
+		// console.log(`afterEach router going to ${to.fullPath} from ${from.fullPath}`);
+		// console.log(to, from);
+    $xui.SelectorManager.unDisplaySelector();
+    $xui.vuejsAppCmpSetting = null; // recharge la liste de cmp
+  });
+
+  instanceVue.$watch('main.stateDataSource', (newValue, oldValue) => {
+    if ($xui.rootdata.idxTabMain == 0) {
       $xui.refreshAction('template:reload-json')   // recharge le json
-      $xui.doStoreOnNextReload = true;
+      //$xui.doStoreOnNextReload = true;
     }
   });
 
   instanceVue.$watch('main.routeEnable', (newValue, oldValue) => {
     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeConfig", "param": { routeEnable: newValue } }, "*");
+  });
+
+  instanceVue.$watch('main.actionEnable', (newValue, oldValue) => {
+    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeConfig", "param": { actionEnable: newValue } }, "*");
   });
 
   instanceVue.$watch('main.selectedClass', function (newValue, oldValue) {

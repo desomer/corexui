@@ -7,9 +7,8 @@ globalThis.$xui.generateApplicationStoreJS = (state, actions) =>
 
     const module = "main";
     for (const mth of actions) {
-        console.debug("/*/*/**/*/*/*/*/*/ add mth", mth);
-        const m = `(p) => {\n${mth.code}\n//# sourceURL=${module}-${mth.name}.js;\n}`;
-        //const code = `${m}\n//# sourceURL=${module}-${mth.name}.js;`;
+        //console.debug("/*/*/**/*/*/*/*/*/ add mth", mth);
+        const m = `(p1, p2) => {\n${mth.code}\n//# sourceURL=${module}-${mth.name}.js;\n}`;
         modulesManager.modulesDesc[module].actions[mth.name]=m;
     }
 
@@ -63,14 +62,17 @@ class VuexModuleManager {
             computed,
             methods: {
                 $mth() {
-                    console.debug("mth", arguments, this);
+                    console.debug("do eval mth", arguments, this);
 
                     if (arguments[1].type=="click") {
-                        let elem = arguments[1].target;
+                        const elem = arguments[1].target;
                         const targetAction = elem.closest("[data-for-idx]");
                         //console.debug("targetAction", targetAction);
                         if (targetAction!=null) {
-                            const forMap = targetAction.parentElement.dataset.forMap;
+                            let forMap = targetAction.dataset.forMap;  // cas du XUI-FOR
+                            if (forMap == null) {
+                                forMap = targetAction.parentElement.dataset.forMap;  // cas du XUI-ROW
+                            }
                             const forIdx = Number.parseInt(targetAction.dataset.forIdx, 10);
                             $xui.info[forMap]=forIdx;
                         }
@@ -89,7 +91,7 @@ class VuexModuleManager {
                     window.parent.postMessage(message, "*");
 
                     if ($xui.actionEnable) {
-                        this.$store.dispatch(`main/${arguments[0]}`, null, { root: true })
+                        this.$store.dispatch(`main/${arguments[0]}`, Array.from(arguments).slice(1), { root: true })
                     }
  
                 },
@@ -104,7 +106,7 @@ class VuexModuleManager {
     reload() {
         const modules = {}
 
-        var newModules = {};
+        const newModules = {};
 
         for (const [namespace, desc] of Object.entries(this.modules)) {
             newModules[namespace] = desc;
@@ -114,7 +116,7 @@ class VuexModuleManager {
             modules : newModules
         })
 
-        var newState = {};
+        const newState = {};
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             newState[namespace] = desc.state;
@@ -246,9 +248,9 @@ class VuexModuleDesc {
 
     _arrayToObject(fields = []) {
         return fields.reduce((prev, path) => {
-            var key = path.split(`.`).slice(-1)[0];
+            //let key = path.split(`.`).slice(-1)[0];
 
-            key = path.replaceAll('.', '_')
+            let key = path.replaceAll('.', '_')
 
             if (prev[key]) {
                 throw new Error(`The key \`${key}\` is already in use.`);
@@ -267,18 +269,18 @@ class VuexModuleDesc {
     sync(fields) {
         const fieldsObject = Array.isArray(fields) ? this._arrayToObject(fields) : fields;
         const namespace = this.namespace;
-        var obj = Object.keys(fieldsObject).reduce((prev, key) => {
+        const obj = Object.keys(fieldsObject).reduce((prev, key) => {
             const path = fieldsObject[key];
             const field = {
                 get() {
-                    return this.$store.getters[namespace + "/getField"](path);
+                    return this.$store.getters[`${namespace}/getField`](path);
                 },
                 set(value) {
-                    this.$store.commit(namespace + "/updateField", { path, value });
+                    this.$store.commit(`${namespace}/updateField`, { path, value });
                 },
             };
 
-            prev[namespace+"$_"+key] = field;
+            prev[`${namespace}$_${key}`] = field;
 
             return prev;
         }, {});
@@ -295,10 +297,10 @@ class VuexModuleDesc {
         const listGetterArray = Object.keys(pathsObject).reduce((entries, key) => {
             const path = pathsObject[key];
 
-            entries[namespace+"$_"+key] = {
+            entries[`${namespace}$_${key}`] = {
                 get() {
                     const store = this.$store;
-                    const rows = _objectEntries(store.getters[namespace + "/getField"](path));
+                    const rows = _objectEntries(store.getters[`${namespace}/getField`](path));
 
                     const itemsGetter = rows
                         .map(fieldsObject => Object.keys(fieldsObject[1]).reduce((prev, fieldKey) => {
@@ -307,10 +309,10 @@ class VuexModuleDesc {
 
                             return Object.defineProperty(prev, fieldKey, {
                                 get() {
-                                    return store.getters[namespace + "/getField"](fieldPath);
+                                    return store.getters[`${namespace}/getField`](fieldPath);
                                 },
                                 set(value) {
-                                    store.commit(namespace + "/updateField", { path: fieldPath, value });
+                                    store.commit(`${namespace}/updateField`, { path: fieldPath, value });
                                 },
                             });
                         }, {}));

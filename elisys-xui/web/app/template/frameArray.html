@@ -1,0 +1,69 @@
+<xui-factory version="1.0">
+   <xui-import xui-path="app/vue/vue2frame.html"></xui-import>
+   <xui-import xui-path="app/vue/vue2CmpLayoutVuetify.html"></xui-import>
+   <xui-import xui-path="app/vue/vue2CmpLayout.html"></xui-import>
+   <xui-import xui-path="app/vue/vue2CmpVuetify.html"></xui-import>
+
+   <frame-vuetify-1 xid="root"></frame-vuetify-1>
+
+   <xui-design xid="root">
+      <xui-prop id="nbpage" val="1"></xui-prop>
+      <xui-prop id="nbroute" val="1"></xui-prop>
+      <xui-prop id="footerHeight" val="48"></xui-prop>
+      <xui-prop id="appConfig" val="{&quot;routeEnable&quot;:true,&quot;actionEnable&quot;:true,&quot;isModePhone&quot;:false,&quot;dataSrc&quot;:&quot;mock&quot;}"></xui-prop>
+      <xui-prop id="binding" val="&quot;ttt&quot;:&quot;bbbb&quot;,&quot;bbbffff&quot;:&quot;jjjj,,,&quot;,&quot;d&quot;:false,&quot;header&quot;:[{&quot;text&quot;:&quot;Dessert&quot;,&quot;align&quot;:&quot;start&quot;,&quot;sortable&quot;:false,&quot;value&quot;:&quot;name&quot;},{&quot;text&quot;:&quot;dddd&quot;,&quot;value&quot;:&quot;name2&quot;,&quot;align&quot;:&quot;center&quot;,&quot;class&quot;:&quot;elevation-4 red lighten-5&quot;,&quot;cellClass&quot;:&quot;elevation-1 red&quot;}],&quot;items&quot;:[{&quot;name&quot;:&quot;4&quot;,&quot;name2&quot;:&quot;djjjdd&quot;},{&quot;name&quot;:&quot;4&quot;,&quot;name2&quot;:&quot;dd&quot;}]"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content">
+      <xui-prop id="nbCond" val="0"></xui-prop>
+      <xui-prop id="withSysBar" val="true"></xui-prop>
+      <xui-prop id="withAppBar" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot">
+      <xui-tabs xid="page-0-route-0-content-slot-tabs_163908327437210"></xui-tabs>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-tabs_163908327437210">
+      <xui-prop id="nb" val="3"></xui-prop>
+      <xui-prop id="height-tabs" val="48px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-tabs_163908327437210-tab-item-1">
+      <xui-title-1 xid="page-0-route-0-content-slot-tabs-title-1_163908328342866"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-tabs-title-1_163908328342866">
+      <xui-prop id="text" val="jjjj,,," binding="bbbffff"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-tabs_163908327437210-tab-1">
+      <xui-title-1 xid="page-0-route-0-content-slot-tabs-title-1_163915906026338"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-tabs-title-1_163915906026338">
+      <xui-prop id="text" val="bbb" binding="ttt"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action">
+      <xui-icon-1 xid="page-0-content-toolbar-action-icon-1_163924099713289"></xui-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-icon-1_163924099713289">
+      <xui-prop id="icon" val="mdi-web"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-tabs_163908327437210-tab-item-0">
+      <xui-data-table-1 xid="page-0-route-0-content-slot-tabs-data-table-1_163924144407191"></xui-data-table-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-tabs-data-table-1_163924144407191">
+      <xui-prop id=":items" val="items"></xui-prop>
+      <xui-prop id=":headers" val="header"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar">
+      <xui-prop id="class" val="elevation-4 red lighten-5 "></xui-prop>
+   </xui-design>
+
+</xui-factory>

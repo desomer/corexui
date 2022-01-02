@@ -32,63 +32,44 @@ import("./clsSelectorManager.js").then((module) => {
 
 /****************************************************************************************/
 $xui.doInitPage = (pageInfo) => {
-    console.debug("pageInfo = ", pageInfo);
+    $xui.rootdata.overlay=true;
+    console.debug("doInitPage pageInfo = ", pageInfo);
 
     $xui.rootdata.frameName=pageInfo.frameName;
     $xui.rootdata.frameTemplate=pageInfo.frameTemplate;
 
-    $xui.router.push("/page1");
+    const state = $xui.vuejs.$store.state;
 
-    setTimeout(() => {
-        const infoFile = $xui.pageDesignManager.getInfoFile("design");
-        $xuicore.initPageXUI(infoFile);
-    }, 100);
+    if (state.main.version==null) { // mode version 1
+        $xui.router.push("/page1");
+    }
+
+    waitForXuiLib("initPageXUI", () => {
+
+        setTimeout(() => {
+            const infoFile = $xui.pageDesignManager.getInfoFile("design");
+            $xuicore.initPageXUI(infoFile);
+        }, 100);
+
+    });
 }
 
-/****************************************************************************************/
-$xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
-    const jsonTemplate = $xui.parseJson(`{${StateTemplate}}`);
-    const jsonStateProp = $xui.parseJson(`{${StateInProperty}}`);
-    var ret = null;
-
-    Object.keys($xui.rootdata.jsonEditorData).forEach((key) => {
-        delete $xui.rootdata.jsonEditorData[key];
-    });
-    Object.assign($xui.rootdata.jsonEditorData, jsonTemplate);
-    ret = $xui.rootdata.jsonEditorData;
-
-
-    if ($xui.rootdata.jsonEditorDataSrc == "mock") {
-        ret = $xui.rootdata.jsonEditorDataMock;
-    }
-
-    if (StateTemplate == "" && StateInProperty == "")  // sauvegarde le mock
-    {
-        ret = $xui.rootdata.jsonEditorDataMock;
-    }
-    else {
-        $xui.rootdata.jsonEditorDataMock = jsonStateProp;
-    }
-
-    console.debug("************ App State initial & mock", jsonTemplate, jsonStateProp);
-    console.debug("************ App State source & editor", ret, $xui.rootdata.jsonEditorData);
-    // retourne au XUI le chaine à sauvegarder 
-    var ret = JSON.stringify(ret);
-    return ret.substring(1, ret.length - 1);
-};
 
 /****************************************************************************************/
 // charge la page global aprés le retour du XUIEngine
 $xui.loadPageJS = (html, options) => {
-    console.debug("loadPageJS binding ---- ", options);
+    console.debug("loadPageJS options ---- ", options);
     $xui.pageDesignManager.loadPage(html, options);
 };
 
 // change une partie de la page aprés le retour du XUIEngine
 $xui.changePageJS = (param) => {
+    console.debug("changePageJS options ---- ", param);
     $xui.pageDesignManager.changePageOnFrame(param);
     doPromiseJS("AfterChangeDisplayProperties");
 };
+
+
 
 /******************************************************************************** */
 // gestion des button refresh et export de la page
@@ -141,11 +122,12 @@ $xui.modeDisplaySelection = false;
 
 
 $xui.setCurrentAction = (actionName) => {
-
-    if (currentAction != null)
+    if (currentAction != null) {
         throw (new SpecifiedError(`action déjà en cours ${actionName} => ${lastAction}`));
+    }
 
     const actionDec = mapAction[actionName];
+
     if (actionDec != null) {
         if (actionDec.text != null) {
             $xui.rootdata.snackbar_text = actionDec.text;
@@ -191,7 +173,7 @@ $xui.setCurrentAction = (actionName) => {
     //     => lancement des reloader sur l'iframe  par le PageDesignManager.changePageJS 
     // puis  <changePageFinish>   (apres le modif sur iframe)  : retour de l'iframe
 
-    var prom = getPromise("AfterChangeSelectByXid");
+    let prom = getPromise("AfterChangeSelectByXid");
     prom.then(() => {
         $xui.rootdata.saveLayout = false;
         currentAction = null;
@@ -201,7 +183,6 @@ $xui.setCurrentAction = (actionName) => {
             if (reselect)
                 $xui.modeDisplaySelection = true;
 
-            //console.debug("changePageFinish ok", $xui.modeDisplaySelection);
             if ($xui.modeDisplaySelection) {
                 setTimeout(() => {   // attente prise en compte chargement des images
                     if (window.$xui.config.traceReselect) {
@@ -232,7 +213,7 @@ $xui.setCurrentAction = (actionName) => {
 $xui.clearAll = () => {
     $xui.setCurrentAction("clearAll");
     $xui.pageDesignManager.clearAll();
-    $xui.rootdata.jsonEditorData = {};
+    $xui.rootdata.stateData = {};
     $xui.refreshAction("template:clearAll");
 }
 
@@ -246,9 +227,9 @@ $xui.updateDirectProperty = (value, variable, xid) => {
 }
 
 $xui.deleteCmp = () => {
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
-    let info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
-    let infoParent = $xuicore.getInfoXUI(infoFile, info.parentXid, info.parentXid);
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    const infoParent = $xuicore.getInfoXUI(infoFile, info.parentXid, info.parentXid);
     console.debug("info deleteCmp ", $xui.propertiesDesign, info, infoParent);
 
     if ($xui.propertiesDesign.isSlot || info.addRemoveAction != null) {
@@ -275,7 +256,7 @@ $xui.copyCmp = () => {
     
     $xui.setCurrentAction("copyCmp");
     $xuicore.copyDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
-    $xui.rootdata.pasteDisabled = false;
+    $xui.rootdata.pasteDisabled=false;
     return true;
 }
 
@@ -334,7 +315,6 @@ $xui.redo = () => {
 };
 
 
-
 $xui.addCmp = (cmp) => {
     $xui.setCurrentAction("addCmp");
     console.debug("addCmp", cmp, $xui.propertiesComponent);
@@ -382,12 +362,12 @@ $xui.getNewXid = (xidParent, nameCmp) => {
 $xui.saveProperties = () => {
     $xui.setCurrentAction("saveProperties");
  
-
+    // recuperation de la configuration
     const config = {   
         routeEnable : $xui.rootdata.routeEnable,
         actionEnable: $xui.rootdata.actionEnable,
         isModePhone : $xui.rootdata.isModePhone,
-        dataSrc : $xui.rootdata.jsonEditorDataSrc
+        dataSrc : $xui.rootdata.stateDataSource
     }
 
     $xui.propertiesDesign.json.push(
@@ -404,82 +384,47 @@ $xui.saveProperties = () => {
     $xuicore.saveDesignPropertiesXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.json);
 }
 
-//--------------------------------------------------------------------------------------------------------
-const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-function initPathTo(pathTo) {
-    let parent = $xui.rootdata.activeSlot[0];
-    let hasRouteDefine = false;
-    do {
-        if (parent.toPath != null) {
 
-            if (parent.toPath.startsWith("router:")) {
-                if (!hasRouteDefine) {
-                    pathTo.unshift(parent.toPath);
-                    hasRouteDefine = true;
-                }
+/****************************************************************************************/
+$xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
+    const jsonTemplate = $xui.parseJson(`{${StateTemplate}}`);
+    const jsonStateProp = $xui.parseJson(`{${StateInProperty}}`);
+    let ret = null;
 
-            }
+    Object.keys($xui.rootdata.stateData).forEach((key) => {
+        delete $xui.rootdata.stateData[key];
+    });
+    Object.assign($xui.rootdata.stateData, jsonTemplate);
+    ret = $xui.rootdata.stateData;
 
-            else {
-                pathTo.unshift(parent.toPath);
-            }
-        }
-        parent = parent.parent;
-    } while (parent != null);
-}
 
-$xui.selectCmp = async () => {
-    console.debug($xui.rootdata.activeSlot);
+    if ($xui.rootdata.stateDataSource == "mock") {
+        ret = $xui.rootdata.stateDataMock;
+    }
 
-    if ($xui.rootdata.activeSlot.length>0)
+    if (StateTemplate == "" && StateInProperty == "")  // sauvegarde le mock
     {
-        const pathTo = [];
-        initPathTo(pathTo);
-
-        for (const action of pathTo) {
-            if (action.startsWith("router:"))
-            {
-                const url = action.substring(7);
-                await $xui.goToRoute(url);
-            }
-            if (action.startsWith("click:"))
-            {
-                var xid = action.substring(6);
-                await $xui.goToClick(xid);
-            }
-        };
-
-        var xid = $xui.rootdata.activeSlot[0].id;
-        $xui.SelectorManager.displaySelectorByXid(xid, xid, false);
+        ret = $xui.rootdata.stateDataMock;
     }
-}
-
-$xui.goToClick =async (xid) => {
-    const node = document.querySelector("#rootFrame").contentWindow.document.querySelectorAll(`[data-xid-slot=${xid}]`);
-    node[0].click();
-    await pause(300);
-}
-
-$xui.goToRoute =async (url) => {
-    if (url.endsWith("/route0")) {
-        url = url.substring(0, url.length - 7);
+    else {
+        $xui.rootdata.stateDataMock = jsonStateProp;
     }
-    if (url.startsWith("/page0")) {
-        url = url.substring(6, url.length);
-    }
-    if (url == "") {
-        url = "/";
-    }
-    const router = document.querySelector("#rootFrame").contentWindow.$xui.router;
 
-    if (router.currentRoute.path != url) {
-        console.debug("route to", url, router.currentRoute.path);
-        router.push(url);
-        await pause(400);
-    }
-}
+    const jsonState = ret;
+    let str = $xuicore.getJsonValidatorXUI($xui.pageDesignManager.getInfoFile("template"));
+    str = `${str}\n//# sourceURL=xui-json-validator.js;\n`;
+    eval(str);
 
+    // console.debug(" **************** *************** ", $xui.jsonvalidator);
+    // console.debug("************ App State initial & mock", jsonTemplate, jsonStateProp);
+    // console.debug("************ App State source & editor", jsonState, $xui.rootdata.stateData);
+    // retourne au XUI le chaine à sauvegarder sans {}
+    ret = JSON.stringify(jsonState);
+    return ret.substring(1, ret.length - 1);
+};
+
+//--------------------------------------------------------------------------------------------------------
 /***************************************************************************************************************/
 $xui.fullScreen = () => {
     $xui.SelectorManager.unDisplaySelector();
@@ -487,6 +432,8 @@ $xui.fullScreen = () => {
 }
 
 $xui.modePreview = () => {
+    if (! $xui.rootdata.overlayEvent) return;
+    
     $xui.isModePreview = !$xui.isModePreview;
     document.querySelector("#rootFrame").classList.toggle("xui-frame-full-screen");
     $xui.refreshAction($xui.isModePreview ? "preview" : "design");
@@ -511,6 +458,11 @@ $xui.sendInTab = () => {
     window.open($xui.getUrlApp(), '_blank');
 }
 
+$xui.sendByMail = () => {
+    window.open(`mailto:test@example.com?subject=app&body=${$xui.getUrlApp()}`);
+}
+
+
 $xui.deploy = () => {
     $xui.refreshAction("export");
 }
@@ -530,11 +482,17 @@ $xui.importPage = (file) => {
         $xui.pageDesignManager.store();
         const infoFile = $xui.pageDesignManager.getInfoFile("design");
         $xuicore.initPageXUI(infoFile);
-        $xui.rootdata.activeTab = 0;
+        $xui.rootdata.idxTabMain = 0;
     }
     reader.readAsText(file);
 }
 
+$xui.XUIToClipboard = () => {
+    navigator.clipboard.writeText($xui.pageDesignManager.codeXUI);
+    $xui.rootdata.snackbar_text = "Copy to clipboard terminated";
+    $xui.rootdata.snackbar_timeout = 2000;
+    $xui.rootdata.snackbar = true;
+}
 
 /***************************************************************************************************************/
 let pageIcon = null;
@@ -568,6 +526,33 @@ $xui.parseJson = (str) => {
     }
 }
 
+
+ function jsonPathToValue(data, path) {
+    if (!path) return data; // if path is undefined or empty return data
+    const listpath = path.split(".");
+    for (let index = 0; index < listpath.length; index++) {
+       if (!listpath[index]) continue; // "a/" = "a"
+       data = data[listpath[index]]; // new data is subdata of data
+       if (!data) return data; // "a/b/d" = undefined
+    }
+    return data;
+ }
+
+ function setValueFromJsonPath (data, path, value) {
+    if (!path) return data; // if path is undefined or empty return data
+    const listpath = path.split(".");
+
+    for (let index = 0; index < listpath.length; index++) {
+       if (!listpath[index]) continue; // "a/" = "a"
+       if (index==listpath.length-1) 
+       {
+            data[listpath[index]] = value;
+       }
+       data = data[listpath[index]]; // new data is subdata of data
+       if (!data) return data; // "a/b/d" = undefined
+    }
+    return data;
+ }
 
 
 

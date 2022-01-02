@@ -62,7 +62,7 @@ $xui.loadApplicationJS = () => {
 	//var modulesManager = null;
 	//if (globalThis.initialiseAppState!=null)
 	//{
-	console.debug("********************* initialiseAppState OK *******************************************");
+	//console.debug("********************* initialiseAppState OK *******************************************");
 	const modulesManager = globalThis.initialiseAppState();
 	//}
 	// else {
@@ -299,30 +299,30 @@ function initStore() {
 //------------------------------------------------------------------------------------------------------
 function initEventRouter() {
 	$xui.router.beforeEach((to, from, next) => {
-		next($xui.routeEnable); // next(false);
-		if ($xui.routeEnable) {
-			var message = {
-				action: "unselect",
+		next($xui.routeEnable); // si false =>  pas de routage
+		if ($xui.routeEnable && to.fullPath!=from.fullPath) {
+			const message = {
+				action: "changeRoute",
 			};
 			window.parent.postMessage(message, "*");
 		}
 	});
 
 	$xui.router.afterEach((to, from) => {
-		console.log("router going to " + to.fullPath + " from " + from.fullPath);
-		console.log(to, from);
+		// console.log(`router going to ${to.fullPath} from ${from.fullPath}`);
+		// console.log(to, from);
 
-		var el = document.querySelector(".v-main__wrap");
+		const el = document.querySelector(".v-main__wrap");
 		if (el == null)
 			return;
-		var scrollPos = window.scrollY;
-		var exitElem = el.firstChild;
-		var exitElemscrollHeight = exitElem.scrollHeight;
+		const scrollPos = window.scrollY;
+		const exitElem = el.firstChild;
+		const exitElemscrollHeight = exitElem.scrollHeight;
 
 		// force le retour en haut du scroll en debut d'animation
 		exitElem.style.position = 'absolute';
-		exitElem.style.height = exitElemscrollHeight + "px";
-		exitElem.style.top = "-" + scrollPos + "px";
+		exitElem.style.height = `${exitElemscrollHeight}px`;
+		exitElem.style.top = `-${scrollPos}px`;
 		window.scrollTo(0, 0);
 
 		if (to.fullPath == "/") {
@@ -341,10 +341,9 @@ function initDirective() {
 	Vue.directive('bottomnavigationhideonscroll', {
 		// Quand l'élément lié est inséré dans le DOM...
 		inserted(el, binding) {
-			var lastScroll = 0;
-			var bottomIsShow = true;
+			let lastScroll = 0;
+			let bottomIsShow = true;
 			window.addEventListener('scroll', (e) => {
-				//console.debug(window.scrollY);
 
 				if (!bottomIsShow && lastScroll > window.scrollY) // remonte
 				{
@@ -375,7 +374,7 @@ function initDirective() {
 		// Quand l'élément lié est inséré dans le DOM...
 		inserted(el, binding) {
 			// L'élément prend le focus
-			console.debug("------------------------------v-pressAnimation", el, binding);
+			//console.debug("------------------------------v-pressAnimation", el, binding);
 			el.classList.add('clickAnimation');
 			el.addEventListener('click', (e) => {
 				if (el.classList.contains('clickAnimationPress')) {
@@ -383,7 +382,7 @@ function initDirective() {
 				} else {
 					el.classList.add('clickAnimationPress');
 					setTimeout(() => {
-						console.debug(e);
+						//console.debug(e);
 						el.classList.remove('clickAnimationPress');
 						$xui.router.push(binding.value.link);
 					}, 100);

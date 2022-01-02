@@ -9,16 +9,11 @@
 	display:block;
 } */
 
-/*********************************************************/
-.jsoneditor {
-    border: thin solid #000000!important;
-}
-.jsoneditor-menu {
-    background-color: #000000 !important;
-}
+
 /*********************barcustom  pour la zone d'action ************************/
 .barcustom::-webkit-scrollbar {
     width: 10px;
+    height : 10px;
 }
 
 .barcustom::-webkit-scrollbar-track {
@@ -46,10 +41,10 @@ html::-webkit-scrollbar {
 }
  
 
- .xui-action-tab {position: absolute; top: 0px; width: var(--width-properties); }
+.xui-action-tab {position: absolute; top: 0px; width: var(--width-properties); }
 
-/* container de l'Iframe */    
-.main-item-2 {
+/* container de l'Iframe    */    
+.root-frame-center {
     border: 1px solid #cecece;
     background-color: #c1c1c1;
     text-align: center;
@@ -92,10 +87,9 @@ pre > code {
 }
 
 /********************** style editor de property ************************/
-.xui-div-scroll-vertical {
-    /*background-color: #565656;  //dark */
+ .xui-div-scroll-vertical {
     overflow-y: scroll; overflow-x: hidden; height: 100%;
-}
+} 
 
 .xui-editor-action-btn
 {
@@ -298,7 +292,7 @@ pre > code {
     height: 86px;
 }*/
 
-#jsonState .ace_content {
+.jsonState .ace_content {
     background-color: rgb(235 235 235);
 }
 
@@ -320,4 +314,27 @@ pre > code {
 /* optional class for removing the outline */
 .prism-editor__textarea:focus {
     outline: none;
+}
+
+.jsoneditor {
+    border: thin solid #000000!important;
+}
+.jsoneditor-menu {
+    background-color: #000000 !important;
+}
+
+/*****************************************/
+.xui-btn-code
+{
+    padding: 0px 35px 0px 0px;
+}
+
+.xui-btn-code-selected
+{
+    padding: 0px 0px 0px 35px !important;
+}
+
+.xui-btn-code-selected >.v-btn
+{
+    color: rgb(255, 89, 0);
 }

@@ -69,8 +69,8 @@ class PropInfo {
   external String get value_orig;
   external String get variable;
   external String get xid;
-  external String get bind;
-  external String get bind_orig;
+  external String? get bind;
+  external String? get bind_orig;
 }
 
 @JS()
@@ -89,8 +89,10 @@ class ObjectDesignProperties {
   external String get template;
   external set template(String xid);
 
-  external String get path;
-  external set path(String xid);
+  // external String get path;
+  // external set path(String xid);
+  external List get path;
+  external set path(List tree);
 }
 
 
@@ -181,8 +183,8 @@ class VueParamJS {
   external set data(String xid);
   external bool get isSlot;
   external set isSlot(bool isSlot);
-  external String get path;
-  external set path(String path);
+  external List<TreeSlot> get path;
+  external set path(List<TreeSlot> path);
   external String get target;
 
   external set target(String xid);
@@ -193,3 +195,4 @@ class VueParamJS {
   external String get xidSlot;
   external set xidSlot(String xidSlot);
 }
+

@@ -14,7 +14,7 @@ $xui.OpenPopupAction = (event) => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
     var ret = $xuicore.getActionsXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, "OpenPopupAction");
 
-    $xui.rootdata.activeAction = 4; // affiche la liste des composants
+    $xui.rootdata.idxTabProperties = 4; // affiche la liste des composants
 
 
     $xui.rootdata.listPopupAdd.length = 0;
@@ -40,7 +40,7 @@ $xui.doActionPopup = (actionId) => {
     let infoFile = $xui.pageDesignManager.getInfoFile("template");
 
 
-    $xui.rootdata.activeAction = 4;  // affiche la liste des composants
+    $xui.rootdata.idxTabProperties = 4;  // affiche la liste des composants
 
     if (actionId.action == "incNbAfter") {
         $xui.setCurrentAction("addFlow");
@@ -73,6 +73,16 @@ $xui.doActionPopup = (actionId) => {
         $xui.setCurrentAction("addFlow");
         let cmp = { xid: 'xui-flow' };
         const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
+        const currentXid = info.parentXid;
+        const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
+        $xuicore.surroundDesignXUI(infoFile, $xui.propertiesDesign.xid, template, newXid);
+        return true;
+    }
+
+    if (actionId.action == "surroundBadge") {
+        $xui.setCurrentAction("addFlow");
+        let cmp = { xid: 'xui-badge-1' };
+        const newXid = $xui.getNewXid(info.parentXid, 'xui-badge-1');
         const currentXid = info.parentXid;
         const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
         $xuicore.surroundDesignXUI(infoFile, $xui.propertiesDesign.xid, template, newXid);

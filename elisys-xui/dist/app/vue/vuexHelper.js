@@ -1,8 +1,17 @@
 globalThis.$xui.generateApplicationStoreJS = (state, actions) =>
 {
+
     const jsonState = JSON.parse(`{${state}}`);
     const modulesManager = new $xui.VuexModuleManager();
 	const main = modulesManager.addModule("main", jsonState);
+
+    const module = "main";
+    for (const mth of actions) {
+        console.debug("/*/*/**/*/*/*/*/*/ add mth", mth);
+        const m = `(p1, p2) => {\n${mth.code}\n//# sourceURL=${module}-${mth.name}.js;\n}`;
+        modulesManager.modulesDesc[module].actions[mth.name]=m;
+    }
+
     return modulesManager.getCode();
 }
 
@@ -49,11 +58,24 @@ class VuexModuleManager {
             }
         }
 
-        const mixinModules = {
+        return {
             computed,
             methods: {
                 $mth() {
                     console.debug("mth", arguments, this);
+
+                    if (arguments[1].type=="click") {
+                        let elem = arguments[1].target;
+                        const targetAction = elem.closest("[data-for-idx]");
+                        //console.debug("targetAction", targetAction);
+                        if (targetAction!=null) {
+                            const forMap = targetAction.parentElement.dataset.forMap;
+                            const forIdx = Number.parseInt(targetAction.dataset.forIdx, 10);
+                            $xui.info[forMap]=forIdx;
+                        }
+                    }
+
+
 
                     const message = {
                         action: "displayMessage",
@@ -65,23 +87,23 @@ class VuexModuleManager {
                     };
                     window.parent.postMessage(message, "*");
 
-                    this.$store.dispatch('main/actionName', null, { root: true })
+                    if ($xui.actionEnable) {
+                        this.$store.dispatch(`main/${arguments[0]}`, Array.from(arguments).slice(1), { root: true })
+                    }
+ 
                 },
-
                 $post(action, ev) {
                     console.debug("$post", this, action, ev);
                     this.$store.dispatch(action);
                 }
             },
         }
-
-        return mixinModules;
     }
 
     reload() {
         const modules = {}
 
-        var newModules = {};
+        const newModules = {};
 
         for (const [namespace, desc] of Object.entries(this.modules)) {
             newModules[namespace] = desc;
@@ -91,7 +113,7 @@ class VuexModuleManager {
             modules : newModules
         })
 
-        var newState = {};
+        const newState = {};
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             newState[namespace] = desc.state;
@@ -104,7 +126,7 @@ class VuexModuleManager {
     getCode() {
         let result = `globalThis.initialiseAppState = () => {\n`;
         
-        result +=`const modulesManager = new VuexModuleManager();\n\n`;
+        result += `const modulesManager = new VuexModuleManager();\n\n`;
         let listModule = "";
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
@@ -118,30 +140,26 @@ class VuexModuleManager {
                 stateJson="$xui.rootdata";
             }
             result += `const ${namespace} = modulesManager.addModule("${namespace}", ${stateJson});\n\n`;
-            listModule += `\n                ${namespace},`;
+            listModule += `\n\t\t\t\t\t\t${namespace},`;
         }
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             result +=`${namespace}.actions={`;
             for (const [nameAction, code] of Object.entries(desc.actions)) {
-                result += `\n  ${nameAction} : ${code}\n`;
+            result += `\n  ${nameAction} : ${code},`;
             }
-            result +=`}\n`;
+            result +=`}\n\n`;
         }
 
         result +=
-`modulesManager.setStore(new Vuex.Store({
-        modules : {${listModule}
-        },
-        plugins : [$xui.logger],
-        strict : true
-}));\n`;
-
+            `modulesManager.setStore(new Vuex.Store({
+                    modules : {${listModule}
+                    },
+                    plugins : [$xui.logger],
+                    strict : true
+            }));\n`;
         
-        result += 
-`
-return modulesManager;
-}\n`;
+        result += `return modulesManager;\n}\n`;
         return this.indentString(result, 8);
     }
 
@@ -227,9 +245,9 @@ class VuexModuleDesc {
 
     _arrayToObject(fields = []) {
         return fields.reduce((prev, path) => {
-            var key = path.split(`.`).slice(-1)[0];
+            //let key = path.split(`.`).slice(-1)[0];
 
-            key = path.replaceAll('.', '_')
+            let key = path.replaceAll('.', '_')
 
             if (prev[key]) {
                 throw new Error(`The key \`${key}\` is already in use.`);
@@ -248,18 +266,18 @@ class VuexModuleDesc {
     sync(fields) {
         const fieldsObject = Array.isArray(fields) ? this._arrayToObject(fields) : fields;
         const namespace = this.namespace;
-        var obj = Object.keys(fieldsObject).reduce((prev, key) => {
+        const obj = Object.keys(fieldsObject).reduce((prev, key) => {
             const path = fieldsObject[key];
             const field = {
                 get() {
-                    return this.$store.getters[namespace + "/getField"](path);
+                    return this.$store.getters[`${namespace}/getField`](path);
                 },
                 set(value) {
-                    this.$store.commit(namespace + "/updateField", { path, value });
+                    this.$store.commit(`${namespace}/updateField`, { path, value });
                 },
             };
 
-            prev[namespace+"$_"+key] = field;
+            prev[`${namespace}$_${key}`] = field;
 
             return prev;
         }, {});
@@ -276,10 +294,10 @@ class VuexModuleDesc {
         const listGetterArray = Object.keys(pathsObject).reduce((entries, key) => {
             const path = pathsObject[key];
 
-            entries[namespace+"$_"+key] = {
+            entries[`${namespace}$_${key}`] = {
                 get() {
                     const store = this.$store;
-                    const rows = _objectEntries(store.getters[namespace + "/getField"](path));
+                    const rows = _objectEntries(store.getters[`${namespace}/getField`](path));
 
                     const itemsGetter = rows
                         .map(fieldsObject => Object.keys(fieldsObject[1]).reduce((prev, fieldKey) => {
@@ -288,10 +306,10 @@ class VuexModuleDesc {
 
                             return Object.defineProperty(prev, fieldKey, {
                                 get() {
-                                    return store.getters[namespace + "/getField"](fieldPath);
+                                    return store.getters[`${namespace}/getField`](fieldPath);
                                 },
                                 set(value) {
-                                    store.commit(namespace + "/updateField", { path: fieldPath, value });
+                                    store.commit(`${namespace}/updateField`, { path: fieldPath, value });
                                 },
                             });
                         }, {}));

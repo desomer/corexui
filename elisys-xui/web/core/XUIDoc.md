@@ -1,4 +1,4 @@
-PAGE MANAGENENT SYSTEM  
+UI MANAGENENT SYSTEM  
     eXtends User Inteface = XUI
 
 
@@ -48,3 +48,6 @@ css to json
 
 copieer clloer excel
 https://jsfiddle.net/mowglisanu/zmhg5rwo/
+
+gestion d'api
+https://wanago.io/2021/12/27/redux-toolkit-query-typescript/

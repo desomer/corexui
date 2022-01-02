@@ -15,7 +15,7 @@ class NativeSlot extends XUIElementNative {
   Future<XUIModel> doProcessPhase1(XUIEngine engine, XUIElementHTML html) async {
     final root = XUIElementXUI();
     root.tag = TAG_NO_DOM;
-    final Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));
+    final Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL, 0));
     return f;
   }
 
@@ -71,7 +71,7 @@ class NativeSlot extends XUIElementNative {
         _addAttributClassStyle("style", html, newChild,";");
       }
       // affecte l'implementation du TAG_DIV_SLOT sur le newChild
-      await XUIModel(this, MODE_ALL).doChildPhase1(newChild, html, engine);
+      await XUIModel(this, MODE_ALL,0).doChildPhase1(newChild, html, engine);
     }
 
     // affecte l'identifiant xid du slot sur le parent si le parent en a pas
@@ -103,10 +103,13 @@ class NativeSlot extends XUIElementNative {
         }
       }
 
+      // pour la selection d'un for
       // affecte la class full sur l'enfant si full et unique
       if (nbChild == 1) {
         _addAttributClassStyle("class", html, childHtml," ");
         _addAttributClassStyle("style", html, childHtml,";");
+        _addAttributClassStyle("v-bind:data-for-idx", html, childHtml," ");
+        _addAttributClassStyle("data-for-map", html, childHtml," ");
 
         if (isFull) {
           childHtml.attributes ??= HashMap<String, XUIProperty>();
@@ -183,7 +186,7 @@ class NativeInjectFile extends XUIElementNative {
 
     root.children ??= []..add(aText);
 
-    final Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));
+    final Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL,0));
     return f;
   }
 }
@@ -218,7 +221,7 @@ class NativeInjectText extends XUIElementNative {
 
     root.children ??= []..add(aText);
 
-    Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL));
+    Future<XUIModel> f = Future.sync(() => XUIModel(root, MODE_ALL, 0));
     return f;
   }
 }

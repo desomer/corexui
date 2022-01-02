@@ -24,8 +24,8 @@
                        <v-list class="fill-height elevation-2" subheader dense>
                           <v-list-item-group>
                              <template v-for="(ListActions_item, ListActions_index) in main.ListActions">
-                                <div class="mx-1 mt-1">
-                                   <v-btn class="rounded-lg  text-transform-none" style="width:100%" rounded @click="$xui.loadCodeAction(ListActions_index)">
+                                <div class="mx-1 mt-1 xui-btn-code">
+                                   <v-btn class="rounded-lg text-transform-none" style="width:100%" rounded @click="$xui.loadCodeAction(ListActions_index)">
                                       <v-icon left>mdi-flash</v-icon>
                                       <span>{{ListActions_item.name}}</span>
                                    </v-btn>
@@ -37,7 +37,7 @@
                     <v-col>
                         <div><span style="padding: 0px 24px;">{{main.currentCodeName}}</span></div>
                         <div style="height: calc(100vh - 152px);">
-                            <prism-editor class="js-editor" v-model="main.currentCode" :highlight="$xui.highlighter" line-numbers></prism-editor>
+                            <prism-editor class="js-editor" v-model="main.currentCode" :highlight="$xui.highlighterJS" line-numbers></prism-editor>
                         </div>
                     </v-col>
                  </v-row>
@@ -68,7 +68,7 @@
    <xui-design xid="module-state">
         <v-row style="height:40px" no-gutters>
             <v-col cols="12">
-            <v-radio-group row v-model="main.jsonEditorDataSrc" class="ml-4 mt-1">
+            <v-radio-group row v-model="main.stateDataSource" class="ml-4 mt-1">
                 <div class="v-radio"></div>
                     <v-radio label="Initial" value="template"></v-radio>
                 </div>
@@ -81,12 +81,12 @@
             </v-col>
         </v-row>
         <v-row style="height:calc(100% - 40px)" no-gutters>
-            <v-col cols="6" id="jsonState">
-                <v-jsoneditor ref="jsonEditor" v-model="main.jsonEditorData" :options="main.jsonEditorOptions" :plus="false"
+            <v-col cols="6" class="jsonState">
+                <v-jsoneditor ref="jsonEditor" v-model="main.stateData" :options="main.jsonEditorOptions" :plus="false"
             height="100%"></v-jsoneditor>
             </v-col>
             <v-col cols="6">
-                    <v-jsoneditor style="height: calc(100% - 25px);" ref="jsonEditor2" v-model="main.jsonEditorDataMock" :options="main.jsonEditorOptionsCode" :plus="false"
+                    <v-jsoneditor style="height: calc(100% - 25px);" ref="jsonEditor2" v-model="main.stateDataMock" :options="main.jsonEditorOptionsMock" :plus="false"
                     height="100%"></v-jsoneditor>
             </v-col>
         </v-row>

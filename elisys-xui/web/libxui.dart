@@ -18,6 +18,7 @@ import 'core/XUISlotTreeManager.dart';
 import 'core/element/XUIElement.dart';
 import 'core/element/XUIProperty.dart';
 import 'core/parser/HTMLWriter.dart';
+import 'core/parser/ObjectReader.dart';
 import 'core/parser/ObjectWriter.dart';
 
 
@@ -72,6 +73,11 @@ external set _getEventMethodsXUI(
     dynamic Function(FileDesignInfo) f);
 
 /// retourne les properties
+@JS('getPropertiesXUI')
+external set _getPropertiesXUI(
+    void Function(FileDesignInfo, String, String, int) f);
+
+
 @JS('getDesignPropertiesXUI')
 external set _getDesignPropertiesXUI(
     void Function(FileDesignInfo, String, String) f);
@@ -80,6 +86,11 @@ external set _getDesignPropertiesXUI(
 @JS('saveDesignPropertiesXUI')
 external set _saveDesignPropertiesXUI(
     dynamic Function(FileDesignInfo, dynamic) f);
+
+/// change les properties
+@JS('getJsonValidatorXUI')
+external set _getJsonValidatorXUI(
+    dynamic Function(FileDesignInfo) f);
 
 ///------------------------------------------------------------------
 Future initPageXUI(FileDesignInfo fileInfo) async {
@@ -94,13 +105,7 @@ Future initPageXUI(FileDesignInfo fileInfo) async {
 
   var options = Options(mode: fileInfo.mode);
 
-  // XUIProperty? propBinding =
-  //     designManager.getXUIEngine().getXUIPropertyFromDesign("root", "binding");
-  // String? lastBinding = propBinding?.content;
-
-  //options.binding = designManager.getXUIEngine().getBindingInfo();
   options.treeSlot = new XUISlotTreeManager(designManager.getXUIEngine()).getSlotTree();
-  //options.dataState = "{" + (lastBinding ?? "") + "}";
 
   XUIProperty? propConfig =  designManager.getXUIEngine().getXUIPropertyFromDesign("root", "appConfig");
   options.appConfig=propConfig?.content?.toString() ?? "";
@@ -140,6 +145,8 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
   return Future.value();
 }
 
+
+
 /// change les properties
 void saveDesignPropertiesXUI(FileDesignInfo fileInfo, dynamic listDesig) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
@@ -149,9 +156,9 @@ void saveDesignPropertiesXUI(FileDesignInfo fileInfo, dynamic listDesig) async {
     if (item.value != item.value_orig || item.bind != item.bind_orig) {
       designMgr.listXidChanged.add(item.xid);
 
-      if (item.bind != item.bind_orig)
+      if (item.bind != item.bind_orig && item.bind!=null && item.bind_orig!=null)
       {
-        designMgr.xuiEngine!.bindingManager.remaneVariable(item.bind_orig, item.bind);
+        designMgr.xuiEngine!.bindingManager.remaneVariable(item.bind_orig!, item.bind!);
       }
 
       if (item.variable.startsWith(":"))
@@ -164,12 +171,7 @@ void saveDesignPropertiesXUI(FileDesignInfo fileInfo, dynamic listDesig) async {
     }
   }
   fileInfo.mode = "template";
-
   await _reloadTemplate(fileInfo);
-
-  // // appel la promise
-  // String xidProp = (listDesign[0] as PropInfo).xid;
-  // doPromiseJS("setDesignProperties", xidProp);
 }
 
 void getDesignPropertiesXUI(
@@ -186,9 +188,23 @@ void getDesignPropertiesXUI(
   ret.isSlot = id.startsWith(SLOT_PREFIX);
   ret.data = "[" + designInfo.bufData.toString() + "]";
   ret.template = designInfo.bufTemplate.toString();
-  ret.path = designInfo.bufPath.toString();
+  ret.path = designInfo.listPath!;
 
   doPromiseJS("getDesignProperties", ret);
+}
+
+dynamic getPropertiesXUI(FileDesignInfo fileInfo, String id, String? idslot, int deep) {
+  if (idslot == null) {
+    idslot = id;
+  }
+  var designInfo = _getDesignManager(fileInfo).getJSDesignValue(id, idslot, deep);
+
+  var ret = ObjectDesignProperties();
+  ret.xid = designInfo.xid;
+  ret.xidSlot = designInfo.xidSlot;
+  ret.isSlot = id.startsWith(SLOT_PREFIX);
+  ret.data = "[" + designInfo.bufData.toString() + "]";
+  return ret;
 }
 
 /// Retourne la liste des composants
@@ -201,7 +217,7 @@ dynamic getComponentsXUI(FileDesignInfo fileInfo, String id, String idslot) {
 
   vueParamJS.data = "[" + designInfo.bufData.toString() + "]";
   vueParamJS.template = designInfo.bufTemplate.toString();
-  vueParamJS.path = designInfo.bufPath.toString();
+ // vueParamJS.path = designInfo.bufPath.toString();
 
   return vueParamJS;
 }
@@ -264,7 +280,6 @@ void cutDesignXUI(FileDesignInfo fileInfo, String id) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
   SlotInfo info = designMgr.getXUIEngine().getSlotInfo(id, id)!;
-
   String? lastCopyXid = _getContentCopyZoneID(designMgr);
 
   if (lastCopyXid != null) {
@@ -463,12 +478,9 @@ void getHtmlFromXUI(FileDesignInfo fileInfo, String idPromise) async {
   }
 
   doPromiseJS(idPromise, html);
-  //context["\$xui"].callMethod("doPromiseJS", [idPromise, html]);
 }
 
 Future _reloadTemplate(FileDesignInfo fileInfo) async {
-  // if (fileInfo.jsonBinding!=null)
-  //   print("jsonBinding="+fileInfo.jsonBinding);
 
   var designMgr = _getDesignManager(fileInfo);
 
@@ -504,7 +516,7 @@ Future _reloadTemplate(FileDesignInfo fileInfo) async {
     options.listReloader = listReloader;
   }
 
-  String objXui = JsonEncoder.withIndent('   ') //null
+  String objXui = JsonEncoder.withIndent(' ') //null
       .convert(ObjectWriter().toObjects(designMgr.getXUIEngine().xuiFile));
 
   options.xuidata = objXui;
@@ -543,6 +555,7 @@ void main() async {
 
   _changeNbChildXUI = allowInterop(changeNbChildXUI);
   _getInfoXUI = allowInterop(getInfoXUI);
+  _getPropertiesXUI = allowInterop(getPropertiesXUI);
   _getDesignPropertiesXUI = allowInterop(getDesignPropertiesXUI);
   _saveDesignPropertiesXUI = allowInterop(saveDesignPropertiesXUI);
   _getComponentsXUI = allowInterop(getComponentsXUI);
@@ -551,7 +564,39 @@ void main() async {
   _initPageXUI = allowInterop(initPageXUI);
   _getActionsXUI = allowInterop(getActionsXUI);
   _getEventMethodsXUI = allowInterop(getEventMethodsXUI);
+  _getJsonValidatorXUI = allowInterop(getJsonValidatorXUI);
 }
+
+
+String getJsonValidatorXUI(FileDesignInfo fileInfo) {
+  XUIDesignManager designManager = XUIDesignManager.getDesignManager(fileInfo);
+
+  StringBuffer buf = StringBuffer();
+  buf.write("\n\$xui.jsonvalidator={");
+  designManager.xuiEngine!.bindingManager.afterJsonValidator.forEach((key, value) {
+    buf.write("'"+key+"': (ctx)=> {"+value.toString()+"},");
+  });
+  buf.write("};");
+
+
+  //engine.bindingManager.validatorInfo[xid]=XUIBinding(cmp.elemXUI.xid!, "","", xid);
+  designManager.xuiEngine!.bindingManager.validatorInfo.forEach((key, value) {
+    List<XUIBinding> listBinding = [];
+    designManager.xuiEngine!.bindingManager.bindingInfo.forEach((k, valueBinding) {
+        if (valueBinding.xid==value.xid)
+        {
+          listBinding.add(valueBinding);
+        }
+    });
+    listBinding.forEach((bind) { 
+        buf.write("\n\$xui.jsonvalidator['"+value.propName+"']( {jsonState, prop:'"+bind.propName+"', attr:'"+bind.attr+"', xid:'"+ bind.xid+"'} );");
+    });
+  });
+
+  return buf.toString();
+}
+
+
 
 XUIDesignManager _getDesignManager(FileDesignInfo fileInfo) {
   return XUIDesignManager.getDesignManager(fileInfo);
@@ -576,18 +621,12 @@ Future _initStoreVersion(XUIDesignManager designManager,
       XUIConfigManager.printc(
           "initEngine with localStorage " + name + " v" + v.toString());
 
-      //print(db);
       var saveDb = json.decode(db!); //loadYaml(db);
 
-      for (var aDesign in saveDb["design"]) {
-        designManager.getXUIEngine().xuiFile.addObjectDesign(aDesign);
-      }
-      for (var anImport in saveDb["import"]) {
-        //designManager.xuiEngine.xuiFile.addObjectImport(anImport);
-      }
-      for (var aCmp in saveDb["component"]) {
-        //designManager.xuiEngine.xuiFile.addObjectCmp(aCmp);
-      }
+      await ObjectReader.addObject(saveDb, designManager.xuiEngine!);
+
+      designManager.xuiEngine!.xuiFile.generateDocumentation(designManager.xuiEngine!);
+
     }
   }
 }

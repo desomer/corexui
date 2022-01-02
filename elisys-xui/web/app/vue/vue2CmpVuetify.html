@@ -87,6 +87,8 @@
 
         <xui-prop var="background-color" cat="style" editor="text">background color</xui-prop>
 
+        <xui-prop var="@change" cat="event:elem" editor="text">Change</xui-prop> 
+
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
@@ -94,7 +96,7 @@
 
     <v-file-input xid="xui-fileinput-1" small-chips truncate-length="15" class="[[class]]"
         -style="[[style]]" [[type]] dense="[[dense]]" flat="[[flat]]" rounded="[[rounded]]"
-        hide-details="[[hide-detail]]" background-color="[[background-color]]" value="[[value]]" label="[[label]]">
+        hide-details="[[hide-detail]]" background-color="[[background-color]]" [[event]] value="[[value]]" label="[[label]]">
     </v-file-input>
 
     <!--------------------------  XUI-RADIO-GROUP-1   ---------------------------->
@@ -121,11 +123,13 @@
         <xui-prop id="desc">Radio</xui-prop>
         <xui-prop id="componentAs">input</xui-prop>
         <xui-prop var="label" editor="text">label</xui-prop>
+        <xui-prop var="value" editor="text">value</xui-prop>
     </xui-doc>
 
-    <div xid="xui-radio-1" class="v-radio">
-        <v-radio label="[[label@1]]"></v-radio>
+    <div xid="xui-radio-1" class="d-flex">
+        <v-radio label="[[label@1]]" value="[[value@1]]"></v-radio>
     </div>
+    <!--v-radio xid="xui-radio-1" label="[[label]]" value="[[value]]"></v-radio-->
 
     <!--------------------------  XUI-SWITCH-1   ---------------------------->
     <xui-doc xid="xui-switch-1">
@@ -134,12 +138,15 @@
         <xui-prop id="desc">switch</xui-prop>
         <xui-prop id="componentAs">input</xui-prop>
         <xui-prop var="label" editor="text">label</xui-prop>
+        <xui-prop var="value" editor="bool">value</xui-prop>
         <xui-prop var="dense" editor="bool">dense</xui-prop>
     </xui-doc>
 
-    <div xid="xui-switch-1">
-        <v-switch  dense=[[dense@1]] label="[[label@1]]"></v-switch>
+    <div xid="xui-switch-1" class="d-flex">
+        <v-switch label="[[label@1]]" dense=[[dense@1]] value="[[value@1]]"></v-switch>
     </div>
+    <!--v-switch xid="xui-switch-1"  dense=[[dense]] label="[[label]]" value="[[value]]"></v-switch-->
+ 
 
 
     <!--------------------------  XUI-BTN-1  ---------------------------->
@@ -166,9 +173,10 @@
         <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
         <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
         <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
     </xui-doc>
 
-    <v-btn xid="xui-btn-1" class="[[class]]" -style="[[style]]" [[btn-type]] [[position]] disabled="[[disabled]]"
+    <v-btn xid="xui-btn-1" class="[[class]]" -style="[[style]]" [[directive]] [[btn-type]] [[position]] disabled="[[disabled]]"
         [[size]] [[event]] to="[[routeto]]" color="[[color]]" dark="[[dark]]" light="[[light]]">[[label@1]]
     </v-btn>
 
@@ -180,7 +188,7 @@
         <xui-prop id="componentAs">action</xui-prop>
 
         <xui-prop var="btn-type" def="icon" editor="combo"
-            list='["depressed","outlined","rounded","text","tile","icon","fab"]'>type depressed/outlined/...</xui-prop>
+            list='["depressed","outlined","rounded","text","tile","icon","fab", "nr"]'>type depressed/outlined/...</xui-prop>
 
         <xui-prop var="icon" def="mdi-plus" editor="icon">icon (mdi-xxx)</xui-prop>
         <xui-prop var="color" cat="vstyle" editor="text">color</xui-prop>
@@ -199,12 +207,13 @@
         <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
         <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
         <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
         
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-btn xid="xui-btn-icon-1" to="[[routeto]]" [[event]] class="[[class]]" -style="[[style]]" [[btn-type]]
+    <v-btn xid="xui-btn-icon-1" to="[[routeto]]" [[directive]] [[event]] class="[[class]]" -style="[[style]]" [[btn-type]]
         disabled="[[disabled]]" [[size]] color="[[color]]" dark="[[dark]]" light="[[light]]">
         <span xui-if=[[textleft@2]]>[[textleft@2]]</span>
         <v-icon [[positionicon@1]]>[[icon@2]]</v-icon><span xui-if=[[textright@2]]>[[textright@2]]</span>
@@ -252,6 +261,21 @@
         <span xui-if=[[textleft@1]]>[[textleft@2]]</span>
         <v-icon [[positionicon@1]]>[[icon@2]]</v-icon><span xui-if=[[textright@1]]>[[textright@2]]</span>
     </v-btn>
+
+
+    <!--------------------------  XUI-BADGE-1   ---------------------------->
+    <xui-doc xid="xui-badge-1">
+        <xui-prop id="name">badge</xui-prop>
+        <xui-prop id="desc">Un badge</xui-prop>
+        <xui-prop var="color" cat="style" editor="text">color</xui-prop>
+        <xui-prop var="d-flex" editor="bool">flex</xui-prop>
+        <xui-prop var="content" editor="text">content</xui-prop>
+        <xui-prop var=":value" editor="text" cat="event:bind">value (show)</xui-prop>
+    </xui-doc>
+
+    <v-badge xid="xui-badge-1" class="[[d-flex]]" overlap content="[[content]]" color="[[color]]" :value=[[:value]]>
+        <xui-slot xid="[[parent-xid]]-col-0" xui-slot-name="slot badge"></xui-slot>
+    </v-badge>
 
     <!--------------------------  XUI-ICON-1   ---------------------------->
     <xui-doc xid="xui-icon-1">

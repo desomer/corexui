@@ -25,6 +25,7 @@
 
         <xui-prop var="color-bg" cat="color" editor="text">color background</xui-prop>
         <xui-prop var="color-sel" cat="color" editor="text">color selected</xui-prop>
+
         <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
         <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
 
@@ -125,7 +126,7 @@
 
     <v-row xid="xui-row-1" class="[[fill-height]] [[class]]" xui-for="idxc" -style="[[style]]" no-gutters
         -align="[[align]]" align-content="[[align-content]]" justify="[[justify]]" if:[[:varitems@-2]]:data-for-map="[[:varitems@-2]]">
-        <v-col [[event@-1]] class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]" if:[[:varitems@-1]]:v-bind:data-for-idx=[[:varitems@-1]]_index if:[[:varitems@-1]]:v-for="([[:varitems@-1]]_item, [[:varitems@-1]]_index) in [[:varitems@-1]]">
+        <v-col [[event@-1]] class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]" if:[[:varitems@-1]]:v-bind:data-for-idx=[[index::varitems@-1]]_index if:[[:varitems@-1]]:v-for="([[:varitems@-1]]_item, [[:varitems@-1]]_index) in [[:varitems@-1]]">
             <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" style-slot="height:100%" xui-slot-name="row col [[idxc@3]]">
             </xui-slot>
         </v-col>
@@ -470,15 +471,33 @@
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
 
+
+        <xui-prop var="dense" cat="style" editor="bool">dense</xui-prop>
+        <xui-prop var="prepend" editor="bool">with prepend</xui-prop>
         <xui-prop var=":varitems" editor="var" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var=":varactive" editor="var" bind-type="array">active var name</xui-prop>
+        <xui-prop var=":varopen" editor="var" bind-type="array">open var name</xui-prop>
+        <xui-prop var=":expandAllCmp" cat="event:bind" editor="var" bind-type="bool">var expand All</xui-prop>
+        <xui-prop var="@update:active" cat="event:elem" editor="text">on active</xui-prop>
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <v-treeview xid="xui-treeview" dense :open-all="true" :transition="true" :items="[[:varitems]]">
-        <template v-slot:prepend="{ item }">
-            <v-icon>
-              mdi-account
-            </v-icon>
-          </template>
+    <v-treeview xid="xui-treeview" dense="[[dense]]" color="red" :open-all="[[:expandAllCmp]]" :transition="true" :items="[[:varitems]]"
+            [[directive]]
+            hoverable
+            return-object=true
+            activatable
+            :active.sync="[[:varactive]]"
+            :open.sync="[[:varopen]]"
+            [[event]]
+            class="[[class]]"
+            -style="[[style]]">
+        <template v-slot:prepend="{ item : [[item::varitems@1]]_item }"  xui-if=[[prepend@1]]>
+            <xui-slot xid="[[parent-xid]]-prepend" xui-slot-name="prepend slot" >
+            </xui-slot>
+        </template>
     </v-treeview>
 
     <!--------------------------dialog   --------------------->
@@ -514,5 +533,124 @@
     <v-snackbar xid="xui-snackbar" v-model="[[:varactive]]" :timeout="-1">
        <xui-slot xid="[[parent-xid]]-slot" xui-reloader=true xui-slot-name="Snackbar slot" xui-doc-id="SnackbarSlot"></xui-slot>
     </v-snackbar>
+
+
+    <!-------------------------- v-data-table   --------------------->
+    <xui-doc xid="xui-data-table-1">
+        <xui-prop id="name">Data Table</xui-prop>
+        <xui-prop id="icon">mdi-table-large</xui-prop>
+        <xui-prop id="desc">Data Table</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var="nb" def=2 editor="int">nb column</xui-prop>
+        <xui-prop var="height" editor="text">fixe height</xui-prop>
+        
+
+        <xui-prop var=":headers" editor="var" bind-type="array">headers var</xui-prop>
+        <xui-prop var=":varitems" editor="var" bind-type="array">items var</xui-prop>
+
+        <xui-prop var="showselect" editor="bool" bind-type="bool">show select box</xui-prop>
+        <xui-prop var=":selected" editor="var" bind-type="array">selected var</xui-prop>
+        <xui-prop var="item-key" editor="var" bind-type="array">item key var</xui-prop>
+        <xui-prop var="checkbox-color" cat="style" editor="text">select checkbox color</xui-prop>
+
+        <xui-prop var="hide-default-header" editor="bool" bind-type="bool">hide default header</xui-prop>
+        <xui-prop var="hide-default-footer" editor="bool" bind-type="bool">hide default footer</xui-prop>
+        
+        
+        <xui-prop var="dense" editor="bool">dense</xui-prop>
+        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="xui-column-data-table">
+        <xui-prop id="name">Data Column</xui-prop>
+        <xui-prop var="data" editor="var">var data</xui-prop>
+        <xui-prop var="dataslot" editor="bool">custom slot</xui-prop>
+        <xui-prop var="align" cat="vstyle" editor="combo" 
+            list='["start", "center", "end"]'>align</xui-prop>
+        <xui-prop var="divider" cat="vstyle" editor="bool">divider</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="cellClass" cat="cellClass" editor="class">cell Class</xui-prop>
+        <xui-prop var="width" editor="text">width</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="DataHeader">
+        <xui-prop id="name">Header</xui-prop>
+    </xui-doc>
+    <xui-doc xid="DataCell">
+        <xui-prop id="name">Data cell</xui-prop>
+    </xui-doc>
+
+    <v-data-table xid="xui-data-table-1"
+        :headers="[[:headers]]"
+        :items="[[:varitems]]"
+        class="[[class]]"
+        -style="[[style]]"
+        dense="[[dense]]"
+        dark="[[dark]]"
+        light="[[light]]"
+        show-select=[[showselect]]
+        item-key="[[item-key]]"
+        checkbox-color=[[checkbox-color]]
+        v-model="[[:selected]]"
+        hide-default-header=[[hide-default-header]]
+        hide-default-footer=[[hide-default-footer]]
+        height="[[height]]"
+        xui-for="idxc" >
+            <xui-column-data-table xid="[[parent-xid]]-[[idxc@0+]]"></xui-column-data-table> 
+    </v-data-table>
+
+    <template xui-no-dom xid="xui-column-data-table">
+        <template v-slot:header.[[data@1|idxc@0+]]="{ header }">
+            <xui-slot xid="[[parent-xid]]-h-[[idxc@0+]]" style-slot="display:inline" xui-slot-name="col [[idxc@0+]]" xui-doc-id="DataHeader"></xui-slot>
+        </template>
+        <template xui-if="[[dataslot@2]]" v-slot:item.[[data@1|idxc@0+]]="{ item : [[item::varitems@2]]_item }">
+            <xui-slot xid="[[parent-xid]]-i-[[idxc@0+]]" style-slot="display:inline" xui-slot-name="data [[idxc@0+]]" xui-doc-id="DataCell"></xui-slot>
+        </template>
+    </template>
+
+    <xui-design xid="xui-jsonvalidator">
+        <script xid="xui-data-table-1">
+            console.debug(">>>>>>>>>>>>>>>>>>>>>>>> ctx = ", ctx);
+            if (ctx.prop==":headers")
+            {
+                let header = jsonPathToValue(ctx.jsonState, ctx.attr);
+                if (!(header instanceof Array))
+                {
+                    header=[];
+                    setValueFromJsonPath(ctx.jsonState, ctx.attr, header); 
+                }
+                const infoFile = $xui.pageDesignManager.getInfoFile("template");
+                const prop = $xuicore.getPropertiesXUI(infoFile, ctx.xid, ctx.xid, 1);
+                const data =$xui.parseJson(prop.data);
+                const found = data.find(e => e.variable =="nb");
+                console.debug("jsonPathToValue", header, found);
+                header.length = 0;
+                const nb = parseInt(found.value);
+                for (let index = 0; index < nb; index++) {
+
+                    const propCol = $xuicore.getPropertiesXUI(infoFile, ctx.xid+"-"+index, ctx.xid+"-"+index, 1);
+                    const dataCol =$xui.parseJson(propCol.data);
+                    let data = dataCol.find(e => e.variable =="data");
+                    if (data.value=="") data.value=""+index;
+                    var jsonColumn = { value: data.value};
+
+                    let align = dataCol.find(e => e.variable =="align");
+                    if (align.value!="") jsonColumn.align=align.value;
+                    let divider = dataCol.find(e => e.variable =="divider");
+                    if (divider.value==true) jsonColumn.divider=true;
+                    let headerClass = dataCol.find(e => e.variable =="class");
+                    if (headerClass.value!="") jsonColumn.class=headerClass.value;
+
+                    header.push(jsonColumn);
+                }
+            }
+        </script>
+    </xui-design>
 
 </xui-factory>

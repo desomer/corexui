@@ -78,7 +78,8 @@ class ParseInfo {
   late ParseInfoMode mode;
   String? context; // nom de l'attribut
   String? prefix;  //  ajoute un prefix à l'attribut   (ex : v-bind:)
-
+  String? orTag;
+  String? tagPrefix;
 
   ParseInfo(content, this.context, this.mode) {
     parsebuilder = StringBuffer(content.toString());

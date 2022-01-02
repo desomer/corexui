@@ -23,7 +23,7 @@
                 $xui.rootdata.dialogBinding = true;
 
                 setTimeout(() => {
-                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set($xui.rootdata.jsonEditorData)
+                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set($xui.rootdata.stateData)
                     console.debug("open Binding Editor", xid, propId);
                 }, 100);
 
@@ -48,6 +48,7 @@
                         console.debug("save binding ok", aProperty, $xui.rootdata);
                     }
                 }
+                $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
             };
         </script>
     </xui-design>
@@ -60,10 +61,10 @@
         }
     </script>
 
-    <div xid="vue-xui-bind-editor">
+    <div xid="vue-xui-bind-editor" style="height: calc(65vh - 140px);">
         <v-text-field class="ma-6" :label="nameBinding" v-model="variableBinding" hint="Bind variable name" outlined
             clearable persistent-hint></v-text-field>
-        <v-jsoneditor ref="jsonEditorBinding" v-model="jsonEditorData" :options="optionsEditor" :plus="false" height="100%">
+        <v-jsoneditor ref="jsonEditorBinding" v-model="stateData" :options="optionsEditor" :plus="false" height="100%">
         </v-jsoneditor>
     </div>
 

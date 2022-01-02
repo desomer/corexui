@@ -32,16 +32,16 @@ main
     <xui-import xui-path="app/vue/vue2CmpLayoutVuetify.html"></xui-import>
     <xui-import xui-path="app/vue/vue2CmpLayout.html"></xui-import>
     <xui-import xui-path="app/vue/vue2CmpVuetify.html"></xui-import>
-    <xui-import xui-path="app/cmpDesignClassChooser.html"></xui-import>
-    <xui-import xui-path="app/cmpDesignBindEditor.html"></xui-import>
+
+    <xui-import xui-path="app/frameDesignerMain.html"></xui-import>
     <xui-import xui-path="app/cmpDesignCode.html"></xui-import>
     <xui-import xui-path="app/cmpDesignState.html"></xui-import>
-    <xui-import xui-path="app/frameDesignerMain.html"></xui-import>
+    
+    <xui-import xui-path="app/vue/vue2CmpDev.html"></xui-import>
+
+    <xui-import xui-path="app/frameDesignerImport.html"></xui-import>
 
     <frame-vuetify-1 xid="root"></frame-vuetify-1>
-
-    <!--  composant small btn d'action  -->
-    <v-btn xid="xui-btn-small" small class="xui-btn-action"></v-btn>
 
     <xui-design xid="root">
         <xui-prop id="nbpage" val="2"></xui-prop>
@@ -49,8 +49,7 @@ main
     </xui-design>
 
     <!----------------------------------------------------------------------------------->
- 
-
+    <!---------------------------PAGE DESIGNER  ----------------------------------------->
     <!----------------------------------------------------------------------------------->
     <xui-design xid="page-1-content">
         <xui-prop id="title" val="PWA Designer"></xui-prop>
@@ -58,7 +57,7 @@ main
 
         <xui-prop id="colorApp" val="#ff5900"></xui-prop>
         <xui-prop id="colorBg" val="white"></xui-prop>
-        <xui-prop id="copyrightApp" val="Elisys 2021 v0.8.0 14/11/2021"></xui-prop>
+        <xui-prop id="copyrightApp" val="Elisys 2021 v0.9.0 05/12/2021"></xui-prop>
 
         <xui-prop id="withAppBar" val="true"></xui-prop>
         <xui-prop id="withLeftNavigation" val="true"></xui-prop>
@@ -74,68 +73,9 @@ main
         <xui-prop id="no-gutter" val="true"></xui-prop>
      </xui-design>
 
-    <!--  composant editor de class  -->
-    <v-dialog xid="xui-class-editor" v-model="main.dialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
-        <v-card>
-            <div class="white--text elevation-6"
-                style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
-                <v-card-title>Class & style</v-card-title>
-            </div>
-            <div style="height:65vh; overflow-y: scroll;">
-                <cmp-list-class></cmp-list-class>
-            </div>
-            <v-card-actions class="elevation-6">
-                <v-btn text @click="main.dialogClass=false;">Cancel</v-btn>
-                <v-btn text @click="$xui.saveClassEditor(); main.dialogClass=false;">Save</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+    <!--  composant small btn d'action  -->
+    <v-btn xid="xui-btn-small" small class="xui-btn-action"></v-btn>
 
-    <!--  composant editor de binding  -->
-    <v-dialog ref="dialogBind" xid="xui-binding-editor" v-model="main.dialogBinding" v-on:click:outside="$xui.saveBindingEditor()"
-        max-width="80vw">
-        <v-card>
-            <div class="white--text elevation-6"
-                style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
-                <v-card-title>Binding & watch</v-card-title>
-            </div>
-            <div style="height:65vh; overflow-y: scroll;">
-                <cmp-bind-editor ref="jsonEditorBindingCont" :options-editor="main.jsonEditorOptions"></cmp-bind-editor>
-            </div>
-            <v-card-actions class="elevation-6">
-                <v-btn text @click="main.dialogBinding=false;">Cancel</v-btn>
-                <v-btn text @click="$xui.saveBindingEditor(); main.dialogBinding=false;">Save</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
-
-    <!--  composant boite de dialog temporaire -->
-    <v-snackbar ref="snack" xid="xui-snackbar-dialog" class="pt-0" elevation="12" v-model="main.snackbar"
-        :timeout="main.snackbar_timeout" top app color="blue-grey">
-        {{ main.snackbar_text }}
-        <template v-slot:action="{ attrs }">
-            <v-btn color="white" text v-bind="attrs" @click="main.snackbar = false">
-                Close
-            </v-btn>
-        </template>
-    </v-snackbar>
-
-    <!--  composant popup action -->
-    <div xid="xui-popup-action" id="xui-display-selector-popup" class="xui-popup-class"
-        style="position:absolute; top:100px; left: 100px;">
-        <v-list dense>
-            <v-list-item v-for="(itemPopup, j) in main.listPopupAdd" :key="j" @click="$xui.doActionPopup(itemPopup)">
-                <v-list-item-icon>
-                    <v-icon>{{itemPopup.icon}}</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                    <v-list-item-title>
-                        <span>{{itemPopup.title}}</span>
-                    </v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
-        </v-list>
-    </div>
 
     <!--------------------------------------------------------------------------->
     <xui-design xid="page-1-content-toolbar">
@@ -153,32 +93,16 @@ main
     </xui-design>
 
     <!--------------------------------------------------------------------------->
-    <xui-design xid="page-1-content">
-        <v-overlay z-index=6 opacity=0.7 :value="main.overlay"><div style="width: 100%;height: 100%;z-index:1" @click="$xui.modePreview()"></div></v-overlay>
-        <xui-snackbar-dialog></xui-snackbar-dialog>
-        <xui-popup-action></xui-popup-action>
-        <xui-class-editor></xui-class-editor>
-        <xui-binding-editor></xui-binding-editor>
-        <div style="position:absolute; bottom:0px ;width: 100%;">
-            <v-snackbar style="position:relative; height:60px" v-for="(item, index) in main.messages"
-                :key="index"
-                v-model="item.snackbar"
-                :timeout="item.timeout"
-            >
-                {{ item.text }}
-            </v-snackbar>
-        </div>
-    </xui-design>
 
     <xui-design xid="page-1-route-0-content">
         <xui-tabs xid="main-tab" xui-nb="7" xui-vertical=true xui-tabs-dense=true xui-dark=true
-            class="fill-height main-tab">
+            class="fill-height">
         </xui-tabs>
     </xui-design>
 
     
     <xui-design xid="main-tab">
-        <xui-prop id=":modelTab" val="activeTab"></xui-prop>
+        <xui-prop id=":modelTab" val="idxTabMain"></xui-prop>
     </xui-design>
 
     <xui-design xid="main-tab-tab-0">
@@ -200,11 +124,28 @@ main
         <v-icon>mdi-image-multiple-outline</v-icon>
     </xui-design>
     <xui-design xid="main-tab-tab-6">
-        <v-icon>mdi-border-inside</v-icon>
+        <v-icon>mdi-play-speed</v-icon>
     </xui-design>
 
     <xui-design xid="main-tab-tab-item-6">
         <div class="ma-10" id="qrcode">QRCode PWA</div>
+        <div style="margin: 0px 40px;"> URL = {{main.urlApp}} </div>
+        <div style="display: flex; margin: 50px 40px;">
+            <v-btn @click="$xui.deploy()">
+               Deploy
+               <v-icon>mdi-database-export-outline</v-icon>
+            </v-btn>
+            <span style="width:50px"></span>
+            <v-btn @click="$xui.sendInTab()">
+                Open App
+                <v-icon>mdi-application-export</v-icon>
+            </v-btn>
+            <span style="width:50px"></span>
+            <v-btn @click="$xui.sendByMail()">
+                Mail
+                <v-icon>mdi-application-export</v-icon>
+            </v-btn>
+        </div>
     </xui-design>
 
     <!---------------------------Editor de page ------------------------------------>
@@ -221,25 +162,33 @@ main
         <div class="main-container fill-height">
             <div class="main-item main-item-0">
                 <v-toolbar height="38" dark>
-                    <v-radio-group v-model="main.jsonEditorDataSrc" row class="pt-6">
+                    <v-radio-group v-model="main.stateDataSource" row class="pt-6">
                        <div class="v-radio">
-                          <v-radio label="Initial" value="template"></v-radio>
+                          <v-radio label="Initial data" value="template"></v-radio>
                        </div>
                        <div class="v-radio">
-                          <v-radio label="Mock" value="mock"></v-radio>
+                          <v-radio label="Mock data" value="mock"></v-radio>
                        </div>
                     </v-radio-group>
                     <v-spacer></v-spacer>
                     <div class="pt-6">
-                       <div>
+                       <div style="display: flex;">
+                          <v-switch dense label="action enable" v-model="main.actionEnable" class="mr-3"></v-switch>
                           <v-switch dense label="route enable" v-model="main.routeEnable" ></v-switch>
                        </div>
                     </div>
                  </v-toolbar>
             </div>
             <div class="main-item main-item-1"></div>
-            <div class="main-item main-item-2">
-                <iframe id='rootFrame'>
+
+            <div class="main-item main-item-4">
+                <v-toolbar height="38" dark> 
+                    <v-checkbox class="mt-5" label="Dialog" value2="displayDialog"></v-checkbox>
+                </v-toolbar>
+            </div>
+            <div class="main-item main-item-5"></div>
+            <div class="main-item root-frame-center">
+                <iframe id='rootFrame' title="page">
                 </iframe>
             </div>
             <div class="main-item main-item-3">
@@ -268,7 +217,7 @@ main
     </xui-tabs>
 
     <xui-design xid="design-action">
-        <xui-prop id=":modelTab" val="activeAction"></xui-prop>
+        <xui-prop id=":modelTab" val="idxTabProperties"></xui-prop>
     </xui-design>
 
     <xui-design xid="action-tab-tab-0">
@@ -290,7 +239,7 @@ main
         <v-icon>mdi-file-tree</v-icon>
     </xui-design>
     <xui-design xid="action-tab-tab-6">
-        <v-icon>mdi-chevron-right-box</v-icon>
+        <v-icon>mdi-console</v-icon>
     </xui-design>
 
 
@@ -313,7 +262,7 @@ main
         <div id="treeCmp" class='barcustom xui-div-scroll-vertical'>
             <v-treeview dense 
             transition=true 
-            :open-all="main.expandAll"
+            :open-all="main.expandAllCmp"
             ref="treeCmp"
             hoverable
             return-object=true
@@ -338,13 +287,13 @@ main
 
     <!--------------------------------------------------------------------------->
     <xui-design xid="main-tab-tab-item-3">
-        <div id="editorContent">
+        <!--div id="editorContent">
             <vue-editor v-model="main.contentEditor"></vue-editor>
         </div>
 
         <div id="resultContent">
             <div v-html="main.contentEditor"></div>
-        </div>
+        </div-->
     </xui-design>
 
     <!--------------------------------------------------------------------------->
@@ -363,10 +312,6 @@ main
         <xui-btn-small @click="$xui.modePreview()">
             <v-icon>mdi-television-play</v-icon>
         </xui-btn-small>
-        <xui-btn-small @click="$xui.sendInTab()">
-            <v-icon>mdi-application-export</v-icon>
-        </xui-btn-small>
-
     </xui-design>
 
     <!--------------------------------------------------------------------------->
@@ -411,60 +356,9 @@ main
             <v-icon>mdi-autorenew</v-icon>
         </xui-btn-small>
 
-        <span style="width:50px"></span>
-
-        <xui-btn-small @click="$xui.deploy()">
-            <v-icon>mdi-database-export-outline</v-icon>
-        </xui-btn-small>
-
 
         <v-spacer></v-spacer>
         <span>&amp;copy;&amp;nbsp;[[copyrightApp@0+]]</span>
-    </xui-design>
-
-    <!--------------------------------------------------------------------------->
-    <xui-design xid="xui-script-data">
-        <script xui-no-dom>
-            // empty js
-        </script>
-    </xui-design>
-
-    <xui-design xid="xui-init-vuetify">
-        $xui.initVuejs($xui.vuejs);
-    </xui-design>
-
-    <xui-design xid="inject-other-header">
-        <link rel="preload" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css" as="style"
-            onload="this.onload=null;this.rel='stylesheet'">
-        <link rel="preload" href="app/frameDesigner.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    </xui-design>
-
-    <xui-design xid="inject-after-body">
-        <script defer src="app/clsHelper.js"></script>
-        <script defer src="app/clsFileSaver.js"></script>
-        <script defer src="app/frameDesignerError.js"></script>
-
-        <script defer src="app/frameDesigner.js"></script>
-        <script defer src="app/frameDesignerProp.js"></script>
-        <script defer src="app/frameDesignerPopupAction.js"></script>
-
-        <script defer src="https://cdn.jsdelivr.net/npm/v-jsoneditor@1.4.2/dist/v-jsoneditor.min.js"></script>
-
-        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>
-        <script defer src="https://unpkg.com/region2d@1.0.0/plain/region2d.min.js"></script>
-        
-
-        <script defer src="libxui.dart.js"></script>
-
-        <script defer src="app/frameDesignerWatch.js"></script>
-        <script defer src="app/frameDesignerData.js"></script>
-
-
-        <script defer src="https://cdn.jsdelivr.net/npm/vue2-editor@2.6.6/dist/vue2-editor.min.js"></script>
-
-        <script defer src="https://cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/qrcode-js-package@1.0.4/qrcode.min.js"></script>
     </xui-design>
 
 </xui-factory>

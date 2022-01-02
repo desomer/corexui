@@ -1,10 +1,12 @@
 export class ComponentManager {
 
+    debug = false;
+
     static getComponentFromTemplate(idTemplate) {
-        const template = document.querySelector("#" + idTemplate);
+        const template = document.querySelector(`#${idTemplate}`);
         if (template == null)
             return {
-                template: "<div>no template "+idTemplate+"</div>"
+                template: `<div>no template ${idTemplate}</div>`
             };
         else
           {
@@ -16,12 +18,12 @@ export class ComponentManager {
     }
 
     static getRouteFromTemplate(idPage, idTemplate) {
-        const page = document.querySelector("#" + idPage);
-        const template = page.content.querySelector("#" + idTemplate);
+        const page = document.querySelector(`#${idPage}`);
+        const template = page.content.querySelector(`#${idTemplate}`);
         template.remove();
         if (template == null)
             return {
-                template: "<div>no template "+idTemplate+"</div>"
+                template: `<div>no template ${idTemplate}</div>`
             };
         else
           {
@@ -50,30 +52,30 @@ export class ComponentManager {
     getVueTemplate(file, xid, mode, aPromise) {
 
         if (window.parent == window) { // test si loader
-            window.waitForXuiLib("getHtmlFromXUI", function () {
-                console.debug("getVueTemplate local ", xid)
-                var infoFileCmp = { file: file, xid: xid, mode: mode };
-                var prom = getPromise("getVueCmp" + xid)
-                $xuicore.getHtmlFromXUI(infoFileCmp, "getVueCmp" + xid);
+            window.waitForXuiLib("getHtmlFromXUI", () => {
+                if (this.debug) console.debug("getVueTemplate local ", xid)
+                const infoFileCmp = { file, xid, mode };
+                const prom = getPromise(`getVueCmp${xid}`);
+                $xuicore.getHtmlFromXUI(infoFileCmp, `getVueCmp${xid}`);
                 prom.then(jsCmp => {
-                    console.debug("returnCmpForFile ", jsCmp)
+                    if (this.debug) console.debug("returnCmpForFile ", jsCmp)
                     aPromise(jsCmp);
                 });
-            }.bind(this), this);
+            }, this);
 
         } else {
-            console.debug("getVueTemplate on parent ", xid)
-            var infoFileCmp = { file: file, xid: xid, mode: mode };
-            var message = {
+            if (this.debug) console.debug("getVueTemplate on parent ", xid)
+            const infoFileCmp = { file, xid, mode };
+            const message = {
                 action: "getCmpForFile",
                 infoFileCmp: infoFileCmp
             };
             window.parent.postMessage(message, "*");
 
             window.addEventListener('message', function (e) {
-                var data = e.data;
-                if (data.action == "returnCmpForFile_" + file + "_" + xid) {
-                    console.debug("returnCmpForFile ", data)
+                const data = e.data;
+                if (data.action == `returnCmpForFile_${file}_${xid}`) {
+                    if (this.debug) console.debug("returnCmpForFile ", data)
                     aPromise(data.jsCmp);
                 }
             }.bind(this));
@@ -83,13 +85,13 @@ export class ComponentManager {
     //------------------------------------------------------------------
     registerVueComponent(idCmp, file, xid) {
 
-        console.debug("create component from import " + idCmp);  // voir xui-split-1
+        if (this.debug) console.debug(`create component from import ${idCmp}`);  // voir xui-split-1
 
-        Vue.component(idCmp, function (resolve, reject) {
-            this.getVueTemplate(file, xid, "final", function (str) {
+        Vue.component(idCmp, (resolve, reject) => {
+            this.getVueTemplate(file, xid, "final", (str) => {
                 this.initComponentFromImport(str, resolve);
-            }.bind(this))
-        }.bind(this));
+            })
+        });
 
     }
 
@@ -98,8 +100,8 @@ export class ComponentManager {
         const dataUri = ComponentManager.esm`${jsCmp}`;
         import(dataUri)
             .then((namespaceObject) => {
-                console.debug("addVueComponent", namespaceObject.default);
-                var cmp = {
+                if (this.debug) console.debug("addVueComponent", namespaceObject.default);
+                const cmp = {
                     data: function () {
                         return $xui.rootdata;
                     },

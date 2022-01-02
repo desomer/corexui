@@ -9,13 +9,31 @@
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
 
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
-    <div xid="xui-block" class="[[class]]" -style="[[style]]">
+    <div xid="xui-block" [[directive]] class="[[class]]" -style="[[style]]">
         <xui-slot style-slot="height:100%" xid="[[parent-xid]]-block" xui-slot-name="Block"></xui-slot>
     </div>
+
+    <!--------------------------  XUI-IFRAME   ------------------------------->
+    <xui-doc xid="xui-iframe-1">
+        <xui-prop id="name">IFrame</xui-prop>
+        <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
+        <xui-prop id="desc">Une IFrame</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
+        <xui-prop var="title" editor="text">title</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <iframe xid="xui-iframe-1" [[directive]] title="[[title]]" class="[[class]]" -style="[[style]]"></iframe>
 
     <!-------------------------------- SCROLLPANE ---------------------------->
     <xui-doc xid="xui-scrollpane-1">
@@ -50,7 +68,7 @@
     </template>
 
     <!--------------------------  XUI-IF-ELSE   ------------------------------->
-    <xui-doc xid="xui-if-else">
+    <!-- <xui-doc xid="xui-if-else">
         <xui-prop id="name">If elseIf else</xui-prop>
         <xui-prop id="icon">mdi-order-bool-descending-variant</xui-prop>
         <xui-prop id="desc">Un block</xui-prop>
@@ -72,7 +90,7 @@
         <template v2-else="">
             <xui-slot style-slot="height:100%" xid="[[parent-xid]]-else" xui-slot-name="else block"></xui-slot>
         </template>
-    </template>
+    </template> -->
 
     <!--------------------------  XUI-SESSION   ------------------------------->
     <xui-doc xid="xui-session">

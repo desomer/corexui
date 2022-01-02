@@ -79,6 +79,7 @@
     </div>
 
     <div xid="editor-icon" style="display: inline-flex; width: 100%;">
+        <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
         <v-text-field dense class='mx-1 mt-3' hide-details clearable
             :label='[[label@1]]' 
             v-model='[[value@1]]'>

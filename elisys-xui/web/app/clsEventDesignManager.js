@@ -72,8 +72,8 @@ export class EventManager {
                 $xui.modeDisplaySelection = true;
 
                 // se repositionne sur l'onglet 0
-                if ($xui.rootdata.activeAction > 2)
-                    $xui.rootdata.activeAction = 0;
+                if ($xui.rootdata.idxTabProperties > 2)
+                    $xui.rootdata.idxTabProperties = 0;
 
                 // 250 = delay d'animation des v-tabs
                 const delayWaitEndAnim = 250;
@@ -82,6 +82,14 @@ export class EventManager {
             else if (data.action == "unselect") {   // sur scroll ou resize
                 $xui.closePopup();
                 $xui.SelectorManager.unDisplaySelector();
+            }
+            else if (data.action == "changeRoute") {   // sur scroll ou resize
+                $xui.closePopup();
+                $xui.SelectorManager.unDisplaySelector();
+                setTimeout(() => {
+                   // $xui.displayPropertiesJS("root", "root", ); 
+                }, 500);
+
             }
             else if (data.action == "drop") {
                 if ($xui.dragItem != null) {
@@ -148,6 +156,10 @@ export class EventManager {
             }
             else if (data.action == "reloader finish") {
                 // lancer par les v-xui-reloader  ou aprés un rechargement global du body
+                console.debug("reloader finish");
+
+                
+                doPromiseJS("OnPageReady");
                 doPromiseJS("AfterChangeSelectByXid");
             }
             else if (data.action == "return getInfoForSelector") {

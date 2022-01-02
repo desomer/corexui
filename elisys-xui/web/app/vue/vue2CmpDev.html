@@ -1,0 +1,101 @@
+<xui-factory version="1.0">
+
+    <xui-design xid="inject-other-header">
+        <link rel="preload" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css" as="style"
+            onload="this.onload=null;this.rel='stylesheet'">
+        <link rel="preload" as="style" href="https://unpkg.com/vue-prism-editor/dist/prismeditor.min.css" 
+            onload="this.onload=null;this.rel='stylesheet'">
+    </xui-design>
+
+    <xui-design xid="inject-after-body">
+        <script defer src="https://cdn.jsdelivr.net/npm/v-jsoneditor@1.4.2/dist/v-jsoneditor.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.25.0/components/prism-css.min.js"></script>
+        <script defer src="https://unpkg.com/vue-prism-editor"></script>
+    </xui-design>
+
+
+    <xui-design xid="xui-script-data">
+        <script xui-no-dom xui-trim-content>
+             $xui.highlighterJS = (code) => Prism.highlight(code, Prism.languages.js, "js");
+             $xui.highlighterCSS = (code) => Prism.highlight(code, Prism.languages.css, "css");
+        </script>
+    </xui-design>
+
+
+     <!--------------------------  XUI-CODE-1   ------------------------------->
+     <xui-doc xid="xui-code-1">
+        <xui-prop id="name">Code viewer</xui-prop>
+        <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
+        <xui-prop id="desc">Une IFrame</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <pre xid="xui-code-1" class="[[class]]" -style="[[style]]">
+        <code [[directive@1]] spellcheck="false"></code>
+    </pre>
+
+
+    <!--------------------------  XUI-CODE-EDITOR-1   ------------------------------->
+    <xui-doc xid="xui-code-editor-1">
+        <xui-prop id="name">Code Editor</xui-prop>
+        <xui-prop id="icon">mdi-checkbox-blank-outline</xui-prop>
+        <xui-prop id="desc">Une IFrame</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var="type" editor="combo" def="highlighterJS" list='["highlighterJS","highlighterCSS"]'>highlighter</xui-prop>
+        <xui-prop var=":model" cat="event:bind" editor="style">var</xui-prop>
+    </xui-doc>
+
+    <prism-editor xid="xui-code-editor-1" [[directive]] class="[[class]]" -style="[[style]]"  v-model="[[:model]]" :highlight="$xui.[[type]]" line-numbers></prism-editor>
+
+    <!--------------------------  XUI-JSON-EDITOR-1   ------------------------------->
+    <xui-doc xid="xui-json-editor-1">
+        <xui-prop id="name">JSON Editor</xui-prop>
+        <xui-prop id="icon">mdi-code-json</xui-prop>
+        <xui-prop id="desc">Un Json Editor</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var=":model" cat="event:model" editor="text">model</xui-prop>
+        <xui-prop var=":options" cat="event:model" editor="text">options</xui-prop>
+        <xui-prop var="plus" cat="event:model" editor="bool">plus</xui-prop>
+    </xui-doc>
+
+    <v-jsoneditor xid="xui-json-editor-1" class="[[class]]" -style="[[style]]"
+        [[directive]] v-model="[[:model]]" 
+        :options="[[:options]]" :plus="[[plus]]" height="100%">
+    </v-jsoneditor>
+
+    <xui-design xid="xui-jsonvalidator">
+        <script xid="xui-json-editor-1">
+            //console.debug(">>>>>>>>>>>>>>>>>>>>>>>> ctx = ", ctx);
+            if (ctx.prop==":options")
+            {
+                const value = jsonPathToValue(ctx.jsonState, ctx.attr);
+                //console.debug("jsonPathToValue", value);
+                if (! (value instanceof Object))
+                {
+                    setValueFromJsonPath(ctx.jsonState, ctx.attr, { mode: "code"});
+                }
+            }
+        </script>
+    </xui-design>
+
+</xui-factory>

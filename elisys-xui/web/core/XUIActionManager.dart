@@ -145,7 +145,7 @@ class XUIActionManager {
     if (xid != null) {
       xuidesign.xid = xid;
       engine.xuiFile.designs[xid] ??= DicoOrdered();
-      engine.xuiFile.designs[xid]!.add(XUIDesign(xuidesign, MODE_ALL));
+      engine.xuiFile.designs[xid]!.add(XUIDesign(xuidesign, MODE_ALL, 0));
     }
 
     if (xuidesign.children != null) {
@@ -169,7 +169,7 @@ class XUIActionManager {
           elemXuiChild.idRessource = engine.xuiFile.reader.id;
           DicoOrdered<XUIDesign> curDesign = DicoOrdered();
           engine.xuiFile.designs[xuiCmp.xid!] = curDesign;
-          curDesign.add(XUIDesign(elemXuiChild, MODE_ALL));
+          curDesign.add(XUIDesign(elemXuiChild, MODE_ALL, 0));
         }
       }
     }
@@ -247,7 +247,7 @@ class XUIActionManager {
     xuiElem.children!.add(child);
     engine.xuiFile.designs[cloneInfo.xidDest!] ??= DicoOrdered();
     engine.xuiFile.designs[cloneInfo.xidDest]!
-        .add(XUIDesign(xuiElem, MODE_ALL));
+        .add(XUIDesign(xuiElem, MODE_ALL, 0));
 
     //clone du design (les propertiesXUI)  en ajoutant un xuidesign sur le child
     XUIDesign? design = _getXUIDesign(infoSrc, mode);
@@ -258,7 +258,7 @@ class XUIActionManager {
         xuiElem.idRessource = engine.xuiFile.reader.id;
         engine.xuiFile.designs[cloneInfo.xidNew!] ??= DicoOrdered();
         engine.xuiFile.designs[cloneInfo.xidNew]!
-            .add(XUIDesign(xuiElem, MODE_ALL));
+            .add(XUIDesign(xuiElem, MODE_ALL, 0));
 
         xuiElem.propertiesXUI = HashMap();
         design.elemXUI.propertiesXUI!.forEach((k, v) {
@@ -336,7 +336,7 @@ class XUIActionManager {
         xuiElem.idRessource = engine.xuiFile.reader.id;
         engine.xuiFile.designs[cloneInfo.xidNew!] ??= DicoOrdered();
         engine.xuiFile.designs[cloneInfo.xidNew]!
-            .add(XUIDesign(xuiElem, MODE_ALL));
+            .add(XUIDesign(xuiElem, MODE_ALL, 0));
 
         xuiElem.propertiesXUI = HashMap();
         design.elemXUI.propertiesXUI!.forEach((k, v) {
