@@ -30,6 +30,25 @@ $xui.selectPath = ()=> {
     $xui.SelectorManager.displaySelectorByXid(sel.id, sel.id, false);
 }
 
+$xui.selectChildPath = ()=> {  
+    const state = $xui.vuejs.$store.state;
+    const sel = state.main.childrenSlots[$xui.info["main.childrenSlots"]];
+    $xui.SelectorManager.displaySelectorByXid(sel.id, sel.id, false);
+}
+
+$xui.selectConditionalPath = ()=> { 
+    const state = $xui.vuejs.$store.state;
+    const sel = state.main.dynamicSlots[$xui.info["main.dynamicSlots"]];
+    if (sel.toPath!=null)
+    {
+        document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "switchValue", "param": { attr: sel.toPath } }, "*");
+    } else
+    {
+        $xui.SelectorManager.displaySelectorByXid(sel.id, sel.id, false);
+    }
+
+}
+
 // select le composant a partir du tree
 $xui.selectCmp = async () => {
     console.debug($xui.rootdata.activeSlot);

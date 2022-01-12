@@ -218,6 +218,9 @@ class XUIResource extends XMLElemReader {
         } else if (id == "add-remove") {
           doc.addRemove =
               (prop.children!.first as XUIElementText).content.toString();
+        } else if (id == "type") {
+          doc.type =
+              (prop.children!.first as XUIElementText).content.toString();
         }
       } else if (prop.attributes!["var"] != null) {
         DocVariables propDoc = DocVariables();
@@ -585,6 +588,13 @@ class DocInfo {
   late String desc;
   String? addRemove;
   List<DocVariables> variables = [];
+  String? type;
+
+  bool isConditional()
+  {
+    return type!=null && type=="conditional";
+  }
+
 }
 
 class DocVariables {

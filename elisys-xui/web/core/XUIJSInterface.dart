@@ -93,6 +93,10 @@ class ObjectDesignProperties {
   // external set path(String xid);
   external List get path;
   external set path(List tree);
+  external List get pathChildren;
+  external set pathChildren(List tree);
+  external List get pathConditional;
+  external set pathConditional(List tree);
 }
 
 

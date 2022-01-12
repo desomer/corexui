@@ -22,23 +22,35 @@ export class PageDesignManager {
 
     /** premier chargement de la page en full */
     loadPage(html, option) {
+        if ($xui.rootdata.isModePhone) {
+            document.querySelector("#rootFrame").classList.remove("xui-iframe-phone");
+        }
+        document.querySelector("#rootFrame").style.display = 'none';
         document.querySelector("#rootFrame").srcdoc = html;
+        $xui.rootdata.routeEnable = true;
+        $xui.rootdata.actionEnable = true;
 
         this.codeHtml = html;
 
-        setTimeout(() => {
+        // setTimeout(() => {
+        //     $xui.displayComponents("", "");
+        //     $xui.displayPropertiesJS("page-0-route-0-content-slot", "page-0-route-0-content-slot");
+        // }, 200);
+
+        let promOnPageReady = getPromise("OnPageReady");
+        promOnPageReady.then(()=> { 
             $xui.displayComponents("", "");
             $xui.displayPropertiesJS("page-0-route-0-content-slot", "page-0-route-0-content-slot");
-        }, 200);
+        });
 
         if (option != null) {
             $xui.rootdata.listSlot.length = 0;
             $xui.rootdata.listSlot.push(...option.treeSlot);
-            const prom = getPromise("OnPageReady");
-            prom.then(()=> { 
+            promOnPageReady.then(()=> { 
                 this.initConfigApp(option); 
                 $xui.rootdata.overlayEvent=true;
                 $xui.rootdata.overlay=false;
+                document.querySelector("#rootFrame").style.display = null;
             });
         }
 
@@ -118,6 +130,13 @@ export class PageDesignManager {
 
         if (param.action == "clear") {
             doPromiseJS("AfterChangeSelectByXid");
+            // $xui.rootdata.routeEnable = true;
+            // $xui.rootdata.actionEnable = true;
+            // setTimeout(() => {
+            //     const infoFile = $xui.pageDesignManager.getInfoFile("design");
+            //     $xuicore.initPageXUI(infoFile);
+            // }, 1000);
+
         }
 
         if (param.action != "showCode" && param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")

@@ -164,6 +164,32 @@ const iterateJSON = (src, dest, funct, functArray) => {
     return Object.fromEntries(entries);
 };
 
+function jsonPathToValue(data, path) {
+    if (!path) return data; // if path is undefined or empty return data
+    const listpath = path.split(".");
+    for (let index = 0; index < listpath.length; index++) {
+       if (!listpath[index]) continue; // "a/" = "a"
+       data = data[listpath[index]]; // new data is subdata of data
+       if (!data) return data; // "a/b/d" = undefined
+    }
+    return data;
+ }
+
+ function setValueFromJsonPath (data, path, value) {
+    if (!path) return data; // if path is undefined or empty return data
+    const listpath = path.split(".");
+
+    for (let index = 0; index < listpath.length; index++) {
+       if (!listpath[index]) continue; // "a/" = "a"
+       if (index==listpath.length-1) 
+       {
+            data[listpath[index]] = value;
+       }
+       data = data[listpath[index]]; // new data is subdata of data
+       if (!data) return data; // "a/b/d" = undefined
+    }
+    return data;
+ }
 
 
 window.addEventListener('message', (e) => {
@@ -184,6 +210,13 @@ window.addEventListener('message', (e) => {
             $xui.modulesManager.reload();
             break;
 
+        case "switchValue":
+            const value = jsonPathToValue($xui.rootdata, data.param.attr);
+            setValueFromJsonPath($xui.rootdata, data.param.attr, !value);
+            $xui.modulesManager.addModule("main", $xui.rootdata);
+            $xui.modulesManager.reload();
+            break;
+
         case "changeConfig":
             console.debug("changeConfig ", data);
             if ('routeEnable' in data.param) {
@@ -199,8 +232,8 @@ window.addEventListener('message', (e) => {
             let hasChangeValue = false;
 
             if (/*data.param.action == "reload-json" && data.param.listReloader == null &&*/ data.param.jsonBinding != null) {
-                var jsonBinding = data.param.jsonBinding;
-                var jsonTemplate = data.param.jsonTemplate;
+                const jsonBinding = data.param.jsonBinding;
+                const jsonTemplate = data.param.jsonTemplate;
 
                 iterateJSON( jsonBinding, $xui.rootdata,
                     (k, v, dest) => {
@@ -214,23 +247,19 @@ window.addEventListener('message', (e) => {
                         return v;
                     }, (a, dest, i) => {
                         // console.log("---- array=", a, " array dest=", dest, "  i=", i);
-                        if (dest == null) {
+                        if (dest == null || (Object.entries(a[0]).length != Object.entries(dest[0]).length)) {
                             hasChangeBinding = true;
                         }
-                        else {
-                            if (Object.entries(a[0]).length != Object.entries(dest[0]).length)
-                            {
-                                hasChangeBinding = true;
-                            }
-                        }
+     
                         return i;
                     });
 
-                if (hasChangeBinding || hasChangeValue || data.param.action == "reload-json") {
+                if (hasChangeBinding /*|| hasChangeValue*/ || data.param.action == "reload-json") {
                     $xui.rootdata = jsonBinding;
                     $xui.modulesManager.addModule("main", $xui.rootdata);
                     $xui.modulesManager.reload();
                 }
+
                 console.debug("***************** iframe store reload ", hasChangeBinding, hasChangeValue, data.param.jsonBinding);
             }
 

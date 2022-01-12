@@ -47,7 +47,7 @@ external set _deleteDesignXUI(void Function(FileDesignInfo, String) f);
 
 @JS('surroundDesignXUI')
 external set _surroundDesignXUI(
-    void Function(FileDesignInfo, String, String, String) f);
+    void Function(FileDesignInfo, String, String, String, String?) f);
 
 @JS('moveDesignXUI')
 external set _moveDesignXUI(void Function(FileDesignInfo, String, String) f);
@@ -188,7 +188,9 @@ void getDesignPropertiesXUI(
   ret.isSlot = id.startsWith(SLOT_PREFIX);
   ret.data = "[" + designInfo.bufData.toString() + "]";
   ret.template = designInfo.bufTemplate.toString();
-  ret.path = designInfo.listPath!;
+  ret.path = designInfo.listPath;
+  ret.pathChildren = designInfo.listChildPath;
+  ret.pathConditional = designInfo.listConditionalPath;
 
   doPromiseJS("getDesignProperties", ret);
 }
@@ -325,7 +327,7 @@ void copyDesignXUI(FileDesignInfo fileInfo, String id) async {
 }
 
 void surroundDesignXUI(FileDesignInfo fileInfo, String id, String template,
-    String xidSurround) async {
+    String xidSurround, String? slotExt) async {
   XUIDesignManager designMgr = _getDesignManager(fileInfo);
 
   SlotInfo info = designMgr.getXUIEngine().getSlotInfo(id, id)!;
@@ -338,7 +340,7 @@ void surroundDesignXUI(FileDesignInfo fileInfo, String id, String template,
 
   await addDesignXUI(fileInfo, xidParent, template, false, true);
 
-  String targetXid = xidSurround + "-col-0";
+  String targetXid = xidSurround + (slotExt??"-col-0");
   designMgr.addXUIDesignEmpty(targetXid);
   designMgr.moveDesign(id, null, targetXid);
 

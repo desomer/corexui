@@ -33,11 +33,19 @@ import("./clsSelectorManager.js").then((module) => {
 /****************************************************************************************/
 $xui.doInitPage = (pageInfo) => {
     $xui.rootdata.overlay=true;
+    $xui.SelectorManager.unDisplaySelector();
     console.debug("doInitPage pageInfo = ", pageInfo);
 
     $xui.rootdata.frameName=pageInfo.frameName;
     $xui.rootdata.frameTemplate=pageInfo.frameTemplate;
-
+    $xui.rootdata.stateData = {};
+    $xui.rootdata.stateDataMock = {};
+    $xui.rootdata.stateDataSource="";
+    $xui.rootdata.idxTabMain=0;
+    if (document.querySelector("#rootFrame")!=null)
+    {
+        document.querySelector("#rootFrame").style.display = 'none';
+    } 
     const state = $xui.vuejs.$store.state;
 
     if (state.main.version==null) { // mode version 1
@@ -97,6 +105,11 @@ $xui.refreshAction = (mode) => {
         infoFile.action = "showCode";   // pas de store
     }
 
+    if (infoFile.action==null)
+    {
+        infoFile.action="?";
+    }
+
     $xuicore.refreshPageXUI(infoFile);
 };
 
@@ -148,8 +161,8 @@ $xui.setCurrentAction = (actionName) => {
     currentAction = actionName;
     console.debug(`START ACTION ------- ${actionName} ---------`)
     let selectionMode = "root";
-    let undisplaySelector = true;
-    let reselect = $xui.modeDisplaySelection;
+    const undisplaySelector = true;
+    const reselect = $xui.modeDisplaySelection;
 
     /**************************/
     if (actionName == "addCmp")
@@ -184,7 +197,7 @@ $xui.setCurrentAction = (actionName) => {
                 $xui.modeDisplaySelection = true;
 
             if ($xui.modeDisplaySelection) {
-                setTimeout(() => {   // attente prise en compte chargement des images
+                setTimeout(() => {   // attente prise en compte chargement des images = taille avec image
                     if (window.$xui.config.traceReselect) {
                         console.debug("reselect after changePageFinish ", $xui.propertiesDesign);
                     }
@@ -211,10 +224,23 @@ $xui.setCurrentAction = (actionName) => {
 
 /***************************************************************************************************************/
 $xui.clearAll = () => {
-    $xui.setCurrentAction("clearAll");
+    // $xui.setCurrentAction("clearAll");
+    // $xui.pageDesignManager.clearAll();
+    // $xui.rootdata.stateData = {};
+    // $xui.refreshAction("template:clearAll");
+
     $xui.pageDesignManager.clearAll();
-    $xui.rootdata.stateData = {};
-    $xui.refreshAction("template:clearAll");
+    $xui.SelectorManager.unDisplaySelector();
+    $xui.rootdata.routeEnable = true;
+    $xui.rootdata.actionEnable = true;
+    $xui.rootdata.idxTabMain=0;
+    $xui.rootdata.overlayEvent=false;
+    $xui.rootdata.overlay=true;
+    document.querySelector("#rootFrame").style.display = 'none';
+   
+    const infoFile = $xui.pageDesignManager.getInfoFile("design");
+    $xuicore.initPageXUI(infoFile);
+
 }
 
 $xui.updateDirectProperty = (value, variable, xid) => {
@@ -417,8 +443,8 @@ $xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
     eval(str);
 
     // console.debug(" **************** *************** ", $xui.jsonvalidator);
-    // console.debug("************ App State initial & mock", jsonTemplate, jsonStateProp);
-    // console.debug("************ App State source & editor", jsonState, $xui.rootdata.stateData);
+    console.debug("************ App State initial & mock", jsonTemplate, jsonStateProp);
+    console.debug("************ App State source & editor", jsonState, $xui.rootdata.stateData);
     // retourne au XUI le chaine à sauvegarder sans {}
     ret = JSON.stringify(jsonState);
     return ret.substring(1, ret.length - 1);
@@ -526,8 +552,7 @@ $xui.parseJson = (str) => {
     }
 }
 
-
- function jsonPathToValue(data, path) {
+function jsonPathToValue(data, path) {
     if (!path) return data; // if path is undefined or empty return data
     const listpath = path.split(".");
     for (let index = 0; index < listpath.length; index++) {

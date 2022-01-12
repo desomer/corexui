@@ -25,6 +25,7 @@
 
         <xui-prop var="color-bg" cat="color" editor="text">color background</xui-prop>
         <xui-prop var="color-sel" cat="color" editor="text">color selected</xui-prop>
+
         <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
         <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
 
@@ -96,7 +97,7 @@
         <xui-prop id="icon">mdi-table-row</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
 
-        <xui-prop var="nb" def="1" editor="int">nb col dans la ligne</xui-prop>
+        <xui-prop var="nb" def="2" editor="int">nb col dans la ligne</xui-prop>
         <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
 
         <xui-prop var="justify" cat="vstyle" editor="combo" 
@@ -125,8 +126,8 @@
 
     <v-row xid="xui-row-1" class="[[fill-height]] [[class]]" xui-for="idxc" -style="[[style]]" no-gutters
         -align="[[align]]" align-content="[[align-content]]" justify="[[justify]]" if:[[:varitems@-2]]:data-for-map="[[:varitems@-2]]">
-        <v-col [[event@-1]] class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]" if:[[:varitems@-1]]:v-bind:data-for-idx=[[:varitems@-1]]_index if:[[:varitems@-1]]:v-for="([[:varitems@-1]]_item, [[:varitems@-1]]_index) in [[:varitems@-1]]">
-            <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" style-slot="height:100%" xui-slot-name="row col [[idxc@3]]">
+        <v-col [[event@-1]] class="[[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]" if:[[:varitems@-1]]:v-bind:data-for-idx=[[index::varitems@-1]]_index if:[[:varitems@-1]]:v-for="([[:varitems@-1]]_item, [[:varitems@-1]]_index) in [[:varitems@-1]]">
+            <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" style-slot="height:100%" xui-slot-name="Cell [[idxc@3]]">
             </xui-slot>
         </v-col>
     </v-row>
@@ -165,7 +166,7 @@
         -style="flex-direction: column;[[style]]" no-gutters -align="[[align]]" align-content="[[align-content]]"
         justify="[[justify]]">
         <v-col class="xui-column [[class@-1]]" -style="[[style@-1]]" cols="[[cols@-1]]">
-            <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" style-slot="height:100%" xui-slot-name="col rol [[idxc@3]]">
+            <xui-slot xid="[[parent-xid]]-col-[[idxc@3]]" style-slot="height:100%" xui-slot-name="Cell [[idxc@3]]">
             </xui-slot>
         </v-col>
     </v-row>
@@ -493,26 +494,64 @@
             [[event]]
             class="[[class]]"
             -style="[[style]]">
-        <template v-slot:prepend="{ item : [[:varitems@1]]_item }"  xui-if=[[prepend@1]]>
+        <template v-slot:prepend="{ item : [[item::varitems@1]]_item }"  xui-if=[[prepend@1]]>
             <xui-slot xid="[[parent-xid]]-prepend" xui-slot-name="prepend slot" >
             </xui-slot>
         </template>
     </v-treeview>
 
+     <!-------------------------- slide group   --------------------->
+     <xui-doc xid="xui-slide-group-1">
+        <xui-prop id="name">Slide group</xui-prop>
+        <xui-prop id="desc">Une ligne</xui-prop>
+        <xui-prop id="icon">mdi-table-row</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+
+        <xui-prop var="nb" def="2" editor="int">nb col dans la ligne</xui-prop>
+        <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
+
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style (ex: height:100%)</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="div:xui-slide-group-1">
+        <xui-prop id="name">Slide Cell</xui-prop>
+        <xui-prop id="desc">Une cellule</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var=":varitems" cat="event:model" editor="var" bind-type="array">items var name</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
+        <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
+    </xui-doc>
+
+    <v-slide-group  xid="xui-slide-group-1" xui-for="idxc" 
+         show-arrows 
+         class="[[fill-height]] [[class]]" -style="[[style]]" 
+         if:[[:varitems@-3]]:data-for-map="[[:varitems@-3]]">
+        <v-slide-item [[event@-2]] class="[[class@-2]]" -style="[[style@-2]]" if:[[:varitems@-2]]:v-for="([[:varitems@-2]]_item, [[:varitems@-2]]_index) in [[:varitems@-2]]">
+            <div if:[[:varitems@-1]]:v-bind:data-for-idx=[[index::varitems@-1]]_index >
+                <xui-slot xid="[[parent-xid]]-col-[[idxc@4]]" style-slot="height:100%" xui-slot-name="Cell [[idxc@4]]"> </xui-slot>
+            </div>
+        </v-slide-item>
+    </v-slide-group >
+
+
     <!--------------------------dialog   --------------------->
-    <xui-doc xid="xui-dialog">
+    <xui-doc xid="xui-dialog-1">
         <xui-prop id="name">Dialog</xui-prop>
         <xui-prop id="icon">mdi-card-bulleted-outline</xui-prop>
         <xui-prop id="desc">Un Dialog</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
+        <xui-prop id="type">conditional</xui-prop>
 
-        <xui-prop var=":varactive" editor="var" def="showDialog" bind-type="bool">show var name</xui-prop>
+        <xui-prop var=":varactive" editor="var" def="showDialog" bind-type="bool">active var name</xui-prop>
 
     </xui-doc>
 
-    <v-dialog xid="xui-dialog" v-model="[[:varactive]]"  max-width="290">
+    <v-dialog xid="xui-dialog-1" v-model="[[:varactive]]"  max-width="290">
        <!--fullscreen hide-overlay persistent scrollable width    transition="dialog-bottom-transition"-->
        <xui-slot xid="[[parent-xid]]-slot" xui-reloader=true xui-slot-name="Dialog slot" xui-doc-id="DialogSlot"></xui-slot>
     </v-dialog>
@@ -525,32 +564,157 @@
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
+        <xui-prop id="type">conditional</xui-prop>
 
-        <xui-prop var=":varactive" editor="var" def="showSnackbar" bind-type="bool">show var name</xui-prop>
+        <xui-prop var=":varactive" editor="var" def="showSnackbar" bind-type="bool">active var name</xui-prop>
     </xui-doc>
 
     <v-snackbar xid="xui-snackbar" v-model="[[:varactive]]" :timeout="-1">
        <xui-slot xid="[[parent-xid]]-slot" xui-reloader=true xui-slot-name="Snackbar slot" xui-doc-id="SnackbarSlot"></xui-slot>
     </v-snackbar>
 
+    <!--------------------------  XUI-OVERLAY   ----------------------------->
+    <xui-doc xid="xui-overlay-1">
+        <xui-prop id="name">Overlay</xui-prop>
+        <xui-prop id="icon">mdi-card</xui-prop>
+        <xui-prop id="desc">Un block</xui-prop>
+        <xui-prop id="componentAs">container</xui-prop>
+        <xui-prop id="favorite">listitem</xui-prop>
+        <xui-prop id="exclude">container</xui-prop>
+        <xui-prop id="type">conditional</xui-prop>
+        <xui-prop var="opacity" cat="vstyle" editor="text" bind-type="dec">opacity (0.0 to 1.0)</xui-prop>
+        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var=":varactive" cat="event:bind" editor="var" bind-type="bool">active var name</xui-prop>
+    </xui-doc>
+
+    <v-overlay xid="xui-overlay-1" absolute opacity=[[opacity]]  :value="[[:varactive]]" 
+        dark="[[dark]]"
+        light="[[light]]"
+        class="[[class]]" -style="[[style]]">
+        <xui-slot xid="[[parent-xid]]-slot" xui-reloader=true xui-slot-name="overlay slot" xui-doc-id="overlaySlot"></xui-slot>
+    </v-overlay>   
 
     <!-------------------------- v-data-table   --------------------->
     <xui-doc xid="xui-data-table-1">
-        <xui-prop id="name">DataTable</xui-prop>
+        <xui-prop id="name">Data Table</xui-prop>
         <xui-prop id="icon">mdi-table-large</xui-prop>
         <xui-prop id="desc">Data Table</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
 
-        <xui-prop var=":headers" editor="var" bind-type="array">headers</xui-prop>
-        <xui-prop var=":items" editor="var" bind-type="array">items</xui-prop>
+        <xui-prop var="nb" def=2 editor="int">nb column</xui-prop>
+        <xui-prop var="height" editor="text">fixe height</xui-prop>
+        
+
+        <xui-prop var=":headers" editor="var" bind-type="array">headers var</xui-prop>
+        <xui-prop var=":varitems" editor="var" bind-type="array">items var</xui-prop>
+
+        <xui-prop var="showselect" editor="bool" bind-type="bool">show select box</xui-prop>
+        <xui-prop var=":selected" editor="var" bind-type="array">selected var</xui-prop>
+        <xui-prop var="item-key" editor="var" bind-type="array">item key var</xui-prop>
+        <xui-prop var="checkbox-color" cat="style" editor="text">select checkbox color</xui-prop>
+
+        <xui-prop var="hide-default-header" editor="bool" bind-type="bool">hide default header</xui-prop>
+        <xui-prop var="hide-default-footer" editor="bool" bind-type="bool">hide default footer</xui-prop>
+        
+        
+        <xui-prop var="dense" editor="bool">dense</xui-prop>
+        <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="xui-column-data-table">
+        <xui-prop id="name">Data Column</xui-prop>
+        <xui-prop var="data" editor="var">var data</xui-prop>
+        <xui-prop var="dataslot" editor="bool">custom slot</xui-prop>
+        <xui-prop var="align" cat="vstyle" editor="combo" 
+            list='["start", "center", "end"]'>align</xui-prop>
+        <xui-prop var="divider" cat="vstyle" editor="bool">divider</xui-prop>
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="cellClass" cat="vstyle" editor="class">cell Class</xui-prop>
+        <xui-prop var="width" editor="text">width</xui-prop>
+    </xui-doc>
+
+    <xui-doc xid="DataHeader">
+        <xui-prop id="name">Header</xui-prop>
+    </xui-doc>
+    <xui-doc xid="DataCell">
+        <xui-prop id="name">Data cell</xui-prop>
     </xui-doc>
 
     <v-data-table xid="xui-data-table-1"
-    :headers="[[:headers]]"
-    :items="[[:items]]"
-    :items-per-page="100"
-    ></v-data-table>
+        :headers="[[:headers]]"
+        :items="[[:varitems]]"
+        class="[[class]]"
+        -style="[[style]]"
+        dense="[[dense]]"
+        dark="[[dark]]"
+        light="[[light]]"
+        show-select=[[showselect]]
+        item-key="[[item-key]]"
+        checkbox-color=[[checkbox-color]]
+        v-model="[[:selected]]"
+        hide-default-header=[[hide-default-header]]
+        hide-default-footer=[[hide-default-footer]]
+        height="[[height]]"
+        xui-for="idxc" >
+            <xui-column-data-table xid="[[parent-xid]]-[[idxc@0+]]"></xui-column-data-table> 
+    </v-data-table>
+
+    <template xui-no-dom xid="xui-column-data-table">
+        <template v-slot:header.[[data@1|idxc@0+]]="{ header }">
+            <xui-slot xid="[[parent-xid]]-h-[[idxc@0+]]" style-slot="display:inline" xui-slot-name="col [[idxc@0+]]" xui-doc-id="DataHeader"></xui-slot>
+        </template>
+        <template xui-if="[[dataslot@2]]" v-slot:item.[[data@1|idxc@0+]]="{ item : [[item::varitems@2]]_item }">
+            <xui-slot xid="[[parent-xid]]-i-[[idxc@0+]]" style-slot="display:inline" xui-slot-name="data [[idxc@0+]]" xui-doc-id="DataCell"></xui-slot>
+        </template>
+    </template>
+
+    <xui-design xid="xui-jsonvalidator">
+        <script xid="xui-data-table-1">
+            console.debug(">>>>>>>>>>>>>>>>>>>>>>>> ctx = ", ctx);
+            if (ctx.prop==":headers")
+            {
+                let header = jsonPathToValue(ctx.jsonState, ctx.attr);
+                if (!(header instanceof Array))
+                {
+                    header=[];
+                    setValueFromJsonPath(ctx.jsonState, ctx.attr, header); 
+                }
+                const infoFile = $xui.pageDesignManager.getInfoFile("template");
+                const prop = $xuicore.getPropertiesXUI(infoFile, ctx.xid, ctx.xid, 1);
+                const data =$xui.parseJson(prop.data);
+                const found = data.find(e => e.variable =="nb");
+                console.debug("jsonPathToValue", header, found);
+                header.length = 0;
+                const nb = parseInt(found.value);
+                for (let index = 0; index < nb; index++) {
+
+                    const propCol = $xuicore.getPropertiesXUI(infoFile, ctx.xid+"-"+index, ctx.xid+"-"+index, 1);
+                    const dataCol =$xui.parseJson(propCol.data);
+                    let data = dataCol.find(e => e.variable =="data");
+                    if (data.value=="") data.value=""+index;
+                    var jsonColumn = { value: data.value};
+
+                    let align = dataCol.find(e => e.variable =="align");
+                    if (align.value!="") jsonColumn.align=align.value;
+                    let divider = dataCol.find(e => e.variable =="divider");
+                    if (divider.value==true) jsonColumn.divider=true;
+                    let headerClass = dataCol.find(e => e.variable =="class");
+                    if (headerClass.value!="") jsonColumn.class=headerClass.value;
+                    let cellClass = dataCol.find(e => e.variable =="cellClass");
+                    if (cellClass.value!="") jsonColumn.cellClass=cellClass.value;
+
+                    header.push(jsonColumn);
+                }
+            }
+        </script>
+    </xui-design>
 
 </xui-factory>

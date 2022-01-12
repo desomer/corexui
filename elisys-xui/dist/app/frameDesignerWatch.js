@@ -1,4 +1,13 @@
 
+$xui.MainTabEnum = {
+  DESIGN : 0,
+  STATE : 1,
+  CODE : 2,
+  PLUG : 3,
+  LOCAL : 4,
+  ASSET : 5,
+  ENV : 6
+}
 
 function onChangeMainTab(instanceVue) {
   instanceVue.$watch('main.idxTabMain', (newValue, oldValue) => {
@@ -10,7 +19,7 @@ function onChangeMainTab(instanceVue) {
     }, 500);
 
 
-    if (oldValue == 1)
+    if (oldValue == $xui.MainTabEnum.STATE)
     {
       if ($xui.rootdata.currentCodeIdx>=0)
       {
@@ -21,7 +30,7 @@ function onChangeMainTab(instanceVue) {
       $xui.rootdata.currentCodeIdx=-1;
     }
 
-    if (newValue == 0 && oldValue == 1) {
+    if (newValue == $xui.MainTabEnum.DESIGN && oldValue == $xui.MainTabEnum.STATE) {
       // retour de l'onglet jsonEditor
       const ctrlStr = `${$xui.rootdata.stateDataSource}#${JSON.stringify($xui.rootdata.stateDataMock)}`;
       if ($xui.lastEditorAppStateValue != ctrlStr) {
@@ -30,12 +39,12 @@ function onChangeMainTab(instanceVue) {
       }
     }
 
-    if (newValue == 0 && oldValue == 4) {
+    if (newValue == $xui.MainTabEnum.DESIGN && oldValue == $xui.MainTabEnum.LOCAL) {
       const infoFile = $xui.pageDesignManager.getInfoFile("design");
       $xuicore.initPageXUI(infoFile);
     }
 
-    if (newValue == 1) {
+    if (newValue == $xui.MainTabEnum.STATE) {
       $xui.lastEditorAppStateValue = `${$xui.rootdata.stateDataSource}#${JSON.stringify($xui.rootdata.stateDataMock)}`;
 
       // reaffiche l'initial State de l'application
@@ -46,16 +55,15 @@ function onChangeMainTab(instanceVue) {
       $xui.rootdata.currentCodeIdx=-1;
       const idxSelected = $xui.rootdata.ListActions.findIndex(element => element.xid == $xui.rootdata.currentCodeXid);
       $xui.loadCodeAction(idxSelected);
-
     }
 
-    if (newValue == 2) {
+    if (newValue == $xui.MainTabEnum.CODE) {
       // onglet code
       $xui.refreshAction('showCode'); // affiche le code et le xui
     }
 
 
-    if (newValue == 6) {
+    if (newValue == $xui.MainTabEnum.ENV) {
       // onglet SEO
       document.getElementById("qrcode").querySelectorAll('*').forEach(n => n.remove());
       $xui.rootdata.urlApp = $xui.getUrlApp();
@@ -103,7 +111,7 @@ $xui.initVuejs = (instanceVue) => {
   });
 
   instanceVue.$watch('main.stateDataSource', (newValue, oldValue) => {
-    if ($xui.rootdata.idxTabMain == 0) {
+    if ($xui.rootdata.idxTabMain == 0 && newValue!="" ) {
       $xui.refreshAction('template:reload-json')   // recharge le json
       //$xui.doStoreOnNextReload = true;
     }

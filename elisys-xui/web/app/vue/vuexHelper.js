@@ -69,26 +69,24 @@ class VuexModuleManager {
                         const targetAction = elem.closest("[data-for-idx]");
                         //console.debug("targetAction", targetAction);
                         if (targetAction!=null) {
-                            let forMap = targetAction.dataset.forMap;  // cas du XUI-FOR
-                            if (forMap == null) {
-                                forMap = targetAction.parentElement.dataset.forMap;  // cas du XUI-ROW
-                            }
+                            const targetMap = targetAction.closest("[data-for-map]");
+                            const forMap = targetMap.dataset.forMap;  // cas du XUI-FOR
                             const forIdx = Number.parseInt(targetAction.dataset.forIdx, 10);
                             $xui.info[forMap]=forIdx;
                         }
                     }
 
-
-
-                    const message = {
-                        action: "displayMessage",
-                        value: {
-                            snackbar: true,
-                            text: arguments[0],
-                            timeout: 2000,
-                          }
-                    };
-                    window.parent.postMessage(message, "*");
+                    if (!$xui.isModeFinal) {
+                        const message = {
+                            action: "displayMessage",
+                            value: {
+                                snackbar: true,
+                                text: arguments[0],
+                                timeout: 2000,
+                              }
+                        };
+                        window.parent.postMessage(message, "*");
+                    }
 
                     if ($xui.actionEnable) {
                         this.$store.dispatch(`main/${arguments[0]}`, Array.from(arguments).slice(1), { root: true })

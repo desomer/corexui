@@ -59,7 +59,7 @@ class XUIActionManager {
             var elemXui = xuiDesign.elemXUI;
 
             // test les bool
-            if (aVariable.editor == "bool" && aVariable.def == null) {
+            if ((aVariable.editor?.startsWith("bool")??false) && aVariable.def == null) {
               if (value == false && elemXui.propertiesXUI != null) {
                 // vide la valeur
                 removeValue = true;
@@ -262,8 +262,16 @@ class XUIActionManager {
 
         xuiElem.propertiesXUI = HashMap();
         design.elemXUI.propertiesXUI!.forEach((k, v) {
-          XUIProperty cloneProp = XUIProperty(v.content);
-          xuiElem.propertiesXUI![k] = cloneProp;
+          if (v is XUIPropertyBinding)
+          {
+            XUIProperty cloneProp = XUIPropertyBinding(v.content, v.binding);
+            xuiElem.propertiesXUI![k] = cloneProp;
+          }
+          else
+          {
+            XUIProperty cloneProp = XUIProperty(v.content);
+            xuiElem.propertiesXUI![k] = cloneProp;
+          }
         });
       }
     }

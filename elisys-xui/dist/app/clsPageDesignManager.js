@@ -22,19 +22,32 @@ export class PageDesignManager {
 
     /** premier chargement de la page en full */
     loadPage(html, option) {
+        if ($xui.rootdata.isModePhone) {
+            document.querySelector("#rootFrame").classList.remove("xui-iframe-phone");
+        }
+        document.querySelector("#rootFrame").style.display = 'none';
         document.querySelector("#rootFrame").srcdoc = html;
+        $xui.rootdata.routeEnable = true;
+        $xui.rootdata.actionEnable = true;
 
         this.codeHtml = html;
 
         setTimeout(() => {
             $xui.displayComponents("", "");
-            $xui.displayPropertiesJS("page-0-route-0-content", "page-0-route-0-content");
-            if (option != null) {
-                $xui.rootdata.listSlot.length = 0;
-                $xui.rootdata.listSlot.push(...option.treeSlot);
-                this.initConfigApp(option);
-            }
+            $xui.displayPropertiesJS("page-0-route-0-content-slot", "page-0-route-0-content-slot");
         }, 200);
+
+        if (option != null) {
+            $xui.rootdata.listSlot.length = 0;
+            $xui.rootdata.listSlot.push(...option.treeSlot);
+            const prom = getPromise("OnPageReady");
+            prom.then(()=> { 
+                this.initConfigApp(option); 
+                $xui.rootdata.overlayEvent=true;
+                $xui.rootdata.overlay=false;
+                document.querySelector("#rootFrame").style.display = null;
+            });
+        }
 
         // activation des button undo et redo
         const name = this.getPageId();
@@ -56,12 +69,16 @@ export class PageDesignManager {
                 $xui.modePhone();
             }
             
-            setTimeout(() => {
-                $xui.rootdata.stateDataSource = appConfig.dataSrc;
-                $xui.rootdata.routeEnable = appConfig.routeEnable;
-                $xui.rootdata.actionEnable = appConfig.actionEnable;
-            }, 500);  // attente page afficher
+            $xui.rootdata.stateDataSource = appConfig.dataSrc;
+            $xui.rootdata.routeEnable = appConfig.routeEnable;
+            $xui.rootdata.actionEnable = appConfig.actionEnable;
 
+        }
+        else
+        {
+            $xui.rootdata.stateDataSource = "template";
+            $xui.rootdata.routeEnable = true;
+            $xui.rootdata.actionEnable = true;
         }
     }
 
@@ -96,8 +113,8 @@ export class PageDesignManager {
         this.codeXUIdata = param.xuidata;
         this.codeXUI = param.xuifile;
 
-        console.debug("binding ---- ", param.binding);
-        console.debug("treeSlot ---- ", param.treeSlot);
+        //console.debug("binding ---- ", param.binding);
+        //console.debug("treeSlot ---- ", param.treeSlot);
 
         $xui.rootdata.listSlot.length = 0;
         $xui.rootdata.listSlot.push(...param.treeSlot);
@@ -108,6 +125,13 @@ export class PageDesignManager {
 
         if (param.action == "clear") {
             doPromiseJS("AfterChangeSelectByXid");
+            // $xui.rootdata.routeEnable = true;
+            // $xui.rootdata.actionEnable = true;
+            // setTimeout(() => {
+            //     const infoFile = $xui.pageDesignManager.getInfoFile("design");
+            //     $xuicore.initPageXUI(infoFile);
+            // }, 1000);
+
         }
 
         if (param.action != "showCode" && param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")
@@ -124,7 +148,7 @@ export class PageDesignManager {
             }, 500);
         }
 
-        if ($xui.rootdata.idxTabMain == 2)  // si onglet 2 actif
+        if ($xui.rootdata.idxTabMain == $xui.MainTabEnum.CODE)  // si onglet 2 actif
         {
             this.loadCode();   // affiche le code du mode (template, preview, final )
             this.loadCodeXUI();

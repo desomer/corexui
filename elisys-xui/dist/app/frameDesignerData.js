@@ -30,6 +30,7 @@ var json = {
 
     saveLayout: false,
     overlay: false,
+    overlayEvent: false,
 
 
 

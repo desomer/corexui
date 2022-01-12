@@ -255,7 +255,7 @@ class XUIBindingManager {
       StringBuffer jsonBinding) {
     dicoObjBind[objName]?.forEach((bindInfo) {
       var type = bindInfo.type;
-      var isNotString = (type == "bool" || type == "int");
+      var isNotString = (type == "bool" || type == "int" || type == "dec");
       var v = isNotString ? (bindInfo.value) : ('"' + bindInfo.value + '"');
 
       if (type == "array") {
@@ -271,6 +271,9 @@ class XUIBindingManager {
 
       if ((v == null || v == "") && type == "int") {
         v = '0';
+      }
+      if ((v == null || v == "") && type == "dec") {
+        v = '0.0';
       }
 
       if (type == "object") {

@@ -14,6 +14,8 @@ export class SelectorManager {
     /************************************************************************************ */
     displaySelectorByPosition(position) {
 
+        if ($xui.rootdata.idxTabMain != $xui.MainTabEnum.DESIGN)
+            return;
 
         /*******************************************************/
         let node = document.getElementById("xui-display-selector");
@@ -30,11 +32,11 @@ export class SelectorManager {
             node.addEventListener("click", (e) => {
                 e.currentTarget.style.display = "none";   // retire sur le click
                 $xui.modeDisplaySelection = false;
-            }, { capture: false })
+            }, { capture: false, passive: true })
 
             node.addEventListener("wheel", (e) => {
                 e.currentTarget.style.display = "none";   // retire sur le wheel
-            }, { capture: false })
+            }, { capture: false, passive: true })
 
             /************************************************* */
             // le node action
@@ -232,7 +234,7 @@ export class SelectorManager {
                     this.displaySelectorByPosition(myRegion.getBounds());
             }
             else if (!found) {
-                console.debug("displaySelectorByXid 5 no found ", xid);
+               // console.debug("displaySelectorByXid 5 no found ", xid);
             }
         }
 

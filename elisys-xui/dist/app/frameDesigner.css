@@ -9,13 +9,7 @@
 	display:block;
 } */
 
-/*********************************************************/
-.jsoneditor {
-    border: thin solid #000000!important;
-}
-.jsoneditor-menu {
-    background-color: #000000 !important;
-}
+
 /*********************barcustom  pour la zone d'action ************************/
 .barcustom::-webkit-scrollbar {
     width: 10px;
@@ -93,9 +87,9 @@ pre > code {
 }
 
 /********************** style editor de property ************************/
-/* .xui-div-scroll-vertical {
+ .xui-div-scroll-vertical {
     overflow-y: scroll; overflow-x: hidden; height: 100%;
-} */
+} 
 
 .xui-editor-action-btn
 {
@@ -322,6 +316,14 @@ pre > code {
     outline: none;
 }
 
+.jsoneditor {
+    border: thin solid #000000!important;
+}
+.jsoneditor-menu {
+    background-color: #000000 !important;
+}
+
+/*****************************************/
 .xui-btn-code
 {
     padding: 0px 35px 0px 0px;

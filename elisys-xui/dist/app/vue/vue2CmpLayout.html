@@ -64,7 +64,7 @@
     </xui-doc>
 
     <template xid="xui-for" v-for="([[:varitems]]_item, [[:varitems]]_index) in [[:varitems]]">
-        <xui-slot style-slot="height:100%" xid="[[parent-xid]]-for" xui-slot-name="For slot"></xui-slot>
+        <xui-slot style-slot="height:100%" xid="[[parent-xid]]-for" xui-slot-name="For slot" data-for-map="[[:varitems@2]]" v-bind:data-for-idx="[[index::varitems@2]]_index"></xui-slot>
     </template>
 
     <!--------------------------  XUI-IF-ELSE   ------------------------------->
@@ -147,6 +147,26 @@
         <xui-slot style-slot="display:inline-flex" xid="[[parent-xid]]-col-[[idxf@2]]" xui-slot-name="Flow [[idxf@2]]">
         </xui-slot>
     </xui-slot>
+
+     <!--------------------------  XUI-OVER-1 ------------------------------->
+     <xui-doc xid="xui-over-1">
+        <xui-prop id="name">Over</xui-prop>
+        <xui-prop id="icon">mdi-transfer-right</xui-prop>
+        <xui-prop id="desc">Flows</xui-prop>
+    </xui-doc>
+
+    <div xid="xui-over-1" style="position:relative; height: 100%; width:auto">
+        <div style="position:absolute; top:0px; height: 100%; width:100%">
+            <div style="display:flex;align-items: center; justify-content: center; height: 100%; width: 100%;"> 
+                <xui-slot xid="[[parent-xid]]-over" 
+                xui-slot-name="Over slot over">
+                </xui-slot>
+            </div>
+        </div>
+        <xui-slot xid="[[parent-xid]]-col-0" 
+            xui-slot-name="Over slot">
+        </xui-slot>
+	</div>
 
     <!--------------------------  XUI-SLOT   ----------------------------->
     <div xid="xui-div-slot" class="xui-class-slot"></div>

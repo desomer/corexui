@@ -5,7 +5,7 @@ $xui.listReloader = {};  // liste des reloader   ajouter dans le vue2frameDesign
 $xui.nbRefeshReloader = 0;
 
 $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
-    console.debug("create component v-xui-reloader")
+    //console.debug("create component v-xui-reloader")
     Vue.component("v-xui-reloader",
         {
             template: '<component v-bind:is="componentToReload"></component>',
@@ -134,27 +134,25 @@ document.addEventListener('pointerup', function (e) {
     window.parent.postMessage(message, "*");
 });
 
-document.addEventListener('scroll', (event) => {
+const unselectSelector = (event) => {
     const message = {
         action: "unselect",
     };
     window.parent.postMessage(message, "*");
-});
+};
 
-window.addEventListener('resize', (event) => {
-    const message = {
-        action: "unselect",
-    };
-    window.parent.postMessage(message, "*");
-});
+document.addEventListener('scroll', unselectSelector);
+
+window.addEventListener('resize', unselectSelector);
 
 //********************************** DISPACH DES EVENTS PROVENANT DU DESIGNER ******************************** */
 const iterateJSON = (src, dest, funct, functArray) => {
-    const entries = Object.entries(src).map(([key, value]) =>
+    const entry = Object.entries(src);
+    const entries = entry.map(([key, value]) =>
         Array.isArray(value) ? [key, value.map(e => {
             var nt = null;
             if (Array.isArray(dest[key])) {
-                nt = dest[key][0];
+                nt = dest[key][value.indexOf(e)];
             }
             functArray(value, dest[key], e);
             iterateJSON(e, nt, funct, functArray)
@@ -166,6 +164,32 @@ const iterateJSON = (src, dest, funct, functArray) => {
     return Object.fromEntries(entries);
 };
 
+function jsonPathToValue(data, path) {
+    if (!path) return data; // if path is undefined or empty return data
+    const listpath = path.split(".");
+    for (let index = 0; index < listpath.length; index++) {
+       if (!listpath[index]) continue; // "a/" = "a"
+       data = data[listpath[index]]; // new data is subdata of data
+       if (!data) return data; // "a/b/d" = undefined
+    }
+    return data;
+ }
+
+ function setValueFromJsonPath (data, path, value) {
+    if (!path) return data; // if path is undefined or empty return data
+    const listpath = path.split(".");
+
+    for (let index = 0; index < listpath.length; index++) {
+       if (!listpath[index]) continue; // "a/" = "a"
+       if (index==listpath.length-1) 
+       {
+            data[listpath[index]] = value;
+       }
+       data = data[listpath[index]]; // new data is subdata of data
+       if (!data) return data; // "a/b/d" = undefined
+    }
+    return data;
+ }
 
 
 window.addEventListener('message', (e) => {
@@ -186,7 +210,15 @@ window.addEventListener('message', (e) => {
             $xui.modulesManager.reload();
             break;
 
+        case "switchValue":
+            const value = jsonPathToValue($xui.rootdata, data.param.attr);
+            setValueFromJsonPath($xui.rootdata, data.param.attr, !value);
+            $xui.modulesManager.addModule("main", $xui.rootdata);
+            $xui.modulesManager.reload();
+            break;
+
         case "changeConfig":
+            console.debug("changeConfig ", data);
             if ('routeEnable' in data.param) {
                  $xui.routeEnable = data.param.routeEnable;  // autorisation de changement de root
             }
@@ -199,13 +231,13 @@ window.addEventListener('message', (e) => {
             let hasChangeBinding = false;
             let hasChangeValue = false;
 
-            if (/*data.param.action == "reload-json" &&*/ data.param.listReloader == null && data.param.jsonBinding != null) {
-                var jsonBinding = data.param.jsonBinding;
-                var jsonTemplate = data.param.jsonTemplate;
+            if (/*data.param.action == "reload-json" && data.param.listReloader == null &&*/ data.param.jsonBinding != null) {
+                const jsonBinding = data.param.jsonBinding;
+                const jsonTemplate = data.param.jsonTemplate;
 
-                iterateJSON(jsonBinding, $xui.rootdata,
+                iterateJSON( jsonBinding, $xui.rootdata,
                     (k, v, dest) => {
-                        console.log("k=", k, " v=", v);
+                        //console.log("k=", k, " v=", v);
                         if (dest == null || dest[k] == null) {
                             hasChangeBinding = true;
                         }
@@ -214,24 +246,19 @@ window.addEventListener('message', (e) => {
                         }
                         return v;
                     }, (a, dest, i) => {
-                        console.log("---- array=", a, " array dest=", dest, "  i=", i);
-                        if (dest == null) {
+                        // console.log("---- array=", a, " array dest=", dest, "  i=", i);
+                        if (dest == null || (Object.entries(a[0]).length != Object.entries(dest[0]).length)) {
                             hasChangeBinding = true;
                         }
-                        else {
-                            //dddd
-                        }
+     
                         return i;
                     });
 
-                if (hasChangeBinding || hasChangeValue || data.param.action == "reload-json") {
-                    // if (hasChangeBinding || hasChangeValue)
+                if (hasChangeBinding /*|| hasChangeValue*/ || data.param.action == "reload-json") {
                     $xui.rootdata = jsonBinding;
-                    
                     $xui.modulesManager.addModule("main", $xui.rootdata);
                     $xui.modulesManager.reload();
                 }
-
 
                 console.debug("***************** iframe store reload ", hasChangeBinding, hasChangeValue, data.param.jsonBinding);
             }
@@ -276,7 +303,7 @@ window.addEventListener('message', (e) => {
 function doChangeContent(data) {
     if (data.param.listReloader != null) {
         const uniqReloader = [...new Set(data.param.listReloader)];
-        console.info("+++++++++++> changeTemplate event only reloader", data.param);
+        console.info("+++++++++++> changeTemplate : only reloader", data.param);
 
         for (const idReloader of uniqReloader) {
             if ($xui.listReloader[idReloader] != null)
@@ -287,7 +314,7 @@ function doChangeContent(data) {
         }
     }
     else {
-        console.info("+++++++++++> changeTemplate event all loadApplicationJS", data.param);
+        console.info("+++++++++++> changeTemplate : all loadApplicationJS", data.param);
         let styleXui = document.body.querySelector("#xui-style"); // retire tous le style
         if (styleXui != null) {
             console.debug("+++++++++++>  move style to header");

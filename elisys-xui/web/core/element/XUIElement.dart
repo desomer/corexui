@@ -136,6 +136,9 @@ class XUIElementHTML extends XUIElement {
       else if (atScope == "-2") {
         return firstChildNoText()!.firstChildNoText()!.searchPropertyXUI(tag, 0, parseInfo);
       }
+      else if (atScope == "-3") {
+        return firstChildNoText()!.firstChildNoText()!.firstChildNoText()!.searchPropertyXUI(tag, 0, parseInfo);
+      }
       else if (atScope == "0+") {
         return searchPropertyXUI(tag, -2, parseInfo);
       }
@@ -202,7 +205,7 @@ class XUIElementHTML extends XUIElement {
             varitems=varitems.substring(varitems.indexOf(".")+1);  // retrait du scope
             name= "$varitems[].$name";
             isArray = name.lastIndexOf("[]");
-            prop.cacheBinding=name;
+            //prop.cacheBinding=name;
             // ignore: avoid_print
             //print("-------------- varitems map --------------> $name");
           }

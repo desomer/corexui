@@ -32,12 +32,20 @@ import("./clsSelectorManager.js").then((module) => {
 
 /****************************************************************************************/
 $xui.doInitPage = (pageInfo) => {
-    console.debug("pageInfo = ", pageInfo);
+    $xui.rootdata.overlay=true;
+    $xui.SelectorManager.unDisplaySelector();
+    console.debug("doInitPage pageInfo = ", pageInfo);
 
     $xui.rootdata.frameName=pageInfo.frameName;
     $xui.rootdata.frameTemplate=pageInfo.frameTemplate;
-    $xui.rootdata.stateDataMock="";
-
+    $xui.rootdata.stateData = {};
+    $xui.rootdata.stateDataMock = {};
+    $xui.rootdata.stateDataSource="";
+    $xui.rootdata.idxTabMain=0;
+    if (document.querySelector("#rootFrame")!=null)
+    {
+        document.querySelector("#rootFrame").style.display = 'none';
+    } 
     const state = $xui.vuejs.$store.state;
 
     if (state.main.version==null) { // mode version 1
@@ -58,12 +66,13 @@ $xui.doInitPage = (pageInfo) => {
 /****************************************************************************************/
 // charge la page global aprés le retour du XUIEngine
 $xui.loadPageJS = (html, options) => {
-    console.debug("loadPageJS binding ---- ", options);
+    console.debug("loadPageJS options ---- ", options);
     $xui.pageDesignManager.loadPage(html, options);
 };
 
 // change une partie de la page aprés le retour du XUIEngine
 $xui.changePageJS = (param) => {
+    console.debug("changePageJS options ---- ", param);
     $xui.pageDesignManager.changePageOnFrame(param);
     doPromiseJS("AfterChangeDisplayProperties");
 };
@@ -94,6 +103,11 @@ $xui.refreshAction = (mode) => {
     if (mode == "showCode") {
         infoFile.mode = "final";
         infoFile.action = "showCode";   // pas de store
+    }
+
+    if (infoFile.action==null)
+    {
+        infoFile.action="?";
     }
 
     $xuicore.refreshPageXUI(infoFile);
@@ -147,8 +161,8 @@ $xui.setCurrentAction = (actionName) => {
     currentAction = actionName;
     console.debug(`START ACTION ------- ${actionName} ---------`)
     let selectionMode = "root";
-    let undisplaySelector = true;
-    let reselect = $xui.modeDisplaySelection;
+    const undisplaySelector = true;
+    const reselect = $xui.modeDisplaySelection;
 
     /**************************/
     if (actionName == "addCmp")
@@ -210,10 +224,23 @@ $xui.setCurrentAction = (actionName) => {
 
 /***************************************************************************************************************/
 $xui.clearAll = () => {
-    $xui.setCurrentAction("clearAll");
+    // $xui.setCurrentAction("clearAll");
+    // $xui.pageDesignManager.clearAll();
+    // $xui.rootdata.stateData = {};
+    // $xui.refreshAction("template:clearAll");
+
     $xui.pageDesignManager.clearAll();
-    $xui.rootdata.stateData = {};
-    $xui.refreshAction("template:clearAll");
+    $xui.SelectorManager.unDisplaySelector();
+    $xui.rootdata.routeEnable = true;
+    $xui.rootdata.actionEnable = true;
+    $xui.rootdata.idxTabMain=0;
+    $xui.rootdata.overlayEvent=false;
+    $xui.rootdata.overlay=true;
+    document.querySelector("#rootFrame").style.display = 'none';
+   
+    const infoFile = $xui.pageDesignManager.getInfoFile("design");
+    $xuicore.initPageXUI(infoFile);
+
 }
 
 $xui.updateDirectProperty = (value, variable, xid) => {
@@ -226,9 +253,9 @@ $xui.updateDirectProperty = (value, variable, xid) => {
 }
 
 $xui.deleteCmp = () => {
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
-    let info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
-    let infoParent = $xuicore.getInfoXUI(infoFile, info.parentXid, info.parentXid);
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
+    const infoParent = $xuicore.getInfoXUI(infoFile, info.parentXid, info.parentXid);
     console.debug("info deleteCmp ", $xui.propertiesDesign, info, infoParent);
 
     if ($xui.propertiesDesign.isSlot || info.addRemoveAction != null) {
@@ -255,7 +282,7 @@ $xui.copyCmp = () => {
     
     $xui.setCurrentAction("copyCmp");
     $xuicore.copyDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
-    $xui.rootdata.pasteDisabled = false;
+    $xui.rootdata.pasteDisabled=false;
     return true;
 }
 
@@ -410,10 +437,16 @@ $xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
         $xui.rootdata.stateDataMock = jsonStateProp;
     }
 
+    const jsonState = ret;
+    let str = $xuicore.getJsonValidatorXUI($xui.pageDesignManager.getInfoFile("template"));
+    str = `${str}\n//# sourceURL=xui-json-validator.js;\n`;
+    eval(str);
+
+    // console.debug(" **************** *************** ", $xui.jsonvalidator);
     console.debug("************ App State initial & mock", jsonTemplate, jsonStateProp);
-    console.debug("************ App State source & editor", ret, $xui.rootdata.stateData);
-    // retourne au XUI le chaine à sauvegarder 
-    ret = JSON.stringify(ret);
+    console.debug("************ App State source & editor", jsonState, $xui.rootdata.stateData);
+    // retourne au XUI le chaine à sauvegarder sans {}
+    ret = JSON.stringify(jsonState);
     return ret.substring(1, ret.length - 1);
 };
 
@@ -425,6 +458,8 @@ $xui.fullScreen = () => {
 }
 
 $xui.modePreview = () => {
+    if (! $xui.rootdata.overlayEvent) return;
+    
     $xui.isModePreview = !$xui.isModePreview;
     document.querySelector("#rootFrame").classList.toggle("xui-frame-full-screen");
     $xui.refreshAction($xui.isModePreview ? "preview" : "design");
@@ -478,6 +513,12 @@ $xui.importPage = (file) => {
     reader.readAsText(file);
 }
 
+$xui.XUIToClipboard = () => {
+    navigator.clipboard.writeText($xui.pageDesignManager.codeXUI);
+    $xui.rootdata.snackbar_text = "Copy to clipboard terminated";
+    $xui.rootdata.snackbar_timeout = 2000;
+    $xui.rootdata.snackbar = true;
+}
 
 /***************************************************************************************************************/
 let pageIcon = null;
@@ -511,6 +552,32 @@ $xui.parseJson = (str) => {
     }
 }
 
+function jsonPathToValue(data, path) {
+    if (!path) return data; // if path is undefined or empty return data
+    const listpath = path.split(".");
+    for (let index = 0; index < listpath.length; index++) {
+       if (!listpath[index]) continue; // "a/" = "a"
+       data = data[listpath[index]]; // new data is subdata of data
+       if (!data) return data; // "a/b/d" = undefined
+    }
+    return data;
+ }
+
+ function setValueFromJsonPath (data, path, value) {
+    if (!path) return data; // if path is undefined or empty return data
+    const listpath = path.split(".");
+
+    for (let index = 0; index < listpath.length; index++) {
+       if (!listpath[index]) continue; // "a/" = "a"
+       if (index==listpath.length-1) 
+       {
+            data[listpath[index]] = value;
+       }
+       data = data[listpath[index]]; // new data is subdata of data
+       if (!data) return data; // "a/b/d" = undefined
+    }
+    return data;
+ }
 
 
 

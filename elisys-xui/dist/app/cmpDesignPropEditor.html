@@ -32,9 +32,15 @@
         </v-text-field>
     </div>
 
-    <div xid="editor-var" style="display: inline-flex; width: 100%;">
-        <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
+    <div xid="editor-text-no-bind" style="display: inline-flex; width: 100%;">
         <v-text-field dense class='mx-1 mt-3' hide-details clearable
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+    </div>
+
+    <div xid="editor-var" style="display: inline-flex; width: 100%;">
+       <v-text-field dense class='mx-1 mt-3' hide-details clearable
             :label='[[label@1]]' 
             v-model='[[value@1]]'>
         </v-text-field>
@@ -48,9 +54,23 @@
         </v-text-field>
     </div>
 
+    <div xid="editor-int-no-bind" style="display: inline-flex; width: 100%;">
+       <v-text-field class='ma-1' hide-details clearable type='number' min='0' max='99' 
+            :label='[[label@1]]' 
+            v-model='[[value@1]]'>
+        </v-text-field>
+    </div>
+
     <div xid="editor-bool" style="display: inline-flex; width: 100%;">
         <v-btn @click.stop="$xui.openBindingEditor([[id@1]],[[variable@1]])" v-bind:class="[([[bind@3]]!='') ? 'xui-with-bind' : '', 'xui-editor-binding-btn', 'tooltip']"><span v-if="[[bind@3]]!=''" class="tooltiptext">{{[[bind@3]]}}</span></v-btn>
         <v-switch dense style='margin: 4px 0px 2px 6px !important; padding: 0px 0px !important;' hide-details inset
+            :label='[[label@1]]'
+            v-model='[[value@1]]'>
+        </v-switch>
+    </div>
+
+    <div xid="editor-bool-no-bind" style="display: inline-flex; width: 100%;">
+       <v-switch dense style='margin: 4px 0px 2px 6px !important; padding: 0px 0px !important;' hide-details inset
             :label='[[label@1]]'
             v-model='[[value@1]]'>
         </v-switch>

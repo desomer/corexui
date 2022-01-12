@@ -12,8 +12,6 @@ import 'XUIActionManager.dart';
 import 'XUIConfigManager.dart';
 import 'element/XUIProperty.dart';
 
-
-
 class XUIDesignManager {
   XUIEngine? xuiEngine;
   static final lock = Lock(); // gestion du lock car multiple iFrame
@@ -138,9 +136,8 @@ class XUIDesignManager {
     return ret;
   }
 
-   ///------------------------------------------------------------------------------------------
-   JSDesignInfo getJSDesignValue(String id, String idslot, int deep)
-   {
+  ///------------------------------------------------------------------------------------------
+  JSDesignInfo getJSDesignValue(String id, String idslot, int deep) {
     var ret = JSDesignInfo();
     var designs = getXUIEngine().getDesignInfo(id, idslot, true);
     ret.xid = id;
@@ -148,14 +145,13 @@ class XUIDesignManager {
     int i = 0;
     var range = designs.getRange(0, deep);
     for (var design in range) {
-        for (DocVariables varCmp in design.docInfo?.variables ?? const []) {
-          _getJSDesignVariableData(varCmp, design, ret, i);
-          i++;
-        }
+      for (DocVariables varCmp in design.docInfo?.variables ?? const []) {
+        _getJSDesignVariableData(varCmp, design, ret, i);
+        i++;
+      }
     }
     return ret;
-   }
-
+  }
 
   Future<JSDesignInfo> getJSDesignInfo(
       String id, String idslot, String mode) async {
@@ -172,35 +168,82 @@ class XUIDesignManager {
     ctx.setCause("getJSDesignInfo");
 
     //------------------------------------------------------------------
-    // calcul du path pour le fil d'ariane
     var idxFor = designs.length;
-    var hasFor = -1;
+    var hasForIdx = -1;
     var startPath = 0;
     var idx = 0;
     const nb = 10;
-    if (idxFor>nb)
-    {
-       startPath=idxFor-nb-1;
+    if (designs.length > nb) {   // affiche que nb element
+      startPath = idxFor - nb - 1;
     }
     designs.reversed.forEach((design) {
-      if (idx==startPath && idx>0) {
+
+      // calcul du path pour le fil d'ariane et du for
+      if (idx == startPath && idx > 0) {
         TreeSlot aSlot = TreeSlot();
         aSlot.name = "...";
-        aSlot.id=design.slotInfo.xid!;
+        aSlot.id = design.slotInfo.xid!;
         ret.listPath.add(aSlot);
-      }
-      else if (idx>=startPath) {
+      } else if (idx >= startPath) {
         TreeSlot aSlot = TreeSlot();
-        aSlot.name = design.docInfo?.name ?? design.slotInfo.docId!;
-        aSlot.id=design.slotInfo.xid!;
+        aSlot.name = design.slotInfo.slotname ??
+            design.docInfo?.name ??
+            design.slotInfo.docId!;
+        bool isSlot = design.slotInfo.implement == TAG_SLOT;
+        if (isSlot) aSlot.name = "[" + aSlot.name + "]";
+        aSlot.id = design.slotInfo.xid!;
         ret.listPath.add(aSlot);
       }
 
+      //-------------- gestion du for
       if (design.slotInfo.mapTag["for"] != null) {
-        hasFor = idxFor;
+        hasForIdx = idxFor;
       }
       idxFor--;
+      //------------------
+
       idx++;
+    });
+
+    //--------------------   LES PATH CHILDREN ------------------------------
+    bool displayChild = true;
+    // ignore: dead_code
+    if (displayChild &&  designs.length > 0 && designs.first.slotInfo.children != null) {
+      designs.first.slotInfo.children!.forEach((slotInfo) {
+        TreeSlot aSlot = TreeSlot();
+        DocInfo? doc = xuiEngine!.docInfo[slotInfo.docId];
+        aSlot.name = slotInfo.slotname ?? doc?.name ?? slotInfo.docId!;
+        bool isSlot = slotInfo.implement == TAG_SLOT;
+        if (isSlot) aSlot.name = "[" + aSlot.name + "]";
+        // aSlot.name=aSlot.name+" ["+(slotInfo.implement??"ni")+"]";
+
+        // if (doc?.isConditional() ?? false) {
+        //   if (slotInfo.elementHTML?.propertiesXUI != null) {
+        //     String? varactive =
+        //         (slotInfo.elementHTML?.propertiesXUI![":varactive"]?.content);
+        //     aSlot.name = aSlot.name + " [x]";
+        //     aSlot.toPath = varactive;
+        //   }
+        // }
+        aSlot.id = slotInfo.xid!;
+        ret.listChildPath.add(aSlot);
+      });
+    }
+
+    //--------------------   LES PATH CONDITIONAL ------------------------------
+    getXUIEngine().mapSlotInfo.forEach((key, slotInfo) {
+      DocInfo? doc = xuiEngine!.docInfo[slotInfo.docId];
+      if (doc?.isConditional() ?? false) {
+        TreeSlot aSlot = TreeSlot();
+        aSlot.name = slotInfo.slotname ?? doc?.name ?? slotInfo.docId!;
+        if (slotInfo.elementHTML?.propertiesXUI != null) {
+           String? varactive =
+              (slotInfo.elementHTML?.propertiesXUI![":varactive"]?.content);
+          aSlot.toPath = varactive;
+        }
+        aSlot.id = slotInfo.xid!;
+        ret.listConditionalPath.add(aSlot);
+      }
     });
     //------------------------------------------------------------------
 
@@ -208,8 +251,16 @@ class XUIDesignManager {
     int i = 0;
     // boucle sur l'ensemble des couches de widget
     for (var design in designs) {
+
+      //print(">>>>> "+(design.slotInfo.implement??"NI")+" > "+(design.docInfo?.variables.length.toString() ?? "0"));
+      if (design.slotInfo.implement == TAG_SLOT &&
+          (design.docInfo?.variables.length ?? 0) == 0) {
+        if (nbCmp==0 && hasForIdx>0) hasForIdx--;
+        if (nbCmp>0)  nbCmp++;
+        continue;
+      }
       //------------------------------------------------------------------
-      if (nbCmp == 0 && hasFor >= 0) {
+      if (nbCmp == 0 && hasForIdx >= 0) {
         await _getJSDesignFor(fi, design, ctx, ret);
       }
       // gestion de l'entete
@@ -224,17 +275,14 @@ class XUIDesignManager {
             (varCmp.cat != null && varCmp.cat.toString().startsWith("event"));
 
         if (varCmp.cat == "config") {
-          continue;
+          continue; // n'affiche pas les prop de config
         }
-
         if (mode == "design" && (isStyle || isEvent)) {
           continue;
         }
-
         if (mode == "style" && !isStyle) {
           continue;
         }
-
         if (mode == "event" && !isEvent) {
           continue;
         }
@@ -246,18 +294,21 @@ class XUIDesignManager {
         _getJSDesignVariableData(varCmp, design, ret, i);
         i++;
       }
+      //-----------------------------------------------------------------
+
       nbCmp++;
       // fin de template
       ret.bufTemplate.write("</div>");
 
-      if (nbCmp == hasFor) {
+      if (hasForIdx>=0 && nbCmp >= hasForIdx) {
         ret.bufTemplate.write("</div>");
+        hasForIdx=-1;
       }
     }
 
-    if (nbCmp < 3) {
-      ret.bufTemplate.write("</div>");
-    }
+    // if (nbCmp < 3) {
+    //   ret.bufTemplate.write("</div>");
+    // }
 
     return ret;
   }
@@ -306,14 +357,14 @@ class XUIDesignManager {
             .binding!);
       }
 
-      if (valInCmp != null && varCmp.editor == "bool") {
+      if (valInCmp != null && (varCmp.editor?.startsWith("bool") ?? false)) {
         value = valInCmp;
       } else if (valInCmp != null) value = jsonEncode(valInCmp.toString());
     }
 
     bool exist = value != null;
     //-------  gestion valeur par defaut ----------------
-    if (value == null && varCmp.editor == "bool") {
+    if (value == null && (varCmp.editor?.startsWith("bool") ?? false)) {
       value = (varCmp.def ?? "false");
     }
     if (value == null) {
@@ -484,10 +535,11 @@ class XUIDesignManager {
                 xid: design.slotInfo.xid!,
                 action: "addFlow",
                 type: "flow",
-                icon: "mdi-table-row",
-                title: "Add flow right");
+                icon: "mdi-transfer-right",
+                title: "Add slot");
             ret.add(act);
           }
+
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbBefore",
@@ -508,14 +560,14 @@ class XUIDesignManager {
               action: "incNbBefore",
               type: "flow",
               icon: "mdi-transfer-left",
-              title: "Add right (before " + design.slotInfo.slotname! + ")");
+              title: "Add before " + design.slotInfo.slotname!);
           ret.add(act);
           act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbAfter",
               type: "flow",
               icon: "mdi-transfer-right",
-              title: "Add right (after " + design.slotInfo.slotname! + ")");
+              title: "Add after " + design.slotInfo.slotname!);
           ret.add(act);
         } else if (idx == 1 && isSlot) {
           // ajoute un slot
@@ -523,17 +575,59 @@ class XUIDesignManager {
               xid: design.slotInfo.xid!,
               action: "addFlow",
               type: "flow",
-              icon: "mdi-table-row",
-              title: "Add flow right");
+              icon: "mdi-transfer-right",
+              title: "Add slot");
           ret.add(act);
         } else if (idx == 1 && !isSlot) {
-          // ajoute un slot
+          if (designs[idx].docInfo?.xid != "xui-no-dom:xui-flow") {
+            // ajoute un slot si pas deja dans un slot
+            ObjectAction act = ObjectAction(
+                xid: design.slotInfo.xid!,
+                action: "surroundLeft",
+                type: "flow",
+                icon: "mdi-transfer-left",
+                title: "Add before in flow ");
+            ret.add(act);
+            // ajoute un slot si pas deja dans un slot
+            act = ObjectAction(
+                xid: design.slotInfo.xid!,
+                action: "surroundRight",
+                type: "flow",
+                icon: "mdi-transfer-right",
+                title: "Add after in flow ");
+            ret.add(act);
+          }
+
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid!,
-              action: "surroundRight",
-              type: "flow",
+              action: "surroundBlock",
+              type: "surround",
+              icon: "mdi-checkbox-blank-outline",
+              title: "Surround in block");
+          ret.add(act);
+
+          act = ObjectAction(
+              xid: design.slotInfo.xid!,
+              action: "surroundOver",
+              type: "surround",
+              icon: "mdi-move-resize-variant",
+              title: "Add over");
+          ret.add(act);
+
+          act = ObjectAction(
+              xid: design.slotInfo.xid!,
+              action: "surroundRow",
+              type: "surround",
               icon: "mdi-table-row",
-              title: "Add flow right");
+              title: "Surround in row");
+          ret.add(act);
+
+          act = ObjectAction(
+              xid: design.slotInfo.xid!,
+              action: "surroundCol",
+              type: "surround",
+              icon: "mdi-table-column",
+              title: "Surround in column");
           ret.add(act);
 
           act = ObjectAction(
@@ -543,7 +637,6 @@ class XUIDesignManager {
               icon: "mdi-checkbox-blank-badge-outline",
               title: "Add badge");
           ret.add(act);
-
         } else {
           // var ti = (design.docInfo.addRemove ?? "noAddRemove") +
           //     "|" +
@@ -565,6 +658,7 @@ class XUIDesignManager {
       }
     }
 
+    // analyse des action
     List<ObjectAction> retFiltered = [];
 
     for (var i = 0; i < ret.length; i++) {
@@ -585,7 +679,9 @@ class XUIDesignManager {
 class JSDesignInfo {
   late String xid;
   late String xidSlot;
-  List<TreeSlot> listPath = [] ;
+  List<TreeSlot> listPath = [];
+  List<TreeSlot> listChildPath = [];
+  List<TreeSlot> listConditionalPath = [];
   var bufData = StringBuffer();
   var bufTemplate = StringBuffer();
 }

@@ -151,34 +151,34 @@ $xui.loadApplicationJS = () => {
 
 
 function initRouter() {
-
+	
 	const routes = [];
-	var idxPage = 0;
-	var pageName = "page-" + idxPage;
+	let idxPage = 0;
+	let pageName = `page-${idxPage}`;
 
-	while (document.querySelector("#" + pageName)!=null) {
-		const defautRouteDef = vue2CmpMgr.ComponentManager.getRouteFromTemplate(pageName, pageName + "-route-0");
-		var children = [
+	while (document.querySelector(`#${pageName}`)!=null) {
+		const defautRouteDef = vue2CmpMgr.ComponentManager.getRouteFromTemplate(pageName, `${pageName}-route-0`);
+		const children = [
 			{ path: '', component: defautRouteDef }
-		]
+		];
 
-		var idxRoute = 1;
+		let idxRoute = 1;
 		while (true) {
-			var idTemplate = pageName + "-route-" + idxRoute;
-			const page = document.querySelector("#" + pageName);
-			const template = page.content.querySelector("#" + idTemplate);
+			const idTemplate = `${pageName}-route-${idxRoute}`;
+			const page = document.querySelector(`#${pageName}`);
+			const template = page.content.querySelector(`#${idTemplate}`);
 			if (template == null) break;
 
-			console.info("create route <" + idTemplate + "> uri='/route" + idxRoute + "'");
+			console.info(`create route <${idTemplate}> uri='/route${idxRoute}'`);
 			const infoRoute = globalThis.vue2CmpMgr.ComponentManager.getRouteFromTemplate(pageName, idTemplate);
-			children.push({ path: 'route' + idxRoute, component: infoRoute });
+			children.push({ path: `route${idxRoute}`, component: infoRoute });
 			idxRoute++;
 		}
 
 		const pageRoute = vue2CmpMgr.ComponentManager.getComponentFromTemplate(pageName);
 		var path = "/";
 		if (idxPage > 0) {
-			path = "/page" + idxPage;
+			path = `/page${idxPage}`;
 		}
 		routes.push(
 			{
@@ -188,7 +188,7 @@ function initRouter() {
 			},
 		);
 		idxPage++;
-		pageName = "page-" + idxPage;
+		pageName = `page-${idxPage}`;
 	}
 
 

@@ -4,8 +4,9 @@ $xui.MainTabEnum = {
   STATE : 1,
   CODE : 2,
   PLUG : 3,
-  PAGES : 4,
-  ENV : 5 
+  LOCAL : 4,
+  ASSET : 5,
+  ENV : 6
 }
 
 function onChangeMainTab(instanceVue) {
@@ -38,7 +39,7 @@ function onChangeMainTab(instanceVue) {
       }
     }
 
-    if (newValue == $xui.MainTabEnum.DESIGN && oldValue == $xui.MainTabEnum.PAGES) {
+    if (newValue == $xui.MainTabEnum.DESIGN && oldValue == $xui.MainTabEnum.LOCAL) {
       const infoFile = $xui.pageDesignManager.getInfoFile("design");
       $xuicore.initPageXUI(infoFile);
     }
@@ -110,7 +111,7 @@ $xui.initVuejs = (instanceVue) => {
   });
 
   instanceVue.$watch('main.stateDataSource', (newValue, oldValue) => {
-    if ($xui.rootdata.idxTabMain == 0) {
+    if ($xui.rootdata.idxTabMain == 0 && newValue!="" ) {
       $xui.refreshAction('template:reload-json')   // recharge le json
       //$xui.doStoreOnNextReload = true;
     }

@@ -51,3 +51,7 @@ https://jsfiddle.net/mowglisanu/zmhg5rwo/
 
 gestion d'api
 https://wanago.io/2021/12/27/redux-toolkit-query-typescript/
+
+
+vuexy
+https://pixinvent.com/demo/vuexy-vuejs-admin-dashboard-template/documentation/

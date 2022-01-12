@@ -11,13 +11,15 @@
         <script defer src="https://cdn.jsdelivr.net/npm/v-jsoneditor@1.4.2/dist/v-jsoneditor.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.25.0/components/prism-css.min.js"></script>
         <script defer src="https://unpkg.com/vue-prism-editor"></script>
     </xui-design>
 
 
     <xui-design xid="xui-script-data">
         <script xui-no-dom xui-trim-content>
-             $xui.highlighter = (code) => Prism.highlight(code, Prism.languages.js, "js");
+             $xui.highlighterJS = (code) => Prism.highlight(code, Prism.languages.js, "js");
+             $xui.highlighterCSS = (code) => Prism.highlight(code, Prism.languages.css, "css");
         </script>
     </xui-design>
 
@@ -53,10 +55,11 @@
         <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var="type" editor="combo" def="highlighterJS" list='["highlighterJS","highlighterCSS"]'>highlighter</xui-prop>
         <xui-prop var=":model" cat="event:bind" editor="style">var</xui-prop>
     </xui-doc>
 
-    <prism-editor xid="xui-code-editor-1" [[directive]] class="[[class]]" -style="[[style]]"  v-model="[[:model]]" :highlight="$xui.highlighter" line-numbers></prism-editor>
+    <prism-editor xid="xui-code-editor-1" [[directive]] class="[[class]]" -style="[[style]]"  v-model="[[:model]]" :highlight="$xui.[[type]]" line-numbers></prism-editor>
 
     <!--------------------------  XUI-JSON-EDITOR-1   ------------------------------->
     <xui-doc xid="xui-json-editor-1">
@@ -79,5 +82,20 @@
         [[directive]] v-model="[[:model]]" 
         :options="[[:options]]" :plus="[[plus]]" height="100%">
     </v-jsoneditor>
+
+    <xui-design xid="xui-jsonvalidator">
+        <script xid="xui-json-editor-1">
+            //console.debug(">>>>>>>>>>>>>>>>>>>>>>>> ctx = ", ctx);
+            if (ctx.prop==":options")
+            {
+                const value = jsonPathToValue(ctx.jsonState, ctx.attr);
+                //console.debug("jsonPathToValue", value);
+                if (! (value instanceof Object))
+                {
+                    setValueFromJsonPath(ctx.jsonState, ctx.attr, { mode: "code"});
+                }
+            }
+        </script>
+    </xui-design>
 
 </xui-factory>

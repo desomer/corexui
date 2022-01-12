@@ -52,7 +52,7 @@ class XUIProperty {
 ///--------------------------------------------------------------------
 class XUIPropertyBinding extends XUIProperty {
   String? binding;
-  String? cacheBinding;
+  //String? cacheBinding;
 
   XUIPropertyBinding(v, b) : super(v) {
     binding = b as String?;

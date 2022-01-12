@@ -1,5 +1,5 @@
 $xui.displayPropertiesJS = (xid, xid_slot) => {
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
 
     let idProp = "AppPropertiesSetting";
     infoFile.action = "design";
@@ -25,13 +25,19 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
     prom.then(prop => {
         $xui.hasPropertiesChanged = false;
 
-        if (prop.path == "") {
-            console.debug("displayPropertiesJS **** INCONNU ****", $xui.propertiesDesign);
-            return;
-        }
+        // if (prop.path == "") {
+        //     console.debug("displayPropertiesJS **** INCONNU ****", $xui.propertiesDesign);
+        //     return;
+        // }
 
         $xui.propertiesDesign = prop;
-        $xui.rootdata.selectedxui = $xui.propertiesDesign.path;
+        $xui.rootdata.breadcrumb.length=0;
+        $xui.rootdata.breadcrumb.push(...$xui.propertiesDesign.path);
+        $xui.rootdata.dynamicSlots.length=0;
+        $xui.rootdata.dynamicSlots.push(...$xui.propertiesDesign.pathConditional);
+        $xui.rootdata.childrenSlots.length=0;
+        $xui.rootdata.childrenSlots.push(...$xui.propertiesDesign.pathChildren);
+
         $xui.propertiesDesign.json = $xui.parseJson($xui.propertiesDesign.data);
 
         if (window.$xui.config.traceDisplayPropertiesJS) {

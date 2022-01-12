@@ -7,7 +7,7 @@ globalThis.$xui.generateApplicationStoreJS = (state, actions) =>
 
     const module = "main";
     for (const mth of actions) {
-        console.debug("/*/*/**/*/*/*/*/*/ add mth", mth);
+        //console.debug("/*/*/**/*/*/*/*/*/ add mth", mth);
         const m = `(p1, p2) => {\n${mth.code}\n//# sourceURL=${module}-${mth.name}.js;\n}`;
         modulesManager.modulesDesc[module].actions[mth.name]=m;
     }
@@ -62,30 +62,31 @@ class VuexModuleManager {
             computed,
             methods: {
                 $mth() {
-                    console.debug("mth", arguments, this);
+                    console.debug("do eval mth", arguments, this);
 
                     if (arguments[1].type=="click") {
-                        let elem = arguments[1].target;
+                        const elem = arguments[1].target;
                         const targetAction = elem.closest("[data-for-idx]");
                         //console.debug("targetAction", targetAction);
                         if (targetAction!=null) {
-                            const forMap = targetAction.parentElement.dataset.forMap;
+                            const targetMap = targetAction.closest("[data-for-map]");
+                            const forMap = targetMap.dataset.forMap;  // cas du XUI-FOR
                             const forIdx = Number.parseInt(targetAction.dataset.forIdx, 10);
                             $xui.info[forMap]=forIdx;
                         }
                     }
 
-
-
-                    const message = {
-                        action: "displayMessage",
-                        value: {
-                            snackbar: true,
-                            text: arguments[0],
-                            timeout: 2000,
-                          }
-                    };
-                    window.parent.postMessage(message, "*");
+                    if (!$xui.isModeFinal) {
+                        const message = {
+                            action: "displayMessage",
+                            value: {
+                                snackbar: true,
+                                text: arguments[0],
+                                timeout: 2000,
+                              }
+                        };
+                        window.parent.postMessage(message, "*");
+                    }
 
                     if ($xui.actionEnable) {
                         this.$store.dispatch(`main/${arguments[0]}`, Array.from(arguments).slice(1), { root: true })

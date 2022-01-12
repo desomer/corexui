@@ -26,12 +26,21 @@ window.onerror = (msg, url, lineNo, columnNo, error) => {
     if (string.includes(substring)) {
         alert('Script Error: See Browser Console for Detail');
     } else {
+
+        let textError = "";
+
+        try {
+            textError=JSON.stringify(error);
+        } catch (err) {
+            
+        }
+        
         const message = [
             `XUI reporting Message: ${msg}`,
             `URL: ${url}`,
             `Line: ${lineNo}`,
             `Column: ${columnNo}`,
-            `Error object: ${JSON.stringify(error)}`
+            `Error object: ${textError}`
         ].join(' - ');
 
         alert(message);
