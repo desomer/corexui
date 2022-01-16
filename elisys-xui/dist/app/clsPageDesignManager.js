@@ -32,16 +32,21 @@ export class PageDesignManager {
 
         this.codeHtml = html;
 
-        setTimeout(() => {
+        // setTimeout(() => {
+        //     $xui.displayComponents("", "");
+        //     $xui.displayPropertiesJS("page-0-route-0-content-slot", "page-0-route-0-content-slot");
+        // }, 200);
+
+        let promOnPageReady = getPromise("OnPageReady");
+        promOnPageReady.then(()=> { 
             $xui.displayComponents("", "");
             $xui.displayPropertiesJS("page-0-route-0-content-slot", "page-0-route-0-content-slot");
-        }, 200);
+        });
 
         if (option != null) {
             $xui.rootdata.listSlot.length = 0;
             $xui.rootdata.listSlot.push(...option.treeSlot);
-            const prom = getPromise("OnPageReady");
-            prom.then(()=> { 
+            promOnPageReady.then(()=> { 
                 this.initConfigApp(option); 
                 $xui.rootdata.overlayEvent=true;
                 $xui.rootdata.overlay=false;

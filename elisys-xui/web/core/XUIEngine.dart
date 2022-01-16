@@ -592,7 +592,12 @@ class DocInfo {
 
   bool isConditional()
   {
-    return type!=null && type=="conditional";
+    return type!=null && type!.contains("conditional");
+  }
+
+  bool isActionEnable()
+  {
+    return type==null || ! (type!.contains("actionDisable"));
   }
 
 }

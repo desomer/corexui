@@ -519,24 +519,60 @@ class XUIDesignManager {
     List<ObjectAction> ret = [];
 
     var designs = getXUIEngine().getDesignInfo(id, idslot, true);
-    var idx = 0;
+    var idx = 0; 
+    var firstNoSlot = 1; 
     for (var design in designs) {
       idx++;
       if (idx > 5) {
         break;
       }
-      bool isSlot = id.startsWith(SLOT_PREFIX);
+      bool isSlot = design.slotInfo.slotname!=null;
+      bool inSlot = idx<designs.length && designs[idx].slotInfo.slotname!=null && (designs[idx].docInfo?.isActionEnable()??true); 
+
+      //print("=============>" + (designs[idx].docInfo?.type??"?"));
       /*********************************** */
       if (design.docInfo != null) {
-        if (design.docInfo!.xid == "v-tab:xui-tabs") {
+
+        if (design.docInfo!.xid == "v-col:xui-row-1") {
+          ObjectAction act = ObjectAction(
+              xid: design.slotInfo.xid!,
+              action: "incNbBefore",
+              icon: "mdi-table-column",
+              type: "row",
+              title: "insert column before");
+          ret.add(act);
+          act = ObjectAction(
+              xid: design.slotInfo.xid!,
+              action: "incNbAfter",
+              icon: "mdi-table-column",
+              type: "row",
+              title: "insert column after");
+          ret.add(act);
+        } else if (design.docInfo!.xid == "v-col:xui-column-responsive-1") {
+          ObjectAction act = ObjectAction(
+              xid: design.slotInfo.xid!,
+              action: "incNbBefore",
+              icon: "mdi-table-row",
+              type: "col",
+              title: "insert row before");
+          ret.add(act);
+          act = ObjectAction(
+              xid: design.slotInfo.xid!,
+              action: "incNbAfter",
+              icon: "mdi-table-row",
+              type: "col",
+              title: "insert column after");
+          ret.add(act);
+        }
+        else if (design.docInfo!.xid == "v-tab:xui-tabs") {
           if (idx == 1) {
-            // ajout un flow
+            // ajout un flow si le premier slot est un v-tab
             ObjectAction act = ObjectAction(
                 xid: design.slotInfo.xid!,
                 action: "addFlow",
                 type: "flow",
                 icon: "mdi-transfer-right",
-                title: "Add slot");
+                title: "Add slot in");
             ret.add(act);
           }
 
@@ -554,31 +590,38 @@ class XUIDesignManager {
               type: "tabs",
               title: "Add new Tab (after " + design.slotInfo.slotname! + ")");
           ret.add(act);
-        } else if (design.docInfo!.xid == "xui-no-dom:xui-flow") {
+        } 
+        //--------------------------------------------------------------
+        else if (design.docInfo!.xid == "xui-no-dom:xui-flow") {
+          // sur un flow
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbBefore",
               type: "flow",
               icon: "mdi-transfer-left",
-              title: "Add before " + design.slotInfo.slotname!);
+              title: "Add slot before");
           ret.add(act);
           act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbAfter",
               type: "flow",
               icon: "mdi-transfer-right",
-              title: "Add after " + design.slotInfo.slotname!);
+              title: "Add slot after");
           ret.add(act);
         } else if (idx == 1 && isSlot) {
-          // ajoute un slot
+          // sur un slot => ajoute un flow 
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "addFlow",
               type: "flow",
               icon: "mdi-transfer-right",
-              title: "Add slot");
+              title: "Add slot in");
           ret.add(act);
-        } else if (idx == 1 && !isSlot) {
+
+          firstNoSlot++;
+
+        } else if (idx == firstNoSlot && !isSlot && inSlot) {
+          // sur un composant
           if (designs[idx].docInfo?.xid != "xui-no-dom:xui-flow") {
             // ajoute un slot si pas deja dans un slot
             ObjectAction act = ObjectAction(
@@ -586,7 +629,7 @@ class XUIDesignManager {
                 action: "surroundLeft",
                 type: "flow",
                 icon: "mdi-transfer-left",
-                title: "Add before in flow ");
+                title: "Add slot before");
             ret.add(act);
             // ajoute un slot si pas deja dans un slot
             act = ObjectAction(
@@ -594,7 +637,7 @@ class XUIDesignManager {
                 action: "surroundRight",
                 type: "flow",
                 icon: "mdi-transfer-right",
-                title: "Add after in flow ");
+                title: "Add slot after");
             ret.add(act);
           }
 
@@ -603,15 +646,7 @@ class XUIDesignManager {
               action: "surroundBlock",
               type: "surround",
               icon: "mdi-checkbox-blank-outline",
-              title: "Surround in block");
-          ret.add(act);
-
-          act = ObjectAction(
-              xid: design.slotInfo.xid!,
-              action: "surroundOver",
-              type: "surround",
-              icon: "mdi-move-resize-variant",
-              title: "Add over");
+              title: "Surround in block ("+designs[idx].slotInfo.slotname!+")");
           ret.add(act);
 
           act = ObjectAction(
@@ -632,11 +667,21 @@ class XUIDesignManager {
 
           act = ObjectAction(
               xid: design.slotInfo.xid!,
+              action: "surroundOver",
+              type: "surround",
+              icon: "mdi-move-resize-variant",
+              title: "Add over");
+          ret.add(act);
+
+          act = ObjectAction(
+              xid: design.slotInfo.xid!,
               action: "surroundBadge",
               type: "surround",
               icon: "mdi-checkbox-blank-badge-outline",
               title: "Add badge");
           ret.add(act);
+        
+
         } else {
           // var ti = (design.docInfo.addRemove ?? "noAddRemove") +
           //     "|" +
@@ -655,6 +700,10 @@ class XUIDesignManager {
           //     title: ti);
           // ret.add(act);
         }
+      }
+      else
+      {
+        if (idx==1) firstNoSlot++;
       }
     }
 

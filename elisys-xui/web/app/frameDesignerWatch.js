@@ -130,6 +130,17 @@ $xui.initVuejs = (instanceVue) => {
   }, { deep: true });
 
 
+  setTimeout(() => {
+    //let winFrame = document.querySelector("#rootFrame");
+    document.addEventListener( "contextmenu", function(e) {
+      e.preventDefault();
+      $xui.OpenPopupAction(e);
+    });
+
+
+  }, 1000);
+
+
   if (false) {
     Vue.use(Vue2Editor);
     const VueEditor = Vue2Editor.VueEditor

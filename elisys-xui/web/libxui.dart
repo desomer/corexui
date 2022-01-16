@@ -443,11 +443,16 @@ Future _doMoveChildByIdx(String suffix, int i, int idst,
   //
   var listDesign = designManager.getXUIEngine().xuiFile.designs[idSlotToMove];
   if (listDesign != null) {
-    var xuiDesign =
-        listDesign.sort(designManager.getXUIEngine().xuiFile.context).first;
+    var xuiDesign = listDesign.sort(designManager.getXUIEngine().xuiFile.context).first;
+
+    if (xuiDesign.elemXUI.children==null || xuiDesign.elemXUI.children!.length==0)
+    {
+      return;
+    }
+
     var id = ((xuiDesign.elemXUI.children!.first) as XUIElementXUI).xid!;
     print("move => " + id + " to " + idSlotToDest);
-    inspect(xuiDesign.elemXUI);
+    // inspect(xuiDesign.elemXUI);
 
     // ajoute le design qui doit recevoir le composant
     designManager.addXUIDesignEmpty(idSlotToDest);
@@ -612,9 +617,12 @@ Future _initStoreVersion(XUIDesignManager designManager,
   if (ver != null) {
     int v = int.parse(ver) - 1;
 
+    var fileName =fileInfo.file;
+    if (v >= 0) {
     // force une page vide pour pouvoir tous surcharger
-    var fileName = 'app/frame0Empty.html'; //fileInfo.file;
-
+      fileName = 'app/frame0Empty.html'; 
+    }
+    
     await designManager.initEngine(fileName, ctx);
 
     if (v >= 0) {

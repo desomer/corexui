@@ -81,7 +81,7 @@ class XUIElementHTML extends XUIElement {
 
       XUIProperty.parse(parseInf, (String tag) {
         final String? ret = searchPropertyXUI(tag, -1, parseInf) as String?;
-        return ret ?? doPropPlaceHolder(tag);
+        return ret ?? doPropPlaceHolder(tag, parseInf);
       });
       // ignore: parameter_assignments
       prop = parseInf.parsebuilder.toString();
@@ -90,13 +90,17 @@ class XUIElementHTML extends XUIElement {
     return prop;
   }
 
-  String doPropPlaceHolder(String tag) {
+  String doPropPlaceHolder(String tag, ParseInfo? parseInfoOptional) {
     // gestion du placeholder pour les CONTENT (ex : XUI-TITLE)
     final int idx = tag.indexOf("@");
     if (idx > 0) {
       // ignore: parameter_assignments
       tag = tag.substring(0, idx);
     }
+
+    if (parseInfoOptional?.tagPrefix=="zero")
+      return "0";
+      
     return "[$tag]";
   }
 
@@ -167,6 +171,12 @@ class XUIElementHTML extends XUIElement {
     {
       tag=tag.substring(5);
       parseInfo.tagPrefix="item";
+    }
+
+    if (tag.startsWith("zero:"))
+    {
+      tag=tag.substring(5);
+      parseInfo.tagPrefix="zero";
     }
 
     final XUIProperty? prop = propertiesXUI == null ? null : propertiesXUI![tag];
@@ -292,7 +302,7 @@ class XUIElementHTML extends XUIElement {
           ret = searchPropertyXUI(t, -1, parseInfo);
         }
 
-        return ret ?? (parseInfo.mode == ParseInfoMode.CONTENT ? doPropPlaceHolder(tag): "");
+        return ret ?? (parseInfo.mode == ParseInfoMode.CONTENT ? doPropPlaceHolder(tag, parseInfo): "");
       });
     } catch (e, s) {
       XUIConfigManager.printc("pb parse $e $s");

@@ -150,7 +150,7 @@
 		<xui-cond-1 xid="[[parent-xid]]-cond"></xui-cond-1>
 	</v-app>
 
-	<template xid="xui-cond-1" xui-for="idxconditional" xui-for-nbvar="nbCond@1">
+	<template xid="xui-cond-1" xui-for="idxconditional" xui-for-nbvar="zero:nbCond@1">
 		<xui-slot style-slot="position:absolute; bottom:50vh; right:50vw; z-index:10" xid="[[parent-xid]]-conditional-[[idxconditional@2]]" 
 		 xui-slot-name="Dialog slot [[idxconditional@2]]"></xui-slot>
 	</template>
@@ -170,7 +170,6 @@
 			</xui-app-1>
 			<!-- les autres route -->
 		</template>
-
 	</template>
 
     <!--------------------------  XUI-ROUTE-TEMPLATE ------------------------------->
@@ -186,8 +185,8 @@
         <xui-prop id="icon">mdi-book-open-page-variant-outline</xui-prop>
         <xui-prop id="desc">Une Route</xui-prop>
         <xui-prop var="@before" cat="event:router" editor="text">Before route</xui-prop>
+		<xui-prop id="type">actionDisable</xui-prop>
     </xui-doc>
-
 
     <template xid="xui-route-template" xui-for="idxroute" xui-forvar-xxx="nbroute@0+" xui-no-dom> 
         <xui-route 

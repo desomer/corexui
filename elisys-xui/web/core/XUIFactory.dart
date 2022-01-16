@@ -145,31 +145,37 @@ class XUIModel implements Comparable<XUIModel> {
   Future _processPhase1Children(
       XUIElementHTML elemHtml, XUIEngine engine) async {
     /**************** FOR  *****************/
-    int nb = 1;
+    int nbFor = 1;
     String? varIdx;
     if (elemHtml.propertiesXUI != null) {
       XUIProperty? xuifor = elemHtml.propertiesXUI!["for"];
       if (xuifor != null) {
         varIdx = xuifor.content.toString();
 
-        var nbs = elemHtml.calculatePropertyXUI(
-            "[[" + elemHtml.getForVar() + "]]", null);
-        //elemHtml.propertiesXUI["nb"]?.content?.toString() ?? "1")
-
+        var nbs = elemHtml.calculatePropertyXUI("[[" + elemHtml.getForVar() + "]]", null);
+        bool okParse = true;
         try {
-          nb = int.parse(nbs!);
+          nbFor = int.parse(nbs!);
         } on Exception catch (e) {
-          XUIConfigManager.printc("************************* ret var for " +
+          okParse=false;
+          XUIConfigManager.printc( "************************* ret var for " +
               nbs! +
               " " +
               e.toString());
         }
+
+        if (!okParse && elemHtml.implementBy != null)
+            {
+              var doc = engine.docInfo[elemHtml.implementBy?.first.elemXUI.xid ?? ""];
+              print("--------------> "+(doc?.name ?? ""));
+            }
+
       }
     }
     /****************************************/
 
     if (elemXUI.children != null) {
-      for (var i = 0; i < nb; i++) {
+      for (var i = 0; i < nbFor; i++) {
         for (var item in elemXUI.children!) {
           if (varIdx != null) {
             // affecte les proprties de la boucle FOR

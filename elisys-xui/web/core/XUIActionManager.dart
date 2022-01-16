@@ -402,8 +402,7 @@ class XUIActionManager {
   }
 
   ///------------------------------------------------------------------------------------
-  UndoAction moveDesign(String xid, String? mode, String? moveToXid,
-      [bool withChild = true]) {
+  UndoAction moveDesign(String xid, String? mode, String? moveToXid, [bool withChild = true]) {
     SlotInfo? info = engine.getSlotInfo(xid, xid);
 
     if (info == null) {
@@ -457,6 +456,19 @@ class XUIActionManager {
         engine.xuiFile.designs.remove(xid);
       } else if (elemToChange != null) {
         _moveToDesign(info, xid, moveToXid, mode, elemToChange);
+      }  else {
+        print("moveDesign parent design " + design.elemXUI.xid!);    
+        // move le parent si l'enfant ne bouge pas (ex : 1 slot)
+        return moveDesign(design.elemXUI.xid!, mode, moveToXid, withChild);
+      }
+    }
+    else
+    {
+      print("moveDesign un slot design");    
+      var pXid = engine.getSlotInfo(xid, xid)?.parentXid;
+      if (pXid!=null)
+      {
+         return moveDesign(pXid, mode, moveToXid, withChild);
       }
     }
 

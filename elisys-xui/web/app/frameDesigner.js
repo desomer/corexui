@@ -162,7 +162,7 @@ $xui.setCurrentAction = (actionName) => {
     console.debug(`START ACTION ------- ${actionName} ---------`)
     let selectionMode = "root";
     const undisplaySelector = true;
-    const reselect = $xui.modeDisplaySelection;
+    let reselect = $xui.modeDisplaySelection;
 
     /**************************/
     if (actionName == "addCmp")
@@ -172,7 +172,11 @@ $xui.setCurrentAction = (actionName) => {
         selectionMode = "current";
 
     if (actionName == "addSlot")
+    {
         selectionMode = "current";
+        reselect=true;
+    }
+
 
     if (actionName == "moveTo")
         selectionMode = "current";

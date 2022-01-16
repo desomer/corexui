@@ -162,7 +162,7 @@ $xui.setCurrentAction = (actionName) => {
     console.debug(`START ACTION ------- ${actionName} ---------`)
     let selectionMode = "root";
     const undisplaySelector = true;
-    const reselect = $xui.modeDisplaySelection;
+    let reselect = $xui.modeDisplaySelection;
 
     /**************************/
     if (actionName == "addCmp")
@@ -172,7 +172,11 @@ $xui.setCurrentAction = (actionName) => {
         selectionMode = "current";
 
     if (actionName == "addSlot")
+    {
         selectionMode = "current";
+        reselect=true;
+    }
+
 
     if (actionName == "moveTo")
         selectionMode = "current";
@@ -197,7 +201,7 @@ $xui.setCurrentAction = (actionName) => {
                 $xui.modeDisplaySelection = true;
 
             if ($xui.modeDisplaySelection) {
-                setTimeout(() => {   // attente prise en compte chargement des images
+                setTimeout(() => {   // attente prise en compte chargement des images = taille avec image
                     if (window.$xui.config.traceReselect) {
                         console.debug("reselect after changePageFinish ", $xui.propertiesDesign);
                     }
