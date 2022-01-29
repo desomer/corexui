@@ -104,21 +104,27 @@ document.addEventListener('pointerdown', e => {
     $xui.targetActionStart = e.target.closest("[data-xid]");
 });
 
-document.addEventListener('pointerup', function (e) {
-    //console.debug("pointerup", e);
+document.addEventListener('pointerup', (e)=> { 
     if (e.button != 0)
-        return;
+             return;
+    selectSelector(e, "select");
+    });
+document.addEventListener( "contextmenu", (e)=> {
+    e.preventDefault();
+    selectSelector(e, "popupAction")
+  });
 
-    let targetAction = e.target.closest("[data-xid]");
+const selectSelector = (e, action) => {
+    const targetAction = e.target.closest("[data-xid]");
     if ($xui.targetActionStart != targetAction)
         return;  // ne fait rien sur le drag si drag sur le même composant  (ex : Split)
 
-    let elemRect = targetAction.getBoundingClientRect();
-    let s = getComputedStyle(targetAction);
-    let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
+    const elemRect = targetAction.getBoundingClientRect();
+    const s = getComputedStyle(targetAction);
+    const margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
 
     const message = {
-        action: "select",
+        action: action,
         xid: targetAction.dataset.xid,
         xid_slot: targetAction.dataset.xidSlot,
         position: {
@@ -127,12 +133,14 @@ document.addEventListener('pointerup', function (e) {
             width: elemRect.width,
             left: elemRect.left,
             top: elemRect.top,
+            clientX : e.clientX,
+            clientY : e.clientY,
             ...margin
         },
     };
-    //console.debug("***********message", message, targetAction, targetActionStart);
     window.parent.postMessage(message, "*");
-});
+}
+
 
 const unselectSelector = (event) => {
     const message = {
@@ -398,6 +406,8 @@ document.addEventListener("keydown", function (event) {
         { ctrl: true, keyCode: 86, action: "ctrlV" },
         { ctrl: true, keyCode: 90, action: "ctrlZ" },
         { ctrl: true, keyCode: 89, action: "ctrlY" },
+        { ctrl: false, keyCode: 46, action: "delete" },  
+        { ctrl: false, keyCode: 8, action: "delete" }   // backSpace
     ];
 
     //console.debug( event.keyCode );

@@ -97,11 +97,19 @@ function onChangeRightPanelTab(instanceVue) {
   }, { deep: true });
 }
 
+//---------------------------------------------------------------------------------------
+function onChangeDesignerlTab(instanceVue) {
+  instanceVue.$watch('main.idxTabDesigner', (newValue, oldValue) => {
+    $xui.SelectorManager.unDisplaySelector();
+  }, { deep: true });
+}
+
 //----------------------------------------------------------------------------------------------------------
 $xui.initVuejs = (instanceVue) => {
 
   onChangeRightPanelTab(instanceVue);
   onChangeMainTab(instanceVue);
+  onChangeDesignerlTab(instanceVue);
 
   $xui.router.afterEach((to, from) => {
 		// console.log(`afterEach router going to ${to.fullPath} from ${from.fullPath}`);
@@ -116,6 +124,7 @@ $xui.initVuejs = (instanceVue) => {
       //$xui.doStoreOnNextReload = true;
     }
   });
+
 
   instanceVue.$watch('main.routeEnable', (newValue, oldValue) => {
     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeConfig", "param": { routeEnable: newValue } }, "*");
@@ -136,7 +145,6 @@ $xui.initVuejs = (instanceVue) => {
       e.preventDefault();
       $xui.OpenPopupAction(e);
     });
-
 
   }, 1000);
 

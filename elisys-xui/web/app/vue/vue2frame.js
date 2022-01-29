@@ -171,7 +171,12 @@ function initRouter() {
 
 			console.info(`create route <${idTemplate}> uri='/route${idxRoute}'`);
 			const infoRoute = globalThis.vue2CmpMgr.ComponentManager.getRouteFromTemplate(pageName, idTemplate);
-			children.push({ path: `route${idxRoute}`, component: infoRoute });
+			children.push(
+				{ 
+				 path: `route${idxRoute}`, 
+				 component: infoRoute,
+				 name: idTemplate,
+				});
 			idxRoute++;
 		}
 
@@ -184,7 +189,8 @@ function initRouter() {
 			{
 				path: path,
 				component: pageRoute,
-				children: children
+				children: children,
+				name: pageName
 			},
 		);
 		idxPage++;
@@ -309,8 +315,8 @@ function initEventRouter() {
 	});
 
 	$xui.router.afterEach((to, from) => {
-		// console.log(`router going to ${to.fullPath} from ${from.fullPath}`);
-		// console.log(to, from);
+		console.log(`router going to ${to.fullPath} from ${from.fullPath}`);
+		console.log(to, from);
 
 		const el = document.querySelector(".v-main__wrap");
 		if (el == null)

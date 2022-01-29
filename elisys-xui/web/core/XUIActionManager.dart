@@ -139,6 +139,7 @@ class XUIActionManager {
     final reader =
         HTMLReader(engine.xuiFile.reader.id as String, engine.xuiFile.reader.provider);
     final XUIResource res = XUIResource(reader, engine.xuiFile.context);
+    reader.id=null; // pas ressource de type fichier
 
     final XUIElementXUI xuidesign = await reader.parseString(html, res) as XUIElementXUI;
 

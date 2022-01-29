@@ -52,6 +52,11 @@ $xui.selectConditionalPath = ()=> {
 // select le composant a partir du tree
 $xui.selectCmp = async () => {
     console.debug($xui.rootdata.activeSlot);
+    if (!$xui.modeDisplaySelection) 
+    {
+        $xui.modeDisplaySelection=true;
+        return;
+    }
 
     if ($xui.rootdata.activeSlot.length>0)
     {

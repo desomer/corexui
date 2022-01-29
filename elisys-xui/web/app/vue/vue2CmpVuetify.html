@@ -126,7 +126,7 @@
         <xui-prop var="value" editor="text">value</xui-prop>
     </xui-doc>
 
-    <div xid="xui-radio-1" class="d-flex">
+    <div xid="xui-radio-1" style="display: inline-block">
         <v-radio label="[[label@1]]" value="[[value@1]]"></v-radio>
     </div>
     <!--v-radio xid="xui-radio-1" label="[[label]]" value="[[value]]"></v-radio-->
@@ -142,7 +142,7 @@
         <xui-prop var="dense" editor="bool">dense</xui-prop>
     </xui-doc>
 
-    <div xid="xui-switch-1" class="d-flex">
+    <div xid="xui-switch-1" style="display: inline-block">
         <v-switch label="[[label@1]]" dense=[[dense@1]] value="[[value@1]]"></v-switch>
     </div>
     <!--v-switch xid="xui-switch-1"  dense=[[dense]] label="[[label]]" value="[[value]]"></v-switch-->
@@ -177,8 +177,7 @@
     </xui-doc>
 
     <v-btn xid="xui-btn-1" class="[[class]]" -style="[[style]]" [[directive]] [[btn-type]] [[position]] disabled="[[disabled]]"
-        [[size]] [[event]] to="[[routeto]]" color="[[color]]" dark="[[dark]]" light="[[light]]">[[label@1]]
-    </v-btn>
+        [[size]] [[event]] to="[[routeto]]" color="[[color]]" dark="[[dark]]" light="[[light]]">[[label@1]]</v-btn>
 
     <!--------------------------  XUI-BTN-ICON-1   ---------------------------->
     <xui-doc xid="xui-btn-icon-1">
@@ -328,7 +327,6 @@
         </xui-slot>
     </v-img>
 
-
     <!--------------------------  XUI-SUBHEADER   ---------------------------->
     <xui-doc xid="xui-subheader-1">
         <xui-prop id="name">Subheader</xui-prop>
@@ -452,7 +450,5 @@
         </v-list-item-icon>
 
     </v-list-item>
-
-
 
 </xui-factory>

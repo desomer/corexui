@@ -48,11 +48,13 @@ class FileDesignInfo {
 @anonymous
 class ObjectAction {
   external factory ObjectAction(
-      {String xid, String action, String type, String icon, String title});
+      {String xid, String action, String type, String icon, String slot, String title});
   external String get action;
   external set action(String action);
   external String get type;
   external set type(String type);
+  external String get slot;
+  external set slot(String slot);
   external String get icon;
   external set icon(String icon);
   external String get title;

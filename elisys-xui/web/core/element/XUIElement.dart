@@ -47,6 +47,15 @@ class XUIElementHTML extends XUIElement {
   List<XUIComponent>? implementBy;
   List<XUIDesign>? designBy;
 
+
+  bool canSurround(FileDesignInfo fileInfo)
+  {
+     var inLocalStorage = "localStorage";
+     var idRessource = (this.originElemXUI?.idRessource ?? inLocalStorage);  
+     print("fffffffffffffffffff "+fileInfo.file);
+     return idRessource==inLocalStorage || idRessource=="app/frame0Empty.html" || idRessource==fileInfo.file;
+  }
+
   int getNbChildNoText() {
     int nb = 0;
     children?.forEach((c) {
@@ -207,7 +216,6 @@ class XUIElementHTML extends XUIElement {
       
       var name = prop.binding!;
       int isArray = name.lastIndexOf("[]");
-
       if (isArray<=0) {
           String? varitems = searchPropertyXUI(":varitems@1+", 0, parseInfo) as String?;
           if (varitems!=null)
@@ -225,6 +233,12 @@ class XUIElementHTML extends XUIElement {
         final arrayName = name.substring(0, isArray);
         name = "${arrayName.split(".").last}_item${name.substring(isArray + 2)}";
         namespace = "";
+      }
+      else
+      {
+        String? varNameSpace = searchPropertyXUI("varnamespace@1+", 0, parseInfo) as String?;
+        if (varNameSpace!=null)
+            namespace=varNameSpace+".";
       }
 
       if (parseInfo.mode == ParseInfoMode.CONTENT) {
@@ -275,6 +289,12 @@ class XUIElementHTML extends XUIElement {
 
         if (numVar == 1 || numVar == 2) {
           namespace = ""; //pas de namespace sur variable item et idx du v-for
+        }
+        else
+        {
+          String? varNameSpace = searchPropertyXUI("varnamespace@1+", 0, parseInfo) as String?;
+          if (varNameSpace!=null)
+              namespace=varNameSpace+".";
         }
 
         // if (numVar == 3) {

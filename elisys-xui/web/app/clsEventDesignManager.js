@@ -65,19 +65,31 @@ export class EventManager {
         // gestion des evenements entre le designer et l'iframe
         window.addEventListener('message', function (e) {
             const data = e.data;
-            if (data.action == "select") {
+            if (data.action == "select" || data.action == "popupAction") {
                 $xui.closePopup();
-                //this.console.debug("message select ", data);
                 $xui.SelectorManager.displaySelectorByPosition(data.position);
                 $xui.modeDisplaySelection = true;
 
                 // se repositionne sur l'onglet 0
-                if ($xui.rootdata.idxTabProperties > 2)
+                if (data.action == "select" && $xui.rootdata.idxTabProperties > 2)
                     $xui.rootdata.idxTabProperties = 0;
 
                 // 250 = delay d'animation des v-tabs
-                const delayWaitEndAnim = 250;
-                setTimeout(() => { $xui.displayPropertiesJS(data.xid, data.xid_slot); }, delayWaitEndAnim);
+                const delayWaitEndAnim = 50;   //250
+                setTimeout(() => { 
+
+                    $xui.displayPropertiesJS(data.xid, data.xid_slot); 
+                    if (data.action == "popupAction")
+                    {
+                        const prom = getPromise("afterDesignProperties");
+                        prom.then(()=>{
+                                const pos = document.querySelector("#rootFrame").getBoundingClientRect();
+                                $xui.OpenPopupAction( {clientX : data.position.clientX+pos.left, clientY :  data.position.clientY + pos.top});
+                            }
+                        )
+                    }
+
+                }, delayWaitEndAnim);
             }
             else if (data.action == "unselect") {   // sur scroll ou resize
                 $xui.closePopup();
@@ -86,10 +98,10 @@ export class EventManager {
             else if (data.action == "changeRoute") {   // sur scroll ou resize
                 $xui.closePopup();
                 $xui.SelectorManager.unDisplaySelector();
-                setTimeout(() => {
-                   // $xui.displayPropertiesJS("root", "root", ); 
-                }, 500);
-
+                
+                // setTimeout(() => {
+                //    // $xui.displayPropertiesJS("root", "root", ); 
+                // }, 500);
             }
             else if (data.action == "drop") {
                 if ($xui.dragItem != null) {
@@ -130,6 +142,9 @@ export class EventManager {
                 if (!$xui.rootdata.redoDisabled) {
                     $xui.redo();
                 }
+            }
+            else if (data.action == "delete") {
+                $xui.deleteCmp();
             }
             else if (data.action == "updateDirectProp") {
                 $xui.SelectorManager.unDisplaySelector();

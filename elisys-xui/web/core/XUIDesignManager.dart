@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:synchronized/synchronized.dart';
 
@@ -515,56 +516,84 @@ class XUIDesignManager {
   ///------------------------------------------------------------------------------------------
 
   List getActionsPopup(
-      XUIContext ctx, String id, String idslot, String action) {
+       FileDesignInfo fileInfo , String id, String idslot, String action) {
     List<ObjectAction> ret = [];
 
     var designs = getXUIEngine().getDesignInfo(id, idslot, true);
     var idx = 0; 
-    var firstNoSlot = 1; 
+    var firstNoSlot = -1; 
+
+
     for (var design in designs) {
       idx++;
-      if (idx > 5) {
+      if (idx > 7) {
         break;
       }
       bool isSlot = design.slotInfo.slotname!=null;
-      bool inSlot = idx<designs.length && designs[idx].slotInfo.slotname!=null && (designs[idx].docInfo?.isActionEnable()??true); 
+      bool inSlot = idx<designs.length && designs[idx].slotInfo.slotname!=null; // && (designs[idx].docInfo?.isActionEnable()??true); 
 
       //print("=============>" + (designs[idx].docInfo?.type??"?"));
       /*********************************** */
       if (design.docInfo != null) {
 
+        if (firstNoSlot==-1 && !isSlot )
+            firstNoSlot=idx;
+
+        if (idx==1 && !isSlot)
+        {
+          // premier non slot
+          ObjectAction act = ObjectAction(
+              xid: design.slotInfo.xid!,
+              action: "class",
+              icon: "mdi-palette-swatch-variant",
+              type: "class",
+              title: "Add classes");
+          ret.insert(0, act);
+          act = ObjectAction(
+              xid: designs[0].slotInfo.xid!,
+              action: "",
+              icon: "",
+              type: "divider",
+              title: "");
+          ret.insert(1, act);
+        }
+
         if (design.docInfo!.xid == "v-col:xui-row-1") {
+          // si rows
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbBefore",
-              icon: "mdi-table-column",
+              icon: "mdi-table-column-plus-before",
               type: "row",
               title: "insert column before");
           ret.add(act);
           act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbAfter",
-              icon: "mdi-table-column",
+              icon: "mdi-table-column-plus-after",
               type: "row",
               title: "insert column after");
           ret.add(act);
-        } else if (design.docInfo!.xid == "v-col:xui-column-responsive-1") {
+
+        } else if ( (design.docInfo!.type?.contains("rows")??false)) {
+          // si de type col
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbBefore",
-              icon: "mdi-table-row",
+              icon: "mdi-table-row-plus-before",
               type: "col",
               title: "insert row before");
           ret.add(act);
           act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbAfter",
-              icon: "mdi-table-row",
+              icon: "mdi-table-row-plus-after",
               type: "col",
-              title: "insert column after");
+              title: "insert row after");
           ret.add(act);
-        }
-        else if (design.docInfo!.xid == "v-tab:xui-tabs") {
+
+        }  else if (design.docInfo!.xid == "v-tab:xui-tabs") {
+          // si onglet de tab
           if (idx == 1) {
             // ajout un flow si le premier slot est un v-tab
             ObjectAction act = ObjectAction(
@@ -572,21 +601,21 @@ class XUIDesignManager {
                 action: "addFlow",
                 type: "flow",
                 icon: "mdi-transfer-right",
-                title: "Add slot in");
+                title: "Add slot in "+design.slotInfo.slotname!);
             ret.add(act);
           }
 
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbBefore",
-              icon: "mdi-tab",
+              icon: "mdi-tab-plus",
               type: "tabs",
               title: "Add new Tab (before " + design.slotInfo.slotname! + ")");
           ret.add(act);
           act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbAfter",
-              icon: "mdi-tab",
+              icon: "mdi-tab-plus",
               type: "tabs",
               title: "Add new Tab (after " + design.slotInfo.slotname! + ")");
           ret.add(act);
@@ -599,112 +628,71 @@ class XUIDesignManager {
               action: "incNbBefore",
               type: "flow",
               icon: "mdi-transfer-left",
-              title: "Add slot before");
+              title: "Add slot before in flow");
           ret.add(act);
           act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "incNbAfter",
               type: "flow",
               icon: "mdi-transfer-right",
-              title: "Add slot after");
+              title: "Add slot after in flow");
           ret.add(act);
-        } else if (idx == 1 && isSlot) {
+        }  
+        else if (idx == 1 && isSlot) {
           // sur un slot => ajoute un flow 
           ObjectAction act = ObjectAction(
               xid: design.slotInfo.xid!,
               action: "addFlow",
               type: "flow",
               icon: "mdi-transfer-right",
-              title: "Add slot in");
+              title: "Add slot in "+design.slotInfo.slotname!);
           ret.add(act);
-
-          firstNoSlot++;
-
-        } else if (idx == firstNoSlot && !isSlot && inSlot) {
-          // sur un composant
-          if (designs[idx].docInfo?.xid != "xui-no-dom:xui-flow") {
-            // ajoute un slot si pas deja dans un slot
-            ObjectAction act = ObjectAction(
-                xid: design.slotInfo.xid!,
-                action: "surroundLeft",
-                type: "flow",
-                icon: "mdi-transfer-left",
-                title: "Add slot before");
-            ret.add(act);
-            // ajoute un slot si pas deja dans un slot
-            act = ObjectAction(
-                xid: design.slotInfo.xid!,
-                action: "surroundRight",
-                type: "flow",
-                icon: "mdi-transfer-right",
-                title: "Add slot after");
-            ret.add(act);
-          }
-
-          ObjectAction act = ObjectAction(
-              xid: design.slotInfo.xid!,
-              action: "surroundBlock",
-              type: "surround",
-              icon: "mdi-checkbox-blank-outline",
-              title: "Surround in block ("+designs[idx].slotInfo.slotname!+")");
-          ret.add(act);
-
-          act = ObjectAction(
-              xid: design.slotInfo.xid!,
-              action: "surroundRow",
-              type: "surround",
-              icon: "mdi-table-row",
-              title: "Surround in row");
-          ret.add(act);
-
-          act = ObjectAction(
-              xid: design.slotInfo.xid!,
-              action: "surroundCol",
-              type: "surround",
-              icon: "mdi-table-column",
-              title: "Surround in column");
-          ret.add(act);
-
-          act = ObjectAction(
-              xid: design.slotInfo.xid!,
-              action: "surroundOver",
-              type: "surround",
-              icon: "mdi-move-resize-variant",
-              title: "Add over");
-          ret.add(act);
-
-          act = ObjectAction(
-              xid: design.slotInfo.xid!,
-              action: "surroundBadge",
-              type: "surround",
-              icon: "mdi-checkbox-blank-badge-outline",
-              title: "Add badge");
-          ret.add(act);
+        } 
         
+        if (idx == firstNoSlot) {  
+          var info = xuiEngine!.getSlotInfo( design.slotInfo.xid!, design.slotInfo.xid!);
+          bool canSurround = info?.elementHTML?.canSurround(fileInfo)??false;
 
-        } else {
-          // var ti = (design.docInfo.addRemove ?? "noAddRemove") +
-          //     "|" +
-          //     (design.slotInfo.slotname ?? "noSlotName") +
-          //     "|" +
-          //     design.docInfo.xid +
-          //     "|" +
-          //     design.docInfo.name +
-          //     "|" +
-          //     design.slotInfo.implement;
+          // sur le premier composant actif mais pas déja dans un flow
+          if (inSlot && canSurround && designs[idx].docInfo?.xid != "xui-flow" && designs[idx].docInfo?.xid != "xui-no-dom:xui-flow") {
 
-          // ObjectAction act = ObjectAction(
-          //     xid: design.slotInfo.xid,
-          //     action: "addFlow",
-          //     icon: "mdi-table-row",
-          //     title: ti);
-          // ret.add(act);
+            // ajoute un slot si pas deja dans un slot de type flow
+            addSurroundFlow(design, ret);
+          }
+        } 
+      }
+    }
+    // --------------------------fin for
+
+    if (designs.length>0)
+    {
+        bool isSlot = designs[0].slotInfo.slotname!=null;
+        if (isSlot)
+        {
+              ObjectAction act = ObjectAction(
+                  xid: designs[0].slotInfo.xid!,
+                  action: "addCmp",
+                  icon: "mdi-shape-plus",
+                  type: "class",
+                  title: "choise component");
+              ret.insert(0, act);
+              act = ObjectAction(
+                xid: designs[0].slotInfo.xid!,
+                action: "",
+                icon: "",
+                type: "divider",
+                title: "");
+              ret.insert(1, act);
         }
-      }
-      else
-      {
-        if (idx==1) firstNoSlot++;
-      }
+
+        var designFirstNoSlot = designs[firstNoSlot-1];
+        isSlot = designFirstNoSlot.slotInfo.slotname!=null;
+        var info = xuiEngine!.getSlotInfo( designFirstNoSlot.slotInfo.xid!, designFirstNoSlot.slotInfo.xid!);
+        bool canSurround = info?.elementHTML?.canSurround(fileInfo)??false;
+
+        if (canSurround && !isSlot) {
+            addSurroundAction(designs, ret, firstNoSlot);
+        }
     }
 
     // analyse des action
@@ -721,6 +709,103 @@ class XUIDesignManager {
     }
 
     return retFiltered;
+  }
+
+  void addSurroundFlow(DesignInfo design, List<ObjectAction> ret) {
+    
+    // ajoute un slot si pas deja dans un slot de type flow
+    ObjectAction act = ObjectAction(
+        xid: design.slotInfo.xid!,
+        action: "surround",
+        type: "xui-flow",
+        slot : "-col-1",
+        icon: "mdi-transfer-left",
+        title: "Add slot before in flow"); //+ (designs[idx].docInfo?.xid ?? ""));
+    ret.add(act);
+    // ajoute un slot si pas deja dans un slot
+    act = ObjectAction(
+        xid: design.slotInfo.xid!,
+        action: "surround",
+        type: "xui-flow",
+        slot : "-col-0",
+        icon: "mdi-transfer-right",
+        title: "Add slot after in flow");
+    ret.add(act);
+  }
+
+  void addSurroundAction(List<DesignInfo> designs, List<ObjectAction> ret, int firstNoSlot) {
+    var designFirstNoSlot = designs[firstNoSlot-1];
+
+     ObjectAction act = ObjectAction(
+        xid: designs[0].slotInfo.xid!,
+        action: "",
+        icon: "",
+        type: "divider",
+        title: "");
+    ret.add(act);
+
+    act = ObjectAction(
+        xid: designFirstNoSlot.slotInfo.xid!,
+        action: "surround",
+        type: "xui-if-else",
+        slot : "-if",
+        icon: "mdi-arrow-decision-auto",
+        title: "Is Conditional (If)");
+    ret.add(act);
+
+    act = ObjectAction(
+        xid: designFirstNoSlot.slotInfo.xid!,
+        action: "surround",
+        type: "xui-row-1",
+        slot : "-col-0",
+        icon: "mdi-table-row",
+        title: "Surround in row");
+    ret.add(act);
+    
+    act = ObjectAction(
+        xid: designFirstNoSlot.slotInfo.xid!,
+        action: "surround",
+        type: "xui-column-responsive-1",
+        slot : "-col-0",
+        icon: "mdi-table-column",
+        title: "Surround in column");
+    ret.add(act);
+
+    act = ObjectAction(
+        xid: designFirstNoSlot.slotInfo.xid!,
+        action: "surround",
+        type: "xui-tabs",
+        slot : "-tab-item-0",
+        icon: "mdi-tab",
+        title: "Surround in tab");
+    ret.add(act);
+    
+    act = ObjectAction(
+        xid: designFirstNoSlot.slotInfo.xid!,
+        action: "surround",
+        type: "xui-block",
+        slot : "-block",
+        icon: "mdi-checkbox-blank-outline",
+        title: "Surround in block");
+    ret.add(act);
+
+    act = ObjectAction(
+        xid: designFirstNoSlot.slotInfo.xid!,
+        action: "surround",
+        type: "xui-over-1",
+        slot : "-col-0",
+        icon: "mdi-move-resize-variant",
+        title: "Add over");
+    ret.add(act);
+    
+    act = ObjectAction(
+        xid: designFirstNoSlot.slotInfo.xid!,
+        action: "surround",
+        type: "xui-badge-1",
+        slot : "-col-0",
+        icon: "mdi-checkbox-blank-badge-outline",
+        title: "Add badge");
+    ret.add(act);
   }
 }
 

@@ -119,12 +119,21 @@ export class SelectorManager {
     displayInTree() {
         if ($xui.rootdata.activeSlot.length == 0 || $xui.rootdata.activeSlot[0].id != $xui.propertiesDesign.xid) {
             let rowInTree = this._searchInTree($xui.propertiesDesign.xid, $xui.rootdata.listSlot);
+            if (rowInTree == null) {
+                const infoFile = $xui.pageDesignManager.getInfoFile("template");
+                let info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xid);
+                rowInTree = this._searchInTree(info.parentXid, $xui.rootdata.listSlot);
+                // if (rowInTree == null) {
+                //     info = $xuicore.getInfoXUI(infoFile, info.parentXid, info.parentXid);
+                //     rowInTree = this._searchInTree(info.parentXid, $xui.rootdata.listSlot);
+                // }
+            }
             if (rowInTree != null) {
                 $xui.rootdata.activeSlot.length = 0;
                 $xui.rootdata.activeSlot.push(rowInTree);
             }
             setTimeout(() => {
-                let elem = document.querySelector("#treeCmp .v-treeview-node--active")
+                const elem = document.querySelector("#treeCmp .v-treeview-node--active")
                 if (elem!=null)
                     elem.scrollIntoView();
             }, 500);
@@ -167,6 +176,63 @@ export class SelectorManager {
         }
         return ret;
     }
+    
+    async getBoundFromXid(xid) {
+         // recherche xid simple
+         let elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid=${xid}]`);
+
+         if (elemRect != null) {
+             //console.debug("displaySelectorByXid 1 ", xid);
+            return elemRect;
+         }
+ 
+         if (elemRect == null) {
+             elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid-slot-${xid}=true]`);
+             if (elemRect != null) {
+                 //console.debug("displaySelectorByXid 2 ", xid);
+                 return elemRect;
+             }
+         }
+ 
+         // recherche xid de slot invisible sur les div enfant => realise un merge des clientRect
+         if (elemRect == null) {
+             const listNode = this._getlistNodeOnIFrame(xid);
+             //console.debug("displaySelectorByXid 31 ", xid, listNode);
+ 
+             if (listNode != null && listNode.length > 0 && listNode.length == listNode[0].parentNode.children.length) {
+                 const parent = true;
+                 elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid-slot=${xid}]`, parent);
+                 if (elemRect != null && (elemRect.width != 0 && elemRect.height != 0)) {
+                     //console.debug("displaySelectorByXid 32 ", xid);
+                     return elemRect;
+                 }
+             }
+ 
+             if (listNode != null && listNode.length > 0) {
+                 // gestion des d'intersection des region des enfants
+                 let myRegion = null;
+                 for (const aNode of listNode) {
+                     elemRect = aNode.getBoundingClientRect();
+                     if (elemRect.width == 0 || elemRect.height == 0) {
+                         console.debug("error get rec", elemRect, xid);
+                         continue;
+                     }
+ 
+                     if (myRegion == null)
+                         myRegion = new Region2D(elemRect);
+                     else
+                         myRegion = myRegion.union(new Region2D(elemRect));
+                 }
+                 //console.debug("displaySelectorByXid 4 ", xid);
+                 if (myRegion != null)
+                     return myRegion.getBounds();
+             }
+             else {
+                // console.debug("displaySelectorByXid 5 no found ", xid);
+             }
+         }
+    }
+
 
     /************************************************************************************ */
     // selection par click des properties
@@ -182,62 +248,11 @@ export class SelectorManager {
             return;
         }
 
-        // recherche xid simple
-        let elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid=${xid}]`);
-
-        if (elemRect != null) {
-            //console.debug("displaySelectorByXid 1 ", xid);
+        const elemRect=  await this.getBoundFromXid(xid);
+        if (elemRect!=null)
             this.displaySelectorByPosition(elemRect);
-        }
 
-        if (elemRect == null) {
-            elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid-slot-${xid}=true]`);
-            if (elemRect != null) {
-                //console.debug("displaySelectorByXid 2 ", xid);
-                this.displaySelectorByPosition(elemRect);
-            }
-        }
-
-        // recherche xid de slot invisible sur les div enfant => realise un merge des clientRect
-        if (elemRect == null) {
-            const listNode = this._getlistNodeOnIFrame(xid);
-            //console.debug("displaySelectorByXid 31 ", xid, listNode);
-            let found = false;
-
-            if (listNode != null && listNode.length > 0 && listNode.length == listNode[0].parentNode.children.length) {
-                let parent = true;
-                elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid-slot=${xid}]`, parent);
-                if (elemRect != null && (elemRect.width != 0 && elemRect.height != 0)) {
-                    //console.debug("displaySelectorByXid 32 ", xid);
-                    this.displaySelectorByPosition(elemRect);
-                    found = true;
-                }
-            }
-
-            if (!found && listNode != null && listNode.length > 0) {
-                // gestion des d'intersection des region des enfants
-                let myRegion = null;
-                for (const aNode of listNode) {
-                    elemRect = aNode.getBoundingClientRect();
-                    if (elemRect.width == 0 || elemRect.height == 0) {
-                        console.debug("error get rec", elemRect, xid);
-                        continue;
-                    }
-
-                    if (myRegion == null)
-                        myRegion = new Region2D(elemRect);
-                    else
-                        myRegion = myRegion.union(new Region2D(elemRect));
-                }
-                //console.debug("displaySelectorByXid 4 ", xid);
-                if (myRegion != null)
-                    this.displaySelectorByPosition(myRegion.getBounds());
-            }
-            else if (!found) {
-               // console.debug("displaySelectorByXid 5 no found ", xid);
-            }
-        }
-
+       
         if (!noDisplayProp) {
             // affiche les properties sur le click (pas sur le survole des properties)
             $xui.modeDisplaySelection = true;

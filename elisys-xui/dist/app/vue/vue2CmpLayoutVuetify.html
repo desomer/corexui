@@ -8,7 +8,7 @@
         <xui-prop id="componentAs">container</xui-prop>
 
         <xui-prop var="nb" def="2" editor="int">nb col dans la ligne</xui-prop>
-        <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
+        <xui-prop var="fill-height" def=true editor="bool">fill height</xui-prop>
 
         <xui-prop var="justify" cat="vstyle" editor="combo" 
             list='["start", "center", "end", "space-between", "space-around"]'
@@ -32,6 +32,7 @@
         <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
         <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
         <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
+        <xui-prop id="add-remove">incNb</xui-prop>
     </xui-doc>
 
     <v-row xid="xui-row-1" class="[[fill-height]] [[class]]" xui-for="idxc" -style="[[style]]" no-gutters
@@ -50,7 +51,7 @@
         <xui-prop id="componentAs">container</xui-prop>
 
         <xui-prop var="nb" def="2" editor="int">nb row dans la colonne</xui-prop>
-        <xui-prop var="fill-height" editor="bool">fill height</xui-prop>
+        <xui-prop var="fill-height" def=true editor="bool">fill height</xui-prop>
 
         <xui-prop var="justify" cat="vstyle" editor="combo" list='["start", "center", "end", "space-between", "space-around"]'
         >justify (vert.)</xui-prop>
@@ -70,6 +71,7 @@
         <xui-prop var="cols" editor="text">Haut. de row (1-12/auto)</xui-prop>
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop id="add-remove">incNb</xui-prop>
     </xui-doc>
 
     <v-row xid="xui-column-responsive-1" class="flex-column  [[fill-height]] [[class]]" xui-for="idxc"
@@ -446,11 +448,15 @@
         <xui-prop var="dark" cat="style" editor="bool">on dark</xui-prop>
         <xui-prop var="light" cat="style" editor="bool">on light</xui-prop>
 
-
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
+    <xui-doc xid="v-list-item-group:xui-list">
+        <xui-prop id="name">Column Cell</xui-prop>
+        <xui-prop id="desc">Une cellule</xui-prop>
+        <xui-prop id="add-remove">incNb</xui-prop>
+    </xui-doc>
 
     <v-list xid="xui-list" xui-for="idxr" class="[[class]]" -style="[[style]]" two-line="[[two-line]]"
         three-line="[[three-line]]" subheader="[[subheader]]" dense="[[dense]]" shaped="[[shaped]]"

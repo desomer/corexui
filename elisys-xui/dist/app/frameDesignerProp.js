@@ -73,6 +73,7 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
             },
             mounted() {
                 this.$nextTick(doMouveOverProperties(posScroll, idProp))
+                doPromiseJS("afterDesignProperties", $xui.propertiesDesign)
             }
         });
     });

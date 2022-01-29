@@ -131,8 +131,7 @@ let mapAction = {
     "moveTo": {}
 }
 $xui.isModePreview = false;
-$xui.modeDisplaySelection = false;
-
+$xui.modeDisplaySelection = true;
 
 $xui.setCurrentAction = (actionName) => {
     if (currentAction != null) {
@@ -321,7 +320,7 @@ $xui.cutCmp = () => {
 $xui.pasteTo = () => {
     $xui.setCurrentAction("pasteTo");
 
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
     const info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xuicore.moveDesignXUI(infoFile, null, info.xid);
 }
@@ -329,7 +328,7 @@ $xui.pasteTo = () => {
 $xui.moveTo = (data) => {
     $xui.setCurrentAction("moveTo");
 
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
     const info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xuicore.moveDesignXUI(infoFile, info.xid, data.xid_slot);
 }

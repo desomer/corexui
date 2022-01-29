@@ -242,7 +242,7 @@ class XUIResource extends XMLElemReader {
   }
 
   bool isSupportTextElement(dynamic parent) {
-    return (parent as XUIElementXUI).tag.toString().toLowerCase() != TAG_DOC;
+    return parent.tag!=null /*null pour les XUIDesign*/ && parent.tag.toString().toLowerCase() != TAG_DOC;
   }
 
   //-------------------------------------------------------------------------------------------
@@ -272,7 +272,6 @@ class XUIResource extends XMLElemReader {
             HTMLReader(element.attributs!["xui-path"]!, reader.provider);
         XUIResource subFile = XUIResource(subReader, context);
         await subFile.parseXUIFile();
-        // subFile.reader.content = null;
         listImport.add(subFile);
         return Future.value();
       } else if (element.tag == TAG_PROP &&
@@ -499,7 +498,7 @@ class XUIEngine {
   void addXUIDesignEmpty(String xid) {
     XUIElementXUI xuiElem = XUIElementXUI();
     xuiElem.xid = xid;
-    xuiElem.idRessource = xuiFile.reader.id;
+    xuiElem.idRessource = null; //xuiFile.reader.id;
     xuiFile.designs[xid] ??= DicoOrdered();
     xuiFile.designs[xid]!.add(XUIDesign(xuiElem, MODE_ALL, 0));
   }
@@ -597,7 +596,7 @@ class DocInfo {
 
   bool isActionEnable()
   {
-    return type==null || ! (type!.contains("actionDisable"));
+    return type!=null && (type!.contains("actionEnable"));
   }
 
 }

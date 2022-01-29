@@ -10,7 +10,7 @@
         <xui-prop id="exclude">container</xui-prop>
 
         <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
-        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="class" cat="class" def = "fill-height xui-p-relative" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
 
@@ -68,29 +68,27 @@
     </template>
 
     <!--------------------------  XUI-IF-ELSE   ------------------------------->
-    <!-- <xui-doc xid="xui-if-else">
-        <xui-prop id="name">If elseIf else</xui-prop>
+    <xui-doc xid="xui-if-else">
+        <xui-prop id="name">If Else</xui-prop>
         <xui-prop id="icon">mdi-order-bool-descending-variant</xui-prop>
         <xui-prop id="desc">Un block</xui-prop>
         <xui-prop id="componentAs">container</xui-prop>
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
+        <xui-prop id="type">conditional</xui-prop>
 
-        <xui-prop var=":varitems" editor="text" def="items" bind-type="array">items var name</xui-prop>
-        <xui-prop var=":varName" editor="text" def="item" bind-type="item-array">item var name</xui-prop>
+        <xui-prop var="withElse" def=false editor="bool-no-bind">With else slot</xui-prop>
+        <xui-prop var="expression" editor="var">if expression (main.x>0)</xui-prop>
     </xui-doc>
 
-    <template xid="xui-if-else">
-        <template v2-if="">
-            <xui-slot style-slot="height:100%" xid="[[parent-xid]]-if" xui-slot-name="if block"></xui-slot>
+    <template xid="xui-if-else" xui-no-dom>
+        <template if:[[expression@1]]:v-if="[[expression@1]]">
+            <xui-slot style-slot="height:100%" xid="[[parent-xid]]-if" xui-slot-name="If block"></xui-slot>
         </template>
-        <template v2-else-if="">
-            <xui-slot style-slot="height:100%" xid="[[parent-xid]]-else-if" xui-slot-name="elseif block"></xui-slot>
+        <template xui-if="[[withElse@1]]" if:[[expression@1]]:v-else>
+            <xui-slot style-slot="height:100%" xid="[[parent-xid]]-else" xui-slot-name="Else block"></xui-slot>
         </template>
-        <template v2-else="">
-            <xui-slot style-slot="height:100%" xid="[[parent-xid]]-else" xui-slot-name="else block"></xui-slot>
-        </template>
-    </template> -->
+    </template>
 
     <!--------------------------  XUI-SESSION   ------------------------------->
     <xui-doc xid="xui-session">
@@ -144,7 +142,7 @@
     </xui-doc>
 
     <xui-slot xid="xui-flow" xui-for="idxf" xui-slot-name="Flow">
-        <xui-slot style-slot="display:inline-flex" xid="[[parent-xid]]-col-[[idxf@2]]" xui-slot-name="Flow [[idxf@2]]">
+        <xui-slot style-slot="display:inline-flex;" xid="[[parent-xid]]-col-[[idxf@2]]" xui-slot-name="Flow [[idxf@2]]">
         </xui-slot>
     </xui-slot>
 

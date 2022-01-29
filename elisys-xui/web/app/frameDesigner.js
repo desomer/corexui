@@ -131,8 +131,7 @@ let mapAction = {
     "moveTo": {}
 }
 $xui.isModePreview = false;
-$xui.modeDisplaySelection = false;
-
+$xui.modeDisplaySelection = true;
 
 $xui.setCurrentAction = (actionName) => {
     if (currentAction != null) {
@@ -321,7 +320,7 @@ $xui.cutCmp = () => {
 $xui.pasteTo = () => {
     $xui.setCurrentAction("pasteTo");
 
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
     const info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xuicore.moveDesignXUI(infoFile, null, info.xid);
 }
@@ -329,7 +328,7 @@ $xui.pasteTo = () => {
 $xui.moveTo = (data) => {
     $xui.setCurrentAction("moveTo");
 
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
     const info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     $xuicore.moveDesignXUI(infoFile, info.xid, data.xid_slot);
 }
@@ -356,7 +355,7 @@ $xui.addCmp = (cmp) => {
 ///---------------------------------------------------------------------------------------
 /// ajoute un composant
 $xui.addCmpXID = (xidDest, idCmp) => {
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
     const newXid = $xui.getNewXid(xidDest, idCmp);
     const template = `<xui-design xid="${xidDest}"><${idCmp} xid="${newXid}"></${idCmp}></xui-design>`;
     $xuicore.addDesignXUI(infoFile, xidDest, template, true, false);
@@ -539,6 +538,30 @@ $xui.openTabUrl = (url) => {
             pageImage = window.open('https://unsplash.com/', '_blank');
         pageImage.focus()
     }
+};
+
+
+$xui.callAPI = (api) => {
+    fetch(api.base+api.url, {
+        method: api.method //ou POST, PUT, DELETE, etc.
+        // ,headers: {
+        //   "Content-Type": "text/plain;charset=UTF-8" //pour un corps de type chaine
+        // },
+        // body: undefined, //ou string, FormData, Blob, BufferSource, ou URLSearchParams
+        // referrer: "about:client", //ou "" (pas de réferanr) ou une url de l'origine
+        // referrerPolicy: "no-referrer-when-downgrade", //ou no-referrer, origin, same-origin...
+        // mode: "cors", //ou same-origin, no-cors
+        // credentials: "same-origin", //ou omit, include
+        // cache: "default", //ou no-store, reload, no-cache, force-cache, ou only-if-cached
+        // redirect: "follow", //ou manual ou error
+        // integrity: "", //ou un hash comme "sha256-abcdef1234567890"
+        // keepalive: false, //ou true pour que la requête survive à la page
+        // signal: undefined //ou AbortController pour annuler la requête
+    })
+    .then(response => response.json())
+    .then(response => alert(JSON.stringify(response)))
+    .catch(error => alert(`Erreur : ${error}`));
+
 };
 
 

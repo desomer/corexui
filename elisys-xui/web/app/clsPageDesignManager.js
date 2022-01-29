@@ -230,13 +230,24 @@ export class PageDesignManager {
         let version = localStorage.getItem(`xui_version_${name}`);
         if (version == null)
             version = "0";
-
         let ver = parseInt(version);
+
+        let versionMin = localStorage.getItem(`xui_version_min_${name}`);
+        if (versionMin == null)
+            versionMin = "0";
+        let verMin = parseInt(versionMin);
 
         localStorage.setItem(`xui_data_${name}_${ver}`, this.codeXUIdata);
         ver++;
         localStorage.setItem(`xui_version_${name}`, `${ver}`);
         localStorage.setItem(`xui_version_max_${name}`, `${ver}`);
+
+        if (ver > verMin + 20 )
+        {
+            localStorage.removeItem(`xui_data_${name}_${verMin}`);
+            verMin++;
+            localStorage.setItem(`xui_version_min_${name}`, `${verMin}`);
+        }
 
         $xui.rootdata.redoDisabled = true;
         $xui.rootdata.undoDisabled = false;
@@ -281,9 +292,16 @@ export class PageDesignManager {
         if (version == null)
             version = "0";
 
+        let versionMin = localStorage.getItem(`xui_version_min_${name}`);
+        if (versionMin == null)
+            versionMin = "0";
+        let verMin = parseInt(versionMin);
+
         let ver = parseInt(version);
-        if (ver > 0)
+        if (ver > verMin+1)
             ver--;
+        else
+            $xui.rootdata.undoDisabled = true;
 
         localStorage.setItem(`xui_version_${name}`, `${ver}`);
         $xui.refreshAction("template:reload");
@@ -300,6 +318,7 @@ export class PageDesignManager {
         
         if (ver < verMax) {
             ver++;
+            $xui.rootdata.undoDisabled = false;
         }
         if (ver == verMax) {
             $xui.rootdata.redoDisabled = true;

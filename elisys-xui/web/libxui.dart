@@ -227,6 +227,11 @@ dynamic getComponentsXUI(FileDesignInfo fileInfo, String id, String idslot) {
 /// retourne les info d'un xid
 dynamic getInfoXUI(FileDesignInfo fileInfo, String id, String idslot) {
   var engine = _getDesignManager(fileInfo).getXUIEngine();
+
+  if (idslot.startsWith(SLOT_PREFIX))
+  {
+     idslot = idslot.substring(SLOT_PREFIX.length);
+  }
   var info = engine.getSlotInfo(id, idslot);
 
   var InfoJS = SlotInfoJS();
@@ -540,10 +545,11 @@ dynamic getActionsXUI(
     FileDesignInfo fileInfo, String id, String idSlot, String action) {
   print("-------------- getActionsXUI ----------------   " + action);
 
-  var ctx = XUIContext(MODE_DESIGN);
   var designManager = _getDesignManager(fileInfo);
 
-  return designManager.getActionsPopup(ctx, id, idSlot, action);
+  inspect(designManager);
+
+  return designManager.getActionsPopup(fileInfo, id, idSlot, action);
 }
 
 dynamic getEventMethodsXUI(FileDesignInfo fileInfo) {

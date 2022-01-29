@@ -14,7 +14,9 @@ $xui.OpenPopupAction = (event) => {
     const infoFile = $xui.pageDesignManager.getInfoFile("template");
     const ret = $xuicore.getActionsXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot, "OpenPopupAction");
 
-    $xui.rootdata.idxTabProperties = 4; // affiche la liste des composants
+    $xui.rootdata.idxTabProperties = 5; // affiche la liste des composants
+    $xui.modeDisplaySelection=false;  // ne change pas de selection
+    $xui.SelectorManager.displayInTree();
 
     $xui.rootdata.listPopupAdd.length = 0;
     $xui.rootdata.listPopupAdd.push(...ret);
@@ -23,32 +25,46 @@ $xui.OpenPopupAction = (event) => {
     popupNode.style.left = `${event.clientX}px`;
     popupNode.style.top = `${event.clientY}px`;
 
-    const hpopup = 16 + (40 * $xui.rootdata.listPopupAdd.length);
+    const hpopup = (40 * $xui.rootdata.listPopupAdd.length);
 
-    if (event.clientY + 100 + hpopup > window.innerHeight) {
-        popupNode.style.top = `${event.clientY - hpopup}px`;  // ouverture en dessus
+    if (event.clientY + 16 + hpopup > window.innerHeight) {
+        popupNode.style.top = `${event.clientY - hpopup}px`;  // ouverture au dessus
     }
 
     popupNode.style.display = "block";   //affiche la div de selection des actions (itemPopup)
 }
 
 
+$xui.doSurroundCmp = (info, infoFile, actionId) => {
+    $xui.setCurrentAction("addSlot");
+    let cmp = { xid: actionId.type };
+    const newXid = $xui.getNewXid(info.parentXid, actionId.type);
+    const currentXid = info.parentXid;
+    const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
+    $xuicore.surroundDesignXUI(infoFile, actionId.xid, template, newXid, actionId.slot);
+}
+
 $xui.doActionPopup = (actionId) => {
     console.debug("doActionPopup", actionId);
     //--------------------------------------------------------
     const infoFile = $xui.pageDesignManager.getInfoFile("template");
 
+    if (actionId.action == "class") {
+        $xui.rootdata.idxTabProperties = 1;  // affiche les style
+        setTimeout(() => {
+            $xui.openClassEditor(actionId.xid);
+        }, 500);
+        return true;
+    }
 
     $xui.rootdata.idxTabProperties = 4;  // affiche la liste des composants
 
-    
     if (actionId.action == "incNbAfter") {
         $xui.setCurrentAction("addSlot");
         $xuicore.changeNbChildXUI(infoFile, actionId.xid, "after");
         console.debug("doActionPopup incNb OK");
         return true;
     }
-
 
     if (actionId.action == "incNbBefore") {
         $xui.setCurrentAction("addSlot");
@@ -57,11 +73,6 @@ $xui.doActionPopup = (actionId) => {
         return true;
     }
 
-
-    const info = $xuicore.getInfoXUI(infoFile, actionId.xid, actionId.xid);
-    const infoParent = $xuicore.getInfoXUI(infoFile, info.parentXid, info.parentXid);
-    console.debug("info add action ", $xui.propertiesDesign, info, infoParent);
-
     if (actionId.action == "addFlow") {
         $xui.setCurrentAction("addCmp");
         $xui.addCmpXID(actionId.xid, "xui-flow");
@@ -69,78 +80,69 @@ $xui.doActionPopup = (actionId) => {
         return true;
     }
 
-    if (actionId.action == "surroundLeft") {
-        $xui.setCurrentAction("addSlot");
-        let cmp = { xid: 'xui-flow' };
-        const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
-        const currentXid = info.parentXid;
-        const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
-        $xuicore.surroundDesignXUI(infoFile, actionId.xid, template, newXid, "-col-1");
+    if (actionId.action == "surround") {
+        const info = $xuicore.getInfoXUI(infoFile, actionId.xid, actionId.xid);
+        $xui.doSurroundCmp(info, infoFile, actionId);
         return true;
     }
-
-    if (actionId.action == "surroundRight") {
-        $xui.setCurrentAction("addSlot");
-        let cmp = { xid: 'xui-flow' };
-        const newXid = $xui.getNewXid(info.parentXid, 'xui-flow');
-        const currentXid = info.parentXid;
-        const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
-        $xuicore.surroundDesignXUI(infoFile, actionId.xid, template, newXid, "-col-0");
-        return true;
-    }
-
-    if (actionId.action == "surroundBadge") {
-        $xui.setCurrentAction("addSlot");
-        const cmp = { xid: 'xui-badge-1' };
-        const newXid = $xui.getNewXid(info.parentXid, 'xui-badge-1');
-        const currentXid = info.parentXid;
-        const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
-        $xuicore.surroundDesignXUI(infoFile, actionId.xid, template, newXid, "-col-0");
-        return true;
-    }
-    if (actionId.action == "surroundBlock") {
-        $xui.setCurrentAction("addSlot");
-        const cmp = { xid: 'xui-block' };
-        const newXid = $xui.getNewXid(info.parentXid, 'xui-block');
-        const currentXid = info.parentXid;
-        const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
-        $xuicore.surroundDesignXUI(infoFile, actionId.xid, template, newXid, "-block");
-        return true;
-    }
-    if (actionId.action == "surroundRow") {
-        $xui.setCurrentAction("addSlot");
-        const cmp = { xid: 'xui-row-1' };
-        const newXid = $xui.getNewXid(info.parentXid, 'xui-row-1');
-        const currentXid = info.parentXid;
-        const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
-        $xuicore.surroundDesignXUI(infoFile, actionId.xid, template, newXid, "-col-0");
-        return true;
-    }
-
-    if (actionId.action == "surroundCol") {
-        $xui.setCurrentAction("addSlot");
-        const cmp = { xid: 'xui-column-responsive-1' };
-        const newXid = $xui.getNewXid(info.parentXid, 'xui-column-responsive-1');
-        const currentXid = info.parentXid;
-        const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
-        $xuicore.surroundDesignXUI(infoFile, actionId.xid, template, newXid, "-col-0");
-        return true;
-    }
-
-    if (actionId.action == "surroundOver") {
-        $xui.setCurrentAction("addSlot");
-        const cmp = { xid: 'xui-over-1' };
-        const newXid = $xui.getNewXid(info.parentXid, 'xui-over-1');
-        const currentXid = info.parentXid;
-        const template = `<xui-design xid="${currentXid}"><${cmp.xid} xid="${newXid}"></${cmp.xid}></xui-design>`;
-        $xuicore.surroundDesignXUI(infoFile, actionId.xid, template, newXid, "-col-0");
-        return true;
-    }
-
-    
-
 }
 
+
+$xui.onActionOver= async (state, item) => 
+{
+    console.debug(`onAction : ${state}`, item);
+    let node = document.getElementById("xui-action-selector");
+    if (node == null) {
+        /************************************************* */
+        // le node selector draggable
+        node = document.createElement("div");
+        node.id = "xui-action-selector";
+        node.classList.add("xui-action-selector");
+
+        nodeTop = document.createElement("div");
+        nodeTop.id = "xui-action-selector-arrow";
+        node.appendChild(nodeTop);
+
+        document.body.appendChild(node);
+    }
+    if (state=="enter") {
+        const position=  await $xui.SelectorManager.getBoundFromXid(item.xid);
+        if (position!=null)
+        {
+            const winFrame = document.querySelector("#rootFrame");
+            const posFrame = winFrame.getBoundingClientRect();
+            // ne depasse pas de l'iframe
+            const pt = Math.max(0, position.top);
+            const ph = Math.min((position.top - pt) + position.height, posFrame.height - pt);
+    
+            node.style.left = `${position.left + posFrame.left}px`;
+            node.style.top = `${pt + posFrame.top}px`;
+            node.style.height = `${ph}px`;
+            node.style.width = `${position.width}px`;
+            node.style.display = null;   //affiche la div de selection
+
+            var nodeTop = document.getElementById("xui-action-selector-arrow");
+            nodeTop.removeAttribute('class');
+            if (item.title.includes("row") && item.title.includes("before"))
+                nodeTop.classList.add("xui-action-selector-top");
+            else if (item.title.includes("row") && item.title.includes("after"))
+                nodeTop.classList.add("xui-action-selector-bottom");
+            else if (item.title.includes("column") && item.title.includes("before"))
+                nodeTop.classList.add("xui-action-selector-left");
+            else if (item.title.includes("column") && item.title.includes("after"))
+                nodeTop.classList.add("xui-action-selector-right");
+            else if (item.title.includes("slot") && item.title.includes("before"))
+                nodeTop.classList.add("xui-action-selector-left");
+            else if (item.title.includes("slot") && item.title.includes("after"))
+                nodeTop.classList.add("xui-action-selector-right");
+        }
+    }
+    else
+    {
+        node.style.display = "none";
+    }
+
+}
 
 /*******************************************LES ACTIONS DELETE, ADD, EDIT**************************************************/
 let cacheHtmlAction = null;
@@ -156,12 +158,12 @@ $xui.displayAction = (xid, xid_slot) => {
                 $xui.vuejsAppCmpAction.$destroy();
             }
             $xui.vuejsAppCmpAction = new Vue({
-                template: "<div id='xui-display-selector-action' style='position:absolute;bottom:-20px;left: 0px;background: rgba(204, 205, 255, 1); border: 1px solid rgb(64, 37, 226); padding: 0px 5px;  z-index: 1000;'>" + html + "</div>",
+                template: `<div id='xui-display-selector-action' style='position:absolute;bottom:-20px;left: 0px;background: rgba(204, 205, 255, 1); border: 1px solid rgb(64, 37, 226); padding: 0px 5px;  z-index: 1000;'>${html}</div>`,
                 el: '#xui-display-selector-action',
                 vuetify: new Vuetify(),
                 data: $xui.rootDataAction,
                 computed: {
-                    $xui: function () {
+                    $xui() {
                         return window.$xui;
                     }
                 }
@@ -176,3 +178,6 @@ $xui.displayAction = (xid, xid_slot) => {
 $xui.displayPropActionByXid= (xid, xid_slot) => {
     console.debug("displayPropActionByXid ", xid);
 };
+
+
+
