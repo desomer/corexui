@@ -18,21 +18,22 @@ function onChangeMainTab(instanceVue) {
       $xui.SelectorManager.unDisplaySelector();
     }, 500);
 
+    const rootdata = $xui.getAppState().main;
 
     if (oldValue == $xui.MainTabEnum.STATE)
     {
-      if ($xui.rootdata.currentCodeIdx>=0)
+      if (rootdata.currentCodeIdx>=0)
       {
         $xui.saveCodeAction();
       }
-      $xui.rootdata.currentCode="no code";
-      $xui.rootdata.currentCodeName="";
-      $xui.rootdata.currentCodeIdx=-1;
+      rootdata.currentCode="no code";
+      rootdata.currentCodeName="";
+      rootdata.currentCodeIdx=-1;
     }
 
-    if (newValue == $xui.MainTabEnum.DESIGN && oldValue == $xui.MainTabEnum.STATE) {
+    if (newValue == $xui.MainTabEnum.DESIGN) {
       // retour de l'onglet jsonEditor
-      const ctrlStr = `${$xui.rootdata.stateDataSource}#${JSON.stringify($xui.rootdata.stateDataMock)}`;
+      const ctrlStr = `${rootdata.stateDataSource}#${JSON.stringify(rootdata.stateDataMock)}`;
       if ($xui.lastEditorAppStateValue != ctrlStr) {
         $xui.refreshAction('template:reload-json'); // recharge le json
         $xui.doStoreOnNextReload = true;
@@ -45,15 +46,16 @@ function onChangeMainTab(instanceVue) {
     }
 
     if (newValue == $xui.MainTabEnum.STATE) {
-      $xui.lastEditorAppStateValue = `${$xui.rootdata.stateDataSource}#${JSON.stringify($xui.rootdata.stateDataMock)}`;
+      $xui.lastEditorAppStateValue = `${rootdata.stateDataSource}#${JSON.stringify(rootdata.stateDataMock)}`;
 
       // reaffiche l'initial State de l'application
-      $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.stateData);
-      $xui.rootdata.ListActions=$xui.getCodeEventXUI();
-      $xui.rootdata.currentCode="no code";
-      $xui.rootdata.currentCodeName="";
-      $xui.rootdata.currentCodeIdx=-1;
-      const idxSelected = $xui.rootdata.ListActions.findIndex(element => element.xid == $xui.rootdata.currentCodeXid);
+      $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor.editor.set(rootdata.stateData);
+
+      rootdata.ListActions=$xui.getCodeEventXUI();
+      rootdata.currentCode="no code";
+      rootdata.currentCodeName="";
+      rootdata.currentCodeIdx=-1;
+      const idxSelected = rootdata.ListActions.findIndex(element => element.xid == rootdata.currentCodeXid);
       $xui.loadCodeAction(idxSelected);
     }
 
@@ -66,8 +68,8 @@ function onChangeMainTab(instanceVue) {
     if (newValue == $xui.MainTabEnum.ENV) {
       // onglet SEO
       document.getElementById("qrcode").querySelectorAll('*').forEach(n => n.remove());
-      $xui.rootdata.urlApp = $xui.getUrlApp();
-      new QRCode(document.getElementById("qrcode"), $xui.rootdata.urlApp);
+      rootdata.urlApp = $xui.getUrlApp();
+      new QRCode(document.getElementById("qrcode"), rootdata.urlApp);
     }
 
   }, { deep: true });
@@ -77,17 +79,19 @@ function onChangeMainTab(instanceVue) {
 function onChangeRightPanelTab(instanceVue) {
   instanceVue.$watch('main.idxTabProperties', (newValue, oldValue) => {
 
+    const rootdata = $xui.getAppState().main;
+
     console.debug(`The idxTabProperties name was changed from ${oldValue} to ${newValue}!`);
-    if ($xui.rootdata.idxTabProperties <= 2) {
+    if (rootdata.idxTabProperties <= 2) {
       $xui.displayPropertiesJS($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
     }
 
-    if ($xui.rootdata.idxTabProperties == 5) {
+    if (rootdata.idxTabProperties == 5) {
 
-      if (!$xui.rootdata.expandAllCmp) {
+      if (!rootdata.expandAllCmp) {
         // expandAll le prtemliere fois
-        $xui.rootdata.expandAllCmp = true;
-        $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.treeCmp.updateAll($xui.rootdata.expandAllCmp);
+        rootdata.expandAllCmp = true;
+        $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.treeCmp.updateAll(rootdata.expandAllCmp);
       }
 
       // affecte le composant selectionné
@@ -118,13 +122,14 @@ $xui.initVuejs = (instanceVue) => {
     $xui.vuejsAppCmpSetting = null; // recharge la liste de cmp
   });
 
+
   instanceVue.$watch('main.stateDataSource', (newValue, oldValue) => {
-    if ($xui.rootdata.idxTabMain == 0 && newValue!="" ) {
+    const rootdata = $xui.getAppState().main;
+    if (rootdata.idxTabMain == 0 && newValue!="" ) {
       $xui.refreshAction('template:reload-json')   // recharge le json
       //$xui.doStoreOnNextReload = true;
     }
   });
-
 
   instanceVue.$watch('main.routeEnable', (newValue, oldValue) => {
     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeConfig", "param": { routeEnable: newValue } }, "*");
@@ -140,10 +145,18 @@ $xui.initVuejs = (instanceVue) => {
 
 
   setTimeout(() => {
-    //let winFrame = document.querySelector("#rootFrame");
+    //let winFrame = ;
     document.addEventListener( "contextmenu", function(e) {
-      e.preventDefault();
-      $xui.OpenPopupAction(e);
+      const rec = document.querySelector("#rootFrame").getBoundingClientRect();
+      const x = e.clientX;
+      const y = e.clientY;
+      console.debug(rec, x, y);
+      if (x>rec.x && x<(rec.x+rec.width) && y>rec.y && y<(rec.y+rec.height) )
+      {
+        e.preventDefault();
+        $xui.OpenPopupAction(e);
+      }
+
     });
 
   }, 1000);

@@ -65,14 +65,15 @@ export class EventManager {
         // gestion des evenements entre le designer et l'iframe
         window.addEventListener('message', function (e) {
             const data = e.data;
+            const rootdata = $xui.getAppState().main;
             if (data.action == "select" || data.action == "popupAction") {
                 $xui.closePopup();
                 $xui.SelectorManager.displaySelectorByPosition(data.position);
                 $xui.modeDisplaySelection = true;
 
                 // se repositionne sur l'onglet 0
-                if (data.action == "select" && $xui.rootdata.idxTabProperties > 2)
-                    $xui.rootdata.idxTabProperties = 0;
+                if (data.action == "select" && rootdata.idxTabProperties > 2)
+                    rootdata.idxTabProperties = 0;
 
                 // 250 = delay d'animation des v-tabs
                 const delayWaitEndAnim = 50;   //250
@@ -129,17 +130,17 @@ export class EventManager {
                 $xui.copyCmp();
             }
             else if (data.action == "ctrlV") {
-                if (!$xui.rootdata.pasteDisabled) {
+                if (!rootdata.pasteDisabled) {
                     $xui.pasteTo();
                 }
             }
             else if (data.action == "ctrlZ") {
-                if (!$xui.rootdata.undoDisabled) {
+                if (!rootdata.undoDisabled) {
                     $xui.undo();
                 }
             }
             else if (data.action == "ctrlY") {
-                if (!$xui.rootdata.redoDisabled) {
+                if (!rootdata.redoDisabled) {
                     $xui.redo();
                 }
             }
@@ -151,11 +152,11 @@ export class EventManager {
                 $xui.updateDirectProperty(data.value, data.variable, data.xid);
             }
             else if (data.action == "displayMessage") {
-                $xui.rootdata.messages.push(data.value);
+                rootdata.messages.push(data.value);
                 this.setTimeout(() => {
-                    const index = $xui.rootdata.messages.indexOf(data.value);
+                    const index = rootdata.messages.indexOf(data.value);
                     if (index !== -1) {
-                        $xui.rootdata.messages.splice(index, 1);
+                        rootdata.messages.splice(index, 1);
                     }
                 }, data.value.timeout);
             }
@@ -173,7 +174,6 @@ export class EventManager {
                 // lancer par les v-xui-reloader  ou aprés un rechargement global du body
                 console.debug("reloader finish");
 
-                
                 doPromiseJS("OnPageReady");
                 doPromiseJS("AfterChangeSelectByXid");
             }

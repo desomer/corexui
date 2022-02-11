@@ -10,8 +10,8 @@ import 'native/register.dart';
 import 'parser/HTMLReader.dart';
 
 const ATTR_XID = "xid";
-const ATTR_PARENT_XID =
-    "parent-xid"; // utiliser dans <xui-slot xid="[[parent-xid]]-content">
+// utiliser dans <xui-slot xid="[[parent-xid]]-content">
+const ATTR_PARENT_XID = "parent-xid"; 
 
 const ATTR_SLOT_NAME = "slot-name";
 const ATTR_SLOT_FULL = "slot-full";
@@ -36,6 +36,8 @@ const ATTR_CONVERT_JSON = "convert-json";
 const ATTR_XUI_IF = "if";
 const ATTR_XUI_FORVAR = "for-nbvar";
 
+const PROP_VAR_ITEMS = ":varitems";
+
 const ATTR_STYLE_SLOT = "style-slot";
 // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
 
@@ -49,14 +51,16 @@ const TAG_FACTORY = "xui-factory";
 const TAG_IMPORT = "xui-import";
 const TAG_PROP = "xui-prop";
 const TAG_SLOT = "xui-slot";
-const TAG_DIV_SLOT =
-    "xui-div-slot"; // nom du composant (div) slot dans la class css xui-class-slot
+// nom du composant (div) slot dans la class css xui-class-slot
+const TAG_DIV_SLOT = "xui-div-slot"; 
 
-const XUI_COPYZONE_SLOT =
-    "xui-copyzone-slot"; // pour la recopie (ctrl c , v , x)
+// pour la recopie (ctrl c , v , x)
+const XUI_COPYZONE_SLOT = "xui-copyzone-slot"; 
 const XUI_TEMPORARY_SLOT = "xui-temporary-slot"; // pour le surround
 
 //const PROP_FOR_VAR = "PROP_FOR_VAR";
+
+const PROP_BIND_PREFIX = "binding";
 
 const MODE_ALL = "";
 const MODE_FINAL = "final";
@@ -281,7 +285,7 @@ class XUIResource extends XMLElemReader {
         p.propertiesXUI ??= HashMap<String, XUIProperty>();
         var b = element.attributs!["binding"];
         if (b != null) {
-          var prop = XUIPropertyBinding(element.attributs!["val"], b);
+          var prop = XUIPropertyBinding(element.attributs!["val"], null, b);
           p.propertiesXUI![element.attributs!["id"]!] = prop;
         } else {
           var prop = XUIProperty(element.attributs!["val"]);

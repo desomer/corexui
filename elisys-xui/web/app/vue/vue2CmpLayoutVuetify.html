@@ -310,6 +310,8 @@
         <xui-prop var=":modelTab" cat="event:model" editor="text" bind-type="int">var model</xui-prop>
         <xui-prop var="@change" cat="event:elem" editor="text">Change</xui-prop>
 
+        <xui-prop var=":varitems" cat="event:model" editor="var" bind-type="array">items var name</xui-prop>
+
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
     </xui-doc>
@@ -340,11 +342,19 @@
         light="[[light]]" color="[[color]]" background-color="[[background-color]]" slider-color="[[slider-color]]"
         icons-and-text="[[icons-and-text]]" show-arrows="[[show-arrows]]" fixed-tabs="[[fixed-tabs]]"
         centered="[[centered]]" right="[[right]]" center-active="[[center-active]]" [[event]] v-model=[[:modelTab]] xui-for="idx">
-        <v-tab [[event@-1]] ref=[[ref@-1]]>
+        
+        <v-tab [[event@-1]] ref=[[ref@-1]]   
+            if:[[:varitems@1]]:v-for="( [[:varitems@1]]_item , [[:varitems@1]]_index ) in [[:varitems@1]]"
+            if:[[:varitems@1]]:#key="[[index::varitems@1]]_index" 
+        >
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-[[idx@0+]]" xui-slot-name="tab [[idx@0+]]"></xui-slot>
         </v-tab>
+
         <!--v-tab-item :transition="false" :reverse-transition="false" eager-->
-        <v-tab-item eager -style="background-color:[[colorBgItem@-1]]">
+        <v-tab-item eager -style="background-color:[[colorBgItem@1]]" 
+                if:[[:varitems@1]]:v-for="( [[:varitems@1]]_item , [[:varitems@1]]_index ) in [[:varitems@1]]"
+                if:[[:varitems@1]]:#key="[[index::varitems@1]]_index" 
+        >
             <!-- eager  desactive le lazyloading -->
             <xui-slot xui-reloader=true xid="[[parent-xid]]-tab-item-[[idx@0+]]" style-slot="height:100%"
                 xui-slot-name="tab content [[idx@0+]]" xui-topath="click:[[parent-xid]]-tab-[[idx@0+]]">

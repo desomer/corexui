@@ -29,8 +29,8 @@
 <script type="module">
 
     const urlParams = new URLSearchParams(window.location.search);
-    window.$xui.rootdata.frameName = urlParams.get("id");
-    window.$xui.rootdata.frameTemplate = urlParams.get("id");
+    //const rootdata = $xui.getAppState().main;
+
 
     import("./app/clsEventDesignManager.js").then((module) => {
         new module.EventManager().initBuild();
@@ -40,6 +40,10 @@
         $xui.pageDesignManager = new module.PageDesignManager();
 
         waitForXuiLib("initPageXUI", function () {
+            //const rootdata = $xui.getAppState().main;
+            window.$xui.rootdata.frameName = urlParams.get("id");
+            window.$xui.rootdata.frameTemplate = urlParams.get("id");
+
             $xui.doPromiseJS  = doPromiseJS;
             var infoFile = $xui.pageDesignManager.getInfoFile("final");
             $xuicore.initPageXUI(infoFile);

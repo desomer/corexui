@@ -62,7 +62,7 @@ class ObjectReader {
         // if (xuiDesign.elemXUI.propertiesXUI[variable] == null) {
         xuiDesign.elemXUI.propertiesXUI![variable] = binding == null
             ? XUIProperty(value)
-            : XUIPropertyBinding(value, binding);
+            : XUIPropertyBinding(value, null, binding);
         // }
         // affecte la prop
         //  xuiDesign.elemXUI.propertiesXUI[variable].content = value;

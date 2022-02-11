@@ -49,6 +49,8 @@ function onChangeMainTab(instanceVue) {
 
       // reaffiche l'initial State de l'application
       $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor.editor.set($xui.rootdata.stateData);
+      $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor2.editor.set($xui.rootdata.stateDataMock);
+      
       $xui.rootdata.ListActions=$xui.getCodeEventXUI();
       $xui.rootdata.currentCode="no code";
       $xui.rootdata.currentCodeName="";

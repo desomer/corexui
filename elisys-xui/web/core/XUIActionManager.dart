@@ -100,13 +100,13 @@ class XUIActionManager {
               }
               if (elemXui.propertiesXUI![variable] == null && withBinding) {
                 elemXui.propertiesXUI![variable] =
-                    XUIPropertyBinding(null, null);
+                    XUIPropertyBinding(null, null, null);
               }
               
               if (!(elemXui.propertiesXUI![variable] is XUIPropertyBinding) &&
                   withBinding) {
                 elemXui.propertiesXUI![variable] =
-                    XUIPropertyBinding(null, null);
+                    XUIPropertyBinding(null, null, null);
               }
               if (elemXui.propertiesXUI![variable] is XUIPropertyBinding &&
                   !withBinding) {
@@ -265,7 +265,7 @@ class XUIActionManager {
         design.elemXUI.propertiesXUI!.forEach((k, v) {
           if (v is XUIPropertyBinding)
           {
-            XUIProperty cloneProp = XUIPropertyBinding(v.content, v.binding);
+            XUIProperty cloneProp = XUIPropertyBinding(v.content, v.namespace, v.binding);
             xuiElem.propertiesXUI![k] = cloneProp;
           }
           else

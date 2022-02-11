@@ -33,7 +33,7 @@ $xui.rootdata.animationNameExit = "";
 $xui.routeEnable = true;
 $xui.actionEnable = true;
 
-$xui.info={};
+$xui.info={};   // map d'info les idx des tableaux
 
 $xui.loadApplicationJS = () => {
 

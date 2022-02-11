@@ -32,8 +32,6 @@ var json = {
     overlay: false,
     overlayEvent: false,
 
-
-
     listPopupAdd: [],
     messages : [],
     snackbar: true,

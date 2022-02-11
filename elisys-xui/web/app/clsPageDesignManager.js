@@ -6,50 +6,53 @@ export class PageDesignManager {
 
 
     getInfoFile(mode) {
+
+        let rootdata = $xui.rootdata;
+        if ($xui.getAppState!=null)
+            rootdata = $xui.getAppState().main;
+
         return {
-            fileID: window.$xui.rootdata.frameName,
-            file: `app/${window.$xui.rootdata.frameTemplate}.html`,
+            fileID: rootdata.frameName,
+            file: `app/${rootdata.frameTemplate}.html`,
             xid: 'root',
             mode,
-            jsonBinding: JSON.stringify($xui.rootdata.stateData)
+            jsonBinding: JSON.stringify(rootdata.stateData)
         };
     }
 
 
     getPageId() {
-        return window.$xui.rootdata.frameName;
+        const rootdata = $xui.getAppState().main;
+        return rootdata.frameName;
     }
 
     /** premier chargement de la page en full */
     loadPage(html, option) {
-        if ($xui.rootdata.isModePhone) {
+        const rootdata = $xui.getAppState().main;
+        if (rootdata.isModePhone) {
             document.querySelector("#rootFrame").classList.remove("xui-iframe-phone");
         }
         document.querySelector("#rootFrame").style.display = 'none';
         document.querySelector("#rootFrame").srcdoc = html;
-        $xui.rootdata.routeEnable = true;
-        $xui.rootdata.actionEnable = true;
+        rootdata.routeEnable = true;
+        rootdata.actionEnable = true;
 
         this.codeHtml = html;
 
-        // setTimeout(() => {
-        //     $xui.displayComponents("", "");
-        //     $xui.displayPropertiesJS("page-0-route-0-content-slot", "page-0-route-0-content-slot");
-        // }, 200);
+        const promOnPageReady = getPromise("OnPageReady");
 
-        let promOnPageReady = getPromise("OnPageReady");
         promOnPageReady.then(()=> { 
             $xui.displayComponents("", "");
             $xui.displayPropertiesJS("page-0-route-0-content-slot", "page-0-route-0-content-slot");
         });
 
         if (option != null) {
-            $xui.rootdata.listSlot.length = 0;
-            $xui.rootdata.listSlot.push(...option.treeSlot);
+            rootdata.listSlot.length = 0;
+            rootdata.listSlot.push(...option.treeSlot);
             promOnPageReady.then(()=> { 
                 this.initConfigApp(option); 
-                $xui.rootdata.overlayEvent=true;
-                $xui.rootdata.overlay=false;
+                rootdata.overlayEvent=true;
+                rootdata.overlay=false;
                 document.querySelector("#rootFrame").style.display = null;
             });
         }
@@ -58,45 +61,55 @@ export class PageDesignManager {
         const name = this.getPageId();
         const version = localStorage.getItem(`xui_version_${name}`);
         if (version != null) {
-            $xui.rootdata.undoDisabled = false;
+            rootdata.undoDisabled = false;
             const versionMax = localStorage.getItem(`xui_version_max_${name}`);
             if (versionMax != null && parseInt(versionMax) > parseInt(version)) {
-                $xui.rootdata.redoDisabled = false;
+                rootdata.redoDisabled = false;
             }
+        }
+
+        if (option.action=="reloaderDisable")
+        {
+            setTimeout(() => {
+                doPromiseJS("OnPageReady");
+            }, 1000);
         }
     }
 
 
     initConfigApp(option) {
+        const rootdata = $xui.getAppState().main;
         if (option.appConfig != null && option.appConfig != "") {
             const appConfig = JSON.parse(option.appConfig); 
             if (appConfig.isModePhone) {
                 $xui.modePhone();
             }
             
-            $xui.rootdata.stateDataSource = appConfig.dataSrc;
-            $xui.rootdata.routeEnable = appConfig.routeEnable;
-            $xui.rootdata.actionEnable = appConfig.actionEnable;
+            rootdata.stateDataSource = appConfig.dataSrc;
+            rootdata.routeEnable = appConfig.routeEnable;
+            rootdata.actionEnable = appConfig.actionEnable;
 
         }
         else
         {
-            $xui.rootdata.stateDataSource = "template";
-            $xui.rootdata.routeEnable = true;
-            $xui.rootdata.actionEnable = true;
+            rootdata.stateDataSource = "template";
+            rootdata.routeEnable = true;
+            rootdata.actionEnable = true;
         }
     }
 
     changePageOnFrame(param) {
 
+        const rootdata = $xui.getAppState().main;
         $xui.SelectorManager.unDisplaySelector();
 
-        param.jsonTemplate = $xui.rootdata.stateData;
-        if ($xui.rootdata.stateDataSource == "mock") {
-            param.jsonBinding = $xui.rootdata.stateDataMock;
+        param.jsonTemplate = rootdata.stateData;
+        
+        if (rootdata.stateDataSource == "mock") {
+            param.jsonBinding = rootdata.stateDataMock;
         }
         else {
-            param.jsonBinding = $xui.rootdata.stateData;
+            param.jsonBinding = rootdata.stateData;
         }
 
         if (param.mode == "template") {
@@ -121,8 +134,8 @@ export class PageDesignManager {
         //console.debug("binding ---- ", param.binding);
         //console.debug("treeSlot ---- ", param.treeSlot);
 
-        $xui.rootdata.listSlot.length = 0;
-        $xui.rootdata.listSlot.push(...param.treeSlot);
+        rootdata.listSlot.length = 0;
+        rootdata.listSlot.push(...param.treeSlot);
 
         if (param.action == "export") {
             this.export();
@@ -153,7 +166,7 @@ export class PageDesignManager {
             }, 500);
         }
 
-        if ($xui.rootdata.idxTabMain == $xui.MainTabEnum.CODE)  // si onglet 2 actif
+        if (rootdata.idxTabMain == $xui.MainTabEnum.CODE)  // si onglet 2 actif
         {
             this.loadCode();   // affiche le code du mode (template, preview, final )
             this.loadCodeXUI();
@@ -165,6 +178,7 @@ export class PageDesignManager {
     async export() {
         const q = faunadb.query;
         const client = new faunadb.Client({ secret: 'fnADgqwCPfACAEWJ2wy7Kb5jrUIN5aa4t93DOl1a' });
+        const rootdata = $xui.getAppState().main;
 
         // client.query(
         // q.Get(q.Ref(q.Collection('Filexui'), '252953488011559426'))
@@ -192,7 +206,7 @@ export class PageDesignManager {
         try {
             ret=  await client.query(
                 q.Get(
-                    q.Match(q.Index('filexuiById'), $xui.rootdata.frameName)
+                    q.Match(q.Index('filexuiById'), rootdata.frameName)
                 )
             )
         } catch (error) {
@@ -202,7 +216,7 @@ export class PageDesignManager {
                 ret= await client.query(
                     q.Create(
                         q.Collection('Filexui'),
-                        { data: { id: $xui.rootdata.frameName, html:"new" } },
+                        { data: { id: rootdata.frameName, html:"new" } },
                     )
                     )
             }
@@ -220,9 +234,9 @@ export class PageDesignManager {
         )
 
         console.log("re save=", ret);
-        $xui.rootdata.snackbar_text = "deploy terminated";
-        $xui.rootdata.snackbar_timeout = 2000;
-        $xui.rootdata.snackbar = true;
+        rootdata.snackbar_text = "deploy terminated";
+        rootdata.snackbar_timeout = 2000;
+        rootdata.snackbar = true;
     }
 
     store() {
@@ -249,8 +263,9 @@ export class PageDesignManager {
             localStorage.setItem(`xui_version_min_${name}`, `${verMin}`);
         }
 
-        $xui.rootdata.redoDisabled = true;
-        $xui.rootdata.undoDisabled = false;
+        const rootdata = $xui.getAppState().main;
+        rootdata.redoDisabled = true;
+        rootdata.undoDisabled = false;
 
         // gestion du max
         // var versionMax = localStorage.getItem('xui_version_max_' + name);
@@ -288,6 +303,8 @@ export class PageDesignManager {
 
     undo() {
         const name = this.getPageId();
+        const rootdata = $xui.getAppState().main;
+
         let version = localStorage.getItem(`xui_version_${name}`);
         if (version == null)
             version = "0";
@@ -301,11 +318,11 @@ export class PageDesignManager {
         if (ver > verMin+1)
             ver--;
         else
-            $xui.rootdata.undoDisabled = true;
+            rootdata.undoDisabled = true;
 
         localStorage.setItem(`xui_version_${name}`, `${ver}`);
         $xui.refreshAction("template:reload");
-        $xui.rootdata.redoDisabled = false;
+        rootdata.redoDisabled = false;
     }
 
     redo() {
@@ -315,13 +332,14 @@ export class PageDesignManager {
 
         let ver = parseInt(version);
         const verMax = parseInt(versionMax);
+        const rootdata = $xui.getAppState().main;
         
         if (ver < verMax) {
             ver++;
-            $xui.rootdata.undoDisabled = false;
+            rootdata.undoDisabled = false;
         }
         if (ver == verMax) {
-            $xui.rootdata.redoDisabled = true;
+            rootdata.redoDisabled = true;
         }
 
         localStorage.setItem(`xui_version_${name}`, `${ver}`);

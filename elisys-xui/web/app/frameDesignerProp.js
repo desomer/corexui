@@ -3,13 +3,14 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
 
     let idProp = "AppPropertiesSetting";
     infoFile.action = "design";
+    const rootdata = $xui.getAppState().main;
 
-    if ($xui.rootdata.idxTabProperties == 1) {
+    if (rootdata.idxTabProperties == 1) {
         idProp = "AppPropertiesStyle";
         infoFile.action = "style";
     }
 
-    if ($xui.rootdata.idxTabProperties == 2) {
+    if (rootdata.idxTabProperties == 2) {
         idProp = "AppPropertiesEvent";
         infoFile.action = "event";
     }
@@ -19,7 +20,7 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         posScroll = document.getElementById(idProp).scrollTop;
     }
 
-    let prom = getPromise("getDesignProperties");
+    const prom = getPromise("getDesignProperties");
 
     $xuicore.getDesignPropertiesXUI(infoFile, xid, xid_slot);
     prom.then(prop => {
@@ -31,12 +32,12 @@ $xui.displayPropertiesJS = (xid, xid_slot) => {
         // }
 
         $xui.propertiesDesign = prop;
-        $xui.rootdata.breadcrumb.length=0;
-        $xui.rootdata.breadcrumb.push(...$xui.propertiesDesign.path);
-        $xui.rootdata.dynamicSlots.length=0;
-        $xui.rootdata.dynamicSlots.push(...$xui.propertiesDesign.pathConditional);
-        $xui.rootdata.childrenSlots.length=0;
-        $xui.rootdata.childrenSlots.push(...$xui.propertiesDesign.pathChildren);
+        rootdata.breadcrumb.length=0;
+        rootdata.breadcrumb.push(...$xui.propertiesDesign.path);
+        rootdata.dynamicSlots.length=0;
+        rootdata.dynamicSlots.push(...$xui.propertiesDesign.pathConditional);
+        rootdata.childrenSlots.length=0;
+        rootdata.childrenSlots.push(...$xui.propertiesDesign.pathChildren);
 
         $xui.propertiesDesign.json = $xui.parseJson($xui.propertiesDesign.data);
 
@@ -152,7 +153,8 @@ $xui.getCodeEventXUI= () =>
 }
 
 $xui.loadCodeAction = (idx) => {
-      if ($xui.rootdata.currentCodeIdx>=0)  
+      const rootdata = $xui.getAppState().main;
+      if (rootdata.currentCodeIdx>=0)  
       {
         $xui.saveCodeAction();
       }
@@ -160,9 +162,9 @@ $xui.loadCodeAction = (idx) => {
       if (idx<0)
         return;
 
-      $xui.rootdata.currentCodeName = `function ${$xui.rootdata.ListActions[idx].name}()`;
-      $xui.rootdata.currentCode= $xui.rootdata.ListActions[idx].code;
-      $xui.rootdata.currentCodeIdx = idx;
+      rootdata.currentCodeName = `function ${rootdata.ListActions[idx].name}()`;
+      rootdata.currentCode= rootdata.ListActions[idx].code;
+      rootdata.currentCodeIdx = idx;
 
       let listAct = document.querySelectorAll(".xui-btn-code");
       let i = 0;
@@ -180,26 +182,26 @@ $xui.loadCodeAction = (idx) => {
 // $xui.highlighter = (code) => Prism.highlight(code, Prism.languages.js, "js");
 
 $xui.saveCodeAction = () => {
-
-    const idx = $xui.rootdata.currentCodeIdx;
-    $xui.rootdata.currentCodeXid= $xui.rootdata.ListActions[idx].xid;
+    const rootdata = $xui.getAppState().main;
+    const idx = rootdata.currentCodeIdx;
+    rootdata.currentCodeXid= rootdata.ListActions[idx].xid;
     
-    const code = $xui.rootdata.ListActions[idx].code;
-    if (code==$xui.rootdata.currentCode)
+    const code = rootdata.ListActions[idx].code;
+    if (code==rootdata.currentCode)
         return;
 
     const jsonProp = [{
-        xid : $xui.rootdata.ListActions[idx].xid,
-        variable : `#${$xui.rootdata.ListActions[idx].eventName}`,
-        value : $xui.rootdata.currentCode,
+        xid : rootdata.ListActions[idx].xid,
+        variable : `#${rootdata.ListActions[idx].eventName}`,
+        value : rootdata.currentCode,
         bind : "@"
     }];
 
-    $xui.rootdata.ListActions[idx].code = $xui.rootdata.currentCode;
+    rootdata.ListActions[idx].code = rootdata.currentCode;
     $xuicore.saveDesignPropertiesXUI($xui.pageDesignManager.getInfoFile("template"), jsonProp);
-    $xui.rootdata.currentCodeIdx=-1;
+    rootdata.currentCodeIdx=-1;
 
-    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeJS", "param": { actions: $xui.rootdata.ListActions } }, "*");
+    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeJS", "param": { actions: rootdata.ListActions } }, "*");
 
 }
 

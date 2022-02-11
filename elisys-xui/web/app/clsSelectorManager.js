@@ -14,7 +14,9 @@ export class SelectorManager {
     /************************************************************************************ */
     displaySelectorByPosition(position) {
 
-        if ($xui.rootdata.idxTabMain != $xui.MainTabEnum.DESIGN)
+        const rootdata = $xui.getAppState().main;
+
+        if (rootdata.idxTabMain != $xui.MainTabEnum.DESIGN)
             return;
 
         /*******************************************************/
@@ -117,20 +119,17 @@ export class SelectorManager {
 
 
     displayInTree() {
-        if ($xui.rootdata.activeSlot.length == 0 || $xui.rootdata.activeSlot[0].id != $xui.propertiesDesign.xid) {
-            let rowInTree = this._searchInTree($xui.propertiesDesign.xid, $xui.rootdata.listSlot);
+        const rootdata = $xui.getAppState().main;
+        if (rootdata.activeSlot.length == 0 || rootdata.activeSlot[0].id != $xui.propertiesDesign.xid) {
+            let rowInTree = this._searchInTree($xui.propertiesDesign.xid, rootdata.listSlot);
             if (rowInTree == null) {
                 const infoFile = $xui.pageDesignManager.getInfoFile("template");
                 let info = $xuicore.getInfoXUI(infoFile, $xui.propertiesDesign.xid, $xui.propertiesDesign.xid);
-                rowInTree = this._searchInTree(info.parentXid, $xui.rootdata.listSlot);
-                // if (rowInTree == null) {
-                //     info = $xuicore.getInfoXUI(infoFile, info.parentXid, info.parentXid);
-                //     rowInTree = this._searchInTree(info.parentXid, $xui.rootdata.listSlot);
-                // }
+                rowInTree = this._searchInTree(info.parentXid, rootdata.listSlot);
             }
             if (rowInTree != null) {
-                $xui.rootdata.activeSlot.length = 0;
-                $xui.rootdata.activeSlot.push(rowInTree);
+                rootdata.activeSlot.length = 0;
+                rootdata.activeSlot.push(rowInTree);
             }
             setTimeout(() => {
                 const elem = document.querySelector("#treeCmp .v-treeview-node--active")

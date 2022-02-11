@@ -109,7 +109,7 @@ Future initPageXUI(FileDesignInfo fileInfo) async {
 
   XUIProperty? propConfig =  designManager.getXUIEngine().getXUIPropertyFromDesign("root", "appConfig");
   options.appConfig=propConfig?.content?.toString() ?? "";
-
+  options.action = XUIConfigManager.reloaderEnable?"":"reloaderDisable";
   loadPageJS(str, options);
 }
 
@@ -127,10 +127,10 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
   }
 
   if (fileInfo.action == "reload-json") {
-    var newBinding = generateApplicationStateJS(
-        "", ""); // affecte le text de l'editor uniquement
+    // affecte le text de l'editor uniquement
+    var newBinding = generateApplicationStateJS("main", "", ""); 
     var designManager = _getDesignManager(fileInfo);
-    await designManager.changeProperty("root", "binding", newBinding, "");
+    await designManager.changeProperty("root", PROP_BIND_PREFIX, newBinding, "");
   }
 
   if (fileInfo.action == "clear") {

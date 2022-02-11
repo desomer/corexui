@@ -15,10 +15,10 @@ external void changePageJS(obj);
 external void doPromiseJS(idPromise, ret);
 
 @JS()
-external String generateApplicationStateJS(template, last);
+external String generateApplicationStateJS(namespace, template, last);
 
 @JS()
-external String generateApplicationStoreJS(state, action);
+external String generateApplicationStoreJS(listState);
 
 
 @JS()
@@ -202,3 +202,15 @@ class VueParamJS {
   external set xidSlot(String xidSlot);
 }
 
+@JS()
+@anonymous
+class bindingState {
+  external String get namespace;
+  external set namespace(String namespace);
+
+  external String get state;
+  external set state(String state);
+
+  external List get actions;
+  external set actions(List action);
+}

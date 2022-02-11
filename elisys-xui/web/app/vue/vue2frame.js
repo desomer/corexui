@@ -11,6 +11,8 @@ Vue.config.productionTip = false;
 Vue.use(Vuex);
 Vue.use(VueRouter);
 
+$xui.getAppState = () => $xui.vuejs.$store.state;
+
 /*********************************************************************************/
 // $xui.createComponentFromTemplate = (idTemplate, computeDataBinding) => {
 // 	return {
@@ -27,17 +29,14 @@ Vue.use(VueRouter);
 globalThis.vue2CmpMgr = vue2CmpMgr;
 globalThis.Vuex = Vuex;
 
-$xui.rootdata.animationNameEnter = "animate__animated animate__fadeInUp";
-$xui.rootdata.animationNameExit = "";
 
 $xui.routeEnable = true;
 $xui.actionEnable = true;
-
 $xui.info={};
 
-$xui.loadApplicationJS = () => {
 
-	$xui.logger = (store) => {
+$xui.loadApplicationJS = () => {
+$xui.logger = (store) => {
 		store.subscribe((event, store) => {
 			console.log(`%c MUTATION ${event.type} `, "color: #03A9F4; font-weigth: bold; background-color: #eee", event.payload, store);
 		});
@@ -58,25 +57,8 @@ $xui.loadApplicationJS = () => {
 		}
 	}
 
-	//initStore();
-	//var modulesManager = null;
-	//if (globalThis.initialiseAppState!=null)
-	//{
-	//console.debug("********************* initialiseAppState OK *******************************************");
+
 	const modulesManager = globalThis.initialiseAppState();
-	//}
-	// else {
-	// 	console.debug("********************* error initialiseAppState NOK *******************************************");
-	// 	modulesManager = new VuexModuleManager();
-	// 	const main = modulesManager.addModule("main", $xui.rootdata);
-	// 	modulesManager.setStore(new Vuex.Store({
-	// 		modules: {
-	// 			main,
-	// 		},
-	// 		plugins: [$xui.logger],
-	// 		strict: true
-	// 	}));
-	// }
 
 
 	$xui.mixinStore = modulesManager.getMixin();
@@ -84,11 +66,12 @@ $xui.loadApplicationJS = () => {
 
 	$xui.rootdata = modulesManager.getStore().state.main;
 
+
 	/***********************************  ROUTER   **********************************/
 	initRouter();
 
 	/*********************************** THEME ***********************************/
-	var darkTheme = document.querySelector("#xui-root-template").attributes["dark"];
+	const darkTheme = document.querySelector("#xui-root-template").attributes["dark"];
 	const configVuetify = {
 		theme: {
 			dark: ((darkTheme != null) ? true : false),
@@ -112,19 +95,6 @@ $xui.loadApplicationJS = () => {
 	/*********************************** VUEJS ***********************************/
 	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-root-template");
 
-	/*************************************************************************** */
-	//$xui.rootdata.toto="4444";
-	// var json = { items:[{ key:"a" }, { key:"b"}]}
-	// $xui.rootdata = { ...$xui.rootdata, ...json };
-
-	//var allState = Reflect.ownKeys($xui.store.state);
-	//console.debug("vue store allState ", allState)
-
-	//console.debug("vue store compute state ", $xui.computeDataBinding)
-	//console.debug("vue inner state", $xui.store.state)
-	//console.debug("vue static data", $xui.rootdata)
-	//console.debug("vue store", $xui.store);
-	//console.debug("vue routes", routes);
 
 	/*************************************************************************** */
 	$xui.vuejs = new Vue({
@@ -146,6 +116,10 @@ $xui.loadApplicationJS = () => {
 			throw err;
 		}
 	});
+
+	const rootdata = $xui.getAppState().main;
+	rootdata.animationNameEnter = "animate__animated animate__fadeInUp";
+	rootdata.animationNameExit = "";
 
 }
 
@@ -244,7 +218,6 @@ function initStore() {
 
 		say(context, event) {
 			console.debug("message say", context, event, this);
-			$xui.rootdata.items.push({ "key": "c" });
 		}
 	};
 
@@ -257,7 +230,6 @@ function initStore() {
 	/*********************************** STORE CQRS  *********************************/
 	$xui.store = new Vuex.Store({
 		state: {
-			count: 0,
 			...$xui.rootdata
 		},
 		mutations: mutations,
@@ -330,14 +302,15 @@ function initEventRouter() {
 		exitElem.style.height = `${exitElemscrollHeight}px`;
 		exitElem.style.top = `-${scrollPos}px`;
 		window.scrollTo(0, 0);
+		const rootdata = $xui.getAppState().main;
 
 		if (to.fullPath == "/") {
-			$xui.rootdata.animationNameEnter = "xui-transition-down animate__animated animate__fadeInUp"; 
-			$xui.rootdata.animationNameExit = "xui-transition animate__animated animate__fadeOutDown";
+			rootdata.animationNameEnter = "xui-transition-down animate__animated animate__fadeInUp"; 
+			rootdata.animationNameExit = "xui-transition animate__animated animate__fadeOutDown";
 		}
 		else {
-			$xui.rootdata.animationNameEnter = "xui-transition animate__animated animate__fadeInUp";
-			$xui.rootdata.animationNameExit = "xui--transition-down animate__animated animate__fadeOutDown";
+			rootdata.animationNameEnter = "xui-transition animate__animated animate__fadeInUp";
+			rootdata.animationNameExit = "xui--transition-down animate__animated animate__fadeOutDown";
 		}
 	});
 }

@@ -38,13 +38,14 @@ class XUIChild extends XUIModel {
 
 /// gestion du binding
 class XUIBinding {
+  String namespace;
   String propName;
   String attr;
   dynamic value;
   String xid;
   String? type;
 
-  XUIBinding(this.propName, this.attr, this.value, this.xid);
+  XUIBinding(this.namespace, this.propName, this.attr, this.value, this.xid);
 }
 
 ///------------------------------------------------------------------
@@ -306,7 +307,7 @@ class XUIModel implements Comparable<XUIModel> {
         {
           String xid = elemHtml.originElemXUI?.xid as String;
           //print(">>>>>>>>>>>>>>>>>>>>>>>>>>>><" + cmp.elemXUI.xid! + "=> " + xid!);
-          engine.bindingManager.validatorInfo[xid]=XUIBinding(cmp.elemXUI.xid!, "","", xid);
+          engine.bindingManager.validatorInfo[xid]=XUIBinding("", cmp.elemXUI.xid!, "","", xid);
         }
       }
     }
@@ -359,7 +360,7 @@ class XUIModel implements Comparable<XUIModel> {
       slotInfo.implement = elemHtml.implementBy?.first.elemXUI.xid;
       slotInfo.docId = getDocumentationID(elemHtml);
 
-      String? hasFor = elemHtml.propertiesXUI?[":varitems"]?.content;
+      String? hasFor = elemHtml.propertiesXUI?[PROP_VAR_ITEMS]?.content;
       if (hasFor != null)
         slotInfo.mapTag["for"] = hasFor;
       else

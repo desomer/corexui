@@ -7,4 +7,4 @@ rem dart pub global activate webdev
 dart pub get
 
 
-pause
+rem pause

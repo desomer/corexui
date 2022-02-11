@@ -51,10 +51,12 @@ class XUIProperty {
 
 ///--------------------------------------------------------------------
 class XUIPropertyBinding extends XUIProperty {
+  String? namespace;
   String? binding;
   //String? cacheBinding;
 
-  XUIPropertyBinding(v, b) : super(v) {
+  XUIPropertyBinding(v, n, b) : super(v) {
+    namespace = n as String?;
     binding = b as String?;
   }
 

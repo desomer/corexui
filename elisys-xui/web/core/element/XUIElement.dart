@@ -217,7 +217,7 @@ class XUIElementHTML extends XUIElement {
       var name = prop.binding!;
       int isArray = name.lastIndexOf("[]");
       if (isArray<=0) {
-          String? varitems = searchPropertyXUI(":varitems@1+", 0, parseInfo) as String?;
+          String? varitems = searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo) as String?;
           if (varitems!=null)
           {
             varitems=varitems.substring(varitems.indexOf(".")+1);  // retrait du scope
@@ -239,8 +239,10 @@ class XUIElementHTML extends XUIElement {
         String? varNameSpace = searchPropertyXUI("varnamespace@1+", 0, parseInfo) as String?;
         if (varNameSpace!=null)
             namespace=varNameSpace+".";
+        prop.namespace=varNameSpace;
       }
 
+      
       if (parseInfo.mode == ParseInfoMode.CONTENT) {
         // si dans un contenu de tag <div>{{binding}}</div>
         return "{{$namespace$name}}";
@@ -362,8 +364,14 @@ class XUIElementHTML extends XUIElement {
       }
 
       if (!isRoot && engine.isModeDesign() && hasTagReloader) {
-        isReloader = true;
-        _doAddReloaderPhase3(engine, buffer);
+        var parseInfo = ParseInfo("", null, ParseInfoMode.PROP);
+        // pas de reloader si dans un v-for (manque le passage de l'item au composant xui-reloader) 
+        String? varitems = searchPropertyXUI(PROP_VAR_ITEMS+"@2", 0, parseInfo) as String?;
+        if (varitems==null)
+        {
+          isReloader = true;
+          _doAddReloaderPhase3(engine, buffer);
+        }
       }
 
       buffer.trim = propertiesXUI != null && propertiesXUI!.containsKey(ATTR_TRIM_CONTENT);
@@ -439,6 +447,12 @@ class XUIElementHTML extends XUIElement {
         {
           keyAttr="v-bind:"+listArg[3];
         }
+
+        if (keyAttr=="#key")  // cas des tab dynamique
+        {
+          keyAttr=":key";
+        }
+
       }
 
       if (attrName.startsWith("[[event")) {
