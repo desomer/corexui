@@ -31,8 +31,8 @@ class XUIActionManager {
 
     final xuiDesign = listDesign!.sort(engine.xuiFile.context).first;
 
-    if (bind=="@")
-    {
+    if (bind==MODE_SET_PROP_NODOC)
+    { // gestion des properties sans documentation
       var elemXui = xuiDesign.elemXUI;
       if (elemXui.propertiesXUI![variable] == null) {  
             elemXui.propertiesXUI![variable] = XUIProperty(null);
@@ -41,6 +41,7 @@ class XUIActionManager {
       return Future.value();
     }
 
+    // gestion par variable avec une documentation 
     List<DesignInfo> designs = engine.getDesignInfo(xid, xid, false);
     for (var design in designs) {
       DocInfo? doc = design.docInfo;

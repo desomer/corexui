@@ -219,9 +219,10 @@ window.addEventListener('message', (e) => {
             break;
 
         case "switchValue":
-            const value = jsonPathToValue($xui.rootdata, data.param.attr);
-            setValueFromJsonPath($xui.rootdata, data.param.attr, !value);
-            $xui.modulesManager.addModule("main", $xui.rootdata);
+            const rootdata = $xui.getAppState().main;
+            const value = jsonPathToValue(rootdata, data.param.attr);
+            setValueFromJsonPath(rootdata, data.param.attr, !value);
+            $xui.modulesManager.addModule("main", rootdata);
             $xui.modulesManager.reload();
             break;
 
@@ -240,10 +241,14 @@ window.addEventListener('message', (e) => {
             let hasChangeValue = false;
 
             if (/*data.param.action == "reload-json" && data.param.listReloader == null &&*/ data.param.jsonBinding != null) {
-                const jsonBinding = data.param.jsonBinding;
-                const jsonTemplate = data.param.jsonTemplate;
+                
+                const jsonBinding = data.param.jsonBinding;  // template ou mock
 
-                iterateJSON( jsonBinding, $xui.rootdata,
+                //const jsonTemplate = data.param.jsonTemplate;
+
+                const dataState = $xui.getAppState().main;
+
+                iterateJSON( jsonBinding, dataState,
                     (k, v, dest) => {
                         //console.log("k=", k, " v=", v);
                         if (dest == null || dest[k] == null) {
@@ -264,7 +269,7 @@ window.addEventListener('message', (e) => {
 
                 if (hasChangeBinding /*|| hasChangeValue*/ || data.param.action == "reload-json") {
                     $xui.rootdata = jsonBinding;
-                    $xui.modulesManager.addModule("main", $xui.rootdata);
+                    $xui.modulesManager.addModule("main", jsonBinding);
                     $xui.modulesManager.reload();
                 }
 

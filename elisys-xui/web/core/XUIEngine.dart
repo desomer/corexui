@@ -37,6 +37,7 @@ const ATTR_XUI_IF = "if";
 const ATTR_XUI_FORVAR = "for-nbvar";
 
 const PROP_VAR_ITEMS = ":varitems";
+const PROP_VAR_NAMESPACE = "varnamespace";
 
 const ATTR_STYLE_SLOT = "style-slot";
 // gestion des tag escape (HTML, HEAD, ETC...) pour le parser dart
@@ -67,6 +68,8 @@ const MODE_FINAL = "final";
 const MODE_DESIGN = "design";
 const MODE_TEMPLATE = "template";
 const MODE_PREVIEW = "preview";
+
+const MODE_SET_PROP_NODOC = "@";
 
 const SLOT_PREFIX = "_slot-";
 
@@ -284,12 +287,14 @@ class XUIResource extends XMLElemReader {
         XUIElementXUI p = parent;
         p.propertiesXUI ??= HashMap<String, XUIProperty>();
         var b = element.attributs!["binding"];
+        var v = element.attributs!["val"];
+        var id = element.attributs!["id"]!;
         if (b != null) {
-          var prop = XUIPropertyBinding(element.attributs!["val"], null, b);
-          p.propertiesXUI![element.attributs!["id"]!] = prop;
+          var prop = XUIPropertyBinding(v, null, b);
+          p.propertiesXUI![id] = prop;
         } else {
-          var prop = XUIProperty(element.attributs!["val"]);
-          p.propertiesXUI![element.attributs!["id"]!] = prop;
+          var prop = XUIProperty(v);
+          p.propertiesXUI![id] = prop;
         }
 
         return Future.value();

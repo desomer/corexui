@@ -12,6 +12,7 @@ $xui.MainTabEnum = {
 function onChangeMainTab(instanceVue) {
   instanceVue.$watch('main.idxTabMain', (newValue, oldValue) => {
     console.debug(`The idxTabMain name was changed from ${oldValue} to ${newValue}!`);
+    if (oldValue==newValue) return;
 
     $xui.SelectorManager.unDisplaySelector();
     setTimeout(() => {
@@ -19,26 +20,9 @@ function onChangeMainTab(instanceVue) {
     }, 500);
 
     const rootdata = $xui.getAppState().main;
+    const rootStore = $xui.getAppState().store;
 
-    if (oldValue == $xui.MainTabEnum.STATE)
-    {
-      if (rootdata.currentCodeIdx>=0)
-      {
-        $xui.saveCodeAction();
-      }
-      rootdata.currentCode="no code";
-      rootdata.currentCodeName="";
-      rootdata.currentCodeIdx=-1;
-    }
-
-    if (newValue == $xui.MainTabEnum.DESIGN) {
-      // retour de l'onglet jsonEditor
-      const ctrlStr = `${rootdata.stateDataSource}#${JSON.stringify(rootdata.stateDataMock)}`;
-      if ($xui.lastEditorAppStateValue != ctrlStr) {
-        $xui.refreshAction('template:reload-json'); // recharge le json
-        $xui.doStoreOnNextReload = true;
-      }
-    }
+    validateStoreModule(rootStore.idxTabStoreModule, oldValue == $xui.MainTabEnum.STATE, newValue != $xui.MainTabEnum.STATE );
 
     if (newValue == $xui.MainTabEnum.DESIGN && oldValue == $xui.MainTabEnum.LOCAL) {
       const infoFile = $xui.pageDesignManager.getInfoFile("design");
@@ -46,24 +30,13 @@ function onChangeMainTab(instanceVue) {
     }
 
     if (newValue == $xui.MainTabEnum.STATE) {
-      $xui.lastEditorAppStateValue = `${rootdata.stateDataSource}#${JSON.stringify(rootdata.stateDataMock)}`;
-
-      // reaffiche l'initial State de l'application
-      $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor.editor.set(rootdata.stateData);
-
-      rootdata.ListActions=$xui.getCodeEventXUI();
-      rootdata.currentCode="no code";
-      rootdata.currentCodeName="";
-      rootdata.currentCodeIdx=-1;
-      const idxSelected = rootdata.ListActions.findIndex(element => element.xid == rootdata.currentCodeXid);
-      $xui.loadCodeAction(idxSelected);
+      loadStoreModule();
     }
 
     if (newValue == $xui.MainTabEnum.CODE) {
       // onglet code
       $xui.refreshAction('showCode'); // affiche le code et le xui
     }
-
 
     if (newValue == $xui.MainTabEnum.ENV) {
       // onglet SEO
@@ -73,6 +46,52 @@ function onChangeMainTab(instanceVue) {
     }
 
   }, { deep: true });
+}
+
+//---------------------------------------------------------------------------------------
+function loadStoreModule() {
+  const rootdata = $xui.getAppState().main;
+  const storeModule = $xui.getCurrentStoreModule();
+  const rootStore = $xui.getAppState().store;
+
+  storeModule.jsonEditorOptions.onEditable = () => false; //TODO ne marche pas
+  storeModule.lastEditorAppStateValue = JSON.stringify(storeModule.stateDataMock);
+
+  // reaffiche l'initial State de l'application
+  $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor[rootStore.idxTabStoreModule].editor.set(storeModule.stateData);
+  $xui.vuejs.$refs.root.$refs.routermain.$refs.routerview.$refs.jsonEditor2[rootStore.idxTabStoreModule].editor.set(storeModule.stateDataMock);
+
+  //TODO passer les namespace
+  storeModule.ListActions = $xui.getEventMethodsXUI(storeModule.nameModule);
+  storeModule.currentCode = "no code";
+  storeModule.currentCodeName = "";
+  storeModule.currentCodeIdx = -1;
+  const idxSelected = storeModule.ListActions.findIndex(element => element.xid == storeModule.currentCodeXid);
+  $xui.loadCodeAction(idxSelected);
+}
+
+function validateStoreModule(idx, bcode, bstate) {
+  const rootStore = $xui.getAppState().store;
+  const storeModule = rootStore.listStoreModule[idx];
+
+  if (bcode) {
+    if (storeModule.currentCodeIdx >= 0) {
+      $xui.saveCodeAction(storeModule);
+    }
+    storeModule.currentCode = "no code";
+    storeModule.currentCodeName = "";
+    storeModule.currentCodeIdx = -1;
+  }
+
+  if (bstate) {
+    // retour de l'onglet jsonEditor
+    const ctrlStr = JSON.stringify(storeModule.stateDataMock);
+    if (storeModule.lastEditorAppStateValue != ctrlStr) {
+      $xui.saveStoreNamespace=storeModule.nameModule;
+      $xui.doStoreOnNextReload = true;
+      $xui.refreshAction('template:reload-json'); // recharge le json
+    }
+  }
 }
 
 //---------------------------------------------------------------------------------------
@@ -102,18 +121,29 @@ function onChangeRightPanelTab(instanceVue) {
 }
 
 //---------------------------------------------------------------------------------------
-function onChangeDesignerlTab(instanceVue) {
+function onChangeDesignerTab(instanceVue) {
   instanceVue.$watch('main.idxTabDesigner', (newValue, oldValue) => {
     $xui.SelectorManager.unDisplaySelector();
   }, { deep: true });
 }
+
+function onChangeStoreModuleTab(instanceVue) {
+  instanceVue.$watch('store.idxTabStoreModule', (newValue, oldValue) => {
+    console.debug(`The idxTabStoreModule name was changed from ${oldValue} to ${newValue}!`);
+    validateStoreModule(oldValue, true, true );
+    loadStoreModule();
+  }, { deep: true });
+}
+
+
 
 //----------------------------------------------------------------------------------------------------------
 $xui.initVuejs = (instanceVue) => {
 
   onChangeRightPanelTab(instanceVue);
   onChangeMainTab(instanceVue);
-  onChangeDesignerlTab(instanceVue);
+  onChangeDesignerTab(instanceVue);
+  onChangeStoreModuleTab(instanceVue);
 
   $xui.router.afterEach((to, from) => {
 		// console.log(`afterEach router going to ${to.fullPath} from ${from.fullPath}`);
@@ -123,11 +153,12 @@ $xui.initVuejs = (instanceVue) => {
   });
 
 
-  instanceVue.$watch('main.stateDataSource', (newValue, oldValue) => {
+  instanceVue.$watch('main.stateDataSource', (newValue, oldValue ) => {
     const rootdata = $xui.getAppState().main;
-    if (rootdata.idxTabMain == 0 && newValue!="" ) {
+    if (rootdata.idxTabMain == 0 && newValue!="" && ( oldValue!="" || newValue=="mock") ) {
+      console.debug(` -------------- stateDataSource change  ------------------${oldValue} => ${newValue}`);
+      $xui.saveStoreNamespace="";
       $xui.refreshAction('template:reload-json')   // recharge le json
-      //$xui.doStoreOnNextReload = true;
     }
   });
 

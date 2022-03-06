@@ -53,8 +53,8 @@
     position: absolute;
     top: 0px;
     left: 0px;
-    z-index: 100;
     background-color: inherit; 
+    z-index: 100;
 }
 
 .xui-transition-down
@@ -65,6 +65,10 @@
     left: 0px;
     background-color: inherit; 
     z-index: 0;
+}
+
+.xui-transition-slow {
+    --animate-duration: 500ms !important;
 }
 
 /****************************************************/
@@ -106,8 +110,23 @@
     transition-property: transform;
 }
 
+.clickAnimationMove {
+    transition-duration: 500ms;
+    perspective: 1000px;
+    transform-origin: left top 0px;
+    transform: translate(0px,0px);
+    will-change: transform;
+    transition-property: transform;
+}
+
+
 .clickAnimationPress {
     transform: matrix(0.95, 0, 0, 0.95, 0, 0);
+}
+
+.clickAnimationOver {
+    transform: matrix(1.02, 0, 0, 1.02, 0, 0);
+    z-index : 1;
 }
 
 /************************ SCROLL ****************************/

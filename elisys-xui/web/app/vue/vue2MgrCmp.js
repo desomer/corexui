@@ -103,7 +103,7 @@ export class ComponentManager {
                 if (this.debug) console.debug("addVueComponent", namespaceObject.default);
                 const cmp = {
                     data: function () {
-                        return $xui.rootdata;
+                        return $xui.rootdataComponent;
                     },
                     computed: {
                         $xui: function () {

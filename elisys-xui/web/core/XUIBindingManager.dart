@@ -8,8 +8,17 @@ import 'element/XUIElement.dart';
 import 'element/XUIProperty.dart';
 import 'native/register.dart';
 
+class XUIBindingStoreFactory
+{
+    var dicoObjBind = LinkedHashMap<String, List<XUIBinding>>();
+    var dicoObjType = LinkedHashMap<String, XUIBinding>();
+    var dicoObjNameSpace = LinkedHashMap<String, String>();
+}
+
+
 class XUIBindingManager {
   XUIEngine engine;
+
   var bindingInfo = LinkedHashMap<String, XUIBinding>();
   var eventInfo = LinkedHashMap<String, XUIBindingEvent>();
   var afterJsonValidator = LinkedHashMap<String, StringBuffer>();
@@ -22,90 +31,118 @@ class XUIBindingManager {
     XUIProperty p = prop.value;
 
     if (prop.key.startsWith(":")) {
-      var parseInfo = ParseInfo(prop, null, ParseInfoMode.PROP);
-      String? varNameSpace = elemHtml.searchPropertyXUI("varnamespace@0+", 0, parseInfo) as String?;
+      //print("*************************** > "+ prop.key+ " =>" + prop.value.content);
+      // gestion des var :xxx
+      if (p.cacheBindingProp==null || prop.value.content!=p.cacheBindingProp!.binding)
+      {
+          p.cacheBindingProp = XUIPropertyBinding("", null, prop.value.content);
+      }
 
-      // gestion du v-for    :items
-      var propB = XUIPropertyBinding("", varNameSpace, prop.value.content);
-      var pme = MapEntry<String, XUIPropertyBinding>(prop.key, propB);
-      _addXUIBinding(pme, model, elemHtml);
+      var pme = MapEntry<String, XUIPropertyBinding>(prop.key, p.cacheBindingProp!);
+      _addXUIBindingPhase1(pme, model, elemHtml);
     }
 
     if (prop.key.startsWith("@")) {
-      //print("******************* event > " + keyAttr);
+      // gestion de @event
+      // si true appel de processPropertiesBindingPhase1Event 
       return true;
     }
 
     if (p.content is String && p.content.startsWith("{{") == true) {
       // gestion du {{value}}
-      var parseInfo = ParseInfo(prop, null, ParseInfoMode.PROP);
-      String? varNameSpace = elemHtml.searchPropertyXUI("varnamespace@0+", 0, parseInfo) as String?;
+      // var parseInfo = ParseInfo(prop, null, ParseInfoMode.PROP);
+      // String? varNameSpace = elemHtml.searchPropertyXUI(PROP_VAR_NAMESPACE+"@0+", 0, parseInfo) as String?;
+
       var varName = p.content.toString().substring(2);
       varName = varName.substring(0, varName.length - 2);
-      var propB = XUIPropertyBinding("", varNameSpace, varName);
+      var propB = XUIPropertyBinding("", null, varName);
       var pme = MapEntry<String, XUIPropertyBinding>(prop.key, propB);
-      _addXUIBinding(pme, model, elemHtml);
+      _addXUIBindingPhase1(pme, model, elemHtml);
     }
 
     if (p is XUIPropertyBinding) {
       var pme = MapEntry<String, XUIPropertyBinding>(prop.key, p);
-      _addXUIBinding(pme, model, elemHtml);
+      _addXUIBindingPhase1(pme, model, elemHtml);
     }
 
     return false;
   }
 
-  void processPropertiesBindingPhase2(
+  void processPropertiesBindingPhase1Event(
       MapEntry<String, XUIProperty> prop, XUIElementHTML elemHtml) {
     if (prop.key.startsWith("@")) {
       elemHtml.doAddEventPhase2(engine, prop.key, prop.value);
     }
   }
 
-  void _addXUIBinding(MapEntry<String, XUIPropertyBinding> prop, XUIModel model,
-      XUIElementHTML elemHtml) {
-    XUIPropertyBinding p = prop.value;
+  void _addXUIBindingPhase1(MapEntry<String, XUIPropertyBinding> proper, XUIModel model,  XUIElementHTML elemHtml) {
 
-    var name = p.binding!;
+    XUIPropertyBinding prop = proper.value;
+
+    var parseInfo = ParseInfo(prop, null, ParseInfoMode.PROP);
+    var name = prop.binding!;
+
     int isArray = name.lastIndexOf("[]");
-
     if (isArray <= 0) {
-      String? varitems = elemHtml.searchPropertyXUI(
-          PROP_VAR_ITEMS+"@1+", 0, ParseInfo(p, null, ParseInfoMode.PROP));
-      if (varitems != null) {
-        varitems = varitems.substring(varitems.indexOf(".") + 1);
-        name = varitems + "[]." + name;
-        //print("-------------- varitems --------------> " + name);
+      //print("A ==================> "+ name + " => " + (prop.cacheBinding?.toString()??"?"));
+      XUIElementHTML? p = elemHtml.parent;
+
+      while (p != null) {
+        String? varitems = p.searchPropertyXUI(PROP_VAR_ITEMS, 0, parseInfo);
+        if (varitems!=null)
+        {
+          if (isArray<=0)
+          {
+              varitems=varitems.substring(varitems.indexOf(".")+1);  // retrait du scope
+              name= "$varitems[].$name";
+          }
+
+        }
+        p = p.parent;
       }
+      prop.cacheBinding=name;
+
+      // String? varitems = elemHtml.searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo);
+      // if (varitems != null) {
+      //   varitems = varitems.substring(varitems.indexOf(".") + 1);
+      //   name = varitems + "[]." + name;
+      //   //print("-------------- varitems --------------> " + name);
+      //   prop.cacheBinding=name;
+      // }
+    }
+
+    //if (prop.namespace==null)
+   // {
+      String? varNameSpace = elemHtml.searchPropertyXUI(PROP_VAR_NAMESPACE+"@0+", 0, parseInfo) as String?;
+      prop.namespace=varNameSpace;
+   // }
+
+    if (prop.namespace==null)
+    {
+        prop.namespace="main";
     }
 
     if (XUIConfigManager.verboseBinding) {
       XUIConfigManager.printc("Prop key [" +
-          prop.key.toString() +
+          proper.key.toString() +
           "] on var binding [" +
-          (p.namespace??"?") + "." + name +
+          (prop.namespace??"?") + "." + name +
           "] xid=" +
           model.elemXUI.xid.toString());
     }
 
-    if (p.namespace==null)
-    {
-      var parseInfo = ParseInfo(prop, null, ParseInfoMode.PROP);
-      String? varNameSpace = elemHtml.searchPropertyXUI("varnamespace@0+", 0, parseInfo) as String?;
-      p.namespace=varNameSpace;
-    }
-
-    var namespace = p.namespace??"main";
-
     // affecte le binding pour la creation du JSON de binding
-    bindingInfo[namespace+"."+name] =
-        XUIBinding(namespace, prop.key, name, p.content, model.elemXUI.xid!);
+    bindingInfo[prop.namespace!+"."+name] =
+        XUIBinding(prop.namespace!, proper.key, name, prop.content, model.elemXUI.xid!);
   }
 
-  dynamic getEventMethodsXUI() {
+
+  dynamic getEventMethodsXUI(String namespace) {
     var listEvent = [];
     engine.bindingManager.eventInfo.forEach((key, value) {
-      listEvent.add(value);
+      if (value.namespace==namespace) {
+        listEvent.add(value);
+      }
     });
     return listEvent;
   }
@@ -113,9 +150,11 @@ class XUIBindingManager {
 
   void processPhase2JS(XUIContext ctx) {
 
-    var bindEngine = BindEngine();
+    var bindEngine = XUIBindingStoreFactory();
 
     doInitBindEngine(bindEngine);
+    doInitBindEngineAction(bindEngine);
+
     if (bindEngine.dicoObjNameSpace["main"]==null)
     {
       //creation du module main m^me si vide
@@ -127,12 +166,8 @@ class XUIBindingManager {
 
       StringBuffer jsonBinding = StringBuffer();
       processPhase2JSBinding(namespace, bindEngine.dicoObjBind, jsonBinding);
-      bindingState bs = addBindPropertyOnRoot(namespace, jsonBinding);
-      if (namespace=="main")
-        bs.actions= getEventMethodsXUI();
-      else
-        bs.actions= [];
-
+      bindingState bs = getBindPropertyOnRoot(namespace, jsonBinding);
+      bs.actions= getEventMethodsXUI(namespace);
       mapState.add(bs);
     });
 
@@ -140,6 +175,7 @@ class XUIBindingManager {
     var store = "";
     try {
       store = generateApplicationStoreJS(mapState);
+     // print(store);
     } catch (e) {
       XUIConfigManager.printc("error" + e.toString());
     }
@@ -156,7 +192,7 @@ class XUIBindingManager {
 
   }
 
-  bindingState addBindPropertyOnRoot(String namespace, StringBuffer jsonBinding) {
+  bindingState getBindPropertyOnRoot(String namespace, StringBuffer jsonBinding) {
 
     bindingState bs = bindingState();
 
@@ -164,7 +200,11 @@ class XUIBindingManager {
       print("--------- namespace " + namespace + " object=" + jsonBinding.toString());
     }
         
-    XUIProperty? propBinding = engine.getXUIPropertyFromDesign("root", PROP_BIND_PREFIX );
+    XUIProperty? propBinding = engine.getXUIPropertyFromDesign("root", PROP_BIND_PREFIX+"_"+namespace );
+    
+    if (propBinding==null && namespace=="main") {
+      propBinding = engine.getXUIPropertyFromDesign("root", PROP_BIND_PREFIX );
+    }
     
     String PropMock = "";
     if (propBinding != null) {
@@ -194,8 +234,15 @@ class XUIBindingManager {
   }
 
   //**************************************************************************************** */
-  void doInitBindEngine(BindEngine bindEngine) {
-    this.bindingInfo.forEach((p, bindInfo) {
+  void doInitBindEngineAction(XUIBindingStoreFactory bindEngine) {
+      this.eventInfo.forEach((p, bindInfo) {
+        bindEngine.dicoObjNameSpace[bindInfo.namespace]=bindInfo.namespace;
+
+      });
+   }
+
+  void doInitBindEngine(XUIBindingStoreFactory bindEngine) {
+    this.bindingInfo.forEach((k, bindInfo) {
       String type = "?";
 
       SlotInfo? slotInfo = engine.getSlotInfo(bindInfo.xid, bindInfo.xid);
@@ -242,8 +289,8 @@ class XUIBindingManager {
         var listAttr = bindInfo.attr.split(".");
         int lastNiv = listAttr.length - 1;
 
-        listAttr.forEach((element) {
-          var newPath = path + "." + element;
+        listAttr.forEach((attr) {
+          var newPath = path + "." + attr;
           // XUIConfigManager.printc("--->" + element);
           if (niv != lastNiv) {
             if (bindEngine.dicoObjBind[path] == null) {
@@ -257,7 +304,7 @@ class XUIBindingManager {
             }
 
             if (!isArray && bindEngine.dicoObjType[newPath] == null) {
-              var newObj = XUIBinding(bindInfo.namespace, "?", element, "{}", "?");
+              var newObj = XUIBinding(bindInfo.namespace, "?", attr, "{}", "?");
               newObj.type = "object";
               bindEngine.dicoObjBind[path]?.add(newObj);
               bindEngine.dicoObjType[newPath] = newObj;
@@ -267,7 +314,7 @@ class XUIBindingManager {
           } else {
             // ajout de l'attribut
             var newObj = XUIBinding(bindInfo.namespace,
-                bindInfo.propName, element, bindInfo.value, bindInfo.xid);
+                bindInfo.propName, attr, bindInfo.value, bindInfo.xid);
             newObj.type = bindInfo.type;
             if (bindEngine.dicoObjBind[path] == null) {
               bindEngine.dicoObjBind[path] = [];
@@ -348,14 +395,14 @@ class XUIBindingManager {
   }
 
   //-------------------------------------- EVENT TO METHOD  -----------------------------------------------
-  void addEventMethod(XUIElement elem, XUIBindingEvent eventMth) {
-    eventInfo[eventMth.name] = eventMth;
+  void addActionCodeMethod(XUIElement elem, XUIBindingEvent eventMth) {
+    eventInfo[eventMth.namespace +"#"+  eventMth.name] = eventMth;
 
     XUIProperty? propCode = elem.propertiesXUI?["#" + eventMth.eventName];
     eventMth.code = propCode?.content ?? "";
 
     // print("******* EVENT ++++ " +
-    //     eventMth.eventName +
+    //     eventMth.namespace +"#"+  eventMth.name +
     //     " on " +
     //     eventMth.xid +
     //     " execute method " +
@@ -363,9 +410,4 @@ class XUIBindingManager {
   }
 }
 
-class BindEngine
-{
-    var dicoObjBind = LinkedHashMap<String, List<XUIBinding>>();
-    var dicoObjType = LinkedHashMap<String, XUIBinding>();
-    var dicoObjNameSpace = LinkedHashMap<String, String>();
-}
+

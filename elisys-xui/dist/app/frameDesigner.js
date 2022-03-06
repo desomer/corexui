@@ -32,16 +32,17 @@ import("./clsSelectorManager.js").then((module) => {
 
 /****************************************************************************************/
 $xui.doInitPage = (pageInfo) => {
-    $xui.rootdata.overlay=true;
+    const rootdata = $xui.getAppState().main;
+    rootdata.overlay=true;
     $xui.SelectorManager.unDisplaySelector();
     console.debug("doInitPage pageInfo = ", pageInfo);
 
-    $xui.rootdata.frameName=pageInfo.frameName;
-    $xui.rootdata.frameTemplate=pageInfo.frameTemplate;
-    $xui.rootdata.stateData = {};
-    $xui.rootdata.stateDataMock = {};
-    $xui.rootdata.stateDataSource="";
-    $xui.rootdata.idxTabMain=0;
+    rootdata.frameName=pageInfo.frameName;
+    rootdata.frameTemplate=pageInfo.frameTemplate;
+    rootdata.stateData = {};
+    rootdata.stateDataMock = {};
+    rootdata.stateDataSource="";
+    rootdata.idxTabMain=0;
     if (document.querySelector("#rootFrame")!=null)
     {
         document.querySelector("#rootFrame").style.display = 'none';
@@ -119,7 +120,7 @@ let lastActionDate = Date.now();
 let lastAction = null;
 let currentAction = null;
 
-let mapAction = {
+const mapAction = {
     "clearAll": { text: "create new page", timeout: 1000 },
     "addCmp": { text: "add component", timeout: 500 },
     "deleteCmp": { text: "delete component", timeout: 1000 },
@@ -134,6 +135,7 @@ $xui.isModePreview = false;
 $xui.modeDisplaySelection = true;
 
 $xui.setCurrentAction = (actionName) => {
+    const rootdata = $xui.getAppState().main;
     if (currentAction != null) {
         throw (new SpecifiedError(`action déjà en cours ${actionName} => ${lastAction}`));
     }
@@ -142,18 +144,18 @@ $xui.setCurrentAction = (actionName) => {
 
     if (actionDec != null) {
         if (actionDec.text != null) {
-            $xui.rootdata.snackbar_text = actionDec.text;
-            $xui.rootdata.snackbar_timeout = actionDec.timeout;
-            $xui.rootdata.snackbar = true;
+            rootdata.snackbar_text = actionDec.text;
+            rootdata.snackbar_timeout = actionDec.timeout;
+            rootdata.snackbar = true;
         }
     }
     else {
-        $xui.rootdata.snackbar_text = actionName;
-        $xui.rootdata.snackbar_timeout = 1000;
-        $xui.rootdata.snackbar = true;
+        rootdata.snackbar_text = actionName;
+        rootdata.snackbar_timeout = 1000;
+        rootdata.snackbar = true;
     }
 
-    $xui.rootdata.saveLayout = true;
+    rootdata.saveLayout = true;
 
     lastActionDate = Date.now();
     lastAction = actionName;
@@ -191,7 +193,7 @@ $xui.setCurrentAction = (actionName) => {
 
     let prom = getPromise("AfterChangeSelectByXid");
     prom.then(() => {
-        $xui.rootdata.saveLayout = false;
+        rootdata.saveLayout = false;
         currentAction = null;
 
         console.debug(`END changePageFinish ------ ${actionName} ------`)
@@ -227,18 +229,15 @@ $xui.setCurrentAction = (actionName) => {
 
 /***************************************************************************************************************/
 $xui.clearAll = () => {
-    // $xui.setCurrentAction("clearAll");
-    // $xui.pageDesignManager.clearAll();
-    // $xui.rootdata.stateData = {};
-    // $xui.refreshAction("template:clearAll");
+    const rootdata = $xui.getAppState().main;
 
     $xui.pageDesignManager.clearAll();
     $xui.SelectorManager.unDisplaySelector();
-    $xui.rootdata.routeEnable = true;
-    $xui.rootdata.actionEnable = true;
-    $xui.rootdata.idxTabMain=0;
-    $xui.rootdata.overlayEvent=false;
-    $xui.rootdata.overlay=true;
+    rootdata.routeEnable = true;
+    rootdata.actionEnable = true;
+    rootdata.idxTabMain=0;
+    rootdata.overlayEvent=false;
+    rootdata.overlay=true;
     document.querySelector("#rootFrame").style.display = 'none';
    
     const infoFile = $xui.pageDesignManager.getInfoFile("design");
@@ -285,7 +284,8 @@ $xui.copyCmp = () => {
     
     $xui.setCurrentAction("copyCmp");
     $xuicore.copyDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
-    $xui.rootdata.pasteDisabled=false;
+    const rootdata = $xui.getAppState().main;
+    rootdata.pasteDisabled=false;
     return true;
 }
 
@@ -297,7 +297,8 @@ $xui.copyCmpOnDrap = (data) => {
 
     $xui.setCurrentAction("copyCmp");
     $xuicore.copyDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
-    $xui.rootdata.pasteDisabled = false;
+    const rootdata = $xui.getAppState().main;
+    rootdata.pasteDisabled = false;
     setTimeout(() => {
         let infoFile = $xui.pageDesignManager.getInfoFile("template");
         $xuicore.moveDesignXUI(infoFile, null, data.xid_slot);
@@ -313,7 +314,8 @@ $xui.cutCmp = () => {
 
     $xui.setCurrentAction("cutCmp");
     $xuicore.cutDesignXUI($xui.pageDesignManager.getInfoFile("template"), $xui.propertiesDesign.xid);
-    $xui.rootdata.pasteDisabled = false;
+    const rootdata = $xui.getAppState().main;
+    rootdata.pasteDisabled = false;
     return true;
 }
 
@@ -355,7 +357,7 @@ $xui.addCmp = (cmp) => {
 ///---------------------------------------------------------------------------------------
 /// ajoute un composant
 $xui.addCmpXID = (xidDest, idCmp) => {
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
     const newXid = $xui.getNewXid(xidDest, idCmp);
     const template = `<xui-design xid="${xidDest}"><${idCmp} xid="${newXid}"></${idCmp}></xui-design>`;
     $xuicore.addDesignXUI(infoFile, xidDest, template, true, false);
@@ -390,13 +392,13 @@ $xui.getNewXid = (xidParent, nameCmp) => {
 
 $xui.saveProperties = () => {
     $xui.setCurrentAction("saveProperties");
- 
+    const rootdata = $xui.getAppState().main;
     // recuperation de la configuration
     const config = {   
-        routeEnable : $xui.rootdata.routeEnable,
-        actionEnable: $xui.rootdata.actionEnable,
-        isModePhone : $xui.rootdata.isModePhone,
-        dataSrc : $xui.rootdata.stateDataSource
+        routeEnable : rootdata.routeEnable,
+        actionEnable: rootdata.actionEnable,
+        isModePhone : rootdata.isModePhone,
+        dataSrc : rootdata.stateDataSource
     }
 
     $xui.propertiesDesign.json.push(
@@ -416,28 +418,29 @@ $xui.saveProperties = () => {
 
 
 /****************************************************************************************/
-$xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
+$xui.generateApplicationStateJS = (namespace, StateTemplate, StateInProperty) => {
     const jsonTemplate = $xui.parseJson(`{${StateTemplate}}`);
     const jsonStateProp = $xui.parseJson(`{${StateInProperty}}`);
     let ret = null;
 
-    Object.keys($xui.rootdata.stateData).forEach((key) => {
-        delete $xui.rootdata.stateData[key];
+    const rootdata = $xui.getAppState().main;
+    Object.keys(rootdata.stateData).forEach((key) => {
+        delete rootdata.stateData[key];
     });
-    Object.assign($xui.rootdata.stateData, jsonTemplate);
-    ret = $xui.rootdata.stateData;
+    Object.assign(rootdata.stateData, jsonTemplate);
+    ret = rootdata.stateData;
 
 
-    if ($xui.rootdata.stateDataSource == "mock") {
-        ret = $xui.rootdata.stateDataMock;
+    if (rootdata.stateDataSource == "mock") {
+        ret = rootdata.stateDataMock;
     }
 
     if (StateTemplate == "" && StateInProperty == "")  // sauvegarde le mock
     {
-        ret = $xui.rootdata.stateDataMock;
+        ret = rootdata.stateDataMock;
     }
     else {
-        $xui.rootdata.stateDataMock = jsonStateProp;
+        rootdata.stateDataMock = jsonStateProp;
     }
 
     const jsonState = ret;
@@ -445,9 +448,8 @@ $xui.generateApplicationStateJS = (StateTemplate, StateInProperty) => {
     str = `${str}\n//# sourceURL=xui-json-validator.js;\n`;
     eval(str);
 
-    // console.debug(" **************** *************** ", $xui.jsonvalidator);
     console.debug("************ App State initial & mock", jsonTemplate, jsonStateProp);
-    console.debug("************ App State source & editor", jsonState, $xui.rootdata.stateData);
+    console.debug("************ App State source & editor", jsonState, rootdata.stateData);
     // retourne au XUI le chaine à sauvegarder sans {}
     ret = JSON.stringify(jsonState);
     return ret.substring(1, ret.length - 1);
@@ -461,17 +463,19 @@ $xui.fullScreen = () => {
 }
 
 $xui.modePreview = () => {
-    if (! $xui.rootdata.overlayEvent) return;
+    const rootdata = $xui.getAppState().main;
+    if (! rootdata.overlayEvent) return;
     
     $xui.isModePreview = !$xui.isModePreview;
     document.querySelector("#rootFrame").classList.toggle("xui-frame-full-screen");
     $xui.refreshAction($xui.isModePreview ? "preview" : "design");
-    $xui.rootdata.overlay = $xui.isModePreview;
+    rootdata.overlay = $xui.isModePreview;
 }
 
 $xui.modePhone = () => {
+    const rootdata = $xui.getAppState().main;
     document.querySelector("#rootFrame").classList.toggle("xui-iframe-phone");
-    $xui.rootdata.isModePhone =  document.querySelector("#rootFrame").classList.contains("xui-iframe-phone");
+    rootdata.isModePhone =  document.querySelector("#rootFrame").classList.contains("xui-iframe-phone");
 }
 
 
@@ -480,7 +484,8 @@ $xui.getUrlApp = () => {
     if (origin=="null")
         origin=window.parent.location.origin;
 
-   return `${origin}/load.html?id=${$xui.rootdata.frameName}`;
+    const rootdata = $xui.getAppState().main;
+    return `${origin}/load.html?id=${rootdata.frameName}`;
 }
 
 $xui.sendInTab = () => {
@@ -506,21 +511,23 @@ $xui.importPage = (file) => {
     console.debug(file);
     const reader = new FileReader();
     reader.onload = (event) => {
+        const rootdata = $xui.getAppState().main;
         $xui.pageDesignManager.clearAll();
         $xui.pageDesignManager.codeXUIdata = event.target.result;
         $xui.pageDesignManager.store();
         const infoFile = $xui.pageDesignManager.getInfoFile("design");
         $xuicore.initPageXUI(infoFile);
-        $xui.rootdata.idxTabMain = 0;
+        rootdata.idxTabMain = 0;
     }
     reader.readAsText(file);
 }
 
 $xui.XUIToClipboard = () => {
     navigator.clipboard.writeText($xui.pageDesignManager.codeXUI);
-    $xui.rootdata.snackbar_text = "Copy to clipboard terminated";
-    $xui.rootdata.snackbar_timeout = 2000;
-    $xui.rootdata.snackbar = true;
+    const rootdata = $xui.getAppState().main;
+    rootdata.snackbar_text = "Copy to clipboard terminated";
+    rootdata.snackbar_timeout = 2000;
+    rootdata.snackbar = true;
 }
 
 /***************************************************************************************************************/
@@ -538,6 +545,30 @@ $xui.openTabUrl = (url) => {
             pageImage = window.open('https://unsplash.com/', '_blank');
         pageImage.focus()
     }
+};
+
+
+$xui.callAPI = (api) => {
+    fetch(api.base+api.url, {
+        method: api.method //ou POST, PUT, DELETE, etc.
+        // ,headers: {
+        //   "Content-Type": "text/plain;charset=UTF-8" //pour un corps de type chaine
+        // },
+        // body: undefined, //ou string, FormData, Blob, BufferSource, ou URLSearchParams
+        // referrer: "about:client", //ou "" (pas de réferanr) ou une url de l'origine
+        // referrerPolicy: "no-referrer-when-downgrade", //ou no-referrer, origin, same-origin...
+        // mode: "cors", //ou same-origin, no-cors
+        // credentials: "same-origin", //ou omit, include
+        // cache: "default", //ou no-store, reload, no-cache, force-cache, ou only-if-cached
+        // redirect: "follow", //ou manual ou error
+        // integrity: "", //ou un hash comme "sha256-abcdef1234567890"
+        // keepalive: false, //ou true pour que la requête survive à la page
+        // signal: undefined //ou AbortController pour annuler la requête
+    })
+    .then(response => response.json())
+    .then(response => alert(JSON.stringify(response)))
+    .catch(error => alert(`Erreur : ${error}`));
+
 };
 
 

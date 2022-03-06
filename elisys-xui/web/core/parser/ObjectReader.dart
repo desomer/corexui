@@ -54,13 +54,13 @@ class ObjectReader {
     if (props != null) {
       for (var aProp in props) {
         // creer la propriete vide
-        var variable = aProp["id"];
+        String variable = aProp["id"];
         var value = aProp["val"];
         var binding = aProp["binding"];
 
         xuiDesign.elemXUI.propertiesXUI ??= HashMap<String, XUIProperty>();
         // if (xuiDesign.elemXUI.propertiesXUI[variable] == null) {
-        xuiDesign.elemXUI.propertiesXUI![variable] = binding == null
+        xuiDesign.elemXUI.propertiesXUI![variable] = (binding == null)
             ? XUIProperty(value)
             : XUIPropertyBinding(value, null, binding);
         // }

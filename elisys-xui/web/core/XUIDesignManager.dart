@@ -355,7 +355,7 @@ class XUIDesignManager {
           is XUIPropertyBinding) {
         BindOfCmp = ((design.slotInfo.elementHTML?.propertiesXUI![varCmp.id]
                 as XUIPropertyBinding)
-            .binding!);
+            .binding??"");
       }
 
       if (valInCmp != null && (varCmp.editor?.startsWith("bool") ?? false)) {
@@ -805,6 +805,15 @@ class XUIDesignManager {
         slot : "-col-0",
         icon: "mdi-checkbox-blank-badge-outline",
         title: "Add badge");
+    ret.add(act);
+
+    act = ObjectAction(
+        xid: designFirstNoSlot.slotInfo.xid!,
+        action: "surround",
+        type: "xui-menu-1",
+        slot : "-activator",
+        icon: "mdi-menu-open",
+        title: "Add menu");
     ret.add(act);
   }
 }

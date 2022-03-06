@@ -15,8 +15,7 @@ export class PageDesignManager {
             fileID: rootdata.frameName,
             file: `app/${rootdata.frameTemplate}.html`,
             xid: 'root',
-            mode,
-            jsonBinding: JSON.stringify(rootdata.stateData)
+            mode
         };
     }
 
@@ -36,6 +35,7 @@ export class PageDesignManager {
         document.querySelector("#rootFrame").srcdoc = html;
         rootdata.routeEnable = true;
         rootdata.actionEnable = true;
+        $xui.saveStoreNamespace="";
 
         this.codeHtml = html;
 
@@ -88,7 +88,6 @@ export class PageDesignManager {
             rootdata.stateDataSource = appConfig.dataSrc;
             rootdata.routeEnable = appConfig.routeEnable;
             rootdata.actionEnable = appConfig.actionEnable;
-
         }
         else
         {
@@ -99,20 +98,24 @@ export class PageDesignManager {
     }
 
     changePageOnFrame(param) {
-
         const rootdata = $xui.getAppState().main;
+        const rootStore = $xui.getAppState().store;
         $xui.SelectorManager.unDisplaySelector();
 
-        param.jsonTemplate = rootdata.stateData;
-        
-        if (rootdata.stateDataSource == "mock") {
-            param.jsonBinding = rootdata.stateDataMock;
-        }
-        else {
-            param.jsonBinding = rootdata.stateData;
+        const jsonListStateModule = [];
+
+        for (let i = 0; i < rootStore.listStoreModule.length; i++) {
+            const module=rootStore.listStoreModule[i];
+            const stateModule = {}; 
+            stateModule.stateData = rootdata.stateDataSource == "mock" ? module.stateDataMock : module.stateData;
+            stateModule.nameModule = module.nameModule;
+            jsonListStateModule.push(stateModule);
         }
 
+        param.jsonListStateModule=jsonListStateModule;
+
         if (param.mode == "template") {
+            console.debug(`************** changeTemplate ************** ${rootdata.stateDataSource}`,  param.jsonListStateModule );
             // change uniquement template de la page aprés le demarrage en mode design et les reloader
             document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeTemplate", "param": param }, "*");
         }
@@ -131,9 +134,6 @@ export class PageDesignManager {
         this.codeXUIdata = param.xuidata;
         this.codeXUI = param.xuifile;
 
-        //console.debug("binding ---- ", param.binding);
-        //console.debug("treeSlot ---- ", param.treeSlot);
-
         rootdata.listSlot.length = 0;
         rootdata.listSlot.push(...param.treeSlot);
 
@@ -143,13 +143,6 @@ export class PageDesignManager {
 
         if (param.action == "clear") {
             doPromiseJS("AfterChangeSelectByXid");
-            // $xui.rootdata.routeEnable = true;
-            // $xui.rootdata.actionEnable = true;
-            // setTimeout(() => {
-            //     const infoFile = $xui.pageDesignManager.getInfoFile("design");
-            //     $xuicore.initPageXUI(infoFile);
-            // }, 1000);
-
         }
 
         if (param.action != "showCode" && param.action != "reload-json" && param.action != "reload" && param.action != "clear" && param.action != "export")
@@ -266,15 +259,6 @@ export class PageDesignManager {
         const rootdata = $xui.getAppState().main;
         rootdata.redoDisabled = true;
         rootdata.undoDisabled = false;
-
-        // gestion du max
-        // var versionMax = localStorage.getItem('xui_version_max_' + name);
-        // if (versionMax == null)
-        //     versionMax = "" + ver;
-
-        // if (parseInt(versionMax) <= ver)
-        //     localStorage.setItem('xui_version_max_' + name, "" + ver);
-
     }
 
     loadCode() {

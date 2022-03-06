@@ -16,24 +16,26 @@
 
             /********************************************************* */
             $xui.openBindingEditor = (xid, propId) => {
+                
                 $xui.editorOpenId = xid;
                 $xui.editorPropId = propId;
 
                 $xui.modeDisplaySelection = false;
-                $xui.rootdata.dialogBinding = true;
+
+                const rootdata = $xui.getAppState().main;
+                rootdata.dialogBinding = true;
 
                 setTimeout(() => {
-                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set($xui.rootdata.stateData)
+                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set(rootdata.stateData)
                     console.debug("open Binding Editor", xid, propId);
                 }, 100);
 
 
-     
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
                         console.debug("load binding", aProperty);
-                        $xui.rootdata.nameBinding = aProperty.label;
-                        $xui.rootdata.variableBinding = aProperty.bind;
+                        rootdata.nameBinding = aProperty.label;
+                        rootdata.variableBinding = aProperty.bind;
                     }
                 }
             }
@@ -41,11 +43,12 @@
             $xui.saveBindingEditor = () => {
                 console.debug("save binding", $xui.editorOpenId, $xui.editorPropId);
 
+                const rootdata = $xui.getAppState().main;
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
-                        aProperty.bind = $xui.rootdata.variableBinding;
+                        aProperty.bind = rootdata.variableBinding;
                         $xui.hasPropertiesChanged = true;
-                        console.debug("save binding ok", aProperty, $xui.rootdata);
+                        console.debug("save binding ok", aProperty, rootdata);
                     }
                 }
                 $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);

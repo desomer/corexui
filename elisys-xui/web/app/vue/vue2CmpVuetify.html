@@ -218,6 +218,39 @@
         <v-icon [[positionicon@1]]>[[icon@2]]</v-icon><span xui-if=[[textright@2]]>[[textright@2]]</span>
     </v-btn>
 
+    <!--------------------------  XUI-BTN-ICON-SLOT   ---------------------------->
+    <xui-doc xid="xui-btn-icon-slot-1">
+        <xui-prop id="name">Button Slot</xui-prop>
+        <xui-prop id="icon">mdi-gesture-tap-button</xui-prop>
+        <xui-prop id="desc">Un bouton Icon</xui-prop>
+        <xui-prop id="componentAs">action</xui-prop>
+
+        <xui-prop var="btn-type" def="icon" editor="combo"
+            list='["depressed","outlined","rounded","text","tile","icon","fab", "nr"]'>type depressed/outlined/...</xui-prop>
+
+        <xui-prop var="color" cat="vstyle" editor="text">color</xui-prop>
+        <xui-prop var="dark" cat="vstyle" editor="bool">on dark</xui-prop>
+        <xui-prop var="light" cat="vstyle" editor="bool">on light</xui-prop>
+
+        <xui-prop var="size" cat="vstyle" editor="combo" list='["large","small","x-small","x-large"]'>size</xui-prop>
+
+        <xui-prop var="disabled" cat="style" editor="bool">disabled</xui-prop>
+
+        <xui-prop var="routeto" cat="event:route" editor="text">route to (/ ; /route1; /page1/route1)</xui-prop>
+        <xui-prop var="@click" cat="event:elem" editor="text">Click</xui-prop> 
+        <xui-prop var="@dblclick" cat="event:elem" editor="text">Double click</xui-prop>
+        <xui-prop var="@contextmenu" cat="event:elem" editor="text">Right click</xui-prop>
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
+        
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+    </xui-doc>
+
+    <v-btn xid="xui-btn-icon-slot-1" to="[[routeto]]" [[directive]] [[event]] class="[[class]]" -style="[[style]]" [[btn-type]]
+        disabled="[[disabled]]" [[size]] color="[[color]]" dark="[[dark]]" light="[[light]]">
+        <xui-slot xid="[[parent-xid]]-slot" xui-slot-name="btn slot" xui-doc-id="btnslot"></xui-slot>
+    </v-btn>
+
     <!--------------------------  XUI-BTN-ICON-2   ---------------------------->
     <xui-doc xid="xui-btn-icon-2">
         <xui-prop id="name">Button Float Icon</xui-prop>
@@ -312,6 +345,7 @@
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
     </xui-doc>
 
 
@@ -322,7 +356,7 @@
 
 
     <v-img xid="xui-image-1" :aspect-ratio="[[aspect-ratio]]" transition=[[transition]] contain=[[contain]] class="[[class]]" -style="[[style]]"
-        src="[[url]]">
+        src="[[url]]" [[directive]]>
         <xui-slot xui-if=[[withSlot@1]] xui-slot-full xid="[[parent-xid]]-image-content" xui-slot-name="Image content">
         </xui-slot>
     </v-img>
@@ -389,6 +423,21 @@
             }
         </style>
     </xui-design>
+
+    <!--------------------------  XUI-BREADCRUMBS-1   ---------------------------->
+    <xui-doc xid="xui-breadcrumbs-1">
+        <xui-prop id="name">Breadcrumbs</xui-prop>
+        <xui-prop id="icon">mdi-chevron-triple-right</xui-prop>
+        <xui-prop id="desc">Une fil d'ariane</xui-prop>
+        <xui-prop id="componentAs">spacer</xui-prop>
+        <xui-prop var=":items" editor="var" cat="event:bind">var items</xui-prop>
+        <xui-prop var="vertical" editor="text">divider</xui-prop>
+    </xui-doc>
+
+    <v-breadcrumbs xid="xui-breadcrumbs-1"
+         :items="[:items]"
+        divider="[[divider]]">
+    </v-breadcrumbs>
 
     <!--------------------------  XUI-LIST-ITEM   ------------------------->
     <xui-doc xid="xui-list-item-1">

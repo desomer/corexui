@@ -75,3 +75,9 @@ https://markus.oberlehner.net/blog/how-to-structure-a-complex-vuex-store/
 DTD
 https://www.chaijs.com/
 https://codeburst.io/vuex-getters-are-great-but-dont-overuse-them-9c946689b414
+
+
+on hover
+https://codepen.io/johnjleider/pen/GRppRJZ
+
+https://stackoverflow.com/questions/51461723/import-umd-javascript-modules-into-browser

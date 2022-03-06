@@ -3,6 +3,7 @@ import 'dart:convert';
 
 class XUIProperty {
   dynamic content;
+  XUIPropertyBinding? cacheBindingProp;
 
   XUIProperty(v) {
     content = v;
@@ -53,7 +54,7 @@ class XUIProperty {
 class XUIPropertyBinding extends XUIProperty {
   String? namespace;
   String? binding;
-  //String? cacheBinding;
+  String? cacheBinding;
 
   XUIPropertyBinding(v, n, b) : super(v) {
     namespace = n as String?;

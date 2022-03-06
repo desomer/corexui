@@ -262,11 +262,12 @@
             ];
 
             var json = {
-                dialogClass: false,
+               // dialogClass: false,
                 listCatClass: listDesignClass
             };
 
-            $xui.rootdata = { ...$xui.rootdata, ...json };
+            //$xui.getAppState().main = { ...$xui.getAppState().main, ...json };
+            $xui.rootdataComponent = { ...$xui.rootdataComponent, ...json };
 
             $xui.initComponentVuejs.push(() => {
                 new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
@@ -276,12 +277,12 @@
             /***************************************************************************************************************/
             $xui.openClassEditor = (id) => {
                 $xui.editorOpenId = id;
-                const rootdata = $xui.getAppState().main;
+                const rootdata = $xui.rootdataComponent; // $xui.getAppState().main;
 
-                console.debug("----openClassEditor ----- "+ id)
+                console.debug("----openClassEditor 2 ----- "+ id, rootdata, $xui.getAppState().main);
 
                 $xui.modeDisplaySelection = false;
-                rootdata.dialogClass = true;
+                $xui.getAppState().main.openDialogClass = true;
 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
@@ -293,7 +294,7 @@
 
             $xui.saveClassEditor = () => {
 
-                const rootdata = $xui.getAppState().main;
+                const rootdata =  $xui.rootdataComponent; // $xui.getAppState().main;
 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {

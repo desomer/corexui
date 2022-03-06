@@ -70,7 +70,7 @@ external set _getActionsXUI(
 
 @JS('getEventMethodsXUI')
 external set _getEventMethodsXUI(
-    dynamic Function(FileDesignInfo) f);
+    dynamic Function(FileDesignInfo, String) f);
 
 /// retourne les properties
 @JS('getPropertiesXUI')
@@ -126,11 +126,15 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
     await _initStoreVersion(designManager, fileInfo, ctx);
   }
 
+  //TODO boucle for sur les namespace
   if (fileInfo.action == "reload-json") {
     // affecte le text de l'editor uniquement
-    var newBinding = generateApplicationStateJS("main", "", ""); 
-    var designManager = _getDesignManager(fileInfo);
-    await designManager.changeProperty("root", PROP_BIND_PREFIX, newBinding, "");
+    if (fileInfo.saveStoreModuleNamespace!="")
+    {
+      var newBinding = generateApplicationStateJS(fileInfo.saveStoreModuleNamespace, "", ""); 
+      var designManager = _getDesignManager(fileInfo);
+      await designManager.changeProperty("root", PROP_BIND_PREFIX+"_"+fileInfo.saveStoreModuleNamespace, newBinding, MODE_SET_PROP_NODOC);
+    }
   }
 
   if (fileInfo.action == "clear") {
@@ -552,10 +556,10 @@ dynamic getActionsXUI(
   return designManager.getActionsPopup(fileInfo, id, idSlot, action);
 }
 
-dynamic getEventMethodsXUI(FileDesignInfo fileInfo) {
+dynamic getEventMethodsXUI(FileDesignInfo fileInfo, String namespace) {
   print("-------------- getEventMethodsXUI ----------------   " + fileInfo.fileID);
   var designManager = _getDesignManager(fileInfo);
-  return designManager.getXUIEngine().bindingManager.getEventMethodsXUI();
+  return designManager.getXUIEngine().bindingManager.getEventMethodsXUI(namespace);
 }
 
 void main() async {

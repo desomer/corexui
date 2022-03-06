@@ -3,11 +3,13 @@
     <xui-design xid="xui-script-data">
         <script xui-no-dom>
             var json = {
-                dialogBinding: false,
                 nameBinding: "name",
-                variableBinding: "var"
+                variableBinding: "var",
+                displayedStateDataBinding:""
             };
-            $xui.rootdata = { ...$xui.rootdata, ...json };
+
+            //$xui.getAppState().main = { ...$xui.getAppState().main, ...json };
+            $xui.rootdataComponent = { ...$xui.rootdataComponent, ...json };
 
             $xui.initComponentVuejs.push(() => {
                 new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-bind-editor", 'app/cmpDesignBindEditor.html', "xui-bind-editor");
@@ -22,11 +24,12 @@
 
                 $xui.modeDisplaySelection = false;
 
-                const rootdata = $xui.getAppState().main;
-                rootdata.dialogBinding = true;
+                const rootdata = $xui.rootdataComponent;
+                $xui.getAppState().main.openDialogBinding = true;
+                const storeModule = $xui.getCurrentStoreModule();
 
                 setTimeout(() => {
-                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set(rootdata.stateData)
+                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set(storeModule.stateData)
                     console.debug("open Binding Editor", xid, propId);
                 }, 100);
 
@@ -43,7 +46,7 @@
             $xui.saveBindingEditor = () => {
                 console.debug("save binding", $xui.editorOpenId, $xui.editorPropId);
 
-                const rootdata = $xui.getAppState().main;
+                const rootdata = $xui.rootdataComponent; 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
                         aProperty.bind = rootdata.variableBinding;
@@ -67,7 +70,7 @@
     <div xid="vue-xui-bind-editor" style="height: calc(65vh - 140px);">
         <v-text-field class="ma-6" :label="nameBinding" v-model="variableBinding" hint="Bind variable name" outlined
             clearable persistent-hint></v-text-field>
-        <v-jsoneditor ref="jsonEditorBinding" v-model="stateData" :options="optionsEditor" :plus="false" height="100%">
+        <v-jsoneditor ref="jsonEditorBinding" v-model="displayedStateDataBinding" :options="optionsEditor" :plus="false" height="100%">
         </v-jsoneditor>
     </div>
 

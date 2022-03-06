@@ -265,6 +265,7 @@
                 dialogClass: false,
                 listCatClass: listDesignClass
             };
+
             $xui.rootdata = { ...$xui.rootdata, ...json };
 
             $xui.initComponentVuejs.push(() => {
@@ -275,26 +276,29 @@
             /***************************************************************************************************************/
             $xui.openClassEditor = (id) => {
                 $xui.editorOpenId = id;
+                const rootdata = $xui.getAppState().main;
 
                 console.debug("----openClassEditor ----- "+ id)
 
                 $xui.modeDisplaySelection = false;
-                $xui.rootdata.dialogClass = true;
+                rootdata.dialogClass = true;
 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
                         console.debug("load class", aProperty);
-                        new DesignClassManager().initClassSelector(aProperty.value, $xui.rootdata.listCatClass);
+                        new DesignClassManager().initClassSelector(aProperty.value, rootdata.listCatClass);
                     }
                 }
             }
 
             $xui.saveClassEditor = () => {
 
+                const rootdata = $xui.getAppState().main;
+
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
                         console.debug("save class", aProperty);
-                        aProperty.value = new DesignClassManager().getClassTextFromSelector(aProperty.value, $xui.rootdata.listCatClass);
+                        aProperty.value = new DesignClassManager().getClassTextFromSelector(aProperty.value, rootdata.listCatClass);
                         $xui.hasPropertiesChanged = true;
                         $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
                     }

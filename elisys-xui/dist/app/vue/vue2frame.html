@@ -58,7 +58,7 @@
 		<link rel="preload" href="./app/vue/vue2frame.css" as="style"
 			onload="this.onload=null;this.rel='stylesheet'">
 
-		<script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<script defer src="https://cdn.jsdelivr.net/npm/vue@2.x"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
 		<script defer src="./app/vue/vuexHelper.js"></script>
 
@@ -193,8 +193,7 @@
 			id="[[parent-xid]]-[[idxroute@0+]]" 
 			xui-topath="router:/page[[idxpage@0+]]/route[[idxroute@0+]]"
 			xui-slot-name="Page [[idxpage@0+]] Route [[idxroute@0+]]"
-		>
-		</xui-route>
+		></xui-route>
     </template>
 
     <template xid="xui-route">
@@ -232,6 +231,8 @@
 		<xui-prop var="start" editor="bool">align start</xui-prop>
 		<xui-prop var="no-gutter" editor="bool">no gutter</xui-prop>
 
+		<xui-prop var="varnamespace" cat="event:bind" editor="text">state name space</xui-prop>
+
 		<xui-prop var="class" cat="class" editor="class">class</xui-prop>
 		<xui-prop var="style" cat="style" editor="style">style</xui-prop>
 	</xui-doc>
@@ -245,7 +246,7 @@
 		<xui-prop id="desc">Contenu slot</xui-prop>
 	</xui-doc>
 
-	<v-container fluid fill-height=[[fill]] align-start=[[start]] pa-0=[[no-gutter]] class="[[class]]" -style="[[style]]"  xid="vue-content-1" >  
+	<v-container xid="vue-content-1" fluid fill-height=[[fill]] align-start=[[start]] pa-0=[[no-gutter]] class="[[class]]" -style="[[style]]" >  
 		<xui-slot xid="[[parent-xid]]-slot" xui-reloader=true style-slot="height:100%;width:100%" xui-slot-name="Route content">
 		</xui-slot>
 	</v-container>

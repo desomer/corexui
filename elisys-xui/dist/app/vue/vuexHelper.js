@@ -1,15 +1,16 @@
-globalThis.$xui.generateApplicationStoreJS = (state, actions) =>
+globalThis.$xui.generateApplicationStoreJS = (listState) =>
 {
 
-    const jsonState = JSON.parse(`{${state}}`);
     const modulesManager = new $xui.VuexModuleManager();
-	const main = modulesManager.addModule("main", jsonState);
 
-    const module = "main";
-    for (const mth of actions) {
-        //console.debug("/*/*/**/*/*/*/*/*/ add mth", mth);
-        const m = `(p1, p2) => {\n${mth.code}\n//# sourceURL=${module}-${mth.name}.js;\n}`;
-        modulesManager.modulesDesc[module].actions[mth.name]=m;
+    for (const bindstate of listState) {
+        const jsonState = JSON.parse(`{${bindstate.state}}`);
+        modulesManager.addModule(bindstate.namespace, jsonState);
+
+        for (const mth of bindstate.actions) {
+            const m = `(p1, p2) => {\n${mth.code}\n//# sourceURL=${bindstate.namespace}-${mth.name}.js;\n}`;
+            modulesManager.modulesDesc[bindstate.namespace].actions[mth.name]=m;
+        }
     }
 
     return modulesManager.getCode();
@@ -67,7 +68,7 @@ class VuexModuleManager {
                     if (arguments[1].type=="click") {
                         const elem = arguments[1].target;
                         const targetAction = elem.closest("[data-for-idx]");
-                        //console.debug("targetAction", targetAction);
+
                         if (targetAction!=null) {
                             const targetMap = targetAction.closest("[data-for-map]");
                             const forMap = targetMap.dataset.forMap;  // cas du XUI-FOR
@@ -133,13 +134,17 @@ class VuexModuleManager {
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             var stateJson = JSON.stringify(desc.state, undefined, 4);
             if (stateJson.length>2) {
-                stateJson= stateJson.substring(0, stateJson.length-1);  // retrait de la dernier accolade
-                stateJson+=" , ...$xui.rootdata }";
+                if (namespace=="main")
+                {
+                    stateJson= stateJson.substring(0, stateJson.length-1);  // retrait de la dernier accolade
+                    stateJson+=" , ...$xui.rootdata }";
+                }
             }
             else
             {
-                stateJson="$xui.rootdata";
+                stateJson="$xui.rootdata";  // pas de mapping
             }
+
             result += `const ${namespace} = modulesManager.addModule("${namespace}", ${stateJson});\n\n`;
             listModule += `\n\t\t\t\t\t\t${namespace},`;
         }
@@ -161,7 +166,9 @@ class VuexModuleManager {
             }));\n`;
         
         result += `return modulesManager;\n}\n`;
-        return this.indentString(result, 8);
+        let ret =  this.indentString(result, 8);
+        console.debug(ret);
+        return ret;
     }
 
 

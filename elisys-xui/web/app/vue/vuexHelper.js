@@ -13,7 +13,10 @@ globalThis.$xui.generateApplicationStoreJS = (listState) =>
         }
     }
 
-    return modulesManager.getCode();
+
+    ret =  modulesManager.getCode();
+    //console.debug(">>>>>>>>> generateApplicationStoreJS\n");
+    return ret;
 }
 
 
@@ -33,6 +36,20 @@ class VuexModuleManager {
 
     addModule(name, state) {
         this.modulesDesc[name] = new VuexModuleDesc(name, state);
+        const aModule = this.modulesDesc[name].module();
+        aModule.sync = this.modulesDesc[name].sync.bind(this.modulesDesc[name]);
+        aModule.syncArray = this.modulesDesc[name].syncArray.bind(this.modulesDesc[name]);
+        aModule.name = name;
+        this.modules[name]=aModule;
+        return aModule;
+    }
+
+    replaceModuleState(store, name, state) {
+        if (this.modulesDesc[name]==null)
+            this.modulesDesc[name] = new VuexModuleDesc(name, state);
+        else
+            this.modulesDesc[name].state=state;
+
         const aModule = this.modulesDesc[name].module();
         aModule.sync = this.modulesDesc[name].sync.bind(this.modulesDesc[name]);
         aModule.syncArray = this.modulesDesc[name].syncArray.bind(this.modulesDesc[name]);
@@ -90,7 +107,7 @@ class VuexModuleManager {
                     }
 
                     if ($xui.actionEnable) {
-                        this.$store.dispatch(`main/${arguments[0]}`, Array.from(arguments).slice(1), { root: true })
+                        this.$store.dispatch(arguments[0], Array.from(arguments).slice(1), { root: true })
                     }
  
                 },
@@ -149,6 +166,10 @@ class VuexModuleManager {
             listModule += `\n\t\t\t\t\t\t${namespace},`;
         }
 
+
+        //result += `try {\n`;
+          
+
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
             result +=`${namespace}.actions={`;
             for (const [nameAction, code] of Object.entries(desc.actions)) {
@@ -156,6 +177,7 @@ class VuexModuleManager {
             }
             result +=`}\n\n`;
         }
+        //result += `} catch (error) {console.error(error);}\n`;
 
         result +=
             `modulesManager.setStore(new Vuex.Store({

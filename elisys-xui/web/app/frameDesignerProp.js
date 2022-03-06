@@ -116,7 +116,7 @@ function doMouveOverProperties(posScroll, idProp)  {
 /***************************************************************************************************************/
 $xui.displayComponents = (xid, xid_slot) => {
 
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
 
     $xui.propertiesComponent = $xuicore.getComponentsXUI(infoFile, xid, xid_slot);
 
@@ -145,63 +145,73 @@ $xui.displayComponents = (xid, xid_slot) => {
 
 }
 /***************************************************************************************************************/
-$xui.getCodeEventXUI= () =>
+$xui.getEventMethodsXUI= (namespace) =>
 {
-    let infoFile = $xui.pageDesignManager.getInfoFile("template");
-    const ret = $xuicore.getEventMethodsXUI(infoFile);
+    const infoFile = $xui.pageDesignManager.getInfoFile("template");
+    const ret = $xuicore.getEventMethodsXUI(infoFile, namespace);
     return ret;
 }
 
 $xui.loadCodeAction = (idx) => {
-      const rootdata = $xui.getAppState().main;
-      if (rootdata.currentCodeIdx>=0)  
-      {
-        $xui.saveCodeAction();
-      }
 
-      if (idx<0)
-        return;
+    const storeModule = $xui.getCurrentStoreModule();
 
-      rootdata.currentCodeName = `function ${rootdata.ListActions[idx].name}()`;
-      rootdata.currentCode= rootdata.ListActions[idx].code;
-      rootdata.currentCodeIdx = idx;
+    if (storeModule.currentCodeIdx>=0)  
+    {
+    $xui.saveCodeAction(storeModule);
+    }
 
-      let listAct = document.querySelectorAll(".xui-btn-code");
-      let i = 0;
-      listAct.forEach((elem) => {
-        elem.classList.remove('xui-btn-code-selected');
-        if (i==idx)
-        {
-            elem.classList.add('xui-btn-code-selected');
-        }
-        i++;
-      });
+    if (idx<0)
+    {
+    return;
+    }
+
+
+    storeModule.currentCodeName = `function ${storeModule.ListActions[idx].name}()`;
+    storeModule.currentCode= storeModule.ListActions[idx].code;
+    storeModule.currentCodeIdx = idx;
+
+    const listAct = document.querySelectorAll(".xui-btn-code");
+    let i = 0;
+    listAct.forEach((elem) => {
+    elem.classList.remove('xui-btn-code-selected');
+    if (i==idx)
+    {
+        elem.classList.add('xui-btn-code-selected');
+    }
+    i++;
+    });
 
 }
 
 // $xui.highlighter = (code) => Prism.highlight(code, Prism.languages.js, "js");
 
-$xui.saveCodeAction = () => {
-    const rootdata = $xui.getAppState().main;
-    const idx = rootdata.currentCodeIdx;
-    rootdata.currentCodeXid= rootdata.ListActions[idx].xid;
+$xui.saveCodeAction = (storeModule) => {
+
+    const idx = storeModule.currentCodeIdx;
+    storeModule.currentCodeXid= storeModule.ListActions[idx].xid;
     
-    const code = rootdata.ListActions[idx].code;
-    if (code==rootdata.currentCode)
+    const code = storeModule.ListActions[idx].code;
+    if (code==storeModule.currentCode)
         return;
 
     const jsonProp = [{
-        xid : rootdata.ListActions[idx].xid,
-        variable : `#${rootdata.ListActions[idx].eventName}`,
-        value : rootdata.currentCode,
+        xid : storeModule.ListActions[idx].xid,
+        variable : `#${storeModule.ListActions[idx].eventName}`,
+        value : storeModule.currentCode,
         bind : "@"
     }];
 
-    rootdata.ListActions[idx].code = rootdata.currentCode;
+    storeModule.ListActions[idx].code = storeModule.currentCode;
     $xuicore.saveDesignPropertiesXUI($xui.pageDesignManager.getInfoFile("template"), jsonProp);
-    rootdata.currentCodeIdx=-1;
+    storeModule.currentCodeIdx=-1;
 
-    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeJS", "param": { actions: rootdata.ListActions } }, "*");
+    const rootdata = $xui.getAppState().main;
+    rootdata.snackbar_text = `Change mth ${storeModule.nameModule}/${storeModule.ListActions[idx].name}`;
+    rootdata.snackbar_timeout = 2000;
+    rootdata.snackbar = true;
+
+    document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeJS", "param": {namespace : storeModule.nameModule ,  actions: storeModule.ListActions } }, "*");
 
 }
 

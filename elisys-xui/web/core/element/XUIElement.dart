@@ -195,6 +195,7 @@ class XUIElementHTML extends XUIElement {
     } else if (parent != null && (deep < 0 || deep > 0)) {
       return parent!.searchPropertyXUI(tag, deep - 1, parseInfo);
     }
+
   }
 
   /// genere la valeur du la property (et affecte le binding vuej )
@@ -213,33 +214,41 @@ class XUIElementHTML extends XUIElement {
     var namespace = "main.";
 
     if (prop is XUIPropertyBinding) {
-      
+      /**************************************** */
+      // gestion attribut avec binding
+      /*************************************** */
       var name = prop.binding!;
+      if (prop.cacheBinding!=null)
+          name=prop.cacheBinding!;
+
       int isArray = name.lastIndexOf("[]");
       if (isArray<=0) {
+
+          // recherche si dans un tableau
           String? varitems = searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo) as String?;
           if (varitems!=null)
           {
             varitems=varitems.substring(varitems.indexOf(".")+1);  // retrait du scope
             name= "$varitems[].$name";
             isArray = name.lastIndexOf("[]");
-            //prop.cacheBinding=name;
-            // ignore: avoid_print
-            //print("-------------- varitems map --------------> $name");
+            print("B ==================> " + (prop.cacheBinding?.toString()??"?"));
           }
       }
       
       if (isArray > 0) {
+        // change le tableau   tab[].toto  en  tab_item.toto
         final arrayName = name.substring(0, isArray);
         name = "${arrayName.split(".").last}_item${name.substring(isArray + 2)}";
         namespace = "";
       }
       else
       {
-        String? varNameSpace = searchPropertyXUI("varnamespace@1+", 0, parseInfo) as String?;
-        if (varNameSpace!=null)
-            namespace=varNameSpace+".";
-        prop.namespace=varNameSpace;
+        if (prop.namespace==null) {
+            String? varNameSpace = searchPropertyXUI(PROP_VAR_NAMESPACE+"@1+", 0, parseInfo) as String?;
+            prop.namespace=varNameSpace;
+        }
+        if (prop.namespace!=null)
+            namespace=prop.namespace!+".";
       }
 
       
@@ -247,19 +256,19 @@ class XUIElementHTML extends XUIElement {
         // si dans un contenu de tag <div>{{binding}}</div>
         return "{{$namespace$name}}";
       }
-      parseInfo.prefix = "v-bind:";
+      parseInfo.prefix = "v-bind:"; //si attribut alors ajoute le v-bind
       return namespace + name;
     }
 
-
-    //print("tag "+ tag);
-    //---------------------------------------------------
-  
+ 
+    /**************************************** */
+    // gestion tab [[:xxx]] avec :   ex :  :varitems :  model
+    /*************************************** */
     if (tag.startsWith(":")) {
-      //les variables :varItems
-      // gestion des v-for
+
       var numVar = 0;
       if (parseInfo.context == "v-for") {
+        // gestion des v-for
         numVar = 5 - parseInfo.parsebuilder.toString().split(tag).length; 
       }
 
@@ -273,7 +282,18 @@ class XUIElementHTML extends XUIElement {
       }
 
       var name = prop.content.toString();
-      final int mapOnArray = name.lastIndexOf("[]"); // gestion de TABLEAU de TABLEAU
+      int mapOnArray = name.lastIndexOf("[]"); // gestion de TABLEAU de TABLEAU
+      if (mapOnArray<0)
+      {
+          String? varitems = searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo) as String?;
+          if (varitems!=null)
+          {
+            varitems=varitems.substring(varitems.indexOf(".")+1);  // retrait du scope
+            name= "$varitems[].$name";
+            mapOnArray = name.lastIndexOf("[]");
+          }
+      }
+
       if (mapOnArray > 0) {
         final arrayName = name.substring(0, mapOnArray);
         if (numVar == 1) {
@@ -294,15 +314,10 @@ class XUIElementHTML extends XUIElement {
         }
         else
         {
-          String? varNameSpace = searchPropertyXUI("varnamespace@1+", 0, parseInfo) as String?;
+          String? varNameSpace = searchPropertyXUI(PROP_VAR_NAMESPACE+"@1+", 0, parseInfo) as String?;
           if (varNameSpace!=null)
               namespace=varNameSpace+".";
         }
-
-        // if (numVar == 3) {
-        //   // affecte la variable de for pour afficher le designer
-        //   this.propertiesXUI![PROP_FOR_VAR]=new XUIProperty(name);
-        // }
 
         return namespace + name;
       }
@@ -311,7 +326,7 @@ class XUIElementHTML extends XUIElement {
     // sinon retour en directe
     return prop.content;
   }
-
+  
   /// generation du contenu avec [[]] d'un balise <div>CONTENT<div>
   dynamic _processContentPhase3(XUIEngine engine, ParseInfo parseInfo) {
     try {
@@ -366,7 +381,7 @@ class XUIElementHTML extends XUIElement {
       if (!isRoot && engine.isModeDesign() && hasTagReloader) {
         var parseInfo = ParseInfo("", null, ParseInfoMode.PROP);
         // pas de reloader si dans un v-for (manque le passage de l'item au composant xui-reloader) 
-        String? varitems = searchPropertyXUI(PROP_VAR_ITEMS+"@2", 0, parseInfo) as String?;
+        String? varitems = searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo) as String?;
         if (varitems==null)
         {
           isReloader = true;
@@ -452,7 +467,6 @@ class XUIElementHTML extends XUIElement {
         {
           keyAttr=":key";
         }
-
       }
 
       if (attrName.startsWith("[[event")) {
@@ -462,9 +476,9 @@ class XUIElementHTML extends XUIElement {
           elem = firstChildNoText()!;
         }
 
-        elem.propertiesXUI?.forEach((key, value) {
+        elem.propertiesXUI?.forEach((key, propXui) {
           if (key.startsWith("@")) {
-            _doAddEventPhase3(engine, buffer, key, value);
+            _doAttributAddEventPhase3(engine, buffer, key, propXui);
           }
         });
         return;
@@ -562,14 +576,20 @@ class XUIElementHTML extends XUIElement {
 
   void doAddEventPhase2(XUIEngine engine, String key, XUIProperty prop) {
         final xid = this.originElemXUI!.xid;
+        
         final ParseInfo parseInfo = ParseInfo(xid, null, ParseInfoMode.ATTR);
         final String xidCal = this._processContentPhase3(engine, parseInfo) as String;
+        XUIPropertyBinding propB = prop as XUIPropertyBinding;
 
-        engine.bindingManager.addEventMethod(this, XUIBindingEvent(xid : xidCal, eventName: key, name: prop.content.toString()));
+        // String? varNameSpace = this.searchPropertyXUI(PROP_VAR_NAMESPACE+"@0+", 0, parseInfo) as String?;
+        //print("=============> " + key+ " => " +(propB.namespace??"?") +"/" + prop.content.toString());
+        engine.bindingManager.addActionCodeMethod(this, XUIBindingEvent(xid : xidCal, eventName: key, namespace: propB.namespace! , name: prop.content.toString()));
   }
 
-  void _doAddEventPhase3(XUIEngine engine, XUIHtmlBuffer buffer, String key, XUIProperty value) {
-    buffer.html.write(' $key="\$mth(\'${value.content}\', ...arguments)"');
+  void _doAttributAddEventPhase3(XUIEngine engine, XUIHtmlBuffer buffer, String key, XUIProperty value) {
+    XUIPropertyBinding propB = value as XUIPropertyBinding;
+   // print("object=>>>   "+(propB.namespace??"?")+"/"+propB.content.toString());
+    buffer.html.write(' $key="\$mth(\'${propB.namespace}/${value.content}\', ...arguments)"');
   }
 
   void _doChildrenPhase3(XUIEngine engine, XUIHtmlBuffer buffer) {

@@ -4,7 +4,8 @@
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 function initPathTo(pathTo) {
-    let parent = $xui.rootdata.activeSlot[0];
+    const rootdata = $xui.getAppState().main;
+    let parent = rootdata.activeSlot[0];
     let hasRouteDefine = false;
     do {
         if (parent.toPath != null) {
@@ -51,14 +52,15 @@ $xui.selectConditionalPath = ()=> {
 
 // select le composant a partir du tree
 $xui.selectCmp = async () => {
-    console.debug($xui.rootdata.activeSlot);
+    const rootdata = $xui.getAppState().main;
+    console.debug(rootdata.activeSlot);
     if (!$xui.modeDisplaySelection) 
     {
         $xui.modeDisplaySelection=true;
         return;
     }
 
-    if ($xui.rootdata.activeSlot.length>0)
+    if (rootdata.activeSlot.length>0)
     {
         const pathTo = [];
         initPathTo(pathTo);
@@ -76,7 +78,7 @@ $xui.selectCmp = async () => {
             }
         }
 
-        xid = $xui.rootdata.activeSlot[0].id;
+        xid = rootdata.activeSlot[0].id;
         $xui.SelectorManager.displaySelectorByXid(xid, xid, false);
     }
 }

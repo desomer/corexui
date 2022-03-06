@@ -256,6 +256,7 @@ class XUIModel implements Comparable<XUIModel> {
   void _processPropertiesPhase1AndBind(
       XUIElementHTML elemHtml, XUIEngine engine) {
     if (elemXUI.propertiesXUI != null) {
+
       bool withAttributPhase2 = false;
       elemXUI.propertiesXUI!.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
@@ -270,18 +271,25 @@ class XUIModel implements Comparable<XUIModel> {
 
           bool hasEvent = engine.bindingManager
               .processPropertiesBindingPhase1(prop, this, elemHtml);
-          if (hasEvent) withAttributPhase2 = true;
-
-          elemHtml.propertiesXUI![prop.key] = p;
+          if (hasEvent) 
+          {
+            withAttributPhase2 = true;
+            var parseInfo = ParseInfo(prop, null, ParseInfoMode.PROP);
+            String? varNameSpace = elemHtml.searchPropertyXUI(PROP_VAR_NAMESPACE+"@0+", 0, parseInfo) as String?; 
+            var propEvent = XUIPropertyBinding(prop.value.content, varNameSpace??"main", null);
+            elemHtml.propertiesXUI![prop.key]= propEvent;
+          }
+          else
+            elemHtml.propertiesXUI![prop.key] = p;
         }
       });
 
       if (withAttributPhase2) {
-        // passe aprés l'affectation de properties pour avec avoir l'ensemble de properties
+        // passe aprés l'affectation de properties pour avec avoir l'ensemble de properties (afin de calculer le xid)
         elemHtml.propertiesXUI!.entries.forEach((prop) {
           if (prop.key.toLowerCase() != cst.ATTR_XID) {
             engine.bindingManager
-                .processPropertiesBindingPhase2(prop, elemHtml);
+                .processPropertiesBindingPhase1Event(prop, elemHtml);   // recherche les event
           }
         });
       }

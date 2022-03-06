@@ -1,0 +1,1698 @@
+<xui-factory version="1.0">
+   <xui-import xui-path="app/vue/vue2frame.html"></xui-import>
+   <xui-import xui-path="app/vue/vue2CmpLayoutVuetify.html"></xui-import>
+   <xui-import xui-path="app/vue/vue2CmpLayout.html"></xui-import>
+   <xui-import xui-path="app/vue/vue2CmpVuetify.html"></xui-import>
+
+   <frame-vuetify-1 xid="root"></frame-vuetify-1>
+
+   <xui-design xid="root">
+      <xui-prop id="nbpage" val="2"></xui-prop>
+      <xui-prop id="nbroute" val="1"></xui-prop>
+      <xui-prop id="footerHeight" val="48"></xui-prop>
+      <xui-prop id="appConfig" val="{&quot;routeEnable&quot;:true,&quot;actionEnable&quot;:true,&quot;isModePhone&quot;:false,&quot;dataSrc&quot;:&quot;mock&quot;}"></xui-prop>
+      <xui-prop id="binding_main" val="&quot;isNavOpen&quot;:false,&quot;displaySolde&quot;:true,&quot;itemsMenu&quot;:[{&quot;name&quot;:&quot;Offrir à&quot;,&quot;itemsSubHeader&quot;:[{&quot;name&quot;:&quot;Un homme&quot;},{&quot;name&quot;:&quot;Une femme&quot;},{&quot;name&quot;:&quot;Un enfant&quot;},{&quot;name&quot;:&quot;Un Adolescent&quot;}]},{&quot;name&quot;:&quot;Choisissez votre occasion cadeau&quot;,&quot;itemsSubHeader&quot;:[{&quot;name&quot;:&quot;Voir toute les occassions&quot;},{&quot;name&quot;:&quot;Naissance&quot;},{&quot;name&quot;:&quot;Anniversaire&quot;},{&quot;name&quot;:&quot;Mariage&quot;}]}]"></xui-prop>
+      <xui-prop id="binding_home" val="&quot;itemsHomeProduct&quot;:[{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte-cadeau-coeur-aquarelle.png?quality=80&amp;bg-color=255,255,255&amp;fit=bounds&amp;height=230&amp;width=360&amp;canvas=360:230&quot;,&quot;sku&quot;:1,&quot;id&quot;:&quot;Carte cadeau Aquarelle&quot;},{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte_plume_2021_413x259_1.png&quot;,&quot;sku&quot;:2,&quot;id&quot;:&quot;Carte cadeau Plume&quot;},{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte-cadeau-merci-rouge.png?quality=80&amp;bg-color=255,255,255&amp;fit=bounds&amp;height=230&amp;width=360&amp;canvas=360:230&amp;dpr=2&quot;,&quot;id&quot;:&quot;Carte cadeau Merci&quot;,&quot;sku&quot;:3}],&quot;itemsHomeCaroussel&quot;:[{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;magestore&#47;bannerslider&#47;images&#47;e&#47;-&#47;e-cartes-2021_1280x268_v5_sans-texte_1.jpg&quot;},{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;magestore&#47;bannerslider&#47;images&#47;e&#47;-&#47;e-cartes-2021_1280x268_v5_sans-texte_2.jpg&quot;},{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;magestore&#47;bannerslider&#47;images&#47;e&#47;-&#47;e-cartes-2021_1280x268_v5_sans-texte_3.jpg&quot;}],&quot;itemsCategory&quot;:[{&quot;urlCat&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;illicado_boxes&#47;banner&#47;image&#47;f.jpg&quot;,&quot;nameCat&quot;:&quot;e-Carte&quot;},{&quot;urlCat&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;illicado_boxes&#47;banner&#47;image&#47;FDGM_427x300_1.jpg&quot;,&quot;nameCat&quot;:&quot;Fêtes de grands-méres&quot;},{&quot;urlCat&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;illicado_boxes&#47;banner&#47;image&#47;Anniversaire_427x300_1.jpg&quot;,&quot;nameCat&quot;:&quot;Anniversaire&quot;},{&quot;urlCat&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;illicado_boxes&#47;banner&#47;image&#47;Naissance_427x300_V1-1.jpg&quot;,&quot;nameCat&quot;:&quot;Naissance&quot;},{&quot;urlCat&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;illicado_boxes&#47;banner&#47;image&#47;Nounou-2021_427x300_1.jpg&quot;,&quot;nameCat&quot;:&quot;Merci&quot;}]"></xui-prop>
+      <xui-prop id="binding_product" val="&quot;itemsCarrouselProduct&quot;:[{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte_plume_2021_413x259_1.png&quot;}],&quot;name&quot;:&quot;Carte cadeau Plume&quot;"></xui-prop>
+      <xui-prop id="binding_category" val="&quot;itemsVoucher&quot;:[{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte_plume_2021_413x259_1.png&quot;,&quot;id&quot;:&quot;Carte cadeau Plume&quot;},{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte-cadeau-coeur-aquarelle.png?quality=80&amp;bg-color=255,255,255&amp;fit=bounds&amp;height=230&amp;width=360&amp;canvas=360:230&quot;,&quot;id&quot;:&quot;Carte cadeau Aquarelle&quot;},{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte-cadeau-merci-rouge.png?quality=80&amp;bg-color=255,255,255&amp;fit=bounds&amp;height=230&amp;width=360&amp;canvas=360:230&amp;dpr=2&quot;,&quot;id&quot;:&quot;Carte cadeau Merci&quot;},{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte_b2c_mariage_2.png?quality=80&amp;bg-color=255,255,255&amp;fit=bounds&amp;height=230&amp;width=360&amp;canvas=360:230&quot;,&quot;id&quot;:&quot;Carte cadeau Félicitations Mariage&quot;},{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte_felicitation.png?quality=80&amp;bg-color=255,255,255&amp;fit=bounds&amp;height=230&amp;width=360&amp;canvas=360:230&amp;dpr=2&quot;,&quot;id&quot;:&quot;Carte cadeau Félicitations&quot;},{&quot;url&quot;:&quot;https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte_generique_2020_1.png?quality=80&amp;bg-color=255,255,255&amp;fit=bounds&amp;height=230&amp;width=360&amp;canvas=360:230&amp;dpr=2&quot;,&quot;id&quot;:&quot;Carte cadeau Hiver&quot;}]"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content">
+      <xui-prop id="withAppBar" val="true"></xui-prop>
+      <xui-prop id="colorApp" val="white"></xui-prop>
+      <xui-prop id="withLeftNavigation" val="true"></xui-prop>
+      <xui-prop id="navTemporary" val="true"></xui-prop>
+      <xui-prop id="withBottomNavigation" val="true"></xui-prop>
+      <xui-prop id="withFloatAction" val="true"></xui-prop>
+      <xui-prop id=":isnavdraweropen" val="isNavOpen"></xui-prop>
+      <xui-prop id="withSysBar" val="true"></xui-prop>
+      <xui-prop id="colorBg" val="white"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1_164581392397971">
+      <xui-prop id="nb" val="5"></xui-prop>
+      <xui-prop id="fill-height" val="false"></xui-prop>
+      <xui-prop id="no-gutters" val="true"></xui-prop>
+      <xui-prop id="align" val="center"></xui-prop>
+      <xui-prop id="align-content" val="center"></xui-prop>
+      <xui-prop id="justify" val="start"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1_164581392397971-col-0">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-prop id="@click" val="goHome"></xui-prop>
+      <xui-prop id="#@click" val="$xui.vuejs.$router.push(&quot;&#47;&quot;);
+"></xui-prop>
+      <xui-image-1 xid="page-0-content-toolbar-title-row-1-image-1_164581398856596"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-image-1_164581398856596">
+      <xui-prop id="url" val="https:&#47;&#47;www.lcas-agency.com&#47;web&#47;image&#47;5673&#47;logo-banniere-happy.png"></xui-prop>
+      <xui-prop id="style" val="height:80px;width:200px"></xui-prop>
+      <xui-prop id="class" val="d-none d-lg-flex"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title">
+      <xui-block xid="page-0-content-toolbar-title-block_164581407639379"></xui-block>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-block_164581407639379">
+      <xui-prop id="class" val="fill-height xui-p-relative "></xui-prop>
+      <xui-prop id="style" val="top: 0px; position:absolute; width:1300px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-block_164581407639379-block">
+      <xui-row-1 xid="page-0-content-toolbar-title-row-1_164581392397971"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar">
+      <xui-prop id="HeaderCollapseonscroll" val="true"></xui-prop>
+      <xui-prop id="headerHeight" val="80"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1_164581392397971-col-1">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-text-1 xid="page-0-content-toolbar-title-row-1-text-1_164581580401097"></xui-text-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-btn-icon-1_16458157210297">
+      <xui-prop id="btn-type" val="icon"></xui-prop>
+      <xui-prop id="icon" val="mdi-account mdi-48px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-text-1_164581580401097">
+      <xui-prop id="text" val="N°1 de la carte cadeau multi-enseignes"></xui-prop>
+      <xui-prop id="class" val="ml-4 d-none d-lg-flex"></xui-prop>
+      <xui-prop id="style" val="max-width:240px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot">
+      <xui-column-responsive-1 xid="page-0-route-0-content-slot-column-responsive-1_164581615066747"></xui-column-responsive-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1_164581615066747">
+      <xui-prop id="nb" val="7"></xui-prop>
+      <xui-prop id="fill-height" val="false"></xui-prop>
+      <xui-prop id="align" val="center"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1_164581615066747-col-0">
+      <xui-prop id="class" val="pt-4 "></xui-prop>
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-block xid="page-0-route-0-content-slot-column-responsive-1-block_164581631273436"></xui-block>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block_164581631273436">
+      <xui-prop id="class" val="fill-height xui-p-relative rounded-xl ma-3 mr-6 "></xui-prop>
+      <xui-prop id="style" val="background-color:#ff6000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-bottom-nav">
+      <xui-prop id="hide-on-scroll-down" val="true"></xui-prop>
+      <xui-prop id="colorApp" val="#4b4b4a"></xui-prop>
+      <xui-prop id="dark" val="true"></xui-prop>
+      <xui-prop id="horizontal" val="true"></xui-prop>
+      <xui-prop id="grow" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1_164581392397971-col-2">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-prop id="class" val="ml-4 d-none d-lg-flex"></xui-prop>
+      <xui-menu-1 xid="page-0-content-toolbar-title-row-1-menu-1_164586436226222"></xui-menu-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-btn-icon-1_164581650796598">
+      <xui-prop id="btn-type" val="rounded"></xui-prop>
+      <xui-prop id="icon" val="mdi-gift mdi-36px mdi-spin"></xui-prop>
+      <xui-prop id="size" val="x-large"></xui-prop>
+      <xui-prop id="textleft" val="Offrir une carte &amp;nbsp;"></xui-prop>
+      <xui-prop id="positionicon" val="right"></xui-prop>
+      <xui-prop id="directive" val="v-on=&quot;on&quot;"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-btn-icon-1_164581680298743">
+      <xui-prop id="btn-type" val="rounded"></xui-prop>
+      <xui-prop id="size" val="x-large"></xui-prop>
+      <xui-prop id="textleft" val="Espace Pro &amp;nbsp;"></xui-prop>
+      <xui-prop id="positionicon" val="right"></xui-prop>
+      <xui-prop id="icon" val="mdi-bank mdi-36px"></xui-prop>
+      <xui-prop id="color" val="#ff6000"></xui-prop>
+      <xui-prop id="dark" val="true"></xui-prop>
+      <xui-prop id="routeto" val="&#47;page1"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block_164581631273436-block">
+      <xui-row-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1_164581718780531"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1_164581718780531">
+      <xui-prop id="nb" val="3"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="align-content" val="center"></xui-prop>
+      <xui-prop id="align" val="center"></xui-prop>
+      <xui-prop id="justify" val="space-around"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1_164581718780531-col-0">
+      <xui-prop id="class" val="mt-4 mx-3"></xui-prop>
+      <xui-prop id="cols" val="10"></xui-prop>
+      <xui-prop id="responsive" val="md=3"></xui-prop>
+      <xui-card-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1_164581719752266"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1_164581719752266">
+      <xui-prop id="height" val="150px"></xui-prop>
+      <xui-prop id="class" val="elevation-4 rounded-xl "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1_164581719752266-CardImage">
+      <xui-prop id="url" val="data:image&#47;jpeg;base64,&#47;9j&#47;4AAQSkZJRgABAQAAAQABAAD&#47;2wCEAAoHCBISEhgUEhUYGRgaGhoeHBkcGBwYHBodGiEcHR0ZHRocIS4lHR4sHxocJjgnKy8xNTU1GiQ7QDszPy40NTEBDAwMDw4QGBIRGDEdHCExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExPzExMTExMTExMTExMf&#47;AABEIAJ8BPgMBIgACEQEDEQH&#47;xAAcAAEAAQUBAQAAAAAAAAAAAAAABAECBQYHAwj&#47;xAA8EAACAgECAwYEAwcCBwEBAAABAgADEQQSBSExEyJBUZGhBgdhcTKBsRQzQlJicqKS0SNDgoOywcLhJP&#47;EABUBAQEAAAAAAAAAAAAAAAAAAAAB&#47;8QAFBEBAAAAAAAAAAAAAAAAAAAAAP&#47;aAAwDAQACEQMRAD8A7NERAREQEREBEtJxzMxet+ItHT+91FSny3gn&#47;SOcDLRNK1nzJ4en4C9h&#47;pTA9WxMFrPmox&#47;c6dR9Xcn&#47;ABUD9YHUpQmcR1nzB4hZ0sVB5IgHu2TMFq+MX2&#47;vbnf+52I9M4gd51nHtJT+9vrU+W8E+g5zBav5haGv8Bew&#47;wBKED1bE4v2soboHTtX8zm6VadR9Xcn&#47;FQP1mC1nx7r36WKg8lVR7sCZphulptgZnV8Yvt&#47;eWu&#47;0Z2I9M4kM3yAbZabIE43yw3SEbJabIE03Sw2yIbJabIEprZYbJGLyheB7myebPPIvLS0D1LywvPMtKFoF5aWFpRQSQACSegAyT9gJkV+H9aULjTXbR47G&#47;TGYGOJlMy0ykC7MpmUzKQK5nRPkprdmvsqPSyon80YEezNOdTYPgLXdhxPSvnANgQ&#47;awFP1YQPpiIiAiIgIiICedjhQWY4ABJJ6ADqZ6TFfE1bNotSqZ3GmwDHXJVoHPuMfNsByukoDKOj2Ejd9Qg54+5B+k1jWfMfidvS1UHkiKPdsn3mlK3KXboGV1fGNTd+9vsf+52I9M4kQPI26VzAldpHaSNujfAk9pHaSNvjfAkF5abJ4b5TdA9+0lN88N0puge5eULzw3Sm6B7F5TfPLdJB0dvZdtsbs87Q5GFLc+QJ6nkenkYHmXlN0890ZgXlpbum08Jr0+k0Q111S3WWOyUo&#47;wCBdmdzsPE5U+3TJMxPG+NJqgn&#47;APNTU4J3PWNu8eAI+n5&#47;lAxqAswVeZJAA8yTgD1knivDrdLZ2dy7WwD1yCD4gjr5flPb4Zq7TWUIfGxT&#47;o7x9lm7&#47;E&#47;DLNXU&#47;abO2rex6grAu9Wc7WHgce4HnA034X0FWp1aU2lgrBsbSASwGQMkHyM2GjhGh1KXJXptRSa0dhe7EruT+Egkgg48PaanwPVdlqqbPBbEz9icH2Jm28S+Jnr1l+n1ZFulY7SoC5RWCsGQqMnGeeefLzEDTeG6s1XVW9Njo&#47;5KwJHoCJtvxpxzW6biD9lqLAvcdFDEphlHLZ0YFsiajxOqpbHWl+0rz3XKlSQfAggcx0z4zZX+NuSMNJS1yVonbP32yoxkDAwM5OM+MCnxzoS+sDV1kPZTW9iKPwu24Hl4E4H3M1a+pq2KOMMOoPh4&#47;wDue2o4jdZa1zuS7nLN0PUEY8gMDGPKR7LGdizEsT1JOSfuTAtiIgJdXaa2V16oQw+6kEe4lsQPrDRagW1pYvR1Vh9mAP8A7kiap8tNb23CtMc5KIUP3rJX9AJtcBERAREQEtZQQQehl0QPlbiml7C+2kjGyx0x9FYgewEi5m1&#47;NHRdlxW7HSwI4&#47;6lAP8Akp9ZqWYF2YzLcxmBdujdLcyqgkgDqSAPzgV3Rum0V&#47;Aes&#47;5j0Ix&#47;Cr295j5YAI95rWs0tlNj12LtdDhh5GBZujdM1xvhlSaPR6ioEdqjizLE5sXGcZ6D8XL6TA5gTNHobbt&#47;ZIz7F3Nj+FfMyLmbr8BdrXRqLaU7R99SBMgZAOX5k4HdY+kxHxlwf9mv3oMV2ZZf6W&#47;iT8jzH0+0CvDOF6daBqdY7hGYqiJjfYRnJyeg5Hy6dZB4u2jOw6TtRnO9Xwdvlgjr4+JmW01S6&#47;R1UI6JfQX2q52ixGOeR8+np9ZB4pwAaWnddcnbFhtqQ7+74lj4QMp8DadNSmq0tjbQ9aMGwMrsbmR6r6S74&#47;VwaBWF&#47;ZFQChkO5Ccd4k&#47;z8vQfeYX4Y4suj1ItdSybHRlGMkMPry6gRw3jz00WaYottFnSt89w55OpHMN0P3GfPIYjMZlIgbLwfiems0v7FrC6Irl6rUG4ozZ3Ar4g5PqZ5cRThtVLJS76i5iMOVatEA8gfxZ&#47;P8pr8QJ3COJNpbVuRVZlDYDZxkgjPL7yPptXZXZ2tblHyTuXr3uv6zxiBVnLEk8ySST5k9ZaBKxAREQEREBERARLYgdq+R2t3aW+kn93aGA+lij&#47;AOkadQnCfkprdmvsqPSyk+tbAj2ZvSd2gIiICIiAiIgcb+eWixbprx&#47;ErofupDL7M05ZO7&#47;OXRdpw3tAMmqxG&#47;Jsof8AzHpODwK5iUiBWUMRA6RxTUaQtpdW+kuvusqrZQhO0FMHDAdWDHxB6TXfj&#47;ThdYX3Nm2tLGVsbqyRt2HHkFHvIem+KtbVStNduxEBAwi7sEk&#47;iYE+PhiYi&#47;UPY5axy7seZJ3MxgbVwttPqOGjT36hKTXeWUtzJVlyQq5BPNj6TAcWo09dm3TWm1Noy5Up3snIAIHLGJDsrZDh1ZT5MCp9DLYGUr4wyaT9nrBXNm9rA5BPIALgeHIeMjNxG009gWym7cAQCQ3mGPMf&#47;pkSIFDKxEBERAREQEREBERAREQEREBEtiAiVVCxwoJPkASfQS+6l6ztsRlOM4YFTjzwYHnESkDYfgPXdhxTSvnANgQ&#47;awFP1Yek+mp8jJYUYOv4lIYfdTke4n1hodSLaksXo6Kw+zAEfrAkxEQEREBERAwvxfof2jh+pq8WqfH9wG5fcCfMCnIzPrcjIwZ8q8Z0ho1N1J&#47;5djqPsGIHtiBDiIgSuGaB9RYETA5EknoqjqTj7gfnNy4b8CVNztvcgDJ2oqDA68yWP6TXPhK7bq1HXerJjpk&#47;iA9VE61oqrghBWtAQRzLOef0AUe8Ix+i+COHpWjGgu7KpId2cAkAkbcheX2my8B4QmnRmKIoySuFVe6eYBwPDp9gJb8Oo1laM5yVUKf7k7re6meHxZqKjZWHCEbbFw4BUMdjA8+WcIw&#47;ORWofM7VV6mrKlS9TA8iCQpIUjl4cxOXzq3FErs01tancWRgNqlgDjI5qMDnOTgyi6IiAiIgIiICIiAiEUk4AJPkBk+0kpw64uibGDPnYGG3djmcbsQI0SRotOljEWWrWAM5YMc&#47;QBepk27h1HZGyu5n22IrkpsAV894A8&#47;CBipbNtGhoGpbT&#47;suEAbNzOxIULkWA&#47;hAzialAk6HQ2XsVrXdgZJyAFHmSTgSY&#47;ArVetWZMWPsDq4dQ3iCR448JZwe+sC2u1iiW17d20ttZSGUlR1HWZKs0JpH7B3c0212klNg5nYdo645QIy8L0z70rtdrUR2GUCITX+JeZznrI&#47;DaK7KNQCvfRFdGz&#47;AAqRuUD7HrMkqdnxXCglWfwBPdtHX7d&#47;2lnw5oLBqHG3&#47;hjtanckBRyI5knzC+sCPwrUumj1HZMUdWrYsvJijEqRnyzzlmuta3R1O7FnrssRiTk4YB1yT+Yl2jrTTO9d9iFLa2RjW3admcgqWA8cjpLNTqNOmnamlncu6uWZQirtBHdGc5OfGBiIiICfR&#47;yy1vbcK058UU1n&#47;tsUHsBPnCdp+Rmt3aXUUE80tDgf02KB6bkaB1KIiAiIgIiICfO3zW0XZcVtIHKxUsH5rtPuhn0TOOfPTRYfTageK2Vn7jDL+rQOVRLYgSNBf2dqP&#47;I6N+QIJ9szuVAusx3kQHyUufUkD2nBDOgcK+Y5ppVLKC7qANwYBWx4nxBgdG0uo&#47;Z1tqLbirlgTgErYA+7AAGN5cf9MwGvs7R0ZuZ7RcZ&#47;PP8Ajumi8R+O9Ta4dURCAQCdzEBsEjqB4DwmH1PxBq7PxXMB5LhP&#47;HBgdU4hxFK0O9gFA6k4E41YRuO3pk4+2eXtKPYzHLMWPmSSfUyTouG33AmutmA5FuQUHy3HAgRonvrtDZQ+yxdpIBHMEEHxBHI9DI0C6UUEnABJ8hzPpMgNNW2jNig70tCuc8irAlcDw5jHrJHCdRrGr7PSjAUksyhVPe&#47;msb25wIGj4fba5StCWXmw&#47;DtH9RbGJMfgNqMgdkC2OE3K4cKx8G29DPf4gO66sPYodq0W5lO9Q4JyW2&#47;iOMHH0nrWlK6S1KLS7o9dpJQoAEOCVz1PPnmBjrOHbarHLHfXaEZccsHPe8+omOm2aXidNx1OzTrues2EOxdXasg4KcgOpPKamTAz&#47;wANvaa9RXS21ytbKchT3WwwyemQ0DTaimxNRZYlgSxAxFvaFNx6N5Z+kwumRGcLY+xT1baWx&#47;0jrzmUe7S1UW1VO9jWbBuKBEXYc5AJ3ZgS7+E6Q6pqDbZvZ2AwihFLd5QSeZHMDlIPCUymqpPU17sf1VNu&#47;wB56tx8bhZ+z1dqAubG3N3lAAYLkAHlMUmpsVy6sQx3ZI5E7s7vXJgbZQ+qFWnShQ9JrG8uVKsWJ3oxY90DoAJrHFUrS+xayCgc7cHIx5A+IHT8pEycY8PLw9IgJI0uratXVQCLEKMD5Eg5H1GJHiBkhx7VhAguYKBgYwDgdBuAyfWY0knqfr+fnPXTaeyxglalmPgP1+g+pmco+FLD+OxEPkMv69IGuxNtt+ANZs3U7LQBkqp2P+StyPrMzw&#47;4KGnrD6hA9hGSDzVPHAHRiPEn8seIc5A8fCUBnUdKO&#47;tJA+gUAfpM1xD4R0eopLWIEcju2IArZ+vgw+hEDis6L8lNbs4g9R6WUn&#47;VWwI9maaPxbh1mltNdmDj8LDoy+DD&#47;bwmS+BNb2HFNK+cDtAh+1gKf&#47;ftA+nIiICIiAiIgJoPzj0PacMLgZNViP8AkSUPs&#47;tN+mH+KtD+0aHU0+L1OB&#47;dtJX3AgfLkSinIzKwKzI8M4Sbq3sa2utKyoZnLZy34cBQc5mNmU4NraUS6u9XNdip+Dbu3I25cFuQ6n1gU&#47;ZNML6kW42IzKrsEKbcsB3d2c9euJI1HDUSrUjb&#47;wASi9VzkklGJUZHTrg5xK3VaWzT2WaZHrelkJ3Pv3K5IyRjukHymS4T8Q33vcv&#47;AA0dqnZWVAp3oAQSTnJwD1gYnQYs0eoTau6s12Bsd7GdrAnyAP6zw4fpHtRwbQlaYZyzNtBc7RhR1JIx+UlcAVBve21ESyt0ILd8lgDu2AcxnHvLdLfp6C6F2trsrCsVTYdwYEY3noMdYHlxe+opTXW5fs1dS+0oDubIAB54HP1mMk7Wamhl21UFDkd9nLt9sdBIMDO8E0VllF6BG2ugKMeSl625AMeWeZ9JTTUqld2mvsSsk1uDneMjO4dzqceEwpdiNpY7R0GTj06SwQMhfXpk2bHe3vDeNnZrt8QpOTmez8UrRHSigJvUqzs7O209QM8hMVED0oves7kYqcEZHkeRHpPOIgIiICIiAiIgIAJOAMk8gB1JPQRMj8PqDq6c9O0U&#47;wCnmPcQOu8A+C102lUcjYwBsYfzddo&#47;pXoPtnxmJ1OnNVoG3x8f9punC7D&#47;AMJi5Idct&#47;SWYKg+xO7&#47;AEyLcld9Ya5SpVlLN3QWUvsyFBLBfqQM4OIHsl40+mDkgFsdRn29ZA0&#47;EksOxwNp8QSWz548pkXrL7O0VCnaocjJCoU7n4ufN8A58zIWpd0VwFAcijkChNm123Fgg2gleRx4CBAt4OK9QCHrK5O&#47;mBs24zuY8s94cpkOI1s+O+ERS4I5swWsbnbA6jGPH+ITz11+n0ljNtcvYWY9MoWO7Ck8upIz1wZKos7cixCoOXOw97IdUVlOcZGE94HO&#47;mLoq+zpevmNiNuwQW3s4JIJ5HknL6Tn6WMhDryZSGU&#47;VTke4nTfmW7rp1WzG5mVUAUKAq5YgADoOXqJzGB9ZaHUi2pLF6OisPswB&#47;8AckzUvljre24Vpz4oprP&#47;AG2Kj&#47;EA&#47;nNtgIiICIiAlJWIHypx&#47;R9hrNRTjGy2xR&#47;aGO3&#47;ABxMfN0+bei7LirsBysRH&#47;MgofeuaXASTwwntk2ojksFCuNyEt3e8PLn7SNLkcqwYdQQR49OfSBtGqTV2pbThERFDFK6SgsI7wXoGOArHJ8V+shjhFeywoHcbFdXHdHeXKjb45YPnPQDzmNu4la5yG2ALtCp3VC97I2j+5uvnPM6e0rkq+0Adc4xzIwD1HU8vrAjxJFGlLjO5V7wUbiRljzwMA+pwOYlr04QPk53MrAjG0rg9c88g&#47;ToYHjEyVdaK&#47;ZlAfwlmYnCqEVnIwRg5LcznoolXXKEbe52asjbRyYbQe94ktuBH28oGNiIgIiICIiAiIgIiICIl0C2emntNbq69VYMPuDmWxA7TwPiTX11mrATZWAc551uzjI5YIY7SPpM9xNHr04yx34HMYHQ7h0GeR6Z6TiXwz8TX6CzdXh0Jy1bZ2t9QR+FvqPzzN51fzE0upXvq9beIK7h+TIeY+4EDJcK4q6ud5Lljks3M9MZyfpymx6d9MmMbVYjugvl2IxnAJ54+k5TqviqlTmpXc+GQEX1PP2mr8R4lbqLN9jZI&#47;CByCDyUeH36wOr8fu3ucjPtIun4xXpV32MFA++T9AOpP0E5oOLanGO2sx&#47;ex9ycyJZYzHLMWPmSSfeBl&#47;ir4gs19&#47;aPyRRtRPJfEn+o+P2A8JhJWIHaPkdrN2m1FJP4LFYD6WL&#47;uh9Z1Kcl+R3DbFXUahlKo&#47;ZqhII3bNxLDzHeAz951qAiIgIiICIiBx&#47;57aHnpdQP66z7Ov6NOST6A+cOh7XhbuBzqdH+wzsb&#47;FzPn+AiIgZzQ3EogQIpwwJLMpwmzOcYx1DEZOecpe4xhrl5rlgFAO4r3hnn3uYHLGe8JhkUsQq5JJwB5k8pQqQcHkRyx5Y8IHvRamwo+7G4MCuCQQMEcyOox6RdqS+&#47;lyd9&#47;2Pe5f5e0ttp2hDnIdd325lSPUTzRsEHAOPA8x+Yge51r73dDt3nnyB5ZyBkj7ek82Z2DMSxGcsckjJ6E&#47;WZFcPbUx2qmwOcKABs3b+Sjn3kPrKPaquLq2BBIFi7doOeZIQ&#47;wALYP2I+0CE+ldQ+RjYVDDPMb84&#47;TnL66q1rD2bjuLBVUheS4yxYg+JwBjwM9VsTtLQ79193fA3cwwZWwOvT3nmt9YGxlLoCSpzsYZxn+YYOBy+kCZotKm8EbStlbshsGQj153B8dcBTzx0YcpG4vWEs2hQCFXdtXarNzy6D+UjH3wT4zzfWNuVkAQICFUcwAc5znqTuOT9Z4M7EKpJIXkoPgD4CBZLoiAiIgIiICIiAiX0VPYcVoznyRS59FBmf4f8DcTvxs0rqD&#47;E+Kx&#47;kQfaBrsTo+g+UGtfBuuprHku6w49FGfzmy6D5PaNOd191h8htrHsCfeBxOemn09lh21o7nyRGc+igz6N0HwJwujBTS1kj+JwbD&#47;mTj8psNGnSsbURVHkqhR6CB848P8AgPil2NmldR&#47;NZisffDnOPsDNk0Pyf1jc7r6a&#47;ooaw&#47;oo953CIHNdD8n9EmDddfZ9AVrU&#47;wCld3+U2Xh&#47;wNwujGzSVEjoXXtT98vnn9ZssQLFUAYAwB0A5CXxEBERAREQEREDFfEui&#47;aNFqKf56nUfcqce+J8sKeU+vJ8q&#47;Eej7DWamnwS6wD7bjj2IgY6IiBL4WyrZvbois3UAkgYUDPjuI9Jdqra7Cr95WyFbPfLAfx5AALeY5Z5HzkKVgSjdWawjByUL7SCFGGwRkEE9QTj6yOzA4wAMAA4zzPnz8ZbLoFe0bAGTgAgc&#47;AnJH2yTLJdEBERAREm8M4VfqrBXQm9j0G5V92IECFE6HoPlHxB&#47;3r01D+5rG9FAH+U2TQfJzTLg36ixz4hFWtffcfeBxiVqQu21AWb+VQWPoOc+i9B8u+FU9NMrnzsZrPZiR7TY9No6qhitEQeSqFHoBA+cNB8FcTvxs0lgB&#47;icCsf5kH2myaD5Q69+dttNQ+haxvQBR7zukQOY6H5PaRcG++2zzCha1PsW95smg+AOFU426VGI8bM2H&#47;ADJE2qIHhp9MlY21oqjyVQo9BPeIgIiICIiAiIgIiICIiB&#47;&#47;2Q=="></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-textfield-1_164581786225959">
+      <xui-prop id="label" val="N° Carte illicado"></xui-prop>
+      <xui-prop id="dense" val="true"></xui-prop>
+      <xui-prop id="hide-detail" val="true"></xui-prop>
+      <xui-prop id="type" val="outlined"></xui-prop>
+      <xui-prop id="rounded" val="true"></xui-prop>
+      <xui-prop id="style" val="width:80%"></xui-prop>
+      <xui-prop id="class" val="d-inline-block "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-image-1_164581821279970">
+      <xui-prop id="style" val="width:200px"></xui-prop>
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;static&#47;version1645513699&#47;frontend&#47;Magento&#47;illicado&#47;fr_FR&#47;images&#47;MOBILE-small.png"></xui-prop>
+      <xui-prop id="class" val="rounded-pill "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1_164581718780531-col-2">
+      <xui-prop id="cols" val="10"></xui-prop>
+      <xui-prop id="responsive" val="md=3"></xui-prop>
+      <xui-card-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1_164581870572872"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1_164581870572872">
+      <xui-prop id="height" val="150px"></xui-prop>
+      <xui-prop id="class" val="elevation-4 rounded-xl mr-md-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1_164581870572872-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.thirard.fr&#47;wp-content&#47;uploads&#47;2021&#47;01&#47;code-cadenas-mid-quality-e1609950073221.jpg"></xui-prop>
+      <xui-prop id="withSlot" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-textfield-1_164581870572968">
+      <xui-prop id="label" val="Votre mot de passe"></xui-prop>
+      <xui-prop id="dense" val="true"></xui-prop>
+      <xui-prop id="hide-detail" val="true"></xui-prop>
+      <xui-prop id="rounded" val="true"></xui-prop>
+      <xui-prop id="type" val="outlined"></xui-prop>
+      <xui-prop id="class" val="d-inline-block "></xui-prop>
+      <xui-prop id="style" val="width:80%"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1_164581870572872-CardImage-image-content">
+      <xui-textfield-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-textfield-1_164581921386849"></xui-textfield-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-textfield-1_164581921386849">
+      <xui-prop id="label" val="Identifiant illicado Pro ou Perso"></xui-prop>
+      <xui-prop id="dense" val="true"></xui-prop>
+      <xui-prop id="hide-detail" val="true"></xui-prop>
+      <xui-prop id="type" val="outlined"></xui-prop>
+      <xui-prop id="rounded" val="true"></xui-prop>
+      <xui-prop id="background-color" val="white"></xui-prop>
+      <xui-prop id="class" val="pa-4"></xui-prop>
+      <xui-prop id="style" val="top:80px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1_164581718780531-col-3">
+      <xui-prop id="cols" val="1"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action">
+      <xui-flow xid="page-0-content-toolbar-action-flow_164581936696629"></xui-flow>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-flow_164581936696629">
+      <xui-prop id="nb" val="4"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-flow-btn-icon-1_164581936943832">
+      <xui-prop id="btn-type" val="icon"></xui-prop>
+      <xui-prop id="icon" val="mdi-help mdi-36px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1_164581870572872-card-main">
+      <xui-flow xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow_164582008453387"></xui-flow>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow_164582008453387">
+      <xui-prop id="nb" val="2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow_164582008453387-col-0">
+      <xui-textfield-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-textfield-1_164581870572968"></xui-textfield-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow_164582008453387-col-1">
+      <xui-btn-icon-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow-btn-icon-1_164582017054457"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow-btn-icon-1_164582017054457">
+      <xui-prop id="btn-type" val="icon"></xui-prop>
+      <xui-prop id="icon" val="mdi-send"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-systembar-systembar-title-1_164582060760689">
+      <xui-prop id="text" val="www.Illicado.com"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-systembar-systembar">
+      <xui-flow xid="page-0-content-systembar-systembar-flow_164582064344222"></xui-flow>
+   </xui-design>
+
+   <xui-design xid="page-0-content-systembar-systembar-flow_164582064344222">
+      <xui-prop id="nb" val="3"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-systembar-systembar-flow_164582064344222-col-0">
+      <xui-title-1 xid="page-0-content-systembar-systembar-title-1_164582060760689"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-systembar-systembar-flow_164582064344222-col-1">
+      <xui-spacer-1 xid="page-0-content-systembar-systembar-flow-spacer-1_164582069148447"></xui-spacer-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-parallax-1_164582126966511">
+      <xui-prop id="url" val="https:&#47;&#47;www.lcas-agency.com&#47;web&#47;image&#47;5782&#47;screen-iso-happy@3x-min.png"></xui-prop>
+      <xui-prop id="height" val="600"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1_164582145402879">
+      <xui-prop id="nb" val="1"></xui-prop>
+      <xui-prop id="fill-height" val="false"></xui-prop>
+      <xui-prop id="justify" val="center"></xui-prop>
+      <xui-prop id="align" val="start"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1_164581615066747-col-2">
+      <xui-prop id="class" val="pb-8"></xui-prop>
+      <xui-row-1 xid="page-0-route-0-content-slot-column-responsive-1-row-1_164582145402879"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-bottom-nav-slot-btn-icon-1_164582158441327">
+      <xui-prop id="btn-type" val="text"></xui-prop>
+      <xui-prop id="icon" val="mdi-home mdi-36px"></xui-prop>
+      <xui-prop id="textright" val="Accueil &amp;nbsp;"></xui-prop>
+      <xui-prop id="positionicon" val="right"></xui-prop>
+      <xui-prop id="routeto" val="&#47;"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-bottom-nav-slot">
+      <xui-flow xid="page-0-content-bottom-nav-slot-flow_164582195531680"></xui-flow>
+   </xui-design>
+
+   <xui-design xid="page-0-content-bottom-nav-slot-flow_164582195531680">
+      <xui-prop id="nb" val="3"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-bottom-nav-slot-flow_164582195531680-col-0">
+      <xui-btn-icon-1 xid="page-0-content-bottom-nav-slot-btn-icon-1_164582158441327"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-bottom-nav-slot-flow_164582195531680-col-1">
+      <xui-btn-icon-1 xid="page-0-content-bottom-nav-slot-flow-btn-icon-1_164582195945792"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-bottom-nav-slot-flow-btn-icon-1_164582195945792">
+      <xui-prop id="btn-type" val="text"></xui-prop>
+      <xui-prop id="icon" val="mdi-gift mdi-36px"></xui-prop>
+      <xui-prop id="textright" val="Offrir une carte &amp;nbsp;"></xui-prop>
+      <xui-prop id="positionicon" val="right"></xui-prop>
+      <xui-prop id="routeto" val="&#47;route2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-bottom-nav-slot-flow_164582195531680-col-2">
+      <xui-btn-icon-1 xid="page-0-content-bottom-nav-slot-flow-btn-icon-1_164582205475929"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-bottom-nav-slot-flow-btn-icon-1_164582205475929">
+      <xui-prop id="btn-type" val="text"></xui-prop>
+      <xui-prop id="icon" val="mdi-account mdi-36px"></xui-prop>
+      <xui-prop id="textright" val="Compte illlcado &amp;nbsp;"></xui-prop>
+      <xui-prop id="positionicon" val="right"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1_164581615066747-col-1">
+      <xui-prop id="class" val="text-center py-3"></xui-prop>
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-title-1 xid="page-0-route-0-content-slot-column-responsive-1-title-1_164582222481277"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-title-1_164582222481277">
+      <xui-prop id="text" val="J&#39;offre une carte : Nos meilleures ventes"></xui-prop>
+      <xui-prop id="class" val="text-h4 "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-systembar-systembar-flow_164582064344222-col-2">
+      <xui-title-1 xid="page-0-content-systembar-systembar-flow-title-1_164582290648258"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-systembar-systembar-flow-title-1_164582290648258">
+      <xui-prop id="text" val="Derniére conexion 25&#47;02&#47;2022 22:02"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1_164582145402879-col-0">
+      <xui-prop id="cols" val="10"></xui-prop>
+      <xui-prop id="responsive" val=":md=&quot;itemsHomeProduct_index==1?4:3&quot;"></xui-prop>
+      <xui-prop id=":varitems" val="itemsHomeProduct"></xui-prop>
+      <xui-card-1 xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1_164582312447431"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1_164582145402879-col-2">
+      <xui-prop id="cols" val="10"></xui-prop>
+      <xui-prop id="responsive" val="md=3"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1_164582145402879-col-1">
+      <xui-prop id="cols" val="10"></xui-prop>
+      <xui-prop id="responsive" val="md=4"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1_164582312447431">
+      <xui-prop id="height" val="auto"></xui-prop>
+      <xui-prop id="directive" val="v-pressanimationmoveto v-elevationonover"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1_164582312447431-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte_plume_2021_413x259_1.png" binding="url"></xui-prop>
+      <xui-prop id="contain" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-main-float-action-btn-icon-2_164582321246176">
+      <xui-prop id="btn-type" val="rounded"></xui-prop>
+      <xui-prop id="icon" val="mdi-gift mdi-24px"></xui-prop>
+      <xui-prop id="position" val="fixed"></xui-prop>
+      <xui-prop id="leftright" val="left"></xui-prop>
+      <xui-prop id="topbottom" val="top"></xui-prop>
+      <xui-prop id="style" val="z-index:1;  top:180px; left : 50px"></xui-prop>
+      <xui-prop id="color" val="red"></xui-prop>
+      <xui-prop id="dark" val="true"></xui-prop>
+      <xui-prop id="textleft" val="Solde Carte"></xui-prop>
+      <xui-prop id="positionicon" val="right"></xui-prop>
+      <xui-prop id="size" val="x-large"></xui-prop>
+      <xui-prop id="class" val="d-none d-md-flex"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1_164581718780531-col-1">
+      <xui-prop id="class" val="d-none d-md-flex"></xui-prop>
+      <xui-row-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-row-1_164582419051775"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-row-1_164582419051775">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="justify" val="center"></xui-prop>
+      <xui-prop id="align-content" val="center"></xui-prop>
+      <xui-prop id="align" val="center"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-row-1_164582419051775-col-0">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-image-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-image-1_164581821279970"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-row-1_164582419051775-col-1">
+      <xui-prop id="cols" val="4"></xui-prop>
+      <xui-text-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-row-1-text-1_164582421765483"></xui-text-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-row-1-text-1_164582421765483">
+      <xui-prop id="text" val="C&#39;est encore plus simple et sécurisé avec l&#39;application illicado!"></xui-prop>
+      <xui-prop id="class" val="text-center white--text text-h4 "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1_164582312447431-card-main">
+      <xui-grid-responsive xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive_164582815572084"></xui-grid-responsive>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive_164582815572084">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="no-gutters" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive_164582815572084-row-1">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="justify" val="center"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive_164582815572084-row-0">
+      <xui-prop id="nb" val="1"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1_164581615066747-col-4">
+      <xui-prop id="class" val="mt-6"></xui-prop>
+      <xui-carousel-1 xid="page-0-route-0-content-slot-column-responsive-1-carousel-1_164582827799857"></xui-carousel-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-carousel-1_164582827799857">
+      <xui-prop id=":varitems" val="itemsHomeCaroussel"></xui-prop>
+      <xui-prop id="height" val="300px"></xui-prop>
+      <xui-prop id="cycle" val="true"></xui-prop>
+      <xui-prop id="interval" val="2000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-carousel-1-image-1_164582850182966">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;media&#47;magestore&#47;bannerslider&#47;images&#47;e&#47;-&#47;e-cartes-2021_1280x268_v5_sans-texte_3.jpg" binding="url"></xui-prop>
+      <xui-prop id="style" val="width:100vw;height:100%"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive_164582815572084-row-0-col-0">
+      <xui-prop id="class" val="text-center"></xui-prop>
+      <xui-prop id="style" val="min-height:40px"></xui-prop>
+      <xui-title-1 xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive-title-1_164582868752114"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive_164582815572084-row-1-col-0">
+      <xui-prop id="cols" val="4"></xui-prop>
+      <xui-image-1 xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive-image-1_164582871271981"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive-image-1_164582871271981">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;static&#47;version1645513699&#47;frontend&#47;Magento&#47;illicado&#47;fr_FR&#47;Illicado_ProductSlider&#47;images&#47;productslider_button_01.png"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive_164582815572084-row-1-col-1">
+      <xui-prop id="cols" val="4"></xui-prop>
+      <xui-image-1 xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive-image-1_164582875901415"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive-image-1_164582875901415">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;static&#47;version1645513699&#47;frontend&#47;Magento&#47;illicado&#47;fr_FR&#47;Illicado_ProductSlider&#47;images&#47;productslider_button_03.png"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1-card-1-grid-responsive-title-1_164582868752114">
+      <xui-prop id="text" val="Carte cadeau Plume" binding="id"></xui-prop>
+      <xui-prop id="class" val="text-h5 "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-flow-image-1_164582979883992">
+      <xui-prop id="url" val="https:&#47;&#47;flagicons.lipis.dev&#47;flags&#47;4x3&#47;gb.svg"></xui-prop>
+      <xui-prop id="contain" val="true"></xui-prop>
+      <xui-prop id="style" val="max-width:30px"></xui-prop>
+      <xui-prop id="class" val="mr-1"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-flow-image-1_164582989532864">
+      <xui-prop id="url" val="https:&#47;&#47;flagicons.lipis.dev&#47;flags&#47;4x3&#47;gf.svg"></xui-prop>
+      <xui-prop id="contain" val="true"></xui-prop>
+      <xui-prop id="style" val="max-width:30px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-flow_164581936696629-col-0">
+      <xui-btn-icon-1 xid="page-0-content-toolbar-action-btn-icon-1_16458157210297"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-flow_164581936696629-col-1">
+      <xui-btn-icon-1 xid="page-0-content-toolbar-action-flow-btn-icon-1_164581936943832"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-flow_164581936696629-col-2">
+      <xui-image-1 xid="page-0-content-toolbar-action-flow-image-1_164582979883992"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-action-flow_164581936696629-col-3">
+      <xui-image-1 xid="page-0-content-toolbar-action-flow-image-1_164582989532864"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1_164581615066747-col-5">
+      <xui-prop id="class" val="mt-6"></xui-prop>
+      <xui-row-1 xid="page-0-route-0-content-slot-column-responsive-1-row-1_16459524011327"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-carousel-1_164582827799857-slot">
+      <xui-image-1 xid="page-0-route-0-content-slot-column-responsive-1-carousel-1-image-1_164582850182966"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route">
+      <xui-prop id="nbroute" val="3"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-toolbar-1_164583884241416">
+      <xui-prop id="HeaderDense" val="true"></xui-prop>
+      <xui-prop id="HeaderFlat" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-toolbar-1_164583884241416-content">
+      <xui-btn-icon-1 xid="page-0-route-1-content-slot-toolbar-1-btn-icon-1_164583885531611"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-toolbar-1-btn-icon-1_164583885531611">
+      <xui-prop id="btn-type" val="rounded"></xui-prop>
+      <xui-prop id="icon" val="mdi-arrow-left-circle"></xui-prop>
+      <xui-prop id="textright" val="Retour"></xui-prop>
+      <xui-prop id="positionicon" val="left"></xui-prop>
+      <xui-prop id="@click" val="doBackProduct"></xui-prop>
+      <xui-prop id="#@click" val="history.back();"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot">
+      <xui-column-responsive-1 xid="page-0-route-1-content-slot-column-responsive-1_164583921801319"></xui-column-responsive-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1_164583921801319">
+      <xui-prop id="nb" val="3"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="no-gutters" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1_164583921801319-col-0">
+      <xui-toolbar-1 xid="page-0-route-1-content-slot-toolbar-1_164583884241416"></xui-toolbar-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1_164581392397971-col-4">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-prop id="class" val="ml-4 d-none d-md-flex"></xui-prop>
+      <xui-btn-icon-1 xid="page-0-content-toolbar-title-row-1-btn-icon-1_164581680298743"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1_164581392397971-col-3">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-prop id="class" val="mx-5 ml-4 d-none d-md-flex"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1_164581392397971-col-3">
+      <xui-menu-1 xid="page-0-content-toolbar-title-row-1-menu-1_16464077663088"></xui-menu-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-btn-icon-1_164586375542417">
+      <xui-prop id="btn-type" val="rounded"></xui-prop>
+      <xui-prop id="icon" val="mdi-credit-card mdi-36px"></xui-prop>
+      <xui-prop id="size" val="x-large"></xui-prop>
+      <xui-prop id="textleft" val="J&#39;ai une carte cadeau  &amp;nbsp;"></xui-prop>
+      <xui-prop id="positionicon" val="right"></xui-prop>
+      <xui-prop id="color" val="#4b4b4a"></xui-prop>
+      <xui-prop id="dark" val="true"></xui-prop>
+      <xui-prop id="directive" val="v-on=&quot;on&quot;"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1_164586436226222-activator">
+      <xui-btn-icon-1 xid="page-0-content-toolbar-title-row-1-btn-icon-1_164581650796598"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1_164586436226222">
+      <xui-prop id="nudgebottom" val="70px"></xui-prop>
+      <xui-prop id="maxwidth" val="100vw"></xui-prop>
+      <xui-prop id="closecontent" val="!true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1_164586436226222-slot">
+      <xui-block xid="page-0-content-toolbar-title-row-1-menu-1-block_164586484875052"></xui-block>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block_164586484875052">
+      <xui-prop id="class" val="fill-height xui-p-relative white "></xui-prop>
+      <xui-prop id="style" val="min-width:100vw;height:500px;z-index:200"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1_164586513333436">
+      <xui-prop id="nb" val="3"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1_164583921801319-col-1">
+      <xui-row-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1_164587432869659"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1_164587432869659">
+      <xui-prop id="nb" val="3"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="justify" val="center"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1_164587432869659-col-0">
+      <xui-prop id="cols" val="11"></xui-prop>
+      <xui-prop id="responsive" val="md=5"></xui-prop>
+      <xui-carousel-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-carousel-1_164587434034199"></xui-carousel-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-carousel-1_164587434034199">
+      <xui-prop id=":varitems" val="itemsCarrouselProduct"></xui-prop>
+      <xui-prop id="height" val="auto"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-carousel-1_164587434034199-slot">
+      <xui-image-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-carousel-1-image-1_164587438183910"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-carousel-1-image-1_164587438183910">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte_plume_2021_413x259_1.png" binding="url"></xui-prop>
+      <xui-prop id="contain" val="true"></xui-prop>
+      <xui-prop id="directive" val="id=&quot;imageProduct&quot;"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1_164587432869659-col-1">
+      <xui-prop id="responsive" val="md=4"></xui-prop>
+      <xui-column-responsive-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1_164587920419889"></xui-column-responsive-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1_164587920419889">
+      <xui-prop id="nb" val="6"></xui-prop>
+      <xui-prop id="fill-height" val="false"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1_164587920419889-col-0">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-title-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-title-1_164587922199291"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-title-1_164587922199291">
+      <xui-prop id="text" val="Carte cadeau Plume" binding="name"></xui-prop>
+      <xui-prop id="class" val="text-h4"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1_164587920419889-col-1">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-divider-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-divider-1_164587927659646"></xui-divider-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-divider-1_164587927659646">
+      <xui-prop id="vertical" val="false"></xui-prop>
+      <xui-prop id="inset" val="false"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-textfield-1_164587932127452">
+      <xui-prop id="label" val="Montant"></xui-prop>
+      <xui-prop id="dense" val="true"></xui-prop>
+      <xui-prop id="hide-detail" val="true"></xui-prop>
+      <xui-prop id="type" val="outlined"></xui-prop>
+      <xui-prop id="style" val="width:200px;  height:50px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1_164587920419889-col-2">
+      <xui-textfield-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-textfield-1_164587936525446"></xui-textfield-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-textfield-1_164587936525446">
+      <xui-prop id="label" val="Quantité"></xui-prop>
+      <xui-prop id="dense" val="true"></xui-prop>
+      <xui-prop id="hide-detail" val="true"></xui-prop>
+      <xui-prop id="type" val="outlined"></xui-prop>
+      <xui-prop id="style" val="width:200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1_164587920419889-col-3">
+      <xui-row-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1_16458794815283"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1_16458794815283">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="fill-height" val="false"></xui-prop>
+      <xui-prop id="no-gutters" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1_16458794815283-col-0">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-textfield-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-textfield-1_164587932127452"></xui-textfield-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1_16458794815283-col-1">
+      <xui-prop id="class" val="my-n1"></xui-prop>
+      <xui-prop id="cols" val="12"></xui-prop>
+      <xui-prop id="responsive" val="md=6"></xui-prop>
+      <xui-toolbar-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1_164587948838127"></xui-toolbar-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1_164587948838127">
+      <xui-prop id="HeaderDense" val="true"></xui-prop>
+      <xui-prop id="HeaderFlat" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1_164587948838127-content">
+      <xui-flow xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-flow_164587954524668"></xui-flow>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-flow_164587954524668">
+      <xui-prop id="nb" val="3"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-flow_164587954524668-col-0">
+      <xui-btn-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-btn-1_164587954151320"></xui-btn-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-flow_164587954524668-col-1">
+      <xui-btn-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-flow-btn-1_16458795492379"></xui-btn-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-flow_164587954524668-col-2">
+      <xui-btn-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-flow-btn-1_164587955176738"></xui-btn-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-btn-1_164587954151320">
+      <xui-prop id="class" val="mr-5 text-h6 "></xui-prop>
+      <xui-prop id="label" val="50 €"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-flow-btn-1_16458795492379">
+      <xui-prop id="class" val="mr-5 text-h6 "></xui-prop>
+      <xui-prop id="label" val="100 €"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-row-1-toolbar-1-flow-btn-1_164587955176738">
+      <xui-prop id="label" val="150 €"></xui-prop>
+      <xui-prop id="class" val="mr-5 text-h6 "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1_164587920419889-col-4">
+      <xui-toolbar-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1_164588008536061"></xui-toolbar-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1_164588008536061">
+      <xui-prop id="HeaderDense" val="false"></xui-prop>
+      <xui-prop id="HeaderFlat" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1-btn-icon-1_164588008898579">
+      <xui-prop id="btn-type" val="rounded"></xui-prop>
+      <xui-prop id="icon" val="mdi-basket mdi-36px"></xui-prop>
+      <xui-prop id="textleft" val="Ajouter au panier &amp;nbsp;"></xui-prop>
+      <xui-prop id="positionicon" val="right"></xui-prop>
+      <xui-prop id="size" val="x-large"></xui-prop>
+      <xui-prop id="color" val="red"></xui-prop>
+      <xui-prop id="dark" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1_164588008536061-content">
+      <xui-flow xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1-flow_164588011140290"></xui-flow>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1-flow_164588011140290">
+      <xui-prop id="nb" val="2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1-flow_164588011140290-col-1">
+      <xui-btn-icon-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1-btn-icon-1_164588008898579"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1-flow_164588011140290-col-0">
+      <xui-spacer-1 xid="page-0-route-1-content-slot-column-responsive-1-row-1-column-responsive-1-toolbar-1-flow-spacer-1_164588011794078"></xui-spacer-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1_164581615066747-col-3">
+      <xui-prop id="style" val="width:auto"></xui-prop>
+      <xui-title-1 xid="page-0-route-0-content-slot-column-responsive-1-title-1_164623768834847"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-card-1_164595233640597">
+      <xui-prop id="height" val="auto"></xui-prop>
+      <xui-prop id="directive" val=" v-elevationonover"></xui-prop>
+      <xui-prop id="routeto" val="&#47;route2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-card-1_164595233640597-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;media&#47;illicado_boxes&#47;banner&#47;image&#47;FDGM_427x300_1.jpg" binding="urlCat"></xui-prop>
+      <xui-prop id="withSlot" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1_16459524011327">
+      <xui-prop id="nb" val="1"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-row-1_16459524011327-col-0">
+      <xui-prop id="cols" val="12"></xui-prop>
+      <xui-prop id="responsive" val="sm=6 md=4"></xui-prop>
+      <xui-prop id=":varitems" val="itemsCategory"></xui-prop>
+      <xui-card-1 xid="page-0-route-0-content-slot-column-responsive-1-card-1_164595233640597"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1_164583921801319-col-2">
+      <xui-tabs xid="page-0-route-1-content-slot-column-responsive-1-tabs_164595991024170"></xui-tabs>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-tabs_164595991024170">
+      <xui-prop id="nb" val="4"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="height-tabs" val="48px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-tabs_164595991024170-tab-0">
+      <xui-title-1 xid="page-0-route-1-content-slot-column-responsive-1-tabs-title-1_164595992183359"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-tabs-title-1_164595992183359">
+      <xui-prop id="text" val="Description"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-tabs_164595991024170-tab-1">
+      <xui-title-1 xid="page-0-route-1-content-slot-column-responsive-1-tabs-title-1_164595993834746"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-tabs-title-1_164595993834746">
+      <xui-prop id="text" val="Livraison"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-tabs_164595991024170-tab-2">
+      <xui-title-1 xid="page-0-route-1-content-slot-column-responsive-1-tabs-title-1_164595994128547"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-tabs-title-1_164595994128547">
+      <xui-prop id="text" val="Avis"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-tabs_164595991024170-tab-3">
+      <xui-title-1 xid="page-0-route-1-content-slot-column-responsive-1-tabs-title-1_164595997870220"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content-slot-column-responsive-1-tabs-title-1_164595997870220">
+      <xui-prop id="text" val="Enseigne"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1_164581615066747-col-6">
+      <xui-parallax-1 xid="page-0-route-0-content-slot-column-responsive-1-parallax-1_164582126966511"></xui-parallax-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-title-1_164623768834847">
+      <xui-prop id="text" val="J&#39;offre une carte : Choisissez votre événement"></xui-prop>
+      <xui-prop id="class" val="text-h4 "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-card-1_164595233640597-CardImage-image-content">
+      <xui-row-1 xid="page-0-route-0-content-slot-column-responsive-1-card-1-row-1_164623838788449"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-card-1-row-1_164623838788449">
+      <xui-prop id="nb" val="1"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="align-content" val="end"></xui-prop>
+      <xui-prop id="align" val="center"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-card-1-row-1_164623838788449-col-0">
+      <xui-prop id="class" val="text-center pb-10 "></xui-prop>
+      <xui-btn-1 xid="page-0-route-0-content-slot-column-responsive-1-card-1-row-1-btn-1_164623842658298"></xui-btn-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-card-1-row-1-btn-1_164623842658298">
+      <xui-prop id="color" val="white"></xui-prop>
+      <xui-prop id="label" val="Category" binding="nameCat"></xui-prop>
+      <xui-prop id="size" val="x-large"></xui-prop>
+      <xui-prop id="style" val="min-width : 80%; height : 70px"></xui-prop>
+      <xui-prop id="class" val="text-h5 text-sm-h4"></xui-prop>
+      <xui-prop id="btn-type" val="tile"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content">
+      <xui-prop id="varnamespace" val="home"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1">
+      <xui-prop id="#@before" val="alert(&quot;doSelectProduct&quot;);"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-content">
+      <xui-prop id="withAppBar" val="true"></xui-prop>
+      <xui-prop id="withFooter" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-content-toolbar-title">
+      <xui-row-1 xid="page-1-content-toolbar-title-row-1_164624154913863"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-1-content-toolbar-title-row-1_164624154913863">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="fill-height" val="false"></xui-prop>
+      <xui-prop id="no-gutters" val="true"></xui-prop>
+      <xui-prop id="justify" val="start"></xui-prop>
+      <xui-prop id="style" val="width:80vw"></xui-prop>
+      <xui-prop id="align" val="center"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-content-toolbar-title-row-1_164624154913863-col-0">
+      <xui-prop id="@click" val="goHome"></xui-prop>
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-prop id="#@click" val="$xui.vuejs.$router.push(&quot;&#47;&quot;);"></xui-prop>
+      <xui-image-1 xid="page-1-content-toolbar-title-row-1-image-1_164624154914992"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-1-content-toolbar-title-row-1-image-1_164624154914992">
+      <xui-prop id="url" val="https:&#47;&#47;www.lcas-agency.com&#47;web&#47;image&#47;5673&#47;logo-banniere-happy.png"></xui-prop>
+      <xui-prop id="style" val="height:80px;width:200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-content-toolbar-title-row-1_164624154913863-col-1">
+      <xui-text-1 xid="page-1-content-toolbar-title-row-1-text-1_164624154915031"></xui-text-1>
+   </xui-design>
+
+   <xui-design xid="page-1-content-toolbar-title-row-1-text-1_164624154915031">
+      <xui-prop id="text" val="Espace Professionel ILLICADO"></xui-prop>
+      <xui-prop id="class" val="ml-4 d-none d-lg-flex"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-content-toolbar">
+      <xui-prop id="headerHeight" val="80"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot">
+      <xui-column-responsive-1 xid="page-1-route-0-content-slot-column-responsive-1_164624190616518"></xui-column-responsive-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1_164624190616518">
+      <xui-prop id="nb" val="5"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1_164624190616518-col-1">
+      <xui-tabs xid="page-1-route-0-content-slot-column-responsive-1-tabs_164624195366350"></xui-tabs>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs_164624195366350">
+      <xui-prop id="nb" val="3"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="height-tabs" val="48px"></xui-prop>
+      <xui-prop id="color" val="red"></xui-prop>
+      <xui-prop id="slider-color" val="red"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs_164624195366350-tab-0">
+      <xui-title-1 xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624199559130"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624199559130">
+      <xui-prop id="text" val="Offrir des avantages a mes employés"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1_164624190616518-col-0">
+      <xui-title-1 xid="page-1-route-0-content-slot-column-responsive-1-title-1_164624212653928"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-title-1_164624212653928">
+      <xui-prop id="text" val="Pas encore client ... Que voulez vous faire ? "></xui-prop>
+      <xui-prop id="class" val="text-h5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1_164624190616518-col-2">
+      <xui-title-1 xid="page-1-route-0-content-slot-column-responsive-1-title-1_164624223504990"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-title-1_164624223504990">
+      <xui-prop id="text" val="Déjà client professionel ... Identifiez vous"></xui-prop>
+      <xui-prop id="class" val="text-h5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs_16462422540402">
+      <xui-prop id="nb" val="3"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="height-tabs" val="48px"></xui-prop>
+      <xui-prop id="slider-color" val="red"></xui-prop>
+      <xui-prop id="color" val="red"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs_16462422540402-tab-0">
+      <xui-title-1 xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624225404083"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624225404083">
+      <xui-prop id="text" val="DEMANDE DE REAPPRO"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs_16462422540402-tab-1">
+      <xui-title-1 xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624230743563"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624230743563">
+      <xui-prop id="text" val="SUIVI DE COMMANDE"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs_16462422540402-tab-2">
+      <xui-title-1 xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624242847660"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624242847660">
+      <xui-prop id="text" val="TABLEAU DE BORD"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs_164624195366350-tab-1">
+      <xui-title-1 xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624250020972"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624250020972">
+      <xui-prop id="text" val="Challenger mes commerciaux"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-content-toolbar-action">
+      <xui-btn-icon-1 xid="page-1-content-toolbar-action-btn-icon-1_164624273803287"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-1-content-toolbar-action-btn-icon-1_164624273803287">
+      <xui-prop id="btn-type" val="icon"></xui-prop>
+      <xui-prop id="icon" val="mdi-help mdi-36px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1_164624190616518-col-4">
+      <xui-tabs xid="page-1-route-0-content-slot-column-responsive-1-tabs_16462422540402"></xui-tabs>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1_164624280604164">
+      <xui-prop id="height" val="150px"></xui-prop>
+      <xui-prop id="class" val="elevation-4 rounded-xl mr-md-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1_164624280604164-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.thirard.fr&#47;wp-content&#47;uploads&#47;2021&#47;01&#47;code-cadenas-mid-quality-e1609950073221.jpg"></xui-prop>
+      <xui-prop id="withSlot" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1_164624280604164-CardImage-image-content">
+      <xui-textfield-1 xid="page-1-route-0-content-slot-column-responsive-1-card-1-textfield-1_164624280604119"></xui-textfield-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1-textfield-1_164624280604119">
+      <xui-prop id="label" val="Identifiant illicado Professionel"></xui-prop>
+      <xui-prop id="dense" val="true"></xui-prop>
+      <xui-prop id="hide-detail" val="true"></xui-prop>
+      <xui-prop id="type" val="outlined"></xui-prop>
+      <xui-prop id="rounded" val="true"></xui-prop>
+      <xui-prop id="background-color" val="white"></xui-prop>
+      <xui-prop id="class" val="pa-4"></xui-prop>
+      <xui-prop id="style" val="top:80px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1_164624280604164-card-main">
+      <xui-flow xid="page-1-route-0-content-slot-column-responsive-1-card-1-flow_164624280604135"></xui-flow>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1-flow_164624280604135">
+      <xui-prop id="nb" val="2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1-flow_164624280604135-col-0">
+      <xui-textfield-1 xid="page-1-route-0-content-slot-column-responsive-1-card-1-flow-textfield-1_164624280604190"></xui-textfield-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1-flow-textfield-1_164624280604190">
+      <xui-prop id="label" val="Votre mot de passe"></xui-prop>
+      <xui-prop id="dense" val="true"></xui-prop>
+      <xui-prop id="hide-detail" val="true"></xui-prop>
+      <xui-prop id="rounded" val="true"></xui-prop>
+      <xui-prop id="type" val="outlined"></xui-prop>
+      <xui-prop id="class" val="d-inline-block "></xui-prop>
+      <xui-prop id="style" val="width:80%"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1-flow_164624280604135-col-1">
+      <xui-btn-icon-1 xid="page-1-route-0-content-slot-column-responsive-1-card-1-flow-btn-icon-1_164624280604241"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-card-1-flow-btn-icon-1_164624280604241">
+      <xui-prop id="btn-type" val="icon"></xui-prop>
+      <xui-prop id="icon" val="mdi-send"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1_164624190616518-col-3">
+      <xui-row-1 xid="page-1-route-0-content-slot-column-responsive-1-row-1_164624282849984"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-row-1_164624282849984">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="justify" val="center"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-row-1_164624282849984-col-0">
+      <xui-prop id="cols" val="11"></xui-prop>
+      <xui-prop id="responsive" val="sm=4"></xui-prop>
+      <xui-card-1 xid="page-1-route-0-content-slot-column-responsive-1-card-1_164624280604164"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs_164624195366350-tab-2">
+      <xui-title-1 xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624294980833"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-1-route-0-content-slot-column-responsive-1-tabs-title-1_164624294980833">
+      <xui-prop id="text" val="PARTENARIAT"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0">
+      <xui-prop id="@before" val="beforePage"></xui-prop>
+      <xui-prop id="#@before" val="console.debug(&quot;arguments&quot;, p1, p2);
+
+const state = $xui.vuejs.$store.state;
+if (p2[0].to.path==&quot;&#47;&quot;)
+{
+  state.main.displaySolde = true;
+}
+else
+{
+  state.main.displaySolde = false;
+}
+
+const product = state.home.itemsHomeProduct[$xui.info[&#39;home.itemsHomeProduct&#39;]];
+console.debug(&quot;product &quot;, product);
+state.product.itemsCarrouselProduct[0].url=product.url;
+state.product.name=product.id;"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-1-content">
+      <xui-prop id="varnamespace" val="product"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1_164633324452449">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="fill-height" val="false"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1_164633324452449-col-0">
+      <xui-prop id="cols" val="3"></xui-prop>
+      <xui-column-responsive-1 xid="page-0-route-2-content-slot-row-1-column-responsive-1_164633328303685"></xui-column-responsive-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1_164633328303685">
+      <xui-prop id="nb" val="4"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="no-gutters" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-main-float-action">
+      <xui-if-else xid="page-0-content-main-float-action-if-else_164633642533232"></xui-if-else>
+   </xui-design>
+
+   <xui-design xid="page-0-content-main-float-action-if-else_164633642533232">
+      <xui-prop id="withElse" val="false"></xui-prop>
+      <xui-prop id="expression" val="main.displaySolde==true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-main-float-action-if-else_164633642533232-if">
+      <xui-btn-icon-2 xid="page-0-content-main-float-action-btn-icon-2_164582321246176"></xui-btn-icon-2>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot">
+      <xui-column-responsive-1 xid="page-0-route-2-content-slot-column-responsive-1_164633706023391"></xui-column-responsive-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-column-responsive-1_164633706023391">
+      <xui-prop id="nb" val="3"></xui-prop>
+      <xui-prop id="fill-height" val="false"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-column-responsive-1_164633706023391-col-1">
+      <xui-row-1 xid="page-0-route-2-content-slot-row-1_164633324452449"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-column-responsive-1_164633706023391-col-0">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-image-1 xid="page-0-route-2-content-slot-column-responsive-1-image-1_164633763123440"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-column-responsive-1-image-1_164633763123440">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;category&#47;Banner-Mariage-2021_1280x268_V2-Sans-Texte.jpg"></xui-prop>
+      <xui-prop id="style" val="height:300px"></xui-prop>
+      <xui-prop id="withSlot" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-column-responsive-1-image-1-btn-icon-1_164633763123591">
+      <xui-prop id="btn-type" val="rounded"></xui-prop>
+      <xui-prop id="icon" val="mdi-arrow-left-circle"></xui-prop>
+      <xui-prop id="textright" val="Retour"></xui-prop>
+      <xui-prop id="positionicon" val="left"></xui-prop>
+      <xui-prop id="@click" val="doBackCategory"></xui-prop>
+      <xui-prop id="#@click" val="history.back();"></xui-prop>
+      <xui-prop id="class" val="ma-3 "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-column-responsive-1-image-1_164633763123440-image-content">
+      <xui-row-1 xid="page-0-route-2-content-slot-column-responsive-1-image-1-row-1_164633764022674"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-column-responsive-1-image-1-row-1_164633764022674">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-column-responsive-1-image-1-row-1_164633764022674-col-0">
+      <xui-btn-icon-1 xid="page-0-route-2-content-slot-column-responsive-1-image-1-btn-icon-1_164633763123591"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1_164633328303685-col-0">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-title-1 xid="page-0-route-2-content-slot-row-1-column-responsive-1-title-1_164633772779197"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1-title-1_164633772779197">
+      <xui-prop id="text" val="Type de carte"></xui-prop>
+      <xui-prop id="class" val="text-h5 "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1-title-1_164633782057348">
+      <xui-prop id="text" val="Choisissez votre occasion cadeau"></xui-prop>
+      <xui-prop id="class" val="text-h5 "></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1_164633328303685-col-2">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-title-1 xid="page-0-route-2-content-slot-row-1-column-responsive-1-title-1_164633782057348"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1_164633324452449-col-1">
+      <xui-row-1 xid="page-0-route-2-content-slot-row-1-row-1_164633814987371"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1_164633814987371">
+      <xui-prop id="nb" val="1"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+      <xui-prop id="class" val="ma-8"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1_164633814987371-col-0">
+      <xui-prop id="cols" val="12"></xui-prop>
+      <xui-prop id=":varitems" val="itemsVoucher"></xui-prop>
+      <xui-prop id="responsive" val="md=4"></xui-prop>
+      <xui-card-1 xid="page-0-route-2-content-slot-row-1-row-1-card-1_16463381527698"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1_16463381527698">
+      <xui-prop id="height" val="auto"></xui-prop>
+      <xui-prop id="directive" val="v-elevationonover v-pressanimationmoveto"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1_16463381527698-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;media&#47;catalog&#47;product&#47;c&#47;a&#47;carte_plume_2021_413x259_1.png" binding="url"></xui-prop>
+      <xui-prop id="contain" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1_16463381527698-card-main">
+      <xui-grid-responsive xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive_164633815277941"></xui-grid-responsive>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive_164633815277941">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="no-gutters" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive_164633815277941-row-0">
+      <xui-prop id="nb" val="1"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive_164633815277941-row-0-col-0">
+      <xui-title-1 xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive-title-1_164633815277946"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive-title-1_164633815277946">
+      <xui-prop id="text" val="Carte cadeau Plume" binding="id"></xui-prop>
+      <xui-prop id="class" val="text-h6"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive_164633815277941-row-1">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="justify" val="center"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive_164633815277941-row-1-col-0">
+      <xui-image-1 xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive-image-1_164633815277949"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive-image-1_164633815277949">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;static&#47;version1645513699&#47;frontend&#47;Magento&#47;illicado&#47;fr_FR&#47;Illicado_ProductSlider&#47;images&#47;productslider_button_01.png"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive_164633815277941-row-1-col-1">
+      <xui-image-1 xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive-image-1_164633815277996"></xui-image-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-row-1-card-1-grid-responsive-image-1_164633815277996">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;static&#47;version1645513699&#47;frontend&#47;Magento&#47;illicado&#47;fr_FR&#47;Illicado_ProductSlider&#47;images&#47;productslider_button_03.png"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content">
+      <xui-prop id="varnamespace" val="category"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1_164633328303685-col-1">
+      <xui-prop id="cols" val="auto"></xui-prop>
+      <xui-toolbar-1 xid="page-0-route-2-content-slot-row-1-column-responsive-1-toolbar-1_164633893755237"></xui-toolbar-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1-toolbar-1_164633893755237">
+      <xui-prop id="HeaderDense" val="true"></xui-prop>
+      <xui-prop id="HeaderFlat" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1-toolbar-1_164633893755237-content">
+      <xui-flow xid="page-0-route-2-content-slot-row-1-column-responsive-1-toolbar-1-flow_16463389566826"></xui-flow>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1-toolbar-1-flow_16463389566826">
+      <xui-prop id="nb" val="2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1-toolbar-1-flow_16463389566826-col-0">
+      <xui-btn-1 xid="page-0-route-2-content-slot-row-1-column-responsive-1-toolbar-1-btn-1_164633894995354"></xui-btn-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-2-content-slot-row-1-column-responsive-1-toolbar-1-flow_16463389566826-col-1">
+      <xui-btn-1 xid="page-0-route-2-content-slot-row-1-column-responsive-1-toolbar-1-flow-btn-1_164633895991016"></xui-btn-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block_164586484875052-block">
+      <xui-column-responsive-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1_164640146103449"></xui-column-responsive-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1_164640146103449">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640153781280">
+      <xui-prop id="height" val="200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640153781280-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.weeza.fr&#47;images&#47;hygrometre-comment-ca-marche.jpg"></xui-prop>
+      <xui-prop id="aspect-ratio" val="1&#47;2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1-title-1_164640157103919">
+      <xui-prop id="text" val="Comment ça marche"></xui-prop>
+      <xui-prop id="class" val="white--text text-h5 mx-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1_164640146103449-col-0">
+      <xui-row-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1_164586513333436"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640153781280-card-main">
+      <xui-title-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1-title-1_164640157103919"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640153781280-card">
+      <xui-prop id="class" val="pa-0 "></xui-prop>
+      <xui-prop id="style" val="background-color:#ff6000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1_164586513333436-col-0">
+      <xui-card-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640153781280"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1_164586513333436-col-1">
+      <xui-card-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640266547236"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640266547236">
+      <xui-prop id="height" val="200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640266547236-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;illicado.com&#47;media&#47;logo-distributeur-illicado.jpg"></xui-prop>
+      <xui-prop id="aspect-ratio" val="1&#47;2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640266547236-card">
+      <xui-prop id="class" val="pa-0"></xui-prop>
+      <xui-prop id="style" val="background-color:#ff6000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640266547236-card-main">
+      <xui-title-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1-title-1_164640266547347"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1-title-1_164640266547347">
+      <xui-prop id="text" val="Trouver un point de ventes"></xui-prop>
+      <xui-prop id="class" val="white--text text-h5 mx-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1_164586513333436-col-2">
+      <xui-prop id="cols" val="6"></xui-prop>
+      <xui-card-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640316548795"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640316548795">
+      <xui-prop id="height" val="200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640316548795-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;media&#47;wysiwyg&#47;enseignes_1.png"></xui-prop>
+      <xui-prop id="aspect-ratio" val="1&#47;2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640316548795-card">
+      <xui-prop id="class" val="pa-0 "></xui-prop>
+      <xui-prop id="style" val="background-color:#ff6000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1_164640316548795-card-main">
+      <xui-title-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1-title-1_164640316548747"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-row-1-card-1-title-1_164640316548747">
+      <xui-prop id="text" val="Où dépenser la carte Illicado"></xui-prop>
+      <xui-prop id="class" val="white--text text-h5 mx-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1_164640146103449-col-1">
+      <xui-row-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1_164640360376391"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1_164640360376391">
+      <xui-prop id="nb" val="1"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1_164640360376391-col-0">
+      <xui-prop id="cols" val="5"></xui-prop>
+      <xui-prop id=":varitems" val="itemsMenu"></xui-prop>
+      <xui-list xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list_164640363288785"></xui-list>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list_164640363288785">
+      <xui-prop id="nb" val="2"></xui-prop>
+      <xui-prop id="tile" val="false"></xui-prop>
+      <xui-prop id="dense" val="true"></xui-prop>
+      <xui-prop id="subheader" val="true"></xui-prop>
+      <xui-prop id="rounded" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list_164640363288785-list-0">
+      <xui-subheader-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list-subheader-1_164640368522657"></xui-subheader-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list-subheader-1_164640368522657">
+      <xui-prop id="text" val="Offrir à" binding="name"></xui-prop>
+      <xui-prop id="class" val="text-h5"></xui-prop>
+      <xui-prop id="style" val="color:#ff48a2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list_164640363288785-list-1">
+      <xui-for xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list-for_164640384962937"></xui-for>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list-for_164640384962937">
+      <xui-prop id=":varitems" val="itemsSubHeader"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list-for_164640384962937-for">
+      <xui-list-item-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list-for-list-item-1_164640387340571"></xui-list-item-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-list-for-list-item-1_164640387340571-title">
+      <xui-prop id="text" val="Un homme" binding="name"></xui-prop>
+      <xui-prop id="class" val="text-subtitle-2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1_16464077663088-activator">
+      <xui-btn-icon-1 xid="page-0-content-toolbar-title-row-1-btn-icon-1_164586375542417"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1_16464077663088-slot">
+      <xui-block xid="page-0-content-toolbar-title-row-1-menu-1-block_164640783744916"></xui-block>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block_164640783744916">
+      <xui-prop id="class" val="fill-height xui-p-relative white"></xui-prop>
+      <xui-prop id="style" val="min-width:100vw;height:330px;z-index:200"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1_16464077663088">
+      <xui-prop id="maxwidth" val="100vw"></xui-prop>
+      <xui-prop id="nudgebottom" val="70px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1_164581719752266-card-main">
+      <xui-flow xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow_164640831061886"></xui-flow>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow_164640831061886">
+      <xui-prop id="nb" val="2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow_164640831061886-col-0">
+      <xui-textfield-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-textfield-1_164581786225959"></xui-textfield-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow_164640831061886-col-1">
+      <xui-btn-icon-1 xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow-btn-icon-1_164640831505858"></xui-btn-icon-1>
+   </xui-design>
+
+   <xui-design xid="page-0-route-0-content-slot-column-responsive-1-block-row-1-card-1-flow-btn-icon-1_164640831505858">
+      <xui-prop id="btn-type" val="icon"></xui-prop>
+      <xui-prop id="icon" val="mdi-send"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block_164640783744916-block">
+      <xui-column-responsive-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1_164640839466896"></xui-column-responsive-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1_164640839466896">
+      <xui-prop id="nb" val="1"></xui-prop>
+      <xui-prop id="fill-height" val="false"></xui-prop>
+      <xui-prop id="class" val="pa-6"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1_164640839466896-col-0">
+      <xui-row-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1_164640840364381"></xui-row-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1_164640840364381">
+      <xui-prop id="nb" val="4"></xui-prop>
+      <xui-prop id="fill-height" val="true"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640852332823">
+      <xui-prop id="height" val="200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640852332823-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;media&#47;wysiwyg&#47;enseignes_1.png"></xui-prop>
+      <xui-prop id="aspect-ratio" val="1&#47;2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640852332823-card">
+      <xui-prop id="class" val="pa-0 "></xui-prop>
+      <xui-prop id="style" val="background-color:#ff6000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640852332823-card-main">
+      <xui-title-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1-title-1_16464085233383"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1-title-1_16464085233383">
+      <xui-prop id="text" val="Où dépenser la carte Illicado"></xui-prop>
+      <xui-prop id="class" val="white--text text-h5 mx-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640853450130">
+      <xui-prop id="height" val="200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640853450130-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.francenum.gouv.fr&#47;files&#47;styles&#47;illustration_articles&#47;public&#47;2021-07&#47;card-6376665_640.jpg?itok=Cra5BQi6"></xui-prop>
+      <xui-prop id="aspect-ratio" val="1&#47;2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640853450130-card">
+      <xui-prop id="class" val="pa-0 "></xui-prop>
+      <xui-prop id="style" val="background-color:#ff6000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640853450130-card-main">
+      <xui-title-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1-title-1_164640853451124"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1-title-1_164640853451124">
+      <xui-prop id="text" val="Securiser ma carte"></xui-prop>
+      <xui-prop id="class" val="white--text text-h5 mx-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640877908272">
+      <xui-prop id="height" val="200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640877908272-CardImage">
+      <xui-prop id="url" val="data:image&#47;jpeg;base64,&#47;9j&#47;4AAQSkZJRgABAQAAAQABAAD&#47;2wCEAAoHCBISEhgUEhUYGRgaGhoeHBkcGBwYHBodGiEcHR0ZHRocIS4lHR4sHxocJjgnKy8xNTU1GiQ7QDszPy40NTEBDAwMDw4QGBIRGDEdHCExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExPzExMTExMTExMTExMf&#47;AABEIAJ8BPgMBIgACEQEDEQH&#47;xAAcAAEAAQUBAQAAAAAAAAAAAAAABAECBQYHAwj&#47;xAA8EAACAgECAwYEAwcCBwEBAAABAgADEQQSBSExEyJBUZGhBgdhcTKBsRQzQlJicqKS0SNDgoOywcLhJP&#47;EABUBAQEAAAAAAAAAAAAAAAAAAAAB&#47;8QAFBEBAAAAAAAAAAAAAAAAAAAAAP&#47;aAAwDAQACEQMRAD8A7NERAREQEREBEtJxzMxet+ItHT+91FSny3gn&#47;SOcDLRNK1nzJ4en4C9h&#47;pTA9WxMFrPmox&#47;c6dR9Xcn&#47;ABUD9YHUpQmcR1nzB4hZ0sVB5IgHu2TMFq+MX2&#47;vbnf+52I9M4gd51nHtJT+9vrU+W8E+g5zBav5haGv8Bew&#47;wBKED1bE4v2soboHTtX8zm6VadR9Xcn&#47;FQP1mC1nx7r36WKg8lVR7sCZphulptgZnV8Yvt&#47;eWu&#47;0Z2I9M4kM3yAbZabIE43yw3SEbJabIE03Sw2yIbJabIEprZYbJGLyheB7myebPPIvLS0D1LywvPMtKFoF5aWFpRQSQACSegAyT9gJkV+H9aULjTXbR47G&#47;TGYGOJlMy0ykC7MpmUzKQK5nRPkprdmvsqPSyon80YEezNOdTYPgLXdhxPSvnANgQ&#47;awFP1YQPpiIiAiIgIiICedjhQWY4ABJJ6ADqZ6TFfE1bNotSqZ3GmwDHXJVoHPuMfNsByukoDKOj2Ejd9Qg54+5B+k1jWfMfidvS1UHkiKPdsn3mlK3KXboGV1fGNTd+9vsf+52I9M4kQPI26VzAldpHaSNujfAk9pHaSNvjfAkF5abJ4b5TdA9+0lN88N0puge5eULzw3Sm6B7F5TfPLdJB0dvZdtsbs87Q5GFLc+QJ6nkenkYHmXlN0890ZgXlpbum08Jr0+k0Q111S3WWOyUo&#47;wCBdmdzsPE5U+3TJMxPG+NJqgn&#47;APNTU4J3PWNu8eAI+n5&#47;lAxqAswVeZJAA8yTgD1knivDrdLZ2dy7WwD1yCD4gjr5flPb4Zq7TWUIfGxT&#47;o7x9lm7&#47;E&#47;DLNXU&#47;abO2rex6grAu9Wc7WHgce4HnA034X0FWp1aU2lgrBsbSASwGQMkHyM2GjhGh1KXJXptRSa0dhe7EruT+Egkgg48PaanwPVdlqqbPBbEz9icH2Jm28S+Jnr1l+n1ZFulY7SoC5RWCsGQqMnGeeefLzEDTeG6s1XVW9Njo&#47;5KwJHoCJtvxpxzW6biD9lqLAvcdFDEphlHLZ0YFsiajxOqpbHWl+0rz3XKlSQfAggcx0z4zZX+NuSMNJS1yVonbP32yoxkDAwM5OM+MCnxzoS+sDV1kPZTW9iKPwu24Hl4E4H3M1a+pq2KOMMOoPh4&#47;wDue2o4jdZa1zuS7nLN0PUEY8gMDGPKR7LGdizEsT1JOSfuTAtiIgJdXaa2V16oQw+6kEe4lsQPrDRagW1pYvR1Vh9mAP8A7kiap8tNb23CtMc5KIUP3rJX9AJtcBERAREQEtZQQQehl0QPlbiml7C+2kjGyx0x9FYgewEi5m1&#47;NHRdlxW7HSwI4&#47;6lAP8Akp9ZqWYF2YzLcxmBdujdLcyqgkgDqSAPzgV3Rum0V&#47;Aes&#47;5j0Ix&#47;Cr295j5YAI95rWs0tlNj12LtdDhh5GBZujdM1xvhlSaPR6ioEdqjizLE5sXGcZ6D8XL6TA5gTNHobbt&#47;ZIz7F3Nj+FfMyLmbr8BdrXRqLaU7R99SBMgZAOX5k4HdY+kxHxlwf9mv3oMV2ZZf6W&#47;iT8jzH0+0CvDOF6daBqdY7hGYqiJjfYRnJyeg5Hy6dZB4u2jOw6TtRnO9Xwdvlgjr4+JmW01S6&#47;R1UI6JfQX2q52ixGOeR8+np9ZB4pwAaWnddcnbFhtqQ7+74lj4QMp8DadNSmq0tjbQ9aMGwMrsbmR6r6S74&#47;VwaBWF&#47;ZFQChkO5Ccd4k&#47;z8vQfeYX4Y4suj1ItdSybHRlGMkMPry6gRw3jz00WaYottFnSt89w55OpHMN0P3GfPIYjMZlIgbLwfiems0v7FrC6Irl6rUG4ozZ3Ar4g5PqZ5cRThtVLJS76i5iMOVatEA8gfxZ&#47;P8pr8QJ3COJNpbVuRVZlDYDZxkgjPL7yPptXZXZ2tblHyTuXr3uv6zxiBVnLEk8ySST5k9ZaBKxAREQEREBERARLYgdq+R2t3aW+kn93aGA+lij&#47;AOkadQnCfkprdmvsqPSyk+tbAj2ZvSd2gIiICIiAiIgcb+eWixbprx&#47;ErofupDL7M05ZO7&#47;OXRdpw3tAMmqxG&#47;Jsof8AzHpODwK5iUiBWUMRA6RxTUaQtpdW+kuvusqrZQhO0FMHDAdWDHxB6TXfj&#47;ThdYX3Nm2tLGVsbqyRt2HHkFHvIem+KtbVStNduxEBAwi7sEk&#47;iYE+PhiYi&#47;UPY5axy7seZJ3MxgbVwttPqOGjT36hKTXeWUtzJVlyQq5BPNj6TAcWo09dm3TWm1Noy5Up3snIAIHLGJDsrZDh1ZT5MCp9DLYGUr4wyaT9nrBXNm9rA5BPIALgeHIeMjNxG009gWym7cAQCQ3mGPMf&#47;pkSIFDKxEBERAREQEREBERAREQEREBEtiAiVVCxwoJPkASfQS+6l6ztsRlOM4YFTjzwYHnESkDYfgPXdhxTSvnANgQ&#47;awFP1Yek+mp8jJYUYOv4lIYfdTke4n1hodSLaksXo6Kw+zAEfrAkxEQEREBERAwvxfof2jh+pq8WqfH9wG5fcCfMCnIzPrcjIwZ8q8Z0ho1N1J&#47;5djqPsGIHtiBDiIgSuGaB9RYETA5EknoqjqTj7gfnNy4b8CVNztvcgDJ2oqDA68yWP6TXPhK7bq1HXerJjpk&#47;iA9VE61oqrghBWtAQRzLOef0AUe8Ix+i+COHpWjGgu7KpId2cAkAkbcheX2my8B4QmnRmKIoySuFVe6eYBwPDp9gJb8Oo1laM5yVUKf7k7re6meHxZqKjZWHCEbbFw4BUMdjA8+WcIw&#47;ORWofM7VV6mrKlS9TA8iCQpIUjl4cxOXzq3FErs01tancWRgNqlgDjI5qMDnOTgyi6IiAiIgIiICIiAiEUk4AJPkBk+0kpw64uibGDPnYGG3djmcbsQI0SRotOljEWWrWAM5YMc&#47;QBepk27h1HZGyu5n22IrkpsAV894A8&#47;CBipbNtGhoGpbT&#47;suEAbNzOxIULkWA&#47;hAzialAk6HQ2XsVrXdgZJyAFHmSTgSY&#47;ArVetWZMWPsDq4dQ3iCR448JZwe+sC2u1iiW17d20ttZSGUlR1HWZKs0JpH7B3c0212klNg5nYdo645QIy8L0z70rtdrUR2GUCITX+JeZznrI&#47;DaK7KNQCvfRFdGz&#47;AAqRuUD7HrMkqdnxXCglWfwBPdtHX7d&#47;2lnw5oLBqHG3&#47;hjtanckBRyI5knzC+sCPwrUumj1HZMUdWrYsvJijEqRnyzzlmuta3R1O7FnrssRiTk4YB1yT+Yl2jrTTO9d9iFLa2RjW3admcgqWA8cjpLNTqNOmnamlncu6uWZQirtBHdGc5OfGBiIiICfR&#47;yy1vbcK058UU1n&#47;tsUHsBPnCdp+Rmt3aXUUE80tDgf02KB6bkaB1KIiAiIgIiICfO3zW0XZcVtIHKxUsH5rtPuhn0TOOfPTRYfTageK2Vn7jDL+rQOVRLYgSNBf2dqP&#47;I6N+QIJ9szuVAusx3kQHyUufUkD2nBDOgcK+Y5ppVLKC7qANwYBWx4nxBgdG0uo&#47;Z1tqLbirlgTgErYA+7AAGN5cf9MwGvs7R0ZuZ7RcZ&#47;PP8Ajumi8R+O9Ta4dURCAQCdzEBsEjqB4DwmH1PxBq7PxXMB5LhP&#47;HBgdU4hxFK0O9gFA6k4E41YRuO3pk4+2eXtKPYzHLMWPmSSfUyTouG33AmutmA5FuQUHy3HAgRonvrtDZQ+yxdpIBHMEEHxBHI9DI0C6UUEnABJ8hzPpMgNNW2jNig70tCuc8irAlcDw5jHrJHCdRrGr7PSjAUksyhVPe&#47;msb25wIGj4fba5StCWXmw&#47;DtH9RbGJMfgNqMgdkC2OE3K4cKx8G29DPf4gO66sPYodq0W5lO9Q4JyW2&#47;iOMHH0nrWlK6S1KLS7o9dpJQoAEOCVz1PPnmBjrOHbarHLHfXaEZccsHPe8+omOm2aXidNx1OzTrues2EOxdXasg4KcgOpPKamTAz&#47;wANvaa9RXS21ytbKchT3WwwyemQ0DTaimxNRZYlgSxAxFvaFNx6N5Z+kwumRGcLY+xT1baWx&#47;0jrzmUe7S1UW1VO9jWbBuKBEXYc5AJ3ZgS7+E6Q6pqDbZvZ2AwihFLd5QSeZHMDlIPCUymqpPU17sf1VNu&#47;wB56tx8bhZ+z1dqAubG3N3lAAYLkAHlMUmpsVy6sQx3ZI5E7s7vXJgbZQ+qFWnShQ9JrG8uVKsWJ3oxY90DoAJrHFUrS+xayCgc7cHIx5A+IHT8pEycY8PLw9IgJI0uratXVQCLEKMD5Eg5H1GJHiBkhx7VhAguYKBgYwDgdBuAyfWY0knqfr+fnPXTaeyxglalmPgP1+g+pmco+FLD+OxEPkMv69IGuxNtt+ANZs3U7LQBkqp2P+StyPrMzw&#47;4KGnrD6hA9hGSDzVPHAHRiPEn8seIc5A8fCUBnUdKO&#47;tJA+gUAfpM1xD4R0eopLWIEcju2IArZ+vgw+hEDis6L8lNbs4g9R6WUn&#47;VWwI9maaPxbh1mltNdmDj8LDoy+DD&#47;bwmS+BNb2HFNK+cDtAh+1gKf&#47;ftA+nIiICIiAiIgJoPzj0PacMLgZNViP8AkSUPs&#47;tN+mH+KtD+0aHU0+L1OB&#47;dtJX3AgfLkSinIzKwKzI8M4Sbq3sa2utKyoZnLZy34cBQc5mNmU4NraUS6u9XNdip+Dbu3I25cFuQ6n1gU&#47;ZNML6kW42IzKrsEKbcsB3d2c9euJI1HDUSrUjb&#47;wASi9VzkklGJUZHTrg5xK3VaWzT2WaZHrelkJ3Pv3K5IyRjukHymS4T8Q33vcv&#47;AA0dqnZWVAp3oAQSTnJwD1gYnQYs0eoTau6s12Bsd7GdrAnyAP6zw4fpHtRwbQlaYZyzNtBc7RhR1JIx+UlcAVBve21ESyt0ILd8lgDu2AcxnHvLdLfp6C6F2trsrCsVTYdwYEY3noMdYHlxe+opTXW5fs1dS+0oDubIAB54HP1mMk7Wamhl21UFDkd9nLt9sdBIMDO8E0VllF6BG2ugKMeSl625AMeWeZ9JTTUqld2mvsSsk1uDneMjO4dzqceEwpdiNpY7R0GTj06SwQMhfXpk2bHe3vDeNnZrt8QpOTmez8UrRHSigJvUqzs7O209QM8hMVED0oves7kYqcEZHkeRHpPOIgIiICIiAiIgIAJOAMk8gB1JPQRMj8PqDq6c9O0U&#47;wCnmPcQOu8A+C102lUcjYwBsYfzddo&#47;pXoPtnxmJ1OnNVoG3x8f9punC7D&#47;AMJi5Idct&#47;SWYKg+xO7&#47;AEyLcld9Ya5SpVlLN3QWUvsyFBLBfqQM4OIHsl40+mDkgFsdRn29ZA0&#47;EksOxwNp8QSWz548pkXrL7O0VCnaocjJCoU7n4ufN8A58zIWpd0VwFAcijkChNm123Fgg2gleRx4CBAt4OK9QCHrK5O&#47;mBs24zuY8s94cpkOI1s+O+ERS4I5swWsbnbA6jGPH+ITz11+n0ljNtcvYWY9MoWO7Ck8upIz1wZKos7cixCoOXOw97IdUVlOcZGE94HO&#47;mLoq+zpevmNiNuwQW3s4JIJ5HknL6Tn6WMhDryZSGU&#47;VTke4nTfmW7rp1WzG5mVUAUKAq5YgADoOXqJzGB9ZaHUi2pLF6OisPswB&#47;8AckzUvljre24Vpz4oprP&#47;AG2Kj&#47;EA&#47;nNtgIiICIiAlJWIHypx&#47;R9hrNRTjGy2xR&#47;aGO3&#47;ABxMfN0+bei7LirsBysRH&#47;MgofeuaXASTwwntk2ojksFCuNyEt3e8PLn7SNLkcqwYdQQR49OfSBtGqTV2pbThERFDFK6SgsI7wXoGOArHJ8V+shjhFeywoHcbFdXHdHeXKjb45YPnPQDzmNu4la5yG2ALtCp3VC97I2j+5uvnPM6e0rkq+0Adc4xzIwD1HU8vrAjxJFGlLjO5V7wUbiRljzwMA+pwOYlr04QPk53MrAjG0rg9c88g&#47;ToYHjEyVdaK&#47;ZlAfwlmYnCqEVnIwRg5LcznoolXXKEbe52asjbRyYbQe94ktuBH28oGNiIgIiICIiAiIgIiICIl0C2emntNbq69VYMPuDmWxA7TwPiTX11mrATZWAc551uzjI5YIY7SPpM9xNHr04yx34HMYHQ7h0GeR6Z6TiXwz8TX6CzdXh0Jy1bZ2t9QR+FvqPzzN51fzE0upXvq9beIK7h+TIeY+4EDJcK4q6ud5Lljks3M9MZyfpymx6d9MmMbVYjugvl2IxnAJ54+k5TqviqlTmpXc+GQEX1PP2mr8R4lbqLN9jZI&#47;CByCDyUeH36wOr8fu3ucjPtIun4xXpV32MFA++T9AOpP0E5oOLanGO2sx&#47;ex9ycyJZYzHLMWPmSSfeBl&#47;ir4gs19&#47;aPyRRtRPJfEn+o+P2A8JhJWIHaPkdrN2m1FJP4LFYD6WL&#47;uh9Z1Kcl+R3DbFXUahlKo&#47;ZqhII3bNxLDzHeAz951qAiIgIiICIiBx&#47;57aHnpdQP66z7Ov6NOST6A+cOh7XhbuBzqdH+wzsb&#47;FzPn+AiIgZzQ3EogQIpwwJLMpwmzOcYx1DEZOecpe4xhrl5rlgFAO4r3hnn3uYHLGe8JhkUsQq5JJwB5k8pQqQcHkRyx5Y8IHvRamwo+7G4MCuCQQMEcyOox6RdqS+&#47;lyd9&#47;2Pe5f5e0ttp2hDnIdd325lSPUTzRsEHAOPA8x+Yge51r73dDt3nnyB5ZyBkj7ek82Z2DMSxGcsckjJ6E&#47;WZFcPbUx2qmwOcKABs3b+Sjn3kPrKPaquLq2BBIFi7doOeZIQ&#47;wALYP2I+0CE+ldQ+RjYVDDPMb84&#47;TnL66q1rD2bjuLBVUheS4yxYg+JwBjwM9VsTtLQ79193fA3cwwZWwOvT3nmt9YGxlLoCSpzsYZxn+YYOBy+kCZotKm8EbStlbshsGQj153B8dcBTzx0YcpG4vWEs2hQCFXdtXarNzy6D+UjH3wT4zzfWNuVkAQICFUcwAc5znqTuOT9Z4M7EKpJIXkoPgD4CBZLoiAiIgIiICIiAiX0VPYcVoznyRS59FBmf4f8DcTvxs0rqD&#47;E+Kx&#47;kQfaBrsTo+g+UGtfBuuprHku6w49FGfzmy6D5PaNOd191h8htrHsCfeBxOemn09lh21o7nyRGc+igz6N0HwJwujBTS1kj+JwbD&#47;mTj8psNGnSsbURVHkqhR6CB848P8AgPil2NmldR&#47;NZisffDnOPsDNk0Pyf1jc7r6a&#47;ooaw&#47;oo953CIHNdD8n9EmDddfZ9AVrU&#47;wCld3+U2Xh&#47;wNwujGzSVEjoXXtT98vnn9ZssQLFUAYAwB0A5CXxEBERAREQEREDFfEui&#47;aNFqKf56nUfcqce+J8sKeU+vJ8q&#47;Eej7DWamnwS6wD7bjj2IgY6IiBL4WyrZvbois3UAkgYUDPjuI9Jdqra7Cr95WyFbPfLAfx5AALeY5Z5HzkKVgSjdWawjByUL7SCFGGwRkEE9QTj6yOzA4wAMAA4zzPnz8ZbLoFe0bAGTgAgc&#47;AnJH2yTLJdEBERAREm8M4VfqrBXQm9j0G5V92IECFE6HoPlHxB&#47;3r01D+5rG9FAH+U2TQfJzTLg36ixz4hFWtffcfeBxiVqQu21AWb+VQWPoOc+i9B8u+FU9NMrnzsZrPZiR7TY9No6qhitEQeSqFHoBA+cNB8FcTvxs0lgB&#47;icCsf5kH2myaD5Q69+dttNQ+haxvQBR7zukQOY6H5PaRcG++2zzCha1PsW95smg+AOFU426VGI8bM2H&#47;ADJE2qIHhp9MlY21oqjyVQo9BPeIgIiICIiAiIgIiICIiB&#47;&#47;2Q=="></xui-prop>
+      <xui-prop id="aspect-ratio" val="1&#47;2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640877908272-card">
+      <xui-prop id="class" val="pa-0 "></xui-prop>
+      <xui-prop id="style" val="background-color:#ff6000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640877908272-card-main">
+      <xui-title-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1-title-1_164640877908210"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1-title-1_164640877908210">
+      <xui-prop id="text" val="Consulter le solde"></xui-prop>
+      <xui-prop id="class" val="white--text text-h5 mx-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="xui-copyzone-slot">
+   </xui-design>
+
+   <xui-design xid="xui-copyzone-slot">
+      <xui-card-1 xid="xui-copyzone-slot-card-1_164640882964531"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="xui-copyzone-slot-card-1_164640882964531">
+      <xui-prop id="height" val="200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="xui-copyzone-slot-card-1_164640882964531-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;www.illicado.com&#47;media&#47;wysiwyg&#47;enseignes_1.png"></xui-prop>
+      <xui-prop id="aspect-ratio" val="1&#47;2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="xui-copyzone-slot-card-1_164640882964531-card">
+      <xui-prop id="class" val="pa-0 "></xui-prop>
+      <xui-prop id="style" val="background-color:#ff6000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="xui-copyzone-slot-card-1_164640882964531-card-main">
+      <xui-title-1 xid="xui-copyzone-slot-card-1-title-1_164640882964646"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="xui-copyzone-slot-card-1-title-1_164640882964646">
+      <xui-prop id="text" val="Où dépenser la carte Illicado"></xui-prop>
+      <xui-prop id="class" val="white--text text-h5 mx-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640882989044">
+      <xui-prop id="height" val="200px"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640882989044-CardImage">
+      <xui-prop id="url" val="https:&#47;&#47;m.media-amazon.com&#47;images&#47;G&#47;08&#47;gc&#47;designs&#47;livepreview&#47;a_generic_10_fr_noto_email_v2016_fr-main._CB648676845_.png"></xui-prop>
+      <xui-prop id="aspect-ratio" val="1&#47;2"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640882989044-card">
+      <xui-prop id="class" val="pa-0 "></xui-prop>
+      <xui-prop id="style" val="background-color:#ff6000"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640882989044-card-main">
+      <xui-title-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1-title-1_164640882989073"></xui-title-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1-title-1_164640882989073">
+      <xui-prop id="text" val="Convertir Amazon ou Pass culture"></xui-prop>
+      <xui-prop id="class" val="white--text text-h5 mx-5"></xui-prop>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1_164640840364381-col-3">
+      <xui-card-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640877908272"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1_164640840364381-col-2">
+      <xui-card-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640853450130"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1_164640840364381-col-1">
+      <xui-card-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640852332823"></xui-card-1>
+   </xui-design>
+
+   <xui-design xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1_164640840364381-col-0">
+      <xui-card-1 xid="page-0-content-toolbar-title-row-1-menu-1-block-column-responsive-1-row-1-card-1_164640882989044"></xui-card-1>
+   </xui-design>
+
+</xui-factory>

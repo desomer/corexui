@@ -15,7 +15,7 @@
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="./app/vue/vue2frame.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
-      <script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
+      <script defer src="https://cdn.jsdelivr.net/npm/vue@2.x"></script>
       <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
       <script defer src="./app/vue/vuexHelper.js"></script>
       <link rel="preload" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
@@ -35,31 +35,56 @@
          <v-app style="width:100vw">
             <template id="page-0-route-0">
                <v-container fluid fill-height align-start>
-                  <v-row no-gutters data-for-map="main.listTemplate">
-                     <v-col @click="$mth('doSelectTemplate', ...arguments)" cols="2" v-bind:data-for-idx="listTemplate_index" v-for="(listTemplate_item, listTemplate_index) in main.listTemplate">
-                        <v-card v-pressanimation="{link:'/page1'}" v-ripple="{ center: false, class: 'black--text' }" class="ml-5">
-                           <v-img height="380px" contain v-bind:src="listTemplate_item.picture">
-                           </v-img>
-                           <v-card-text>
-                              <v-row no-gutters>
-                                 <v-col>
-                                    <span class="text-h6">{{listTemplate_item.id}}</span>
-                                 </v-col>
-                                 <v-col cols="auto">
-                                    <v-icon>mdi-chevron-right</v-icon>
-                                 </v-col>
-                              </v-row>
-                           </v-card-text>
-                        </v-card>
-                     </v-col>
-                  </v-row>
+                  <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;" centered>
+                     <v-tab>
+                        <span>APPS</span>
+                        <v-btn icon>
+                           <v-icon>mdi-apps</v-icon>
+                        </v-btn>
+                     </v-tab>
+                     <v-tab-item eager>
+                        <v-row class="ma-1" data-for-map="main.listTemplate">
+                           <v-col @click="$mth('doSelectTemplate', ...arguments)" cols="2" v-bind:data-for-idx="listTemplate_index" v-for="(listTemplate_item, listTemplate_index) in main.listTemplate">
+                              <v-card v-pressanimation="{link:'/page1'}" v-ripple="{ center: false, class: 'black--text' }" class="elevation-4">
+                                 <v-img height="380px" contain v-bind:src="listTemplate_item.picture">
+                                 </v-img>
+                                 <v-card-text>
+                                    <v-row>
+                                       <v-col>
+                                          <span class="text-h6">{{listTemplate_item.id}}</span>
+                                       </v-col>
+                                       <v-col cols="auto">
+                                          <v-icon>mdi-chevron-right</v-icon>
+                                       </v-col>
+                                    </v-row>
+                                 </v-card-text>
+                              </v-card>
+                           </v-col>
+                        </v-row>
+                     </v-tab-item>
+                     <v-tab>
+                        <span>templates</span>
+                        <v-btn icon>
+                           <v-icon>mdi-play-box-multiple</v-icon>
+                        </v-btn>
+                     </v-tab>
+                     <v-tab-item eager>
+                     </v-tab-item>
+                  </v-tabs>
                </v-container>
             </template>
             <v-app-bar app dark height="32" color="#ff5900">
                <v-app-bar-nav-icon @click.stop="main.isNavdrawerOpen = !main.isNavdrawerOpen"></v-app-bar-nav-icon>
                <v-toolbar-title>
+                  <span>App Code Generator</span>
                </v-toolbar-title>
                <v-spacer></v-spacer>
+               <v-btn icon>
+                  <v-icon>mdi-help</v-icon>
+               </v-btn>
+               <v-btn icon>
+                  <v-icon>mdi-account</v-icon>
+               </v-btn>
             </v-app-bar>
             <v-navigation-drawer v-model="main.isNavdrawerOpen" temporary app>
             </v-navigation-drawer>
@@ -100,10 +125,10 @@
                                                    <v-col cols="auto">
                                                       <v-radio-group v-model="main.stateDataSource" row>
                                                          <span class="mr-3">Data Model</span>
-                                                         <div class="d-flex">
+                                                         <div style="display: inline-block">
                                                             <v-radio label="Empty data" value="template"></v-radio>
                                                          </div>
-                                                         <div class="d-flex">
+                                                         <div style="display: inline-block">
                                                             <v-radio label="Initial data" value="mock"></v-radio>
                                                          </div>
                                                       </v-radio-group>
@@ -111,12 +136,12 @@
                                                    <v-col>
                                                    </v-col>
                                                    <v-col cols="auto">
-                                                      <div class="d-flex">
+                                                      <div style="display: inline-block">
                                                          <v-switch label="action enable" v-model="main.actionEnable"></v-switch>
                                                       </div>
                                                    </v-col>
                                                    <v-col class="pl-4" cols="auto">
-                                                      <div class="d-flex">
+                                                      <div style="display: inline-block">
                                                          <v-switch label="route enable" v-model="main.routeEnable"></v-switch>
                                                       </div>
                                                    </v-col>
@@ -125,7 +150,7 @@
                                           </v-col>
                                           <v-col class="xui-column" cols="auto">
                                              <v-toolbar height="35" dense dark style="border:1px solid grey">
-                                                <v-row no-gutters>
+                                                <v-row>
                                                    <v-col cols="auto">
                                                       <span class="mr-6">Children</span>
                                                    </v-col>
@@ -133,8 +158,7 @@
                                                       <v-slide-group show-arrows data-for-map="main.childrenSlots">
                                                          <v-slide-item v-for="(childrenSlots_item, childrenSlots_index) in main.childrenSlots">
                                                             <div v-bind:data-for-idx="childrenSlots_index">
-                                                               <v-btn class="pa-0 pr-5 text-decoration-underline text-body-1 text-transform-none" x-small @click="$mth('doSelectChildPath', ...arguments)">{{childrenSlots_item.name}}
-    </v-btn>
+                                                               <v-btn class="pa-0 pr-5 text-decoration-underline text-body-1 text-transform-none" x-small @click="$mth('doSelectChildPath', ...arguments)">{{childrenSlots_item.name}}</v-btn>
                                                             </div>
                                                          </v-slide-item>
                                                       </v-slide-group>
@@ -146,8 +170,7 @@
                                                       <v-slide-group show-arrows data-for-map="main.dynamicSlots">
                                                          <v-slide-item v-for="(dynamicSlots_item, dynamicSlots_index) in main.dynamicSlots">
                                                             <div v-bind:data-for-idx="dynamicSlots_index">
-                                                               <v-btn class="pa-0 pr-5 text-decoration-underline text-body-1 text-transform-none" x-small @click="$mth('doSelectConditionalPath', ...arguments)">{{dynamicSlots_item.name}}
-    </v-btn>
+                                                               <v-btn class="pa-0 pr-5 text-decoration-underline text-body-1 text-transform-none" x-small @click="$mth('doSelectConditionalPath', ...arguments)">{{dynamicSlots_item.name}}</v-btn>
                                                             </div>
                                                          </v-slide-item>
                                                       </v-slide-group>
@@ -223,6 +246,68 @@
                               <span class="ml-3">Route</span>
                            </v-tab>
                            <v-tab-item eager>
+                              <v-row class="fill-height" no-gutters>
+                                 <v-col cols="3">
+                                    <v-row class="flex-column  fill-height" style="flex-direction: column;">
+                                       <v-col class="xui-column" style="height: 40px" cols="auto">
+                                          <v-subheader class="elevation-2 my-0 py-0" style="white-space: pre-wrap;">List Routes</v-subheader>
+                                       </v-col>
+                                       <v-col class="xui-column">
+                                          <v-treeview color="red" :transition="true" :items="main.listRoute" hoverable return-object activatable>
+                                          </v-treeview>
+                                       </v-col>
+                                    </v-row>
+                                 </v-col>
+                                 <v-col cols="auto">
+                                    <v-divider class="xui-divider" style="height:100%" vertical></v-divider>
+                                 </v-col>
+                                 <v-col>
+                                    <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;">
+                                       <v-tab>
+                                          <span>Route Info</span>
+                                       </v-tab>
+                                       <v-tab-item eager>
+                                          <v-container fuild class="xui-form pa-8">
+                                             <v-row class="xui-form-gutter">
+                                                <v-col>
+                                                   <v-text-field dense hide-details label="short name"></v-text-field>
+                                                </v-col>
+                                             </v-row>
+                                             <v-row class="xui-form-gutter">
+                                                <v-col>
+                                                   <v-text-field dense hide-details label="path"></v-text-field>
+                                                </v-col>
+                                             </v-row>
+                                             <v-row class="xui-form-gutter">
+                                                <v-col>
+                                                   <div style="display: inline-block">
+                                                      <v-switch label="redirect" dense></v-switch>
+                                                   </div>
+                                                </v-col>
+                                                <v-col>
+                                                   <v-text-field dense hide-details label="redirect path"></v-text-field>
+                                                </v-col>
+                                             </v-row>
+                                             <v-row class="xui-form-gutter">
+                                                <v-col>
+                                                   <v-divider class="xui-divider mt-6"></v-divider>
+                                                </v-col>
+                                             </v-row>
+                                             <v-row class="xui-form-gutter">
+                                                <v-col>
+                                                   <v-text-field dense hide-details label="before route action"></v-text-field>
+                                                </v-col>
+                                             </v-row>
+                                             <v-row class="xui-form-gutter">
+                                                <v-col>
+                                                   <v-text-field dense hide-details label="after route action"></v-text-field>
+                                                </v-col>
+                                             </v-row>
+                                          </v-container>
+                                       </v-tab-item>
+                                    </v-tabs>
+                                 </v-col>
+                              </v-row>
                            </v-tab-item>
                            <v-tab>
                               <v-icon>mdi-web</v-icon>
@@ -235,7 +320,7 @@
                                     <span class="ml-3">CSS</span>
                                  </v-tab>
                                  <v-tab-item eager>
-                                    <v-row class="fill-height" no-gutters>
+                                    <v-row class="fill-height">
                                        <v-col>
                                           <div class="fill-height xui-p-relative">
                                              <div class="xui-p-absolute xui-overflow">
@@ -307,24 +392,37 @@
                                  <v-tab-item eager>
                                     <v-row class="fill-height" no-gutters>
                                        <v-col cols="3">
-                                          <v-list>
-                                             <v-list-item-group>
-                                                <template v-for="(ListActions_item, ListActions_index) in main.ListActions">
-                                                   <div class="mx-1 mt-1 xui-btn-code" v-bind:data-for-idx="ListActions_index" data-for-map="main.ListActions">
-                                                      <v-btn @click="$xui.loadCodeAction(ListActions_index)" class="rounded-lg text-transform-none" style="width:100%" nr>
-                                                         <span>{{ListActions_item.name}}</span>
-                                                         <v-icon>mdi-lightning-bolt</v-icon>
-                                                      </v-btn>
-                                                   </div>
-                                                </template>
-                                             </v-list-item-group>
-                                          </v-list>
+                                          <div class="fill-height xui-p-relative">
+                                             <div class="xui-p-absolute xui-overflow">
+                                                <v-list dense>
+                                                   <v-list-item-group>
+                                                      <template v-for="(ListActions_item, ListActions_index) in main.ListActions">
+                                                         <div class="mx-1 mt-1 xui-btn-code" v-bind:data-for-idx="ListActions_index" data-for-map="main.ListActions">
+                                                            <v-btn @click="$xui.loadCodeAction(ListActions_index)" class="rounded-lg text-transform-none" style="width:100%" nr>
+                                                               <span>{{ListActions_item.name}}</span>
+                                                               <v-icon>mdi-lightning-bolt</v-icon>
+                                                            </v-btn>
+                                                         </div>
+                                                      </template>
+                                                   </v-list-item-group>
+                                                </v-list>
+                                             </div>
+                                          </div>
                                        </v-col>
                                        <v-col>
                                           <v-row class="flex-column  fill-height" style="flex-direction: column;" no-gutters>
                                              <v-col class="xui-column" cols="auto">
-                                                <v-toolbar height="40">
-                                                   <span>{{main.currentCodeName}}</span>
+                                                <v-toolbar height="49">
+                                                   <v-row class="fill-height">
+                                                      <v-col>
+                                                         <span>{{main.currentCodeName}}</span>
+                                                      </v-col>
+                                                      <v-col cols="auto">
+                                                         <div style="display: inline-block">
+                                                            <v-switch label="debug" dense></v-switch>
+                                                         </div>
+                                                      </v-col>
+                                                   </v-row>
                                                 </v-toolbar>
                                              </v-col>
                                              <v-col class="xui-column">
@@ -359,6 +457,130 @@
                                     <span class="ml-3">Data Provider</span>
                                  </v-tab>
                                  <v-tab-item eager>
+                                    <v-row class="fill-height">
+                                       <v-col cols="3">
+                                          <div class="fill-height xui-p-relative elevation-4">
+                                             <div class="xui-p-absolute xui-overflow">
+                                                <v-list dense>
+                                                   <v-list-item-group>
+                                                      <template v-for="(ListDataProvider_item, ListDataProvider_index) in main.ListDataProvider">
+                                                         <div class="mx-1 mt-1 xui-btn-code" v-bind:data-for-idx="ListDataProvider_index" data-for-map="main.ListDataProvider">
+                                                            <v-btn class="rounded-lg text-transform-none" style="width:100%" nr>
+                                                               <span>{{ListDataProvider_item.name}}</span>
+                                                               <v-icon right>mdi-api</v-icon>
+                                                            </v-btn>
+                                                         </div>
+                                                      </template>
+                                                   </v-list-item-group>
+                                                </v-list>
+                                             </div>
+                                          </div>
+                                       </v-col>
+                                       <v-col>
+                                          <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;">
+                                             <v-tab>
+                                                <v-icon>mdi-database-search</v-icon>
+                                                <span class="ml-2">Search</span>
+                                             </v-tab>
+                                             <v-tab-item eager>
+                                                <v-row class="flex-column  fill-height" style="flex-direction: column;" no-gutters>
+                                                   <v-col class="xui-column" cols="auto">
+                                                      <v-container fuild class="xui-form">
+                                                         <v-row class="xui-form-gutter elevation-3 ma-1 pa-1 pt-2">
+                                                            <v-col cols="1">
+                                                               <v-text-field dense hide-details v-model="main.currentAPI.method" label="Method"></v-text-field>
+                                                            </v-col>
+                                                            <v-col cols="auto">
+                                                               <v-text-field dense hide-details v-model="main.currentAPI.base" label="Base"></v-text-field>
+                                                            </v-col>
+                                                            <v-col>
+                                                               <v-text-field dense hide-details v-model="main.currentAPI.url" label="Url"></v-text-field>
+                                                            </v-col>
+                                                         </v-row>
+                                                      </v-container>
+                                                   </v-col>
+                                                   <v-col class="xui-column">
+                                                      <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;" dark>
+                                                         <v-tab>
+                                                            <span>Payload</span>
+                                                         </v-tab>
+                                                         <v-tab-item eager>
+                                                            <v-jsoneditor :options="main.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
+                                                         </v-tab-item>
+                                                         <v-tab>
+                                                            <span>headers</span>
+                                                         </v-tab>
+                                                         <v-tab-item eager>
+                                                            <v-jsoneditor :options="main.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
+                                                         </v-tab-item>
+                                                         <v-tab>
+                                                            <span>Validations</span>
+                                                         </v-tab>
+                                                         <v-tab-item eager>
+                                                         </v-tab-item>
+                                                      </v-tabs>
+                                                   </v-col>
+                                                   <v-col class="xui-column" cols="auto">
+                                                      <v-toolbar dense>
+                                                         <v-btn @click="$mth('doDPTestAPI', ...arguments)">
+                                                            <span>TEST</span>
+                                                            <v-icon>mdi-play</v-icon>
+                                                         </v-btn>
+                                                         <v-btn class="mx-4">
+                                                            <span>SAVE MOCK</span>
+                                                            <v-icon right>mdi-database-import-outline</v-icon>
+                                                         </v-btn>
+                                                         <div style="display: inline-block">
+                                                            <v-switch label="use mock"></v-switch>
+                                                         </div>
+                                                      </v-toolbar>
+                                                   </v-col>
+                                                   <v-col class="xui-column">
+                                                      <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;">
+                                                         <v-tab>
+                                                            <v-icon>mdi-database-search</v-icon>
+                                                            <span class="ml-2">Preview</span>
+                                                         </v-tab>
+                                                         <v-tab-item eager>
+                                                            <v-jsoneditor :options="main.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
+                                                         </v-tab-item>
+                                                         <v-tab>
+                                                            <v-icon>mdi-database-search</v-icon>
+                                                            <span class="ml-2">Mock</span>
+                                                         </v-tab>
+                                                         <v-tab-item eager>
+                                                         </v-tab-item>
+                                                      </v-tabs>
+                                                   </v-col>
+                                                </v-row>
+                                             </v-tab-item>
+                                             <v-tab>
+                                                <v-icon>mdi-database-plus</v-icon>
+                                                <span class="ml-2">Create</span>
+                                             </v-tab>
+                                             <v-tab-item eager>
+                                             </v-tab-item>
+                                             <v-tab>
+                                                <v-icon>mdi-database-arrow-right</v-icon>
+                                                <span class="ml-2">Read</span>
+                                             </v-tab>
+                                             <v-tab-item eager>
+                                             </v-tab-item>
+                                             <v-tab>
+                                                <v-icon>mdi-database-edit</v-icon>
+                                                <span class="ml-2">Update</span>
+                                             </v-tab>
+                                             <v-tab-item eager>
+                                             </v-tab-item>
+                                             <v-tab>
+                                                <v-icon>mdi-database-remove</v-icon>
+                                                <span class="ml-2">Delete</span>
+                                             </v-tab>
+                                             <v-tab-item eager>
+                                             </v-tab-item>
+                                          </v-tabs>
+                                       </v-col>
+                                    </v-row>
                                  </v-tab-item>
                               </v-tabs>
                            </v-tab-item>
@@ -375,12 +597,10 @@
                                     <v-text-field dense hide-details v-model="main.exportFileName" label="export name"></v-text-field>
                                  </v-col>
                                  <v-col cols="auto">
-                                    <v-btn class="ml-5" @click="$mth('doExportFile', ...arguments)">Export
-    </v-btn>
+                                    <v-btn class="ml-5" @click="$mth('doExportFile', ...arguments)">Export</v-btn>
                                  </v-col>
                                  <v-col>
-                                    <v-btn class="ml-5" @click="$mth('doExportXUIClipboard', ...arguments)">Export XUI To Clipboard
-    </v-btn>
+                                    <v-btn class="ml-5" @click="$mth('doExportXUIClipboard', ...arguments)">Export XUI To Clipboard</v-btn>
                                  </v-col>
                                  <v-col>
                                  </v-col>
@@ -423,14 +643,14 @@
                         <v-icon>mdi-puzzle</v-icon>
                      </v-tab>
                      <v-tab-item eager>
-                        <v-row no-gutters>
+                        <v-row>
                            <v-col>
                               <template v-for="(listPlugins_item, listPlugins_index) in main.listPlugins">
                                  <div class="elevation-3 rounded ma-4" v-bind:data-for-idx="listPlugins_index" data-for-map="main.listPlugins">
                                     <v-container class="xui-grid">
                                        <v-row dense align="center">
                                           <v-col class="mr-5" cols="auto">
-                                             <div class="d-flex">
+                                             <div style="display: inline-block">
                                                 <v-switch label="Used" v-model="listPlugins_item.use"></v-switch>
                                              </div>
                                           </v-col>
@@ -438,7 +658,7 @@
                                              <v-text-field dense hide-details v-model="listPlugins_item.path" label="Plugin path"></v-text-field>
                                           </v-col>
                                           <v-col cols="auto">
-                                             <div class="d-flex">
+                                             <div style="display: inline-block">
                                                 <v-switch label="Only Production" v-model="listPlugins_item.onlyProd"></v-switch>
                                              </div>
                                           </v-col>
@@ -471,7 +691,7 @@
                            <v-tab-item eager>
                               <v-row class="flex-column" style="flex-direction: column;" no-gutters>
                                  <v-col class="xui-column">
-                                    <div id="qrcode" class="ma-10" style="height:300px">
+                                    <div id="qrcode" class="ma-10" style="height:200px">
                                     </div>
                                  </v-col>
                                  <v-col class="xui-column">
@@ -524,7 +744,7 @@
             </v-snackbar>
             <div id="xui-display-selector-popup" class="xui-popup-class" style="position:absolute; top:100px; left: 100px;" @mouseleave="$xui.onActionOver('leave', null)">
                <v-list dense>
-                  <v-list-item style="min-height: 20px;" v-for="(itemPopup, j) in main.listPopupAdd" :key="j" @click="$xui.doActionPopup(itemPopup)" @mouseenter="$xui.onActionOver('enter',itemPopup)">
+                  <v-list-item style="min-height: 10px;" v-for="(itemPopup, j) in main.listPopupAdd" :key="j" @click="$xui.doActionPopup(itemPopup)" @mouseenter="$xui.onActionOver('enter',itemPopup)">
                      <template v-if="itemPopup.type=='divider'">
                         <v-divider></v-divider>
                      </template>
@@ -579,9 +799,10 @@
                <v-toolbar-title>
                   <template v-for="(breadcrumb_item, breadcrumb_index) in main.breadcrumb">
                      <div class="d-inline-block" v-bind:data-for-idx="breadcrumb_index" data-for-map="main.breadcrumb">
-                        <v-btn class="pa-0 text-decoration-underline text-body-1 text-transform-none" text x-small @click="$mth('doSelectPath', ...arguments)">{{breadcrumb_item.name}}
-    </v-btn>
-                        <span class="mr-1">></span>
+                        <v-btn class="pa-0 text-decoration-underline text-body-1 text-transform-none" text x-small @click="$mth('doSelectPath', ...arguments)">{{breadcrumb_item.name}}</v-btn>
+                        <template v-if="breadcrumb_index < main.breadcrumb.length-1">
+                           <span class="mr-1">></span>
+                        </template>
                      </div>
                   </template>
                </v-toolbar-title>
@@ -606,7 +827,7 @@
                   <router-view ref="routerview"></router-view>
                </transition>
             </v-main>
-            <v-footer app height="32" dark color="#ff5900" class="pt-1">
+            <v-footer app height="32" dark color="#ff5900" class="pt-1" style="z-index:5">
                <v-btn @click="$mth('doFADelete', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
@@ -628,9 +849,10 @@
                <div style="width:50px">
                </div>
                <v-btn @click="$mth('doFAClearAll', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
-                  <v-icon>mdi-new-box</v-icon>
+                  <v-icon>mdi-delete</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
+               <span>Version 0.8.4 12/02/22 &#169; Desomer G</span>
             </v-footer>
             <template></template>
          </v-app>
@@ -911,6 +1133,7 @@
                 dialogClass: false,
                 listCatClass: listDesignClass
             };
+
             $xui.rootdata = { ...$xui.rootdata, ...json };
 
             $xui.initComponentVuejs.push(() => {
@@ -921,26 +1144,29 @@
             /***************************************************************************************************************/
             $xui.openClassEditor = (id) => {
                 $xui.editorOpenId = id;
+                const rootdata = $xui.getAppState().main;
 
                 console.debug("----openClassEditor ----- "+ id)
 
                 $xui.modeDisplaySelection = false;
-                $xui.rootdata.dialogClass = true;
+                rootdata.dialogClass = true;
 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
                         console.debug("load class", aProperty);
-                        new DesignClassManager().initClassSelector(aProperty.value, $xui.rootdata.listCatClass);
+                        new DesignClassManager().initClassSelector(aProperty.value, rootdata.listCatClass);
                     }
                 }
             }
 
             $xui.saveClassEditor = () => {
 
+                const rootdata = $xui.getAppState().main;
+
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
                         console.debug("save class", aProperty);
-                        aProperty.value = new DesignClassManager().getClassTextFromSelector(aProperty.value, $xui.rootdata.listCatClass);
+                        aProperty.value = new DesignClassManager().getClassTextFromSelector(aProperty.value, rootdata.listCatClass);
                         $xui.hasPropertiesChanged = true;
                         $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
                     }
@@ -961,24 +1187,26 @@
 
             /********************************************************* */
             $xui.openBindingEditor = (xid, propId) => {
+                
                 $xui.editorOpenId = xid;
                 $xui.editorPropId = propId;
 
                 $xui.modeDisplaySelection = false;
-                $xui.rootdata.dialogBinding = true;
+
+                const rootdata = $xui.getAppState().main;
+                rootdata.dialogBinding = true;
 
                 setTimeout(() => {
-                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set($xui.rootdata.stateData)
+                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set(rootdata.stateData)
                     console.debug("open Binding Editor", xid, propId);
                 }, 100);
 
 
-     
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
                         console.debug("load binding", aProperty);
-                        $xui.rootdata.nameBinding = aProperty.label;
-                        $xui.rootdata.variableBinding = aProperty.bind;
+                        rootdata.nameBinding = aProperty.label;
+                        rootdata.variableBinding = aProperty.bind;
                     }
                 }
             }
@@ -986,11 +1214,12 @@
             $xui.saveBindingEditor = () => {
                 console.debug("save binding", $xui.editorOpenId, $xui.editorPropId);
 
+                const rootdata = $xui.getAppState().main;
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
-                        aProperty.bind = $xui.rootdata.variableBinding;
+                        aProperty.bind = rootdata.variableBinding;
                         $xui.hasPropertiesChanged = true;
-                        console.debug("save binding ok", aProperty, $xui.rootdata);
+                        console.debug("save binding ok", aProperty, rootdata);
                     }
                 }
                 $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
@@ -1266,6 +1495,7 @@
                 dialogClass: false,
                 listCatClass: listDesignClass
             };
+
             $xui.rootdata = { ...$xui.rootdata, ...json };
 
             $xui.initComponentVuejs.push(() => {
@@ -1276,26 +1506,29 @@
             /***************************************************************************************************************/
             $xui.openClassEditor = (id) => {
                 $xui.editorOpenId = id;
+                const rootdata = $xui.getAppState().main;
 
                 console.debug("----openClassEditor ----- "+ id)
 
                 $xui.modeDisplaySelection = false;
-                $xui.rootdata.dialogClass = true;
+                rootdata.dialogClass = true;
 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
                         console.debug("load class", aProperty);
-                        new DesignClassManager().initClassSelector(aProperty.value, $xui.rootdata.listCatClass);
+                        new DesignClassManager().initClassSelector(aProperty.value, rootdata.listCatClass);
                     }
                 }
             }
 
             $xui.saveClassEditor = () => {
 
+                const rootdata = $xui.getAppState().main;
+
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
                         console.debug("save class", aProperty);
-                        aProperty.value = new DesignClassManager().getClassTextFromSelector(aProperty.value, $xui.rootdata.listCatClass);
+                        aProperty.value = new DesignClassManager().getClassTextFromSelector(aProperty.value, rootdata.listCatClass);
                         $xui.hasPropertiesChanged = true;
                         $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
                     }
@@ -1316,24 +1549,26 @@
 
             /********************************************************* */
             $xui.openBindingEditor = (xid, propId) => {
+                
                 $xui.editorOpenId = xid;
                 $xui.editorPropId = propId;
 
                 $xui.modeDisplaySelection = false;
-                $xui.rootdata.dialogBinding = true;
+
+                const rootdata = $xui.getAppState().main;
+                rootdata.dialogBinding = true;
 
                 setTimeout(() => {
-                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set($xui.rootdata.stateData)
+                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set(rootdata.stateData)
                     console.debug("open Binding Editor", xid, propId);
                 }, 100);
 
 
-     
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
                         console.debug("load binding", aProperty);
-                        $xui.rootdata.nameBinding = aProperty.label;
-                        $xui.rootdata.variableBinding = aProperty.bind;
+                        rootdata.nameBinding = aProperty.label;
+                        rootdata.variableBinding = aProperty.bind;
                     }
                 }
             }
@@ -1341,11 +1576,12 @@
             $xui.saveBindingEditor = () => {
                 console.debug("save binding", $xui.editorOpenId, $xui.editorPropId);
 
+                const rootdata = $xui.getAppState().main;
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
-                        aProperty.bind = $xui.rootdata.variableBinding;
+                        aProperty.bind = rootdata.variableBinding;
                         $xui.hasPropertiesChanged = true;
-                        console.debug("save binding ok", aProperty, $xui.rootdata);
+                        console.debug("save binding ok", aProperty, rootdata);
                     }
                 }
                 $xui.SelectorManager.displaySelectorByXid($xui.propertiesDesign.xid, $xui.propertiesDesign.xidSlot);
@@ -1374,7 +1610,7 @@
                     "picture": "app/template/designer.png",
                     "id": "Designer",
                     "frameName": "frame1",
-                    "frameTemplate": "frameDesigner2"
+                    "frameTemplate": "frameDesignerMain"
                 }
             ],
             "urlApp": "urlapp",
@@ -1392,12 +1628,29 @@
             "pasteDisabled": true,
             "undoDisabled": true,
             "redoDisabled": true,
-            "ListActions": [],
+            "ListDataProvider": [
+                {
+                    "name": "api music"
+                }
+            ],
             "listSlot": [
                 {
                     "id": 1,
                     "name": "no tree",
                     "icon": "mdi-minus"
+                }
+            ],
+            "ListActions": [
+                {
+                    "name": "name"
+                },
+                {
+                    "name": "name"
+                }
+            ],
+            "listRoute": [
+                {
+                    "name": "route0"
                 }
             ],
             "currentCodeName": "mth name",
@@ -1458,6 +1711,11 @@
                     "name": "path2"
                 }
             ],
+            "currentAPI": {
+                "method": "GET",
+                "base": "https://api.apispreadsheets.com",
+                "url": "/data/TynVLA2r7ouuzE8k"
+            },
             "version": 2
          , ...$xui.rootdata });
 
@@ -1480,6 +1738,11 @@
           onActiveSlot : (p1, p2) => {
         $xui.selectCmp();
         //# sourceURL=main-onActiveSlot.js;
+        },
+          doDPTestAPI : (p1, p2) => {
+        console.debug($xui.vuejs.$store.state.main.currentAPI);
+        $xui.callAPI($xui.vuejs.$store.state.main.currentAPI);
+        //# sourceURL=main-doDPTestAPI.js;
         },
           doExportFile : (p1, p2) => {
         $xui.downloadPage();
@@ -1585,6 +1848,16 @@
                 line-height: 14px;
                 font-size: 0.9rem;
             }
+
+            .xui-form .v-input--selection-controls 
+            {
+                margin-top: 0px;
+            }
+
+            .xui-form  .v-input__control
+            {
+                height: 22px;
+            }
         
             .xui-grid-layout {
                 display: grid;
@@ -1619,9 +1892,10 @@
    <script defer src="https://cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/qrcode-js-package@1.0.4/qrcode.min.js"></script>
    <script type="module">
+
 		import "./app/vue/vue2frame.js";
 		$xui.loadApplicationJS();
 	
-        $xui.initVuejs($xui.vuejs);
-    </script>
+       $xui.initVuejs($xui.vuejs);
+           </script>
 </html>

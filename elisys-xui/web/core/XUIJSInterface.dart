@@ -39,9 +39,8 @@ class FileDesignInfo {
   external String get xid;
   external set xid(String xid);
 
-  external String get jsonBinding;
-  external set jsonBinding(String json);
-
+  external String get saveStoreModuleNamespace;
+  external set saveStoreModuleNamespace(String json);
 }
 
 @JS()
@@ -140,10 +139,11 @@ class BindObj {
 class XUIBindingEvent {
    external String xid;
    external String eventName;
+   external String namespace;
    external String name;
    external String? code; 
 
-   external factory XUIBindingEvent({String xid, String eventName, String name});
+   external factory XUIBindingEvent({String xid, String eventName, String namespace, String name});
 }
 
 @JS()

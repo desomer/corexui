@@ -15,7 +15,7 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
                 doChangeComponent(e) {
 
                     var oldId = `${this.partid}-${this.id}`;
-                    //console.debug("doChangeComponent " + oldId + " reponse **************", e);
+                    //console.debug("doChangeComponent " + oldId + " reponse **************", e)
                     delete Vue.options.components[oldId];
 
                     this.id++; //passe en composant suivant
@@ -32,7 +32,7 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
 
                     this.$nextTick(function () {
                         $xui.nbRefeshReloader--;
-                        //console.debug("nbRefeshReloader ", $xui.nbRefeshReloader);
+                        //console.debug("nbRefeshReloader ", $xui.nbRefeshReloader)
                         if ($xui.nbRefeshReloader == 0) {
                             var message = {
                                 action: "reloader finish",
@@ -42,7 +42,7 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
                     });
                 },
                 reload() {
-                    //console.debug("reload **************", this.partid);
+                    //console.debug("reload **************", this.partid)
                     $xui.nbRefeshReloader++;
                     var message = {
                         action: "get template reloader",
@@ -150,14 +150,18 @@ const unselectSelector = (event) => {
 };
 
 document.addEventListener('scroll', unselectSelector);
-
 window.addEventListener('resize', unselectSelector);
+
 
 //********************************** DISPACH DES EVENTS PROVENANT DU DESIGNER ******************************** */
 const iterateJSON = (src, dest, funct, functArray) => {
+    if (dest==null) {
+        return
+    } 
+
     const entry = Object.entries(src);
     const entries = entry.map(([key, value]) =>
-        Array.isArray(value) ? [key, value.map(e => {
+        Array.isArray(value) && dest!=null ? [key, value.map(e => {
             var nt = null;
             if (Array.isArray(dest[key])) {
                 nt = dest[key][value.indexOf(e)];
@@ -165,7 +169,7 @@ const iterateJSON = (src, dest, funct, functArray) => {
             functArray(value, dest[key], e);
             iterateJSON(e, nt, funct, functArray)
         })]
-            : typeof value === 'object'
+            : typeof value === 'object' && dest!=null
                 ? [key, iterateJSON(value, dest[key], funct, functArray)]
                 : [key, funct(key, value, dest)]
     );
@@ -210,7 +214,7 @@ window.addEventListener('message', (e) => {
 
         case "changeJS":
             console.debug("changeJS ", data, $xui.modulesManager);
-            const module = "main";
+            const module = data.param.namespace;
             for (const mth of data.param.actions) {
                 const m = `(p1, p2) => {\n${mth.code}\n};`;
                 $xui.modulesManager.addAction(module, mth.name, `${m}\n//# sourceURL=${module}-${mth.name}.js;`);
@@ -237,59 +241,7 @@ window.addEventListener('message', (e) => {
             break;
 
         case "changeTemplate":
-            let hasChangeBinding = false;
-            let hasChangeValue = false;
-
-            if (/*data.param.action == "reload-json" && data.param.listReloader == null &&*/ data.param.jsonBinding != null) {
-                
-                const jsonBinding = data.param.jsonBinding;  // template ou mock
-
-                //const jsonTemplate = data.param.jsonTemplate;
-
-                const dataState = $xui.getAppState().main;
-
-                iterateJSON( jsonBinding, dataState,
-                    (k, v, dest) => {
-                        //console.log("k=", k, " v=", v);
-                        if (dest == null || dest[k] == null) {
-                            hasChangeBinding = true;
-                        }
-                        if (dest != null && dest[k] != v) {
-                            hasChangeValue = true;
-                        }
-                        return v;
-                    }, (a, dest, i) => {
-                        // console.log("---- array=", a, " array dest=", dest, "  i=", i);
-                        if (dest == null || (Object.entries(a[0]).length != Object.entries(dest[0]).length)) {
-                            hasChangeBinding = true;
-                        }
-     
-                        return i;
-                    });
-
-                if (hasChangeBinding /*|| hasChangeValue*/ || data.param.action == "reload-json") {
-                    $xui.rootdata = jsonBinding;
-                    $xui.modulesManager.addModule("main", jsonBinding);
-                    $xui.modulesManager.reload();
-                }
-
-                console.debug("***************** iframe store reload ", hasChangeBinding, hasChangeValue, data.param.jsonBinding);
-            }
-
-            if (data.param.action == "reload-json") {
-                if (hasChangeBinding)
-                    data.param.listReloader = null;  // recharge tout
-                else
-                    return;  // change uniquement le json du template
-            }
-
-            const oldrouteEnable = $xui.routeEnable;
-            $xui.routeEnable = true;  // autorise le positionnements des routes durant les reloads
-
-            doChangeContent(data);
-
-            $xui.routeEnable = oldrouteEnable;
-
+            changeTemplateOrState(data);
             break;
 
         case "doChangeComponent":
@@ -312,6 +264,79 @@ window.addEventListener('message', (e) => {
     }
 
 });
+
+function changeTemplateOrState(data) {
+    const hasChangeBinding = validStoreState(data);
+
+    let changeContent = true;
+    if (data.param.action == "reload-json") {
+        if (hasChangeBinding)
+            data.param.listReloader = null; // recharge tout
+        else
+            changeContent = false; // change uniquement le json du template
+    }
+
+    if (changeContent) {
+        const oldrouteEnable = $xui.routeEnable;
+        $xui.routeEnable = true; // autorise le positionnements des routes durant les reloads
+
+        doChangeContent(data);
+
+        $xui.routeEnable = oldrouteEnable;
+    }
+}
+
+function validStoreState(data) {
+
+    let mustBeReload = false;
+    let mustBeRevalidate = false;
+
+    if ( /*data.param.action == "reload-json" && data.param.listReloader == null &&*/ data.param.jsonListStateModule != null) {
+        data.param.jsonListStateModule.forEach(module => {
+
+            let hasChangeBinding = false;
+            let hasChangeValue = false;
+            const jsonBinding = module.stateData; // template ou mock
+            const dataState = $xui.getAppState()[module.nameModule];
+    
+            iterateJSON(jsonBinding, dataState,
+                (k, v, dest) => {
+                    //console.log("k=", k, " v=", v)
+                    if (dest == null || dest[k] == null) {
+                        hasChangeBinding = true;
+                    }
+                    if (dest != null && dest[k] != v) {
+                        hasChangeValue = true;
+                    }
+                    return v;
+                }, (a, dest, i) => {
+                    // console.log("---- array=", a, " array dest=", dest, "  i=", i)
+                    if (dest == null  || (dest.length>0 && (Object.entries(a[0]).length != Object.entries(dest[0]).length))) {
+                        hasChangeBinding = true;
+                    }
+    
+                    return i;
+                });
+    
+            if (hasChangeBinding /*|| hasChangeValue*/ || data.param.action == "reload-json") {
+                $xui.modulesManager.replaceModuleState($xui.vuejs.$store, module.nameModule, jsonBinding);
+                mustBeReload=true; 
+            }
+            if (hasChangeBinding) {
+                mustBeRevalidate=true;
+            }
+                 
+            console.debug("***************** iframe store reload ", hasChangeBinding, hasChangeValue, module.nameModule, jsonBinding);
+    
+        });
+
+        if (mustBeReload)  {
+            $xui.modulesManager.reload();
+        }
+
+    }
+    return false; //mustBeRevalidate;
+}
 
 function doChangeContent(data) {
     if (data.param.listReloader != null) {
@@ -336,7 +361,13 @@ function doChangeContent(data) {
         }
 
         document.body.innerHTML = data.param.html; // change tous le body
-        $xui.loadApplicationJS();
+
+        // const code =  $xui.modulesManager.getCode();    // code avec le code en code
+        // eval(code);
+
+        //console.debug("++++++ initialiseAppState +++++>", globalThis.initialiseAppState);
+
+        $xui.loadApplicationJS(true);    // true = ne change pas store
         console.debug("+++++++++++>  post le reloader finish vers le designer");
         const messageOk = {
             action: "reloader finish"
