@@ -80,7 +80,7 @@
 		</div>
 
 		<template id="xui-root-template" dark=[[darkApp@0+]]>
-			<transition :duration="600" name="xui-class-transition" 
+			<transition :duration="main.animationDuration" name="xui-class-transition" 
 				:enter-active-class="main.animationNameEnter"
 				:leave-active-class="main.animationNameExit">
 				<router-view ref="routermain">
@@ -207,7 +207,7 @@
 	</xui-doc>
 
 	<v-main xid="vue-router-content-1" -style="background-color:[[colorBg@1]]" xui-no-design>
-			<transition :duration="600" name="xui-class-transition"   
+			<transition :duration="main.animationDuration" name="xui-class-transition"   
 				:enter-active-class="main.animationNameEnter"
 				:leave-active-class="main.animationNameExit">
 				<router-view ref="routerview">
@@ -229,7 +229,7 @@
 
 		<xui-prop var="fill" editor="bool">fill height</xui-prop>
 		<xui-prop var="start" editor="bool">align start</xui-prop>
-		<xui-prop var="no-gutter" editor="bool">no gutter</xui-prop>
+		<xui-prop var="no-gutter" cat="vstyle" editor="bool">no gutter</xui-prop>
 
 		<xui-prop var="varnamespace" cat="event:bind" editor="text">state name space</xui-prop>
 
@@ -512,6 +512,7 @@
 	<script xid="xui-script-data">			
 			$xui = {};
 			$xui.rootdata = {};
+			$xui.rootdataComponent = {};
 			// ----------------------------------------------
 			$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler
 	</script>
@@ -527,7 +528,7 @@
 	<!--------------------------------------------------------------------------------------->
 	<script type="module" xid="xui-init-vuetify">
 		import "./app/vue/vue2frame.js";
-		$xui.loadApplicationJS();
+		$xui.loadApplicationJS(false);
 	</script>
 
 	<!--------------------------- PAS IMPLEMENTATION EN MODE FINAL ------------>

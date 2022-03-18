@@ -9,7 +9,7 @@
 
         <xui-prop var="nb" cat="config" def="2" editor="int">nb col dans la ligne</xui-prop>
         <xui-prop var="fill-height" def=true editor="bool">fill height</xui-prop>
-        <xui-prop var="no-gutters" editor="bool">no gutters</xui-prop>
+        <xui-prop var="no-gutters" cat="vstyle" editor="bool">no gutters</xui-prop>
 
         <xui-prop var="justify" cat="vstyle" editor="combo" 
             list='["start", "center", "end", "space-between", "space-around"]'
@@ -54,7 +54,7 @@
 
         <xui-prop var="nb" cat="config" def="2" editor="int">nb row dans la colonne</xui-prop>
         <xui-prop var="fill-height" def=true editor="bool">fill height</xui-prop>
-        <xui-prop var="no-gutters" editor="bool">no gutters</xui-prop>
+        <xui-prop var="no-gutters" cat="vstyle" editor="bool">no gutters</xui-prop>
 
         <xui-prop var="justify" cat="vstyle" editor="combo" list='["start", "center", "end", "space-between", "space-around"]'
         >justify (vert.)</xui-prop>
@@ -510,9 +510,9 @@
 
         <xui-prop var="dense" cat="style" editor="bool">dense</xui-prop>
         <xui-prop var="prepend" editor="bool">with prepend</xui-prop>
-        <xui-prop var=":varitems" editor="var" def="items" bind-type="array">items var name</xui-prop>
-        <xui-prop var=":varactive" editor="var" bind-type="array">active var name</xui-prop>
-        <xui-prop var=":varopen" editor="var" bind-type="array">open var name</xui-prop>
+        <xui-prop var=":varitems" cat="event:model" editor="var" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var=":varactive" cat="event:model" editor="var" bind-type="array">active var name</xui-prop>
+        <xui-prop var=":varopen" cat="event:model" editor="var" bind-type="array">open var name</xui-prop>
         <xui-prop var=":expandAllCmp" cat="event:bind" editor="var" bind-type="bool">var expand All</xui-prop>
         <xui-prop var="@update:active" cat="event:elem" editor="text">on active</xui-prop>
         <xui-prop var="directive" cat="event:directive" editor="text">directive</xui-prop>
@@ -699,7 +699,7 @@
         <xui-prop var="hidedelimiterbackground" editor="bool">hide delimiter background</xui-prop> 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
-        <xui-prop var=":varitems" editor="var" def="items" bind-type="array">items var</xui-prop>
+        <xui-prop var=":varitems" cat="event:model" editor="var" def="items" bind-type="array">items var</xui-prop>
     </xui-doc>
 
     <v-carousel xid="xui-carousel-1" v-model="[[model]]" class="[[class]]" -style="[[style]]"

@@ -71,6 +71,10 @@
     --animate-duration: 500ms !important;
 }
 
+.xui-transition-slow2 {
+    --animate-duration: 1000ms !important;
+}
+
 /****************************************************/
 .xui-tabs:not(.v-tabs--vertical)>.v-tabs-items {
     height: calc(100% - var(--xui-tab-h, 48px));

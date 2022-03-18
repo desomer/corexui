@@ -33,15 +33,19 @@ import("./clsSelectorManager.js").then((module) => {
 /****************************************************************************************/
 $xui.doInitPage = (pageInfo) => {
     const rootdata = $xui.getAppState().main;
+    const rootStore = $xui.getAppState().store;
     rootdata.overlay=true;
     $xui.SelectorManager.unDisplaySelector();
     console.debug("doInitPage pageInfo = ", pageInfo);
 
     rootdata.frameName=pageInfo.frameName;
     rootdata.frameTemplate=pageInfo.frameTemplate;
-    rootdata.stateData = {};
-    rootdata.stateDataMock = {};
+
+    rootStore.listStoreModule.length = 0
+    $xui.getStoreModuleByName("main");  // creation du store main
+    rootStore.idxTabStoreModule=0;
     rootdata.stateDataSource="";
+
     rootdata.idxTabMain=0;
     if (document.querySelector("#rootFrame")!=null)
     {
@@ -92,6 +96,7 @@ $xui.refreshAction = (mode) => {
     if (mode == "template:reload-json") {
         infoFile.mode = "template";
         infoFile.action = "reload-json";  // pas de store
+        infoFile.saveStoreModuleNamespace=$xui.saveStoreNamespace;
     }
     if (mode == "template:clearAll") {
         infoFile.mode = "design";
@@ -406,7 +411,7 @@ $xui.saveProperties = () => {
         xid : "root",
         variable : `appConfig`,
         value : JSON.stringify(config),
-        bind : "@"
+        bind : "@"    // MODE_SET_PROP_NODOC
     });
 
     console.debug("saveProperties", $xui.propertiesDesign.json);
@@ -424,35 +429,91 @@ $xui.generateApplicationStateJS = (namespace, StateTemplate, StateInProperty) =>
     let ret = null;
 
     const rootdata = $xui.getAppState().main;
-    Object.keys(rootdata.stateData).forEach((key) => {
-        delete rootdata.stateData[key];
-    });
-    Object.assign(rootdata.stateData, jsonTemplate);
-    ret = rootdata.stateData;
+    const storeModule = $xui.getStoreModuleByName(namespace);
+    if (StateTemplate != "") {
+        Object.keys(storeModule.stateData).forEach((key) => {
+            delete storeModule.stateData[key];
+        });
+        Object.assign(storeModule.stateData, jsonTemplate);
+    }   
 
+    ret = storeModule.stateData;
 
     if (rootdata.stateDataSource == "mock") {
-        ret = rootdata.stateDataMock;
+        ret = storeModule.stateDataMock;
     }
 
     if (StateTemplate == "" && StateInProperty == "")  // sauvegarde le mock
     {
-        ret = rootdata.stateDataMock;
+        console.debug("******** get mock for sauvegarde **********");
+        ret = storeModule.stateDataMock;
     }
     else {
-        rootdata.stateDataMock = jsonStateProp;
+        console.debug("******** set mock **********");
+        storeModule.stateDataMock = jsonStateProp;
     }
 
     const jsonState = ret;
+    // validate json
     let str = $xuicore.getJsonValidatorXUI($xui.pageDesignManager.getInfoFile("template"));
     str = `${str}\n//# sourceURL=xui-json-validator.js;\n`;
     eval(str);
 
-    console.debug("************ App State initial & mock", jsonTemplate, jsonStateProp);
-    console.debug("************ App State source & editor", jsonState, rootdata.stateData);
+    console.debug(`************ App State empty & prop namespace=${namespace} source=${rootdata.stateDataSource}` , jsonTemplate, jsonStateProp);
+    console.debug("************ App State after validation" , jsonState);
     // retourne au XUI le chaine à sauvegarder sans {}
     ret = JSON.stringify(jsonState);
     return ret.substring(1, ret.length - 1);
+};
+
+$xui.getCurrentStoreModule = () => {
+    const rootStore = $xui.getAppState().store;
+    return rootStore.listStoreModule[rootStore.idxTabStoreModule];
+};
+
+$xui.getStoreModuleByName = (name) => {
+    const rootStore = $xui.getAppState().store;
+    let found = null;
+    for (let i = 0; i < rootStore.listStoreModule.length; i++) {
+        module=rootStore.listStoreModule[i];
+        if (module.nameModule==name)
+        {
+            found = module;
+            break;
+        }
+    }
+    if (found==null)
+    {
+        //TODO create empty avec le XUIEngine
+        found = {
+            "nameModule": name,
+            "stateData": {},
+            "stateDataMock": {},
+            "jsonEditorOptions": {
+              "mode": "code"
+            },
+            "jsonEditorOptionsMock": {
+              "mode": "code"
+            },
+            "ListActions": [
+            ],
+            "currentCodeName": "mth name",
+            "currentCode": "",
+            "currentCodeIdx": -1,
+            "currentCodeXid": "",
+            "ListDataProvider": [
+              {}
+            ],
+            "currentAPI": {
+              "method": "GET",
+              "base": "https://api.apispreadsheets.com",
+              "url": "/data/TynVLA2r7ouuzE8k"
+            }
+          };
+        rootStore.listStoreModule.push(found);
+    }
+
+    return found;
 };
 
 //--------------------------------------------------------------------------------------------------------
@@ -612,6 +673,8 @@ function jsonPathToValue(data, path) {
     }
     return data;
  }
+
+
 
 
 

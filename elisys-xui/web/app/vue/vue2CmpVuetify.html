@@ -342,6 +342,7 @@
         <xui-prop var="aspect-ratio" editor="text">aspect ratio (16/9)</xui-prop>
         <xui-prop var="withSlot" editor="bool">with Slot</xui-prop>
         <xui-prop var="transition" editor="text">transition (fade-transition, false)</xui-prop>
+        <xui-prop var="eager" editor="bool">eager</xui-prop>
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
@@ -356,7 +357,7 @@
 
 
     <v-img xid="xui-image-1" :aspect-ratio="[[aspect-ratio]]" transition=[[transition]] contain=[[contain]] class="[[class]]" -style="[[style]]"
-        src="[[url]]" [[directive]]>
+        src="[[url]]" [[directive]] eager="[[eager]]">
         <xui-slot xui-if=[[withSlot@1]] xui-slot-full xid="[[parent-xid]]-image-content" xui-slot-name="Image content">
         </xui-slot>
     </v-img>

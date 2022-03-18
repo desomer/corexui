@@ -123,11 +123,14 @@ const selectSelector = (e, action) => {
     const s = getComputedStyle(targetAction);
     const margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
 
+    let displayMode = getDisplayInfo(s, targetAction);
+
     const message = {
         action: action,
         xid: targetAction.dataset.xid,
         xid_slot: targetAction.dataset.xidSlot,
         position: {
+            parentDisplay: displayMode,
             hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
             height: elemRect.height,
             width: elemRect.width,
@@ -139,6 +142,34 @@ const selectSelector = (e, action) => {
         },
     };
     window.parent.postMessage(message, "*");
+}
+
+$xui.getInfoForSelector = (selector, parent) => {
+    let targetAction = document.querySelector(selector);
+    if (targetAction == null) return null;
+    if (parent)
+        targetAction = targetAction.parentNode;
+
+    let elemRect = targetAction.getBoundingClientRect();
+    let s = getComputedStyle(targetAction);
+
+    let displayMode = getDisplayInfo(s, targetAction);
+
+    let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
+
+    const ret = {
+        selector,
+        parent,
+        parentDisplay: displayMode,
+        hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
+        height: elemRect.height,
+        width: elemRect.width,
+        left: elemRect.left,
+        top: elemRect.top,
+        ...margin
+    };
+
+    return ret;
 }
 
 
@@ -175,6 +206,39 @@ const iterateJSON = (src, dest, funct, functArray) => {
     );
     return Object.fromEntries(entries);
 };
+
+function getDisplayInfo(s, targetAction) {
+    let displayMode= null;
+
+    if (s.position == "fixed") {
+        displayMode = "fixed";
+    }
+
+    else {
+
+        if (targetAction.tagName == "INPUT") {
+            targetAction = targetAction.closest(".v-input");
+        }
+        if (targetAction.parentNode.classList.contains("v-input__slot")) {
+            targetAction = targetAction.closest(".v-input");
+        }
+
+
+        let sp = getComputedStyle(targetAction.parentNode);
+        if (sp.display == "contents")
+            sp = getComputedStyle(targetAction.parentNode.parentNode);
+
+        displayMode = sp.display;
+
+        if (displayMode == "flex") {
+            displayMode = displayMode + " " + sp.flexDirection;
+        }
+
+        console.debug(">>>>>>>>>>>>>>>>>>>>>> parent", targetAction.parentNode);
+    }
+
+    return displayMode;
+}
 
 function jsonPathToValue(data, path) {
     if (!path) return data; // if path is undefined or empty return data
@@ -408,30 +472,6 @@ $xui.updateDirectPropValue = (value, variable, xid) => {
     window.parent.postMessage(message, "*");
 }
 
-$xui.getInfoForSelector = (selector, parent) => {
-    let targetAction = document.querySelector(selector);
-    if (targetAction == null) return null;
-    if (parent)
-        targetAction = targetAction.parentNode;
-
-    let elemRect = targetAction.getBoundingClientRect();
-    let s = getComputedStyle(targetAction);
-
-    let margin = { mb: parseInt(s.marginBottom), mt: parseInt(s.marginTop), ml: parseInt(s.marginLeft), mr: parseInt(s.marginRight) }
-
-    const ret = {
-        selector,
-        parent,
-        hasMargin: (margin.mb > 0 || margin.mt > 0 || margin.ml > 0 || margin.mr > 0),
-        height: elemRect.height,
-        width: elemRect.width,
-        left: elemRect.left,
-        top: elemRect.top,
-        ...margin
-    };
-
-    return ret;
-}
 
 //*************************************** POST LES KEYEVENT AU PARENT  ********************************* */
 document.addEventListener("keydown", function (event) {

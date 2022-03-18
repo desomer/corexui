@@ -80,7 +80,6 @@ export class SelectorManager {
         // var z = 1+(1-$xui.zoom);
         const z = 1; //1.11;  //pour zoom 0.9
 
-
         position.top = position.top * z;
         position.left = position.left * z;
         position.height = position.height * z;

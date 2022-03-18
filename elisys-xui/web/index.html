@@ -27,7 +27,7 @@
          <div class="sk-plane" style="margin: 40vh auto"></div>
       </div>
       <template id="xui-root-template">
-         <transition :duration="600" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
+         <transition :duration="main.animationDuration" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
             <router-view ref="routermain"></router-view>
          </transition>
       </template>
@@ -43,8 +43,8 @@
                         </v-btn>
                      </v-tab>
                      <v-tab-item eager>
-                        <v-row class="ma-1" data-for-map="main.listTemplate">
-                           <v-col @click="$mth('doSelectTemplate', ...arguments)" cols="2" v-bind:data-for-idx="listTemplate_index" v-for="(listTemplate_item, listTemplate_index) in main.listTemplate">
+                        <v-row class="ma-1" data-for-map="home.listTemplate">
+                           <v-col @click="$mth('home/doSelectTemplate', ...arguments)" cols="2" v-bind:data-for-idx="listTemplate_index" v-for="(listTemplate_item, listTemplate_index) in home.listTemplate">
                               <v-card v-pressanimation="{link:'/page1'}" v-ripple="{ center: false, class: 'black--text' }" class="elevation-4">
                                  <v-img height="380px" contain v-bind:src="listTemplate_item.picture">
                                  </v-img>
@@ -89,7 +89,7 @@
             <v-navigation-drawer v-model="main.isNavdrawerOpen" temporary app>
             </v-navigation-drawer>
             <v-main>
-               <transition :duration="600" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
+               <transition :duration="main.animationDuration" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
                   <router-view ref="routerview"></router-view>
                </transition>
             </v-main>
@@ -158,7 +158,7 @@
                                                       <v-slide-group show-arrows data-for-map="main.childrenSlots">
                                                          <v-slide-item v-for="(childrenSlots_item, childrenSlots_index) in main.childrenSlots">
                                                             <div v-bind:data-for-idx="childrenSlots_index">
-                                                               <v-btn class="pa-0 pr-5 text-decoration-underline text-body-1 text-transform-none" x-small @click="$mth('doSelectChildPath', ...arguments)">{{childrenSlots_item.name}}</v-btn>
+                                                               <v-btn class="pa-0 pr-5 text-decoration-underline text-body-1 text-transform-none" x-small @click="$mth('main/doSelectChildPath', ...arguments)">{{childrenSlots_item.name}}</v-btn>
                                                             </div>
                                                          </v-slide-item>
                                                       </v-slide-group>
@@ -170,7 +170,7 @@
                                                       <v-slide-group show-arrows data-for-map="main.dynamicSlots">
                                                          <v-slide-item v-for="(dynamicSlots_item, dynamicSlots_index) in main.dynamicSlots">
                                                             <div v-bind:data-for-idx="dynamicSlots_index">
-                                                               <v-btn class="pa-0 pr-5 text-decoration-underline text-body-1 text-transform-none" x-small @click="$mth('doSelectConditionalPath', ...arguments)">{{dynamicSlots_item.name}}</v-btn>
+                                                               <v-btn class="pa-0 pr-5 text-decoration-underline text-body-1 text-transform-none" x-small @click="$mth('main/doSelectConditionalPath', ...arguments)">{{dynamicSlots_item.name}}</v-btn>
                                                             </div>
                                                          </v-slide-item>
                                                       </v-slide-group>
@@ -229,7 +229,7 @@
                                           </v-tab>
                                           <v-tab-item eager>
                                              <div id="treeCmp" class="xui-overflow barcustom">
-                                                <v-treeview dense color="red" :open-all="main.expandAllCmp" :transition="true" :items="main.listSlot" ref="treeCmp" hoverable return-object activatable :active.sync="main.activeSlot" :open.sync="main.openSlot" @update:active="$mth('onActiveSlot', ...arguments)" style="width:fit-content">
+                                                <v-treeview dense color="red" :open-all="main.expandAllCmp" :transition="true" :items="main.listSlot" ref="treeCmp" hoverable return-object activatable :active.sync="main.activeSlot" :open.sync="main.openSlot" @update:active="$mth('main/onActiveSlot', ...arguments)" style="width:fit-content">
                                                    <template v-slot:prepend="{ item : listSlot_item }">
                                                       <v-icon>{{listSlot_item.icon}}</v-icon>
                                                    </template>
@@ -346,12 +346,12 @@
                         <v-icon>mdi-database</v-icon>
                      </v-tab>
                      <v-tab-item eager>
-                        <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;" dark>
-                           <v-tab>
+                        <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;" dark v-model="store.idxTabStoreModule">
+                           <v-tab v-for="( listStoreModule_item , listStoreModule_index ) in store.listStoreModule" :key="listStoreModule_index">
                               <v-icon>mdi-view-module</v-icon>
-                              <span class="ml-3">Main Module</span>
+                              <span class="ml-3">{{listStoreModule_item.nameModule}}</span>
                            </v-tab>
-                           <v-tab-item eager>
+                           <v-tab-item eager v-for="( listStoreModule_item , listStoreModule_index ) in store.listStoreModule" :key="listStoreModule_index">
                               <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;">
                                  <v-tab>
                                     <v-icon>mdi-view-module</v-icon>
@@ -367,7 +367,7 @@
                                                 </v-toolbar>
                                              </v-col>
                                              <v-col class="xui-column jsonState">
-                                                <v-jsoneditor ref="jsonEditor" v-model="main.stateData" :options="main.jsonEditorOptions" height="100%"></v-jsoneditor>
+                                                <v-jsoneditor ref="jsonEditor" v-model="listStoreModule_item.stateData" :options="listStoreModule_item.jsonEditorOptions" height="100%"></v-jsoneditor>
                                              </v-col>
                                           </v-row>
                                        </v-col>
@@ -379,7 +379,7 @@
                                                 </v-toolbar>
                                              </v-col>
                                              <v-col class="xui-column">
-                                                <v-jsoneditor ref="jsonEditor2" v-model="main.stateDataMock" :options="main.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
+                                                <v-jsoneditor ref="jsonEditor2" v-model="listStoreModule_item.stateDataMock" :options="listStoreModule_item.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
                                              </v-col>
                                           </v-row>
                                        </v-col>
@@ -396,8 +396,8 @@
                                              <div class="xui-p-absolute xui-overflow">
                                                 <v-list dense>
                                                    <v-list-item-group>
-                                                      <template v-for="(ListActions_item, ListActions_index) in main.ListActions">
-                                                         <div class="mx-1 mt-1 xui-btn-code" v-bind:data-for-idx="ListActions_index" data-for-map="main.ListActions">
+                                                      <template v-for="(ListActions_item, ListActions_index) in listStoreModule_item.ListActions">
+                                                         <div class="mx-1 mt-1 xui-btn-code" v-bind:data-for-idx="ListActions_index" data-for-map="listStoreModule_item.ListActions">
                                                             <v-btn @click="$xui.loadCodeAction(ListActions_index)" class="rounded-lg text-transform-none" style="width:100%" nr>
                                                                <span>{{ListActions_item.name}}</span>
                                                                <v-icon>mdi-lightning-bolt</v-icon>
@@ -415,7 +415,7 @@
                                                 <v-toolbar height="49">
                                                    <v-row class="fill-height">
                                                       <v-col>
-                                                         <span>{{main.currentCodeName}}</span>
+                                                         <span>{{listStoreModule_item.currentCodeName}}</span>
                                                       </v-col>
                                                       <v-col cols="auto">
                                                          <div style="display: inline-block">
@@ -427,7 +427,7 @@
                                              </v-col>
                                              <v-col class="xui-column">
                                                 <div style="height: calc(100vh - 200px);">
-                                                   <prism-editor class="js-editor" v-model="main.currentCode" :highlight="$xui.highlighterJS" line-numbers></prism-editor>
+                                                   <prism-editor class="js-editor" v-model="listStoreModule_item.currentCode" :highlight="$xui.highlighterJS" line-numbers></prism-editor>
                                                 </div>
                                              </v-col>
                                           </v-row>
@@ -463,8 +463,8 @@
                                              <div class="xui-p-absolute xui-overflow">
                                                 <v-list dense>
                                                    <v-list-item-group>
-                                                      <template v-for="(ListDataProvider_item, ListDataProvider_index) in main.ListDataProvider">
-                                                         <div class="mx-1 mt-1 xui-btn-code" v-bind:data-for-idx="ListDataProvider_index" data-for-map="main.ListDataProvider">
+                                                      <template v-for="(ListDataProvider_item, ListDataProvider_index) in listStoreModule_item.ListDataProvider">
+                                                         <div class="mx-1 mt-1 xui-btn-code" v-bind:data-for-idx="ListDataProvider_index" data-for-map="listStoreModule_item.ListDataProvider">
                                                             <v-btn class="rounded-lg text-transform-none" style="width:100%" nr>
                                                                <span>{{ListDataProvider_item.name}}</span>
                                                                <v-icon right>mdi-api</v-icon>
@@ -488,13 +488,13 @@
                                                       <v-container fuild class="xui-form">
                                                          <v-row class="xui-form-gutter elevation-3 ma-1 pa-1 pt-2">
                                                             <v-col cols="1">
-                                                               <v-text-field dense hide-details v-model="main.currentAPI.method" label="Method"></v-text-field>
+                                                               <v-text-field dense hide-details v-model="listStoreModule_item.currentAPI.method" label="Method"></v-text-field>
                                                             </v-col>
                                                             <v-col cols="auto">
-                                                               <v-text-field dense hide-details v-model="main.currentAPI.base" label="Base"></v-text-field>
+                                                               <v-text-field dense hide-details v-model="listStoreModule_item.currentAPI.base" label="Base"></v-text-field>
                                                             </v-col>
                                                             <v-col>
-                                                               <v-text-field dense hide-details v-model="main.currentAPI.url" label="Url"></v-text-field>
+                                                               <v-text-field dense hide-details v-model="listStoreModule_item.currentAPI.url" label="Url"></v-text-field>
                                                             </v-col>
                                                          </v-row>
                                                       </v-container>
@@ -505,13 +505,13 @@
                                                             <span>Payload</span>
                                                          </v-tab>
                                                          <v-tab-item eager>
-                                                            <v-jsoneditor :options="main.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
+                                                            <v-jsoneditor :options="listStoreModule_item.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
                                                          </v-tab-item>
                                                          <v-tab>
                                                             <span>headers</span>
                                                          </v-tab>
                                                          <v-tab-item eager>
-                                                            <v-jsoneditor :options="main.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
+                                                            <v-jsoneditor :options="listStoreModule_item.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
                                                          </v-tab-item>
                                                          <v-tab>
                                                             <span>Validations</span>
@@ -522,7 +522,7 @@
                                                    </v-col>
                                                    <v-col class="xui-column" cols="auto">
                                                       <v-toolbar dense>
-                                                         <v-btn @click="$mth('doDPTestAPI', ...arguments)">
+                                                         <v-btn @click="$mth('store/doDPTestAPI', ...arguments)">
                                                             <span>TEST</span>
                                                             <v-icon>mdi-play</v-icon>
                                                          </v-btn>
@@ -542,7 +542,7 @@
                                                             <span class="ml-2">Preview</span>
                                                          </v-tab>
                                                          <v-tab-item eager>
-                                                            <v-jsoneditor :options="main.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
+                                                            <v-jsoneditor :options="listStoreModule_item.jsonEditorOptionsMock" height="100%"></v-jsoneditor>
                                                          </v-tab-item>
                                                          <v-tab>
                                                             <v-icon>mdi-database-search</v-icon>
@@ -597,15 +597,15 @@
                                     <v-text-field dense hide-details v-model="main.exportFileName" label="export name"></v-text-field>
                                  </v-col>
                                  <v-col cols="auto">
-                                    <v-btn class="ml-5" @click="$mth('doExportFile', ...arguments)">Export</v-btn>
+                                    <v-btn class="ml-5" @click="$mth('main/doExportFile', ...arguments)">Export</v-btn>
                                  </v-col>
                                  <v-col>
-                                    <v-btn class="ml-5" @click="$mth('doExportXUIClipboard', ...arguments)">Export XUI To Clipboard</v-btn>
+                                    <v-btn class="ml-5" @click="$mth('main/doExportXUIClipboard', ...arguments)">Export XUI To Clipboard</v-btn>
                                  </v-col>
                                  <v-col>
                                  </v-col>
                                  <v-col cols="4">
-                                    <v-file-input small-chips truncate-length="15" dense hide-details @change="$mth('doImportFile', ...arguments)" label="import file"></v-file-input>
+                                    <v-file-input small-chips truncate-length="15" dense hide-details @change="$mth('main/doImportFile', ...arguments)" label="import file"></v-file-input>
                                  </v-col>
                               </v-row>
                            </v-col>
@@ -703,15 +703,15 @@
                                  </v-col>
                                  <v-col class="xui-column">
                                     <v-toolbar>
-                                       <v-btn @click="$mth('doDPDeploy', ...arguments)" class="mr-10" nr color="red lighten-2" dark>
+                                       <v-btn @click="$mth('main/doDPDeploy', ...arguments)" class="mr-10" nr color="red lighten-2" dark>
                                           <span>Deploy</span>
                                           <v-icon right>mdi-database-export-outline</v-icon>
                                        </v-btn>
-                                       <v-btn @click="$mth('doDPOpenApp', ...arguments)" class="mx-3" nr>
+                                       <v-btn @click="$mth('main/doDPOpenApp', ...arguments)" class="mx-3" nr>
                                           <span>Open In New Tab</span>
                                           <v-icon right>mdi-application-export</v-icon>
                                        </v-btn>
-                                       <v-btn @click="$mth('doDPSendAppUrl', ...arguments)" nr>
+                                       <v-btn @click="$mth('main/doDPSendAppUrl', ...arguments)" nr>
                                           <span>SEND URL</span>
                                           <v-icon right>mdi-email-fast</v-icon>
                                        </v-btn>
@@ -761,7 +761,7 @@
                   </v-list-item>
                </v-list>
             </div>
-            <v-dialog v-model="main.dialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
+            <v-dialog v-model="main.openDialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
                <v-card>
                   <div class="white--text elevation-6" style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
                      <v-card-title>Class & style</v-card-title>
@@ -770,12 +770,12 @@
                      <cmp-list-class></cmp-list-class>
                   </div>
                   <v-card-actions class="elevation-6">
-                     <v-btn text @click="main.dialogClass=false;">Cancel</v-btn>
-                     <v-btn text @click="$xui.saveClassEditor(); main.dialogClass=false;">Save</v-btn>
+                     <v-btn text @click="main.openDialogClass=false;">Cancel</v-btn>
+                     <v-btn text @click="$xui.saveClassEditor(); main.openDialogClass=false;">Save</v-btn>
                   </v-card-actions>
                </v-card>
             </v-dialog>
-            <v-dialog ref="dialogBind" v-model="main.dialogBinding" v-on:click:outside="$xui.saveBindingEditor()" width="80vw">
+            <v-dialog ref="dialogBind" v-model="main.openDialogBinding" v-on:click:outside="$xui.saveBindingEditor()" width="80vw">
                <v-card>
                   <div class="white--text elevation-6" style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
                      <v-card-title>Binding & watch</v-card-title>
@@ -784,8 +784,8 @@
                      <cmp-bind-editor ref="jsonEditorBindingCont" :options-editor="main.jsonEditorOptions"></cmp-bind-editor>
                   </div>
                   <v-card-actions class="elevation-6">
-                     <v-btn text @click="main.dialogBinding=false;">Cancel</v-btn>
-                     <v-btn text @click="$xui.saveBindingEditor(); main.dialogBinding=false;">Save</v-btn>
+                     <v-btn text @click="main.openDialogBinding=false;">Cancel</v-btn>
+                     <v-btn text @click="$xui.saveBindingEditor(); main.openDialogBinding=false;">Save</v-btn>
                   </v-card-actions>
                </v-card>
             </v-dialog>
@@ -799,7 +799,7 @@
                <v-toolbar-title>
                   <template v-for="(breadcrumb_item, breadcrumb_index) in main.breadcrumb">
                      <div class="d-inline-block" v-bind:data-for-idx="breadcrumb_index" data-for-map="main.breadcrumb">
-                        <v-btn class="pa-0 text-decoration-underline text-body-1 text-transform-none" text x-small @click="$mth('doSelectPath', ...arguments)">{{breadcrumb_item.name}}</v-btn>
+                        <v-btn class="pa-0 text-decoration-underline text-body-1 text-transform-none" text x-small @click="$mth('main/doSelectPath', ...arguments)">{{breadcrumb_item.name}}</v-btn>
                         <template v-if="breadcrumb_index < main.breadcrumb.length-1">
                            <span class="mr-1">></span>
                         </template>
@@ -807,52 +807,52 @@
                   </template>
                </v-toolbar-title>
                <v-spacer></v-spacer>
-               <v-btn @click="$mth('doMDFullScreen', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+               <v-btn @click="$mth('main/doMDFullScreen', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
                   <v-icon>mdi-fullscreen</v-icon>
                </v-btn>
-               <v-btn @click="$mth('doMDMobile', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+               <v-btn @click="$mth('main/doMDMobile', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
                   <v-icon>mdi-monitor-cellphone</v-icon>
                </v-btn>
-               <v-btn @click="$mth('doMDPreview', ...arguments)" class="mx-7" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+               <v-btn @click="$mth('main/doMDPreview', ...arguments)" class="mx-7" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
                   <v-icon>mdi-television-play</v-icon>
                </v-btn>
-               <v-btn @click="$mth('doRefresh', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+               <v-btn @click="$mth('main/doRefresh', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
                   <v-icon>mdi-refresh</v-icon>
                </v-btn>
             </v-app-bar>
             <v-navigation-drawer temporary app>
             </v-navigation-drawer>
             <v-main>
-               <transition :duration="600" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
+               <transition :duration="main.animationDuration" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
                   <router-view ref="routerview"></router-view>
                </transition>
             </v-main>
             <v-footer app height="32" dark color="#ff5900" class="pt-1" style="z-index:5">
-               <v-btn @click="$mth('doFADelete', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+               <v-btn @click="$mth('main/doFADelete', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
-               <v-btn @click="$mth('doFACut', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+               <v-btn @click="$mth('main/doFACut', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
                   <v-icon>mdi-content-cut</v-icon>
                </v-btn>
-               <v-btn @click="$mth('doFACopy', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+               <v-btn @click="$mth('main/doFACopy', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
                   <v-icon>mdi-content-copy</v-icon>
                </v-btn>
-               <v-btn @click="$mth('doFAPaste', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.pasteDisabled" small color="#ffffff00">
+               <v-btn @click="$mth('main/doFAPaste', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.pasteDisabled" small color="#ffffff00">
                   <v-icon>mdi-content-paste</v-icon>
                </v-btn>
-               <v-btn @click="$mth('doFAUndo', ...arguments)" class="ml-6" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.undoDisabled" small color="#ffffff00">
+               <v-btn @click="$mth('main/doFAUndo', ...arguments)" class="ml-6" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.undoDisabled" small color="#ffffff00">
                   <v-icon>mdi-undo</v-icon>
                </v-btn>
-               <v-btn @click="$mth('doFARedo', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.redoDisabled" small color="#ffffff00">
+               <v-btn @click="$mth('main/doFARedo', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.redoDisabled" small color="#ffffff00">
                   <v-icon>mdi-redo</v-icon>
                </v-btn>
                <div style="width:50px">
                </div>
-               <v-btn @click="$mth('doFAClearAll', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+               <v-btn @click="$mth('main/doFAClearAll', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
                   <v-icon>mdi-delete</v-icon>
                </v-btn>
                <v-spacer></v-spacer>
-               <span>Version 0.8.4 12/02/22 &#169; Desomer G</span>
+               <span>Version 0.8.5   06/03/22 &#169; Desomer G</span>
             </v-footer>
             <template></template>
          </v-app>
@@ -862,6 +862,7 @@
 			
 			$xui = {};
 			$xui.rootdata = {};
+			$xui.rootdataComponent = {};
 			// ----------------------------------------------
 			$xui.initComponentVuejs = [];  // liste des function de creation de cmp vuejs à appeler
 	
@@ -1130,11 +1131,12 @@
             ];
 
             var json = {
-                dialogClass: false,
+               // dialogClass: false,
                 listCatClass: listDesignClass
             };
 
-            $xui.rootdata = { ...$xui.rootdata, ...json };
+            //$xui.getAppState().main = { ...$xui.getAppState().main, ...json };
+            $xui.rootdataComponent = { ...$xui.rootdataComponent, ...json };
 
             $xui.initComponentVuejs.push(() => {
                 new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
@@ -1144,12 +1146,12 @@
             /***************************************************************************************************************/
             $xui.openClassEditor = (id) => {
                 $xui.editorOpenId = id;
-                const rootdata = $xui.getAppState().main;
+                const rootdata = $xui.rootdataComponent; // $xui.getAppState().main;
 
-                console.debug("----openClassEditor ----- "+ id)
+                console.debug("----openClassEditor 2 ----- "+ id, rootdata, $xui.getAppState().main);
 
                 $xui.modeDisplaySelection = false;
-                rootdata.dialogClass = true;
+                $xui.getAppState().main.openDialogClass = true;
 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
@@ -1161,7 +1163,7 @@
 
             $xui.saveClassEditor = () => {
 
-                const rootdata = $xui.getAppState().main;
+                const rootdata =  $xui.rootdataComponent; // $xui.getAppState().main;
 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
@@ -1174,11 +1176,13 @@
             }
         
             var json = {
-                dialogBinding: false,
                 nameBinding: "name",
-                variableBinding: "var"
+                variableBinding: "var",
+                displayedStateDataBinding:""
             };
-            $xui.rootdata = { ...$xui.rootdata, ...json };
+
+            //$xui.getAppState().main = { ...$xui.getAppState().main, ...json };
+            $xui.rootdataComponent = { ...$xui.rootdataComponent, ...json };
 
             $xui.initComponentVuejs.push(() => {
                 new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-bind-editor", 'app/cmpDesignBindEditor.html', "xui-bind-editor");
@@ -1193,11 +1197,12 @@
 
                 $xui.modeDisplaySelection = false;
 
-                const rootdata = $xui.getAppState().main;
-                rootdata.dialogBinding = true;
+                const rootdata = $xui.rootdataComponent;
+                $xui.getAppState().main.openDialogBinding = true;
+                const storeModule = $xui.getCurrentStoreModule();
 
                 setTimeout(() => {
-                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set(rootdata.stateData)
+                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set(storeModule.stateData)
                     console.debug("open Binding Editor", xid, propId);
                 }, 100);
 
@@ -1214,7 +1219,7 @@
             $xui.saveBindingEditor = () => {
                 console.debug("save binding", $xui.editorOpenId, $xui.editorPropId);
 
-                const rootdata = $xui.getAppState().main;
+                const rootdata = $xui.rootdataComponent; 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
                         aProperty.bind = rootdata.variableBinding;
@@ -1492,11 +1497,12 @@
             ];
 
             var json = {
-                dialogClass: false,
+               // dialogClass: false,
                 listCatClass: listDesignClass
             };
 
-            $xui.rootdata = { ...$xui.rootdata, ...json };
+            //$xui.getAppState().main = { ...$xui.getAppState().main, ...json };
+            $xui.rootdataComponent = { ...$xui.rootdataComponent, ...json };
 
             $xui.initComponentVuejs.push(() => {
                 new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-list-class", 'app/cmpDesignClassChooser.html', "xui-list-class");
@@ -1506,12 +1512,12 @@
             /***************************************************************************************************************/
             $xui.openClassEditor = (id) => {
                 $xui.editorOpenId = id;
-                const rootdata = $xui.getAppState().main;
+                const rootdata = $xui.rootdataComponent; // $xui.getAppState().main;
 
-                console.debug("----openClassEditor ----- "+ id)
+                console.debug("----openClassEditor 2 ----- "+ id, rootdata, $xui.getAppState().main);
 
                 $xui.modeDisplaySelection = false;
-                rootdata.dialogClass = true;
+                $xui.getAppState().main.openDialogClass = true;
 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
@@ -1523,7 +1529,7 @@
 
             $xui.saveClassEditor = () => {
 
-                const rootdata = $xui.getAppState().main;
+                const rootdata =  $xui.rootdataComponent; // $xui.getAppState().main;
 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.cat == "class" && aProperty.xid == $xui.editorOpenId) {
@@ -1536,11 +1542,13 @@
             }
         
             var json = {
-                dialogBinding: false,
                 nameBinding: "name",
-                variableBinding: "var"
+                variableBinding: "var",
+                displayedStateDataBinding:""
             };
-            $xui.rootdata = { ...$xui.rootdata, ...json };
+
+            //$xui.getAppState().main = { ...$xui.getAppState().main, ...json };
+            $xui.rootdataComponent = { ...$xui.rootdataComponent, ...json };
 
             $xui.initComponentVuejs.push(() => {
                 new vue2CmpMgr.ComponentManager().registerVueComponent("cmp-bind-editor", 'app/cmpDesignBindEditor.html', "xui-bind-editor");
@@ -1555,11 +1563,12 @@
 
                 $xui.modeDisplaySelection = false;
 
-                const rootdata = $xui.getAppState().main;
-                rootdata.dialogBinding = true;
+                const rootdata = $xui.rootdataComponent;
+                $xui.getAppState().main.openDialogBinding = true;
+                const storeModule = $xui.getCurrentStoreModule();
 
                 setTimeout(() => {
-                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set(rootdata.stateData)
+                    $xui.vuejs.$refs.root.$refs.routermain.$refs.jsonEditorBindingCont.$refs.jsonEditorBinding.editor.set(storeModule.stateData)
                     console.debug("open Binding Editor", xid, propId);
                 }, 100);
 
@@ -1576,7 +1585,7 @@
             $xui.saveBindingEditor = () => {
                 console.debug("save binding", $xui.editorOpenId, $xui.editorPropId);
 
-                const rootdata = $xui.getAppState().main;
+                const rootdata = $xui.rootdataComponent; 
                 for (const aProperty of $xui.propertiesDesign.json) {
                     if (aProperty.variable == $xui.editorPropId && aProperty.xid == $xui.editorOpenId) {
                         aProperty.bind = rootdata.variableBinding;
@@ -1592,7 +1601,7 @@
         globalThis.initialiseAppState = () => {
         const modulesManager = new VuexModuleManager();
 
-        const main = modulesManager.addModule("main", {
+        const home = modulesManager.addModule("home", {
             "listTemplate": [
                 {
                     "picture": "",
@@ -1612,7 +1621,10 @@
                     "frameName": "frame1",
                     "frameTemplate": "frameDesignerMain"
                 }
-            ],
+            ]
+        });
+
+        const main = modulesManager.addModule("main", {
             "urlApp": "urlapp",
             "frameTemplate": "",
             "frameName": "",
@@ -1628,11 +1640,7 @@
             "pasteDisabled": true,
             "undoDisabled": true,
             "redoDisabled": true,
-            "ListDataProvider": [
-                {
-                    "name": "api music"
-                }
-            ],
+            "stateDataSource": "template",
             "listSlot": [
                 {
                     "id": 1,
@@ -1640,32 +1648,14 @@
                     "icon": "mdi-minus"
                 }
             ],
-            "ListActions": [
-                {
-                    "name": "name"
-                },
-                {
-                    "name": "name"
-                }
-            ],
+            "activeSlot": [],
+            "openSlot": [],
+            "expandAllCmp": false,
             "listRoute": [
                 {
                     "name": "route0"
                 }
             ],
-            "currentCodeName": "mth name",
-            "currentCode": "",
-            "currentCodeIdx": -1,
-            "currentCodeXid": "",
-            "stateDataSource": "mock",
-            "stateData": "",
-            "stateDataMock": "",
-            "jsonEditorOptions": {
-                "mode": "code"
-            },
-            "jsonEditorOptionsMock": {
-                "mode": "code"
-            },
             "childrenSlots": [
                 {
                     "name": "path1"
@@ -1711,22 +1701,58 @@
                     "name": "path2"
                 }
             ],
-            "currentAPI": {
-                "method": "GET",
-                "base": "https://api.apispreadsheets.com",
-                "url": "/data/TynVLA2r7ouuzE8k"
-            },
             "version": 2
          , ...$xui.rootdata });
 
-        main.actions={
+        const store = modulesManager.addModule("store", {
+            "listStoreModule": [
+                {
+                    "nameModule": "main",
+                    "stateData": "",
+                    "stateDataMock": "",
+                    "jsonEditorOptions": {
+                        "mode": "code"
+                    },
+                    "jsonEditorOptionsMock": {
+                        "mode": "code"
+                    },
+                    "ListActions": [
+                        {
+                            "name": "name"
+                        },
+                        {
+                            "name": "name"
+                        }
+                    ],
+                    "currentCodeName": "mth name",
+                    "currentCode": "",
+                    "currentCodeIdx": -1,
+                    "currentCodeXid": "",
+                    "ListDataProvider": [
+                        {
+                            "name": "api music"
+                        }
+                    ],
+                    "currentAPI": {
+                        "method": "GET",
+                        "base": "https://api.apispreadsheets.com",
+                        "url": "/data/TynVLA2r7ouuzE8k"
+                    }
+                }
+            ],
+            "idxTabStoreModule": 0
+        });
+
+        home.actions={
           doSelectTemplate : (p1, p2) => {
         const state = $xui.vuejs.$store.state;
-         const sel = state.main.listTemplate[$xui.info["main.listTemplate"]];
+         const sel = state.home.listTemplate[$xui.info["home.listTemplate"]];
          console.debug("doSelectTemplate", sel );
          $xui.doInitPage(sel);
-        //# sourceURL=main-doSelectTemplate.js;
-        },
+        //# sourceURL=home-doSelectTemplate.js;
+        },}
+
+        main.actions={
           doSelectChildPath : (p1, p2) => {
         $xui.selectChildPath();
         //# sourceURL=main-doSelectChildPath.js;
@@ -1738,11 +1764,6 @@
           onActiveSlot : (p1, p2) => {
         $xui.selectCmp();
         //# sourceURL=main-onActiveSlot.js;
-        },
-          doDPTestAPI : (p1, p2) => {
-        console.debug($xui.vuejs.$store.state.main.currentAPI);
-        $xui.callAPI($xui.vuejs.$store.state.main.currentAPI);
-        //# sourceURL=main-doDPTestAPI.js;
         },
           doExportFile : (p1, p2) => {
         $xui.downloadPage();
@@ -1819,9 +1840,18 @@
         //# sourceURL=main-doFAClearAll.js;
         },}
 
+        store.actions={
+          doDPTestAPI : (p1, p2) => {
+        console.debug($xui.vuejs.$store.state.main.currentAPI);
+        $xui.callAPI($xui.vuejs.$store.state.main.currentAPI);
+        //# sourceURL=store-doDPTestAPI.js;
+        },}
+
         modulesManager.setStore(new Vuex.Store({
                             modules : {
+        						home,
         						main,
+        						store,
                             },
                             plugins : [$xui.logger],
                             strict : true
@@ -1894,7 +1924,7 @@
    <script type="module">
 
 		import "./app/vue/vue2frame.js";
-		$xui.loadApplicationJS();
+		$xui.loadApplicationJS(false);
 	
        $xui.initVuejs($xui.vuejs);
            </script>

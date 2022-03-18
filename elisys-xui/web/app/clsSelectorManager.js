@@ -45,41 +45,42 @@ export class SelectorManager {
             const nodeAction = document.createElement("div");
             nodeAction.id = "xui-display-selector-action";
             node.appendChild(nodeAction);
-
-
             /************************************************* */
             document.body.appendChild(node);
 
             /************************************************* */
+            //le node info
+            const aNodeInfo = document.createElement("div");
+            aNodeInfo.id = "xui-display-selector-info";
+            $xui.css(aNodeInfo, {
+                position: "absolute",	
+                right: "0px",	top: "-20px", 
+                width : "80px", height : "20px"   
+            });
+            node.appendChild(aNodeInfo);
 
-            // le node action
-            // var nodePopup = document.createElement("div");
-            // nodePopup.id = "xui-display-selector-popup";
-            // document.body.appendChild(nodePopup);
             /************************************************* */
             // le node margin
-            var nodeMargin = document.createElement("div");
-            nodeMargin.id = "xui-display-selector-margin";
-            nodeMargin.classList.add("xui-style-selector-margin");
-            nodeMargin.addEventListener("click", (e) => {
+            const aNodeMargin = document.createElement("div");
+            aNodeMargin.id = "xui-display-selector-margin";
+            aNodeMargin.classList.add("xui-style-selector-margin");
+            aNodeMargin.addEventListener("click", (e) => {
                 e.currentTarget.style.display = "none";   // retire sur le click
                 $xui.modeDisplaySelection = false;
             }, { capture: false })
-            document.body.appendChild(nodeMargin);
+            document.body.appendChild(aNodeMargin);
             /************************************************* */
         }
 
-        var nodeMargin = document.getElementById("xui-display-selector-margin");
+        const nodeMargin = document.getElementById("xui-display-selector-margin");
+        const nodeInfo = document.getElementById("xui-display-selector-info");
         const posFrame = rootFrame.getBoundingClientRect();
-        //console.debug(position);
 
         // si survole page (root) = affiche la totalité de la page (même si scroll)
         if (position.selector == "[data-xid=root]") {
             position.top = 0;
         }
-        // var z = 1+(1-$xui.zoom);
         const z = 1; //1.11;  //pour zoom 0.9
-
 
         position.top = position.top * z;
         position.left = position.left * z;
@@ -111,6 +112,7 @@ export class SelectorManager {
             nodeMargin.style.display = "none";
         }
 
+        nodeInfo.innerHTML= position.parentDisplay;
 
         // affiche les action du Node
         $xui.displayAction($xui.propertiesDesign.xid, null);
@@ -158,7 +160,7 @@ export class SelectorManager {
         this.idxGetInfoForSelectorOnIFrame++;
         const idx = this.idxGetInfoForSelectorOnIFrame;
         const prom = getPromise(`getInfoForSelectorOnIFrame${idx}`);
-        let winFrame = document.querySelector("#rootFrame").contentWindow;
+        const winFrame = document.querySelector("#rootFrame").contentWindow;
         winFrame.postMessage({ "action": "getInfoForSelector", "selector": selector, "parent": parent, "idx": idx }, "*");
         return prom;
     }
@@ -181,14 +183,12 @@ export class SelectorManager {
          let elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid=${xid}]`);
 
          if (elemRect != null) {
-             //console.debug("displaySelectorByXid 1 ", xid);
             return elemRect;
          }
  
          if (elemRect == null) {
              elemRect = await this._getInfoForSelectorOnIFrame(`[data-xid-slot-${xid}=true]`);
              if (elemRect != null) {
-                 //console.debug("displaySelectorByXid 2 ", xid);
                  return elemRect;
              }
          }
@@ -247,9 +247,9 @@ export class SelectorManager {
             return;
         }
 
-        const elemRect=  await this.getBoundFromXid(xid);
-        if (elemRect!=null)
-            this.displaySelectorByPosition(elemRect);
+        const elemInfo=  await this.getBoundFromXid(xid);
+        if (elemInfo!=null)
+            this.displaySelectorByPosition(elemInfo);
 
        
         if (!noDisplayProp) {

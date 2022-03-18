@@ -60,7 +60,7 @@
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
 
-        <xui-prop var=":varitems" editor="var" def="items" bind-type="array">items var name</xui-prop>
+        <xui-prop var=":varitems" cat="event:model" editor="var" def="items" bind-type="array">items var name</xui-prop>
     </xui-doc>
 
     <template xid="xui-for" v-for="([[:varitems]]_item, [[:varitems]]_index) in [[:varitems]]">

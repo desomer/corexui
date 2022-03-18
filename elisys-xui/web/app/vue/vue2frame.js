@@ -35,6 +35,11 @@ $xui.actionEnable = true;
 $xui.info={};
 
 
+$xui.css = (element, style) => {
+	for (const property in style)
+		element.style[property] = style[property];
+}
+
 $xui.loadApplicationJS = (noChangeStateManager) => {
 	$xui.logger = (store) => {
 		store.subscribe((event, store) => {
@@ -303,26 +308,7 @@ function initEventRouter() {
 			};
 			window.parent.postMessage(message, "*"); // indique le changement de route (retire le selector)
 		}
-	});
-
-	$xui.router.afterEach((to, from) => {
-		console.log(`router going to ${to.fullPath} from ${from.fullPath}`);
-		console.log(to, from);
-
-		const el = document.querySelector(".v-main__wrap");
-		if (el == null)
-			return;
-		const scrollPos = window.scrollY;
-		const exitElem = el.firstChild;
-		const exitElemscrollHeight = exitElem.scrollHeight;
-
-		// force le retour en haut du scroll en debut d'animation
-		exitElem.style.position = 'absolute';
-		exitElem.style.height = `${exitElemscrollHeight}px`;
-		exitElem.style.top = `-${scrollPos}px`;
-		window.scrollTo(0, 0);
-		const rootdata = $xui.getAppState().main;
-
+		const rootdata = $xui.vuejs==null ? $xui.rootdata : $xui.getAppState().main;
 		if (rootdata.computeAnimate)
 		{
 
@@ -336,10 +322,29 @@ function initEventRouter() {
 			}
 		}
 		rootdata.computeAnimate=true;
+	});
 
+	$xui.router.afterEach((to, from) => {
+		console.log(`router going to ${to.fullPath} from ${from.fullPath}`);
+		//console.log(to, from);
+
+		const el = document.querySelector(".v-main__wrap");
+		if (el == null)
+			return;
+		const scrollPos = window.scrollY;
+		const exitElem = el.firstChild;
+		const exitElemscrollHeight = exitElem.scrollHeight;
+
+		// force le retour en haut du scroll en debut d'animation
+		exitElem.style.position = 'absolute';
+		exitElem.style.height = `${exitElemscrollHeight}px`;
+		exitElem.style.top = `-${scrollPos}px`;
+		window.scrollTo(0, 0);
 
 	});
 }
+
+
 
 function initDirective() {
 	console.debug("*** add directive ***");
@@ -397,11 +402,6 @@ function initDirective() {
 		}
 	});
 
-	function css(element, style) {
-		for (const property in style)
-			element.style[property] = style[property];
-	}
-
 	Vue.directive('pressanimationmoveto', {
 		// Quand l'élément lié est inséré dans le DOM...
 		inserted(el, binding) {
@@ -426,7 +426,7 @@ function initDirective() {
 				const topPos = elemRect.top; // + window.scrollY;
 				const leftPos = elemRect.left; // + window.scrollX;
 
-				css(el, { position : "fixed", "z-index":5,	
+				$xui.css(el, { position : "fixed", "z-index":5,	
 				left: leftPos+"px",	top: topPos+"px", 
 				width : elemRect.width+"px", height : elemRect.height+"px"   });
 
@@ -435,7 +435,7 @@ function initDirective() {
 					$xui.vuejs.$mth(binding.value.mth, e, binding.value.param);
 
 				setTimeout(() => {
-					css(el, { transform: "translate("+(-leftPos-50)+"px,"+(-topPos+160)+"px) scale(1,1)" });
+					$xui.css(el, { transform: "translate("+(-leftPos-50)+"px,"+(-topPos+160)+"px) scale(1,1)" });
 				}, 1);
 
 				setTimeout(() => {
@@ -444,7 +444,7 @@ function initDirective() {
 						const eldest = document.querySelector("#imageProduct");
 						const elemRectDest = eldest.getBoundingClientRect();
 						const zoom = elemRectDest.width/elemRect.width;
-						css(el, { transform: "translate("+(-leftPos-50)+"px,"+(-topPos+160)+"px) scale("+zoom+","+zoom+")" });
+						$xui.css(el, { transform: "translate("+(-leftPos-50)+"px,"+(-topPos+160)+"px) scale("+zoom+","+zoom+")" });
 					}, 50);
 				}, 10);
 

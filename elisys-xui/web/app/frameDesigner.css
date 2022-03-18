@@ -286,6 +286,13 @@ pre > code {
 {
     padding: 0;
 }
+
+
+#xui-display-selector-info {
+    border: 1px solid rgb(20, 23, 201);
+    z-index: 1001;
+    background: rgba(204, 205, 255, 1)
+}
 /******************************************************************************/
 .xui-frame-full-screen {
     position : fixed !important;

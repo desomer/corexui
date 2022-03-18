@@ -35,8 +35,8 @@ $xui.actionEnable = true;
 $xui.info={};
 
 
-$xui.loadApplicationJS = () => {
-$xui.logger = (store) => {
+$xui.loadApplicationJS = (noChangeStateManager) => {
+	$xui.logger = (store) => {
 		store.subscribe((event, store) => {
 			console.log(`%c MUTATION ${event.type} `, "color: #03A9F4; font-weigth: bold; background-color: #eee", event.payload, store);
 		});
@@ -57,14 +57,28 @@ $xui.logger = (store) => {
 		}
 	}
 
+	if (noChangeStateManager) {
+			// ne change pas de store
+	}
+	else {
 
-	const modulesManager = globalThis.initialiseAppState();
+		let modulesManager = null;
+		try {
+			modulesManager = globalThis.initialiseAppState();
+		} catch (error) {
+			console.error(error);
+			modulesManager=new VuexModuleManager();
+			const main = modulesManager.addModule("main", {});
+			modulesManager.setStore(new Vuex.Store({modules : {main}}));
+		}
+		$xui.modulesManager = modulesManager;
+	}
 
 
-	$xui.mixinStore = modulesManager.getMixin();
-	$xui.modulesManager = modulesManager;
+	$xui.mixinStore = $xui.modulesManager.getMixin();
 
-	$xui.rootdata = modulesManager.getStore().state.main;
+
+	//$xui.rootdata = modulesManager.getStore().state.main;
 
 
 	/***********************************  ROUTER   **********************************/
@@ -100,7 +114,7 @@ $xui.logger = (store) => {
 	$xui.vuejs = new Vue({
 		el: '#app',
 		router: $xui.router,
-		store: modulesManager.getStore(),
+		store: $xui.modulesManager.getStore(),
 		mixins: [$xui.mixinStore],
 		components: { RootComponent },
 		computed: { ...$xui.computeDataBinding },
@@ -118,9 +132,10 @@ $xui.logger = (store) => {
 	});
 
 	const rootdata = $xui.getAppState().main;
-	rootdata.animationNameEnter = "animate__animated animate__fadeInUp";
-	rootdata.animationNameExit = "";
-
+	rootdata.animationNameEnter = "xui-transition animate__animated animate__fadeInUp";
+	rootdata.animationNameExit = "xui-transition-down animate__animated animate__fadeOutDown";
+	rootdata.animationDuration = 600;
+	rootdata.computeAnimate=true;
 }
 
 
@@ -255,10 +270,10 @@ function initStore() {
 	// });
 	// passer la valeur littérale 'count' revient à écrire `state => state.count`
 	//$xui.storeDataBinding = Vuex.mapState({ titre2: 'count' });   // titre2 mount l'attribut private 'count' du state
-	var allState = Reflect.ownKeys($xui.store.state);
-	var allGetters = Reflect.ownKeys(getters);
-	var allMutations = Reflect.ownKeys(mutations);
-	var allActions = Reflect.ownKeys(actions);
+	const allState = Reflect.ownKeys($xui.store.state);
+	const allGetters = Reflect.ownKeys(getters);
+	const allMutations = Reflect.ownKeys(mutations);
+	const allActions = Reflect.ownKeys(actions);
 
 	$xui.mixinStore = {
 		methods: {
@@ -279,16 +294,34 @@ function initEventRouter() {
 	$xui.router.beforeEach((to, from, next) => {
 		next($xui.routeEnable); // si false =>  pas de routage
 		if ($xui.routeEnable && to.fullPath!=from.fullPath) {
+
+			// lance l'action
+			$xui.vuejs.$mth('main/beforePage', {type:"route", to, from});
+
 			const message = {
 				action: "changeRoute",
 			};
-			window.parent.postMessage(message, "*");
+			window.parent.postMessage(message, "*"); // indique le changement de route (retire le selector)
 		}
+		const rootdata = $xui.vuejs==null ? $xui.rootdata : $xui.getAppState().main;
+		if (rootdata.computeAnimate)
+		{
+
+			if (to.fullPath == "/") {
+				rootdata.animationNameEnter = "xui-transition-down animate__animated animate__fadeInUp"; 
+				rootdata.animationNameExit = "xui-transition animate__animated animate__fadeOutDown";
+			}
+			else {
+				rootdata.animationNameEnter = "xui-transition animate__animated animate__fadeInUp";
+				rootdata.animationNameExit = "xui-transition-down animate__animated animate__fadeOutDown";
+			}
+		}
+		rootdata.computeAnimate=true;
 	});
 
 	$xui.router.afterEach((to, from) => {
 		console.log(`router going to ${to.fullPath} from ${from.fullPath}`);
-		console.log(to, from);
+		//console.log(to, from);
 
 		const el = document.querySelector(".v-main__wrap");
 		if (el == null)
@@ -302,21 +335,13 @@ function initEventRouter() {
 		exitElem.style.height = `${exitElemscrollHeight}px`;
 		exitElem.style.top = `-${scrollPos}px`;
 		window.scrollTo(0, 0);
-		const rootdata = $xui.getAppState().main;
 
-		if (to.fullPath == "/") {
-			rootdata.animationNameEnter = "xui-transition-down animate__animated animate__fadeInUp"; 
-			rootdata.animationNameExit = "xui-transition animate__animated animate__fadeOutDown";
-		}
-		else {
-			rootdata.animationNameEnter = "xui-transition animate__animated animate__fadeInUp";
-			rootdata.animationNameExit = "xui--transition-down animate__animated animate__fadeOutDown";
-		}
 	});
 }
 
 function initDirective() {
 	console.debug("*** add directive ***");
+
 	Vue.directive('bottomnavigationhideonscroll', {
 		// Quand l'élément lié est inséré dans le DOM...
 		inserted(el, binding) {
@@ -369,5 +394,125 @@ function initDirective() {
 			});
 		}
 	});
+
+	function css(element, style) {
+		for (const property in style)
+			element.style[property] = style[property];
+	}
+
+	Vue.directive('pressanimationmoveto', {
+		// Quand l'élément lié est inséré dans le DOM...
+		inserted(el, binding) {
+			// L'élément prend le focus
+			//console.debug("------------------------------v-pressAnimation", el, binding);
+			el.addEventListener('click', (e) => {
+
+				if (!$xui.routeEnable) return;
+
+				const elemRect = el.getBoundingClientRect();
+
+				el.classList.remove('clickAnimation');
+				el.classList.add('clickAnimationMove');
+
+				const rootdata = $xui.getAppState().main;
+				rootdata.animationDuration = 600;
+				rootdata.computeAnimate = false;
+				// slow = 500
+				rootdata.animationNameEnter = "xui-transition animate__animated animate__fadeIn xui-transition-slow";
+				rootdata.animationNameExit = "xui-transition-down animate__animated animate__fadeOut xui-transition-slow";
+
+				const topPos = elemRect.top; // + window.scrollY;
+				const leftPos = elemRect.left; // + window.scrollX;
+
+				css(el, { position : "fixed", "z-index":5,	
+				left: leftPos+"px",	top: topPos+"px", 
+				width : elemRect.width+"px", height : elemRect.height+"px"   });
+
+				$xui.vuejs.$mth('main/xui_beforeMove', e);
+				if (binding.value!=null && binding.value.mth)
+					$xui.vuejs.$mth(binding.value.mth, e, binding.value.param);
+
+				setTimeout(() => {
+					css(el, { transform: "translate("+(-leftPos-50)+"px,"+(-topPos+160)+"px) scale(1,1)" });
+				}, 1);
+
+				setTimeout(() => {
+					$xui.router.push("/route1");
+					setTimeout(() => {
+						const eldest = document.querySelector("#imageProduct");
+						const elemRectDest = eldest.getBoundingClientRect();
+						const zoom = elemRectDest.width/elemRect.width;
+						css(el, { transform: "translate("+(-leftPos-50)+"px,"+(-topPos+160)+"px) scale("+zoom+","+zoom+")" });
+					}, 50);
+				}, 10);
+
+
+
+			});
+		}
+	});
+
+	// gestion de la direcvtive       v-elevationonover 
+	Vue.directive('elevationonover', {
+		// Quand l'élément lié est inséré dans le DOM...
+		inserted(el, binding) {
+			// L'élément prend le focus
+			el.classList.add('clickAnimation');
+			el.addEventListener('mouseover', (e) => {
+				el.classList.add('elevation-10');
+				el.classList.add('clickAnimationOver');
+			});
+			el.addEventListener('mouseout', (e) => {
+				el.classList.remove('elevation-10');
+				el.classList.remove('clickAnimationOver');
+			});
+		}
+	});
+
+	//////////////////////////////////////////////////////////////////////
+
+	const template = 
+	`<v-carousel> 
+		<template v-for="(item, index) in items"> 
+			<v-carousel-item v-if="(index + 1) % columns === 1 || columns === 1" 
+							:key="index"> 
+				<v-row class="flex-nowrap" style="height:100%"> 
+					<template v-for="(n,i) in columns"> 
+						<template v-if="(+index + i) < slider.length"> 
+						<v-col :key="i"> 
+							<template v-if="(+index + i) < slider.length">
+								<slot></slot>
+							</template>
+						</v-col> 
+						</template> 
+					</template> 
+				</v-row> 
+			</v-carousel-item> 
+		</template> 
+	</v-carousel>`;
+
+  Vue.component('v-multi-carousel', {
+	template: template,
+	props: ['items'],
+	methods: {},
+	computed: {
+		columns() {
+		  if (this.$vuetify.breakpoint.xl) {
+			return 4;
+		  }
+	
+		  if (this.$vuetify.breakpoint.lg) {
+			return 3;
+		  }
+	
+		  if (this.$vuetify.breakpoint.md) {
+			return 2;
+		  }
+	
+		  return 1;
+		}
+	  }
+  });
+
 }
 

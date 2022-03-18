@@ -13,12 +13,20 @@ globalThis.$xui.generateApplicationStoreJS = (listState) =>
         }
     }
 
-
     ret =  modulesManager.getCode();
     //console.debug(">>>>>>>>> generateApplicationStoreJS\n");
     return ret;
 }
 
+
+// globalThis.$xui.getRequireModule = (url, module = {exports:{}}) =>
+// {
+//     const response = await fetch(url);
+//     const script = await response.text();
+//     const func = Function("module", "exports", script)
+//     func.call(module, module, module.exports);
+//     return module.exports;
+// }
 
 class VuexModuleManager {
 
@@ -80,7 +88,7 @@ class VuexModuleManager {
             computed,
             methods: {
                 $mth() {
-                    console.debug("do eval mth", arguments, this);
+                    // console.debug("do eval mth", arguments, this);
 
                     if (arguments[1].type=="click") {
                         const elem = arguments[1].target;

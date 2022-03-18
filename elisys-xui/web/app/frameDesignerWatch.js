@@ -50,7 +50,7 @@ function onChangeMainTab(instanceVue) {
 
 //---------------------------------------------------------------------------------------
 function loadStoreModule() {
-  const rootdata = $xui.getAppState().main;
+  //const rootdata = $xui.getAppState().main;
   const storeModule = $xui.getCurrentStoreModule();
   const rootStore = $xui.getAppState().store;
 

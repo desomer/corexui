@@ -92,17 +92,9 @@ export class EventManager {
 
                 }, delayWaitEndAnim);
             }
-            else if (data.action == "unselect") {   // sur scroll ou resize
+            else if (data.action == "unselect" || data.action == "changeRoute") {   // sur scroll ou resize
                 $xui.closePopup();
                 $xui.SelectorManager.unDisplaySelector();
-            }
-            else if (data.action == "changeRoute") {   // sur scroll ou resize
-                $xui.closePopup();
-                $xui.SelectorManager.unDisplaySelector();
-                
-                // setTimeout(() => {
-                //    // $xui.displayPropertiesJS("root", "root", ); 
-                // }, 500);
             }
             else if (data.action == "drop") {
                 if ($xui.dragItem != null) {
@@ -178,7 +170,7 @@ export class EventManager {
                 doPromiseJS("AfterChangeSelectByXid");
             }
             else if (data.action == "return getInfoForSelector") {
-                //console.debug("*******>", data);
+                console.debug("*******>", data);
                 doPromiseJS(`getInfoForSelectorOnIFrame${data.info.idx}`, data.ret);
             }
 

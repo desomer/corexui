@@ -69,6 +69,18 @@ main
         </v-card>
     </v-dialog>
 
+    <!--  composant editor de binding  -->
+    <v-dialog ref="dialogError" xid="xui-error-dialog"  v-model="main.openDialogError" >
+        <v-snackbar v-model="main.openDialogError" class="pt-0" elevation="12" centered color="red"> 
+            {{ main.dialogError_text }}
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" text v-bind="attrs" @click="main.openDialogError = false">
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>
+    </v-dialog>
+
     <!--  composant boite de dialog temporaire -->
     <v-snackbar ref="snack" xid="xui-snackbar-dialog" class="pt-0" elevation="12" v-model="main.snackbar"
         :timeout="main.snackbar_timeout" top app color="blue-grey">
@@ -122,6 +134,7 @@ main
         <xui-class-editor></xui-class-editor> 
         <xui-binding-editor></xui-binding-editor>
         <xui-snack-messages></xui-snack-messages>
+        <xui-error-dialog></xui-error-dialog>
     </xui-design>
     <!--------------------------------------------------------------------------->
 

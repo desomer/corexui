@@ -34,7 +34,7 @@ main
 
 
     <!--  composant editor de class  -->
-    <v-dialog xid="xui-class-editor" v-model="main.dialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
+    <v-dialog xid="xui-class-editor" v-model="main.openDialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
         <v-card>
             <div class="white--text elevation-6"
                 style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
@@ -44,15 +44,15 @@ main
                 <cmp-list-class></cmp-list-class>
             </div>
             <v-card-actions class="elevation-6">
-                <v-btn text @click="main.dialogClass=false;">Cancel</v-btn>
-                <v-btn text @click="$xui.saveClassEditor(); main.dialogClass=false;">Save</v-btn>
+                <v-btn text @click="main.openDialogClass=false;">Cancel</v-btn>
+                <v-btn text @click="$xui.saveClassEditor(); main.openDialogClass=false;">Save</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
 
 
     <!--  composant editor de binding  -->
-    <v-dialog ref="dialogBind" xid="xui-binding-editor" v-model="main.dialogBinding" v-on:click:outside="$xui.saveBindingEditor()"
+    <v-dialog ref="dialogBind" xid="xui-binding-editor" v-model="main.openDialogBinding" v-on:click:outside="$xui.saveBindingEditor()"
         width="80vw">
         <v-card>
             <div class="white--text elevation-6"
@@ -63,8 +63,8 @@ main
                 <cmp-bind-editor ref="jsonEditorBindingCont" :options-editor="main.jsonEditorOptions"></cmp-bind-editor>
             </div>
             <v-card-actions class="elevation-6">
-                <v-btn text @click="main.dialogBinding=false;">Cancel</v-btn>
-                <v-btn text @click="$xui.saveBindingEditor(); main.dialogBinding=false;">Save</v-btn>
+                <v-btn text @click="main.openDialogBinding=false;">Cancel</v-btn>
+                <v-btn text @click="$xui.saveBindingEditor(); main.openDialogBinding=false;">Save</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

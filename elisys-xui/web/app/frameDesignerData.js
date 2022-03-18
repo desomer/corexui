@@ -34,6 +34,9 @@ var json = {
     overlay: false,
     overlayEvent: false,
 
+    openDialogError : false,
+    dialogError_text : "error",
+
     //listPopupAdd: [],
     // messages : [],
     // snackbar: true,
