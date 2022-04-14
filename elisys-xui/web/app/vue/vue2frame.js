@@ -53,38 +53,18 @@ $xui.loadApplicationJS = (noChangeStateManager) => {
 		$xui.vuejs.$destroy();
 	}
 	else {
-		/********************** creation des composants une seule fois xui/vuejs  *****************/
+		// init le directive vuejs
 		initDirective();
 
+		/********************** creation des composants une seule fois xui/vuejs  *****************/
 		const listFunctCreateCmp = $xui.initComponentVuejs;
 		for (const functCreateCmp of listFunctCreateCmp) {
 			functCreateCmp();
 		}
 	}
 
-	if (noChangeStateManager) {
-			// ne change pas de store
-	}
-	else {
 
-		let modulesManager = null;
-		try {
-			modulesManager = globalThis.initialiseAppState();
-		} catch (error) {
-			console.error(error);
-			modulesManager=new VuexModuleManager();
-			const main = modulesManager.addModule("main", {});
-			modulesManager.setStore(new Vuex.Store({modules : {main}}));
-		}
-		$xui.modulesManager = modulesManager;
-	}
-
-
-	$xui.mixinStore = $xui.modulesManager.getMixin();
-
-
-	//$xui.rootdata = modulesManager.getStore().state.main;
-
+	initState(noChangeStateManager);
 
 	/***********************************  ROUTER   **********************************/
 	initRouter();
@@ -114,7 +94,6 @@ $xui.loadApplicationJS = (noChangeStateManager) => {
 	/*********************************** VUEJS ***********************************/
 	const RootComponent = vue2CmpMgr.ComponentManager.getComponentFromTemplate("xui-root-template");
 
-
 	/*************************************************************************** */
 	$xui.vuejs = new Vue({
 		el: '#app',
@@ -136,13 +115,36 @@ $xui.loadApplicationJS = (noChangeStateManager) => {
 		}
 	});
 
+	/******************************    INIT ROUTE ANIMATION ******************************** */
 	const rootdata = $xui.getAppState().main;
 	rootdata.animationNameEnter = "xui-transition animate__animated animate__fadeInUp";
 	rootdata.animationNameExit = "xui-transition-down animate__animated animate__fadeOutDown";
 	rootdata.animationDuration = 600;
 	rootdata.computeAnimate=true;
+
 }
 
+function initState(noChangeStateManager) {
+	if (noChangeStateManager) {
+		// ne change pas de store
+	}
+	else {
+
+		let modulesManager = null;
+		try {
+			modulesManager = globalThis.initialiseAppState();
+		} catch (error) {
+			console.error(error);
+			modulesManager = new VuexModuleManager($xui.vuejs);
+			const main = modulesManager.addModule("main", {});
+			modulesManager.setStore(new Vuex.Store({ modules: { main } }));
+		}
+		$xui.modulesManager = modulesManager;
+	}
+
+
+	$xui.mixinStore = $xui.modulesManager.getMixin();
+}
 
 function initRouter() {
 	
@@ -213,86 +215,86 @@ function initRouter() {
 }
 
 
-function initStore() {
-	var mutations = {
-		increment(state, info) {
-			console.debug("-------event info = ", info);
-			state.count += info.amount;
-		},
-		mutate(state, payload) {
-			console.debug("-------event mutate = ", state, payload);
-			Vue.set(state, payload.property, payload.value);
-		},
-	};
+// function initStore() {
+// 	var mutations = {
+// 		increment(state, info) {
+// 			console.debug("-------event info = ", info);
+// 			state.count += info.amount;
+// 		},
+// 		mutate(state, payload) {
+// 			console.debug("-------event mutate = ", state, payload);
+// 			Vue.set(state, payload.property, payload.value);
+// 		},
+// 	};
 
-	var actions = {
-		add(context, payload) {
+// 	var actions = {
+// 		add(context, payload) {
 
-			context.commit({
-				type: 'increment',
-				amount: payload
-			});
+// 			context.commit({
+// 				type: 'increment',
+// 				amount: payload
+// 			});
 
-			context.state.titre += payload;
-		},
+// 			context.state.titre += payload;
+// 		},
 
-		say(context, event) {
-			console.debug("message say", context, event, this);
-		}
-	};
+// 		say(context, event) {
+// 			console.debug("message say", context, event, this);
+// 		}
+// 	};
 
-	var getters = {
-		$xui: () => $xui
-	};
-
-
-
-	/*********************************** STORE CQRS  *********************************/
-	$xui.store = new Vuex.Store({
-		state: {
-			...$xui.rootdata
-		},
-		mutations: mutations,
-		getters: getters,
-		actions: actions
-	});
-
-	// generique
-	$xui.store.commit('mutate', {
-		property: 'count',
-		value: 12
-	}, {
-		root: true // don't forget to pass this second argument when you want to call a root mutation
-	});
-
-	$xui.store.commit('increment', { amount: 3 }); // appel une mutation
+// 	var getters = {
+// 		$xui: () => $xui
+// 	};
 
 
-	//  $xui.store.dispatch('inc', 1);    // appel une action
-	// $xui.storeAction = Vuex.mapActions({
-	// 	add: 'inc', // attacher `this.add()` à `this.$store.dispatch('increment')`
-	// 	say: 'say'
-	// });
-	// passer la valeur littérale 'count' revient à écrire `state => state.count`
-	//$xui.storeDataBinding = Vuex.mapState({ titre2: 'count' });   // titre2 mount l'attribut private 'count' du state
-	const allState = Reflect.ownKeys($xui.store.state);
-	const allGetters = Reflect.ownKeys(getters);
-	const allMutations = Reflect.ownKeys(mutations);
-	const allActions = Reflect.ownKeys(actions);
 
-	$xui.mixinStore = {
-		methods: {
-			...Vuex.mapMutations(allMutations),
-			...Vuex.mapActions(allActions)
-		},
-		computed: {
-			...Vuex.mapState(allState),
-			...Vuex.mapGetters(allGetters)
-		}
-	};
+// 	/*********************************** STORE CQRS  *********************************/
+// 	$xui.store = new Vuex.Store({
+// 		state: {
+// 			...$xui.rootdata
+// 		},
+// 		mutations: mutations,
+// 		getters: getters,
+// 		actions: actions
+// 	});
 
-	console.debug("mixin store", $xui.mixinStore);
-}
+// 	// generique
+// 	$xui.store.commit('mutate', {
+// 		property: 'count',
+// 		value: 12
+// 	}, {
+// 		root: true // don't forget to pass this second argument when you want to call a root mutation
+// 	});
+
+// 	$xui.store.commit('increment', { amount: 3 }); // appel une mutation
+
+
+// 	//  $xui.store.dispatch('inc', 1);    // appel une action
+// 	// $xui.storeAction = Vuex.mapActions({
+// 	// 	add: 'inc', // attacher `this.add()` à `this.$store.dispatch('increment')`
+// 	// 	say: 'say'
+// 	// });
+// 	// passer la valeur littérale 'count' revient à écrire `state => state.count`
+// 	//$xui.storeDataBinding = Vuex.mapState({ titre2: 'count' });   // titre2 mount l'attribut private 'count' du state
+// 	const allState = Reflect.ownKeys($xui.store.state);
+// 	const allGetters = Reflect.ownKeys(getters);
+// 	const allMutations = Reflect.ownKeys(mutations);
+// 	const allActions = Reflect.ownKeys(actions);
+
+// 	$xui.mixinStore = {
+// 		methods: {
+// 			...Vuex.mapMutations(allMutations),
+// 			...Vuex.mapActions(allActions)
+// 		},
+// 		computed: {
+// 			...Vuex.mapState(allState),
+// 			...Vuex.mapGetters(allGetters)
+// 		}
+// 	};
+
+// 	console.debug("mixin store", $xui.mixinStore);
+// }
 
 //------------------------------------------------------------------------------------------------------
 function initEventRouter() {
@@ -325,7 +327,7 @@ function initEventRouter() {
 	});
 
 	$xui.router.afterEach((to, from) => {
-		console.log(`router going to ${to.fullPath} from ${from.fullPath}`);
+		console.log(`*************** router going to ${to.fullPath} from ${from.fullPath} ***************`);
 		//console.log(to, from);
 
 		const el = document.querySelector(".v-main__wrap");
@@ -347,7 +349,6 @@ function initEventRouter() {
 
 
 function initDirective() {
-	console.debug("*** add directive ***");
 
 	Vue.directive('bottomnavigationhideonscroll', {
 		// Quand l'élément lié est inséré dans le DOM...
@@ -515,6 +516,8 @@ function initDirective() {
 		}
 	  }
   });
+
+  console.debug("*************** add directive OK ***************");
 
 }
 

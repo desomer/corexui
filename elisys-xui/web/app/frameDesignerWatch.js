@@ -9,6 +9,12 @@ $xui.MainTabEnum = {
   ENV : 6
 }
 
+$xui.DesignTabEnum = {
+  DESIGN : 0,
+  ROUTE : 1,
+  DEV : 2
+}
+
 function onChangeMainTab(instanceVue) {
   instanceVue.$watch('main.idxTabMain', (newValue, oldValue) => {
     console.debug(`The idxTabMain name was changed from ${oldValue} to ${newValue}!`);
@@ -86,7 +92,7 @@ function validateStoreModule(idx, bcode, bstate) {
   if (bstate) {
     // retour de l'onglet jsonEditor
     const ctrlStr = JSON.stringify(storeModule.stateDataMock);
-    if (storeModule.lastEditorAppStateValue != ctrlStr) {
+    if (storeModule.lastEditorAppStateValue!=null && storeModule.lastEditorAppStateValue != ctrlStr) {
       $xui.saveStoreNamespace=storeModule.nameModule;
       $xui.doStoreOnNextReload = true;
       $xui.refreshAction('template:reload-json'); // recharge le json
@@ -124,6 +130,32 @@ function onChangeRightPanelTab(instanceVue) {
 function onChangeDesignerTab(instanceVue) {
   instanceVue.$watch('main.idxTabDesigner', (newValue, oldValue) => {
     $xui.SelectorManager.unDisplaySelector();
+    const exampleCss = "// example :  .aClass {}";
+    if (newValue==$xui.DesignTabEnum.DEV)
+    {
+      const infoFile = $xui.pageDesignManager.getInfoFile("template");
+      const propValue = $xuicore.getPropertieFromXUI(infoFile, "root", "rootcss");
+
+      const rootdata = $xui.getAppState().main;
+      if (propValue==null)
+        rootdata.infodev.csseditor= exampleCss;
+      else
+        rootdata.infodev.csseditor= propValue;
+    }
+
+    if (oldValue==$xui.DesignTabEnum.DEV)
+    {
+      const rootdata = $xui.getAppState().main;
+      const jsonProp = [{
+        xid : "root",
+        variable : "rootcss",
+        value : rootdata.infodev.csseditor,
+        bind : "@"
+      }];
+      console.debug("save css");
+      $xuicore.saveDesignPropertiesXUI($xui.pageDesignManager.getInfoFile("template"), jsonProp);
+    }
+
   }, { deep: true });
 }
 

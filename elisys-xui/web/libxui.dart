@@ -72,11 +72,15 @@ external set _getActionsXUI(
 external set _getEventMethodsXUI(
     dynamic Function(FileDesignInfo, String) f);
 
+
+@JS('getPropertieFromXUI')
+external set _getPropertieFromXUI(
+    void Function(FileDesignInfo, String, String) f);
+
 /// retourne les properties
 @JS('getPropertiesXUI')
 external set _getPropertiesXUI(
     void Function(FileDesignInfo, String, String, int) f);
-
 
 @JS('getDesignPropertiesXUI')
 external set _getDesignPropertiesXUI(
@@ -126,7 +130,7 @@ Future refreshPageXUI(FileDesignInfo fileInfo) async {
     await _initStoreVersion(designManager, fileInfo, ctx);
   }
 
-  //TODO boucle for sur les namespace
+
   if (fileInfo.action == "reload-json") {
     // affecte le text de l'editor uniquement
     if (fileInfo.saveStoreModuleNamespace!="")
@@ -197,6 +201,11 @@ void getDesignPropertiesXUI(
   ret.pathConditional = designInfo.listConditionalPath;
 
   doPromiseJS("getDesignProperties", ret);
+}
+
+dynamic getPropertieFromXUI(FileDesignInfo fileInfo, String id, String variable) {
+     var prop = _getDesignManager(fileInfo).getXUIEngine().getXUIPropertyFromDesign(id, variable);
+     return prop==null?null : prop.content;
 }
 
 dynamic getPropertiesXUI(FileDesignInfo fileInfo, String id, String? idslot, int deep) {
@@ -502,7 +511,7 @@ Future _reloadTemplate(FileDesignInfo fileInfo) async {
 
   List listReloader = [];
   designMgr.listXidChanged.forEach((key) {
-    var reloaderId = designMgr.getXUIEngine().getReloaderID(key);
+    var reloaderId = designMgr.getXUIEngine().getReloaderID(key, fileInfo);
 
     if (XUIConfigManager.verboseReloader) {
       XUIConfigManager.printc("****** reloader : changed xid  " +
@@ -573,6 +582,7 @@ void main() async {
   _changeNbChildXUI = allowInterop(changeNbChildXUI);
   _getInfoXUI = allowInterop(getInfoXUI);
   _getPropertiesXUI = allowInterop(getPropertiesXUI);
+  _getPropertieFromXUI = allowInterop(getPropertieFromXUI);
   _getDesignPropertiesXUI = allowInterop(getDesignPropertiesXUI);
   _saveDesignPropertiesXUI = allowInterop(saveDesignPropertiesXUI);
   _getComponentsXUI = allowInterop(getComponentsXUI);

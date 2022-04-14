@@ -1,10 +1,10 @@
 <xui-factory version="1.0">
 
 	<xui-doc xid="page">
+		<xui-prop var="title" editor="text">Default Page title</xui-prop>
 		<xui-prop var="darkApp" cat="vstyle" editor="bool-no-bind">dark app</xui-prop>
 		<xui-prop var="nbpage" def="0" editor="int-no-bind">nb page</xui-prop>
 		<xui-prop var="binding" cat="config" editor="text">Data Binding</xui-prop>
-
 		<xui-prop id="name">Application</xui-prop>
 		<xui-prop id="desc">L'application</xui-prop>
 		<xui-prop id="icon">mdi-application-cog</xui-prop>
@@ -57,7 +57,7 @@
 		<!--  https://animate.style/ --->
 		<link rel="preload" href="./app/vue/vue2frame.css" as="style"
 			onload="this.onload=null;this.rel='stylesheet'">
-
+		<xui-inject-text xui-path="data-css"></xui-inject-text>	
 		<script defer src="https://cdn.jsdelivr.net/npm/vue@2.x"></script>
 		<script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
 		<script defer src="./app/vue/vuexHelper.js"></script>
@@ -78,7 +78,7 @@
 		<div id="app">
 			<div class="sk-plane" style="margin: 40vh auto"></div>
 		</div>
-
+		<!----------------------------------------------------------------------------------->
 		<template id="xui-root-template" dark=[[darkApp@0+]]>
 			<transition :duration="main.animationDuration" name="xui-class-transition" 
 				:enter-active-class="main.animationNameEnter"
@@ -93,7 +93,7 @@
 			<xui-temporary xid="xui-temporary-slot"></xui-temporary>
 		</template>
 
-		<!-- les pages -->
+		<!---------------------------------- les pages -------------------------------------->
 		<xui-page-template xid="page" xui-for-nbvar="nbpage@0+"></xui-page-template>
 
 	</xui-design>

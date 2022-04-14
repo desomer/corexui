@@ -213,16 +213,37 @@ class XUIActionManager {
     return ret;
   }
 
+  /*************************************************************************************************/
+  XUIElementXUI _getOrCreateDesignElem(String xidDest) {
+    late XUIElementXUI xuiElem;
+    if (engine.xuiFile.designs[xidDest]!=null && engine.xuiFile.designs[xidDest]!.list.length>0 )
+    {
+        xuiElem=engine.xuiFile.designs[xidDest]!.list[0].elemXUI;
+    }
+    else
+    {
+    // ajoute un xuidesign sur le parent pour ajouter le child
+      xuiElem = XUIElementXUI();
+      xuiElem.xid = xidDest;
+      xuiElem.idRessource = engine.xuiFile.reader.id;
+      engine.xuiFile.designs[xidDest] ??= DicoOrdered();
+      engine.xuiFile.designs[xidDest]!
+          .add(XUIDesign(xuiElem, MODE_ALL, 0));
+    }
+    return xuiElem;
+  }
+
+  /*************************************************************************************************/
   UndoAction? cloneDesign(XUICloneDicoItem cloneInfo, String? mode) {
     SlotInfo? infoSrc = engine.getSlotInfo(cloneInfo.xidSrc, cloneInfo.xidSrc);
     if (infoSrc != null) {
       cloneInfo.xidNew = _getNewXid(cloneInfo.xidDest!, infoSrc.implement!);
 
-      print("**** start clone " +
+      print("**** start clone by html crawl " +
           cloneInfo.xidSrc +
-          " => " +
+          " => new " +
           cloneInfo.xidNew! +
-          " to " +
+          " to dest " +
           cloneInfo.xidDest!);
       _addClone(infoSrc, cloneInfo, mode);
 
@@ -237,52 +258,67 @@ class XUIActionManager {
   void _addClone(SlotInfo infoSrc, XUICloneDicoItem cloneInfo, String? mode) {
     var tag = infoSrc.implement;
 
-    // ajoute un xuidesign sur le parent pour ajouter le child
-    XUIElementXUI xuiElem = XUIElementXUI();
-    xuiElem.xid = cloneInfo.xidDest!;
-    xuiElem.idRessource = engine.xuiFile.reader.id;
+    print("**** _addClone implement " + tag! + " src= "+
+    cloneInfo.xidSrc +
+    " => new " +
+    cloneInfo.xidNew! +
+    " to dest " +
+    cloneInfo.xidDest!);
+
+    XUIElementXUI xuiDesignElem = _getOrCreateDesignElem(cloneInfo.xidDest!);
+
     XUIElementXUI child = XUIElementXUI();
     child.idRessource = engine.xuiFile.reader.id;
     child.xid = cloneInfo.xidNew!;
     child.tag = tag;
-    xuiElem.children ??= [];
-    xuiElem.children!.add(child);
-    engine.xuiFile.designs[cloneInfo.xidDest!] ??= DicoOrdered();
-    engine.xuiFile.designs[cloneInfo.xidDest]!
-        .add(XUIDesign(xuiElem, MODE_ALL, 0));
+    xuiDesignElem.children ??= [];
+    xuiDesignElem.children!.add(child);
 
     //clone du design (les propertiesXUI)  en ajoutant un xuidesign sur le child
     XUIDesign? design = _getXUIDesign(infoSrc, mode);
     if (design != null) {
       if (design.elemXUI.propertiesXUI != null) {
-        XUIElementXUI xuiElem = XUIElementXUI();
-        xuiElem.xid = cloneInfo.xidNew!;
-        xuiElem.idRessource = engine.xuiFile.reader.id;
-        engine.xuiFile.designs[cloneInfo.xidNew!] ??= DicoOrdered();
-        engine.xuiFile.designs[cloneInfo.xidNew]!
-            .add(XUIDesign(xuiElem, MODE_ALL, 0));
 
-        xuiElem.propertiesXUI = HashMap();
-        design.elemXUI.propertiesXUI!.forEach((k, v) {
-          if (v is XUIPropertyBinding)
-          {
-            XUIProperty cloneProp = XUIPropertyBinding(v.content, v.namespace, v.binding);
-            xuiElem.propertiesXUI![k] = cloneProp;
-          }
-          else
-          {
-            XUIProperty cloneProp = XUIProperty(v.content);
-            xuiElem.propertiesXUI![k] = cloneProp;
-          }
-        });
+        print("<_addClone> copie prop from " + infoSrc.xid! + " to " + cloneInfo.xidNew!); 
+
+        XUIElementXUI xuiDesignElem = _getOrCreateDesignElem(cloneInfo.xidNew!);
+        _cloneProp(xuiDesignElem, design);
       }
     }
   }
 
-  void _cloneChildHtml(XUICloneDico dico, XUIElementHTML elem, String? mode) {
-    if (elem.children != null) {
-      for (var childHtml in elem.children!) {
+  void _cloneProp(XUIElementXUI xuiDesignElem, XUIDesign design) {
+    xuiDesignElem.propertiesXUI = HashMap();
+    design.elemXUI.propertiesXUI!.forEach((k, v) {
+      if (v is XUIPropertyBinding)
+      {
+        XUIProperty cloneProp = XUIPropertyBinding(v.content, v.namespace, v.binding);
+        xuiDesignElem.propertiesXUI![k] = cloneProp;
+      }
+      else
+      {
+        XUIProperty cloneProp = XUIProperty(v.content);
+        xuiDesignElem.propertiesXUI![k] = cloneProp;
+      }
+    });
+  }
+
+  void _cloneChildHtml(XUICloneDico dico, XUIElementHTML elemHTML, String? mode) {
+   // print("_cloneChildHtml on src" + (elemHTML.originElemXUI?.xid??"?") ) ; 
+
+    if (elemHTML.originElemXUI?.xid!=null && elemHTML.designBy!=null)
+    {
+       for (var design in elemHTML.designBy!) {
+              if (mode == null || design.mode == mode) {
+                _doCloneOnlyDesign(dico, design.elemXUI , mode);
+              }
+          }
+    }
+
+    if (elemHTML.children != null) {
+      for (var childHtml in elemHTML.children!) {
         if (childHtml is XUIElementHTML) {
+          
           //pas les commentaire
           if (childHtml.designBy != null) {
             for (var design in childHtml.designBy!) {
@@ -292,19 +328,21 @@ class XUIActionManager {
                   for (var childDesign in design.elemXUI.children!) {
                     if (childDesign is XUIElementXUI &&
                         childDesign.xid != null) {
-                      _doClone(dico, design.elemXUI, childDesign, mode);
+                      _doCloneAndCalcXID(dico, design.elemXUI, childDesign, mode);
                     }
                   }
-                } else {
+                } // else {
                   // cas des enfants (designable) ajouter par les parent sans design (ex: xui-title-1 dans xui-list-item-1)
-                  print("****** test doCloneOnlyDesign " + design.elemXUI.xid!);
+                /////////////////////   print("****** _cloneChildHtml doCloneOnlyDesign " + design.elemXUI.xid!);
                   //SlotInfo info = engine.getSlotInfo(design.elemXUI.xid, design.elemXUI.xid);
                   //SlotInfo infoParent = engine.getSlotInfo(info.parentXid, info.parentXid);
-                  _doCloneOnlyDesign(dico, design.elemXUI, mode);
-                }
+                 // _doCloneOnlyDesign(dico, design.elemXUI, mode);
+              //  }
               }
             }
           }
+
+          // continue le crawl de l'html
           _cloneChildHtml(dico, childHtml, mode);
         }
       }
@@ -312,19 +350,20 @@ class XUIActionManager {
   }
 
   void _doCloneOnlyDesign(
-      XUICloneDico dico, XUIElementXUI parent, String? mode) {
-    var idxParentStartNum = parent.xid!.indexOf("_");
-    var idxParentEndNum = parent.xid!.indexOf("-", idxParentStartNum);
+      XUICloneDico dico, XUIElementXUI elemSrc, String? mode) {
+    var idxParentStartNum = elemSrc.xid!.indexOf("_");
+    var idxParentEndNum = elemSrc.xid!.indexOf("-", idxParentStartNum);
 
     if (idxParentEndNum == -1) {
       // ne provient pas d'un slot
+       print("******  doCloneOnlydesign no slot  xidSrc=<"+ elemSrc.xid! +">");
       return;
     }
 
-    var xidSrc = parent.xid!.substring(0, idxParentEndNum);
-    var slotNameSuffix = parent.xid!.substring(xidSrc.length);
+    var xidSrc = elemSrc.xid!.substring(0, idxParentEndNum);
+    var slotNameSuffix = elemSrc.xid!.substring(xidSrc.length);
     var newIDSlot = dico.dico[xidSrc]!.xidNew! + slotNameSuffix;
-    var xidClone = parent.xid;
+    var xidClone = elemSrc.xid;
 
     print("****** doCloneOnlydesign  xidSrc=<" +
         xidClone! +
@@ -341,23 +380,17 @@ class XUIActionManager {
     XUIDesign? design = _getXUIDesign(infoSrc, mode);
     if (design != null) {
       if (design.elemXUI.propertiesXUI != null) {
-        XUIElementXUI xuiElem = XUIElementXUI();
-        xuiElem.xid = cloneInfo.xidNew!;
-        xuiElem.idRessource = engine.xuiFile.reader.id;
-        engine.xuiFile.designs[cloneInfo.xidNew!] ??= DicoOrdered();
-        engine.xuiFile.designs[cloneInfo.xidNew]!
-            .add(XUIDesign(xuiElem, MODE_ALL, 0));
 
-        xuiElem.propertiesXUI = HashMap();
-        design.elemXUI.propertiesXUI!.forEach((k, v) {
-          XUIProperty cloneProp = XUIProperty(v.content);
-          xuiElem.propertiesXUI![k] = cloneProp;
-        });
+        print("<_doCloneOnlyDesign> copie prop from " + infoSrc.xid! + " to " + cloneInfo.xidNew!); 
+
+        XUIElementXUI xuiDesignElem = _getOrCreateDesignElem(cloneInfo.xidNew!);
+        _cloneProp(xuiDesignElem, design);
+
       }
     }
   }
 
-  void _doClone(XUICloneDico dico, XUIElementXUI parent, XUIElementXUI srcElem,
+  void _doCloneAndCalcXID(XUICloneDico dico, XUIElementXUI parent, XUIElementXUI srcElem,
       String? mode) {
     //SlotInfo info = engine.getSlotInfo(childDesign.xid, childDesign.xid);
     // var design = _getXUIDesignParent(info, mode);
@@ -397,6 +430,8 @@ class XUIActionManager {
       _addClone(infoSrc, cloneInfo, mode);
     }
   }
+  /************************************************************************************************ */
+
 
   ///------------------------------------------------------------------------------------
   UndoAction removeDesign(String xid, String? mode, [bool withChild = true]) {

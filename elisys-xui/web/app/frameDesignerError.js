@@ -5,7 +5,6 @@ const observer = new ReportingObserver((reports, observer) => {
     }
 }, { buffered: true });
 
-console.log("***************start reporting ********************");
 observer.observe();
 
 window.onunhandledrejection = function (e) {
@@ -20,7 +19,7 @@ window.addEventListener('error', function (e) {
 })
 
 window.onerror = (msg, url, lineNo, columnNo, error) => {
-    console.log("***************error reporting OK ********************");
+    console.log("*************** error reporting OK *******************");
     const string = msg.toLowerCase();
     const substring = "script error";
     if (string.includes(substring)) {
@@ -84,4 +83,4 @@ var SpecifiedError = function SpecifiedError(message) {
 SpecifiedError.prototype = new Error();
 SpecifiedError.prototype.constructor = SpecifiedError;
 
-console.log("***************start reporting OK ********************");
+console.log("*************** start reporting OK ********************");

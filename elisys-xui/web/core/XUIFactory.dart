@@ -136,8 +136,9 @@ class XUIModel implements Comparable<XUIModel> {
       engine.xuiFile.searchDesign(listDico, xid);
 
       for (var dico in listDico) {
-        for (var item in dico.sort(engine.xuiFile.context)) {
-          await item.processPhase1(engine, elemHtml);
+        for (var design in dico.sort(engine.xuiFile.context)) {
+          design.use=true;
+          await design.processPhase1(engine, elemHtml);
         }
       }
     }

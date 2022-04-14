@@ -219,9 +219,12 @@ function getDisplayInfo(s, targetAction) {
         if (targetAction.tagName == "INPUT") {
             targetAction = targetAction.closest(".v-input");
         }
-        if (targetAction.parentNode.classList.contains("v-input__slot")) {
+        if (targetAction.parentNode.classList!=null && targetAction.parentNode.classList.contains("v-input__slot")) {
             targetAction = targetAction.closest(".v-input");
         }
+
+        if (targetAction.parentNode==window.document)
+            return "html";
 
 
         let sp = getComputedStyle(targetAction.parentNode);
@@ -234,7 +237,7 @@ function getDisplayInfo(s, targetAction) {
             displayMode = displayMode + " " + sp.flexDirection;
         }
 
-        console.debug(">>>>>>>>>>>>>>>>>>>>>> parent", targetAction.parentNode);
+        // console.debug(">>>>>>>>>>>>>>>>>>>>>> parent", targetAction.parentNode);
     }
 
     return displayMode;
@@ -270,7 +273,7 @@ function jsonPathToValue(data, path) {
 
 window.addEventListener('message', (e) => {
     const data = e.data;
-    if (data.action != "getInfoForSelector") {
+    if (data.action != "getInfoForSelector" && data.action!="doChangeComponent") {
         console.debug("--- CORE --- message ", data);
     }
 
@@ -280,7 +283,7 @@ window.addEventListener('message', (e) => {
             console.debug("changeJS ", data, $xui.modulesManager);
             const module = data.param.namespace;
             for (const mth of data.param.actions) {
-                const m = `(p1, p2) => {\n${mth.code}\n};`;
+                const m = `async (p1, p2) => {\n${mth.code}\n};`;
                 $xui.modulesManager.addAction(module, mth.name, `${m}\n//# sourceURL=${module}-${mth.name}.js;`);
             }
             $xui.modulesManager.reload();

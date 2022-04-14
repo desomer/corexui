@@ -199,9 +199,9 @@ $xui.saveCodeAction = async (storeModule) => {
     const rootdata = $xui.getAppState().main;
 
     // validate JS syntaxe
-    const acorn = await globalThis.requireXUI.require('https://cdn.jsdelivr.net/npm/acorn-6to5@0.11.1-31/acorn_csp.min.js');
+    const acorn = await globalThis.requireXUI.require('https://cdn.jsdelivr.net/npm/acorn@8.7.0/dist/acorn.min.js'); // 'https://cdn.jsdelivr.net/npm/acorn-6to5@0.11.1-31/acorn_csp.min.js');
     try {
-        const ok = acorn.parse(storeModule.currentCode, {ecmaVersion: "latest"});
+        const ok = acorn.parse("let fct = async ()=> {\n"+ storeModule.currentCode +" }", {ecmaVersion: "latest"});
         console.debug("*********** AST *************", ok);
     } catch (error) {
         console.debug(error.message, error);

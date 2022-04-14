@@ -79,6 +79,11 @@ $xui.loadPageJS = (html, options) => {
 $xui.changePageJS = (param) => {
     console.debug("changePageJS options ---- ", param);
     $xui.pageDesignManager.changePageOnFrame(param);
+    if ($xui.selectPathCmp!=null)
+    {
+        console.debug("reselect path " + $xui.selectPathCmp);
+        $xui.doPathSelectAction($xui.selectPathCmp);
+    }
     doPromiseJS("AfterChangeDisplayProperties");
 };
 
@@ -139,7 +144,7 @@ const mapAction = {
 $xui.isModePreview = false;
 $xui.modeDisplaySelection = true;
 
-$xui.setCurrentAction = (actionName) => {
+$xui.setCurrentAction = (actionName, onXid) => {
     const rootdata = $xui.getAppState().main;
     if (currentAction != null) {
         throw (new SpecifiedError(`action déjà en cours ${actionName} => ${lastAction}`));
@@ -190,6 +195,12 @@ $xui.setCurrentAction = (actionName) => {
 
     if (undisplaySelector)
         $xui.SelectorManager.unDisplaySelector();
+
+
+    let pathCmp = $xui.getPathActionByXid(onXid??$xui.propertiesDesign.xid);    
+
+    if (pathCmp!=null)
+        $xui.selectPathCmp=pathCmp;
 
     // setCurrentAction  => puis appel XUI
     // puis  <changePage>  (affichage du code et save localstorage)  : retour du xui
@@ -352,7 +363,7 @@ $xui.redo = () => {
 
 
 $xui.addCmp = (cmp) => {
-    $xui.setCurrentAction("addCmp");
+    $xui.setCurrentAction("addCmp",$xui.propertiesComponent.xid);
     console.debug("addCmp", cmp, $xui.propertiesComponent);
     $xui.addCmpXID($xui.propertiesComponent.xid, cmp.xid);
 }

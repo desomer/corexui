@@ -3,7 +3,7 @@
 //--------------------------------------------------------------------------------------------------------
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-function initPathTo(pathTo) {
+function _initPathTo(pathTo) {
     const rootdata = $xui.getAppState().main;
     let parent = rootdata.activeSlot[0];
     let hasRouteDefine = false;
@@ -63,7 +63,7 @@ $xui.selectCmp = async () => {
     if (rootdata.activeSlot.length>0)
     {
         const pathTo = [];
-        initPathTo(pathTo);
+        _initPathTo(pathTo);
 
         for (const action of pathTo) {
             if (action.startsWith("router:"))
@@ -84,7 +84,13 @@ $xui.selectCmp = async () => {
 }
 
 $xui.goToClick =async (xid) => {
-    const node = document.querySelector("#rootFrame").contentWindow.document.querySelectorAll(`[data-xid-slot=${xid}]`);
+    let node = document.querySelector("#rootFrame").contentWindow.document.querySelectorAll(`[data-xid-slot=${xid}]`);
+
+    if (node.lenght==0)
+    {
+        document.querySelector("#rootFrame").contentWindow.document.querySelectorAll(`[data-xid-slot-${xid}=true]`);
+    }
+
     if (node.lenght>=0)
         node[0].click();
     await pause(300);

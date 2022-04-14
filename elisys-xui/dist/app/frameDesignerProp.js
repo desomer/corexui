@@ -152,20 +152,21 @@ $xui.getEventMethodsXUI= (namespace) =>
     return ret;
 }
 
-$xui.loadCodeAction = (idx) => {
+$xui.loadCodeAction = async (idx) => {
 
     const storeModule = $xui.getCurrentStoreModule();
 
     if (storeModule.currentCodeIdx>=0)  
     {
-    $xui.saveCodeAction(storeModule);
+        const saveOk = await $xui.saveCodeAction(storeModule);
+        if (!saveOk)
+            return;
     }
 
     if (idx<0)
     {
-    return;
+        return;
     }
-
 
     storeModule.currentCodeName = `function ${storeModule.ListActions[idx].name}()`;
     storeModule.currentCode= storeModule.ListActions[idx].code;
@@ -193,9 +194,21 @@ $xui.saveCodeAction = async (storeModule) => {
     
     const code = storeModule.ListActions[idx].code;
     if (code==storeModule.currentCode)
-        return;
+        return true;
 
+    const rootdata = $xui.getAppState().main;
 
+    // validate JS syntaxe
+    const acorn = await globalThis.requireXUI.require('https://cdn.jsdelivr.net/npm/acorn@8.7.0/dist/acorn.min.js'); // 'https://cdn.jsdelivr.net/npm/acorn-6to5@0.11.1-31/acorn_csp.min.js');
+    try {
+        const ok = acorn.parse("let fct = async ()=> {\n"+ storeModule.currentCode +" }", {ecmaVersion: "latest"});
+        console.debug("*********** AST *************", ok);
+    } catch (error) {
+        console.debug(error.message, error);
+        rootdata.openDialogError =true;
+        rootdata.dialogError_text = error.message;
+        return false;
+    }
 
     const jsonProp = [{
         xid : storeModule.ListActions[idx].xid,
@@ -204,16 +217,16 @@ $xui.saveCodeAction = async (storeModule) => {
         bind : "@"
     }];
 
-    storeModule.ListActions[idx].code = storeModule.currentCode;
     $xuicore.saveDesignPropertiesXUI($xui.pageDesignManager.getInfoFile("template"), jsonProp);
+
+    storeModule.ListActions[idx].code = storeModule.currentCode;
     storeModule.currentCodeIdx=-1;
 
-    const rootdata = $xui.getAppState().main;
     rootdata.snackbar_text = `Change mth ${storeModule.nameModule}/${storeModule.ListActions[idx].name}`;
     rootdata.snackbar_timeout = 2000;
     rootdata.snackbar = true;
 
     document.querySelector("#rootFrame").contentWindow.postMessage({ "action": "changeJS", "param": {namespace : storeModule.nameModule ,  actions: storeModule.ListActions } }, "*");
-
+    return true;
 }
 

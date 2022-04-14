@@ -605,12 +605,13 @@
         <xui-prop id="favorite">listitem</xui-prop>
         <xui-prop id="exclude">container</xui-prop>
         <xui-prop id="type">conditional</xui-prop>
-
+        <xui-prop var="class" cat="class" editor="class">class</xui-prop>
+        <xui-prop var="style" cat="style" editor="style">style</xui-prop>
         <xui-prop var=":varactive" editor="var" def="showDialog" bind-type="bool">active var name</xui-prop>
-
+        <xui-prop var="max-width" editor="text">max width</xui-prop>
     </xui-doc>
 
-    <v-dialog xid="xui-dialog-1" v-model="[[:varactive]]"  max-width="290">
+    <v-dialog xid="xui-dialog-1" v-model="[[:varactive]]" class="[[class]]" -style="[[style]]" max-width="[[max-width]]">
        <!--fullscreen hide-overlay persistent scrollable width    transition="dialog-bottom-transition"-->
        <xui-slot xid="[[parent-xid]]-slot" xui-reloader=true xui-slot-name="Dialog slot" xui-doc-id="DialogSlot"></xui-slot>
     </v-dialog>

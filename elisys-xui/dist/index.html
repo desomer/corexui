@@ -1,7 +1,7 @@
 <html style="height:100%;">
    <head>
       <meta charset="utf-8"></meta>
-      <title>[title]</title>
+      <title>Material App Generator</title>
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover"></meta>
       <meta name="mobile-web-app-capable" content="yes"></meta>
       <meta name="apple-mobile-web-app-capable" content="yes"></meta>
@@ -18,8 +18,8 @@
       <script defer src="https://cdn.jsdelivr.net/npm/vue@2.x"></script>
       <script defer src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
       <script defer src="./app/vue/vuexHelper.js"></script>
-      <link rel="preload" href="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/themes/prism.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
-      <link rel="preload" as="style" href="https://unpkg.com/vue-prism-editor/dist/prismeditor.min.css" onload="this.onload=null;this.rel='stylesheet'"></link>
+      <link rel="preload" href="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/themes/prism.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
+      <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/vue-prism-editor@1.3.0/dist/prismeditor.min.css" onload="this.onload=null;this.rel='stylesheet'"></link>
       <link rel="preload" href="app/frameDesigner.css" as="style" onload="this.onload=null;this.rel='stylesheet'"></link>
    </head>
    <body style="height:100%;">
@@ -34,12 +34,45 @@
       <template id="page-0">
          <v-app style="width:100vw">
             <template id="page-0-route-0">
-               <v-container fluid fill-height align-start>
-                  <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;" centered>
+               <v-container fluid fill-height align-start pa-0>
+                  <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;" centered v-model="home.idxHomeMainTab">
                      <v-tab>
-                        <span>APPS</span>
+                        <span>welcome</span>
+                        <v-btn icon>
+                           <v-icon>mdi-alpha-w-box</v-icon>
+                        </v-btn>
+                     </v-tab>
+                     <v-tab-item eager>
+                        <div style="flex: 1 0 auto">
+                           <session class="xui-session">
+                              <v-img class="xui-class-slot-full" src="https://images.unsplash.com/photo-1637625854255-d893202554f4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80">
+                                 <v-row class="flex-column  false  xui-class-slot-full" style="flex-direction: column;">
+                                    <v-col class="xui-column text-center  mt-12" cols="auto">
+                                       <span class="text-h3">build free responsive web apps without code</span>
+                                    </v-col>
+                                    <v-col class="xui-column text-center  mt-12" cols="auto">
+                                       <span class="text-h4">Generate code and export in developer IDE </span>
+                                    </v-col>
+                                    <v-col class="xui-column text-center  mt-12" cols="auto">
+                                       <v-btn rounded x-large @click="$mth('home/goToTemplate', ...arguments)" color="#ff5900" dark>Choose a Starting Point</v-btn>
+                                    </v-col>
+                                 </v-row>
+                              </v-img>
+                           </session>
+                        </div>
+                     </v-tab-item>
+                     <v-tab>
+                        <span>MY APPS</span>
                         <v-btn icon>
                            <v-icon>mdi-apps</v-icon>
+                        </v-btn>
+                     </v-tab>
+                     <v-tab-item eager>
+                     </v-tab-item>
+                     <v-tab>
+                        <span>templates</span>
+                        <v-btn icon>
+                           <v-icon>mdi-play-box-multiple</v-icon>
                         </v-btn>
                      </v-tab>
                      <v-tab-item eager>
@@ -62,28 +95,20 @@
                            </v-col>
                         </v-row>
                      </v-tab-item>
-                     <v-tab>
-                        <span>templates</span>
-                        <v-btn icon>
-                           <v-icon>mdi-play-box-multiple</v-icon>
-                        </v-btn>
-                     </v-tab>
-                     <v-tab-item eager>
-                     </v-tab-item>
                   </v-tabs>
                </v-container>
             </template>
-            <v-app-bar app dark height="32" color="#ff5900">
+            <v-app-bar app light flat color="white">
                <v-app-bar-nav-icon @click.stop="main.isNavdrawerOpen = !main.isNavdrawerOpen"></v-app-bar-nav-icon>
                <v-toolbar-title>
-                  <span>App Code Generator</span>
+                  <span class="font-weight-medium">Elisys App Code Generator</span>
                </v-toolbar-title>
                <v-spacer></v-spacer>
                <v-btn icon>
-                  <v-icon>mdi-help</v-icon>
+                  <v-icon>mdi-help mdi-36px</v-icon>
                </v-btn>
-               <v-btn icon>
-                  <v-icon>mdi-account</v-icon>
+               <v-btn @click="$mth('main/doLogin', ...arguments)" icon>
+                  <v-icon>mdi-account mdi-36px</v-icon>
                </v-btn>
             </v-app-bar>
             <v-navigation-drawer v-model="main.isNavdrawerOpen" temporary app>
@@ -93,9 +118,34 @@
                   <router-view ref="routerview"></router-view>
                </transition>
             </v-main>
-            <v-footer app height="32" dark color="#ff5900" class="pt-1">
+            <v-footer app height="32" light color="white" class="pt-1">
+               <v-spacer></v-spacer>
+               <span>Version 0.8.5   06/03/22 &#169; Desomer G</span>
             </v-footer>
-            <template></template>
+            <template>
+               <v-dialog v-model="main.showLogin" max-width="500">
+                  <div class="fill-height xui-p-relative">
+                     <v-card v-ripple="{ center: false, class: 'black--text' }">
+                        <v-img height="150px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5joF9bHglsIgbGwAIRccZHgAeT3VW9qvtwiYMQdVvwlvQ5m0B6T615teyl35Vll_7PzU&usqp=CAU">
+                        </v-img>
+                        <v-card-text>
+                           <v-row class="flex-column  fill-height" style="flex-direction: column;">
+                              <v-col class="xui-column">
+                                 <v-text-field dense hide-details v-model="main.login" label="Mail"></v-text-field>
+                              </v-col>
+                              <v-col class="xui-column">
+                                 <v-text-field dense hide-details v-model="main.password" label="Password"></v-text-field>
+                              </v-col>
+                              <v-col class="xui-column">
+                                 <v-btn @click="$mth('main/doConnect', ...arguments)">Login</v-btn>
+                                 <v-btn class="ml-5" @click="$mth('main/doDisconnect', ...arguments)">Logout</v-btn>
+                              </v-col>
+                           </v-row>
+                        </v-card-text>
+                     </v-card>
+                  </div>
+               </v-dialog>
+            </template>
          </v-app>
       </template>
       <template id="page-1">
@@ -794,6 +844,18 @@
             {{ item.text }}
         </v-snackbar>
             </div>
+            <v-dialog ref="dialogError" v-model="main.openDialogError">
+               <v-snackbar v-model="main.openDialogError" class="pt-0" elevation="12" centered color="red">
+ 
+            {{ main.dialogError_text }}
+                              <template v-slot:action="{ attrs }">
+                     <v-btn color="white" text v-bind="attrs" @click="main.openDialogError = false">
+                    Close
+                </v-btn>
+                  </template>
+               </v-snackbar>
+            </v-dialog>
+            <div id="firebaseui-auth-container"></div>
             <v-app-bar app dark height="32" color="#ff5900">
                <v-app-bar-nav-icon></v-app-bar-nav-icon>
                <v-toolbar-title>
@@ -1599,7 +1661,7 @@
    <script>
  // ------ ici le store vuex dynamique ---------;
         globalThis.initialiseAppState = () => {
-        const modulesManager = new VuexModuleManager();
+        const modulesManager = new VuexModuleManager($xui.vuejs);
 
         const home = modulesManager.addModule("home", {
             "listTemplate": [
@@ -1625,6 +1687,10 @@
         });
 
         const main = modulesManager.addModule("main", {
+            "idxHomeMainTab": 0,
+            "showLogin": false,
+            "login": "",
+            "password": "",
             "urlApp": "urlapp",
             "frameTemplate": "",
             "frameName": "",
@@ -1744,7 +1810,12 @@
         });
 
         home.actions={
-          doSelectTemplate : (p1, p2) => {
+          goToTemplate : async (p1, p2) => {
+        const state = $xui.vuejs.$store.state;
+        state.home.idxHomeMainTab=2;
+        //# sourceURL=home-goToTemplate.js;
+        },
+          doSelectTemplate : async (p1, p2) => {
         const state = $xui.vuejs.$store.state;
          const sel = state.home.listTemplate[$xui.info["home.listTemplate"]];
          console.debug("doSelectTemplate", sel );
@@ -1753,95 +1824,107 @@
         },}
 
         main.actions={
-          doSelectChildPath : (p1, p2) => {
+          doLogin : async (p1, p2) => {
+        $xui.getAppState().main.showLogin=true;
+        //# sourceURL=main-doLogin.js;
+        },
+          doConnect : async (p1, p2) => {
+        $xui.connect();
+        //# sourceURL=main-doConnect.js;
+        },
+          doDisconnect : async (p1, p2) => {
+        $xui.disconnect();
+        //# sourceURL=main-doDisconnect.js;
+        },
+          doSelectChildPath : async (p1, p2) => {
         $xui.selectChildPath();
         //# sourceURL=main-doSelectChildPath.js;
         },
-          doSelectConditionalPath : (p1, p2) => {
+          doSelectConditionalPath : async (p1, p2) => {
         $xui.selectConditionalPath();
         //# sourceURL=main-doSelectConditionalPath.js;
         },
-          onActiveSlot : (p1, p2) => {
+          onActiveSlot : async (p1, p2) => {
         $xui.selectCmp();
         //# sourceURL=main-onActiveSlot.js;
         },
-          doExportFile : (p1, p2) => {
+          doExportFile : async (p1, p2) => {
         $xui.downloadPage();
         //# sourceURL=main-doExportFile.js;
         },
-          doExportXUIClipboard : (p1, p2) => {
+          doExportXUIClipboard : async (p1, p2) => {
         $xui.XUIToClipboard();
         //# sourceURL=main-doExportXUIClipboard.js;
         },
-          doImportFile : (p1, p2) => {
+          doImportFile : async (p1, p2) => {
         console.debug("doImportFile", p1, p2);
         $xui.importPage(p2[0]);
  
         //# sourceURL=main-doImportFile.js;
         },
-          doDPDeploy : (p1, p2) => {
+          doDPDeploy : async (p1, p2) => {
         $xui.deploy();
         //# sourceURL=main-doDPDeploy.js;
         },
-          doDPOpenApp : (p1, p2) => {
+          doDPOpenApp : async (p1, p2) => {
         $xui.sendInTab();
         //# sourceURL=main-doDPOpenApp.js;
         },
-          doDPSendAppUrl : (p1, p2) => {
+          doDPSendAppUrl : async (p1, p2) => {
         $xui.sendByMail();
         //# sourceURL=main-doDPSendAppUrl.js;
         },
-          doSelectPath : (p1, p2) => {
+          doSelectPath : async (p1, p2) => {
         $xui.selectPath();
         //# sourceURL=main-doSelectPath.js;
         },
-          doMDFullScreen : (p1, p2) => {
+          doMDFullScreen : async (p1, p2) => {
         $xui.fullScreen();
         //# sourceURL=main-doMDFullScreen.js;
         },
-          doMDMobile : (p1, p2) => {
+          doMDMobile : async (p1, p2) => {
         $xui.modePhone();
         //# sourceURL=main-doMDMobile.js;
         },
-          doMDPreview : (p1, p2) => {
+          doMDPreview : async (p1, p2) => {
         $xui.modePreview();
         //# sourceURL=main-doMDPreview.js;
         },
-          doRefresh : (p1, p2) => {
+          doRefresh : async (p1, p2) => {
         $xui.refreshAction('template:reload');
         //# sourceURL=main-doRefresh.js;
         },
-          doFADelete : (p1, p2) => {
+          doFADelete : async (p1, p2) => {
         $xui.deleteCmp();
         //# sourceURL=main-doFADelete.js;
         },
-          doFACut : (p1, p2) => {
+          doFACut : async (p1, p2) => {
         $xui.cutCmp();
         //# sourceURL=main-doFACut.js;
         },
-          doFACopy : (p1, p2) => {
+          doFACopy : async (p1, p2) => {
         $xui.copyCmp();
         //# sourceURL=main-doFACopy.js;
         },
-          doFAPaste : (p1, p2) => {
+          doFAPaste : async (p1, p2) => {
         $xui.pasteTo();
         //# sourceURL=main-doFAPaste.js;
         },
-          doFAUndo : (p1, p2) => {
+          doFAUndo : async (p1, p2) => {
         $xui.undo();
         //# sourceURL=main-doFAUndo.js;
         },
-          doFARedo : (p1, p2) => {
+          doFARedo : async (p1, p2) => {
         $xui.redo();
         //# sourceURL=main-doFARedo.js;
         },
-          doFAClearAll : (p1, p2) => {
+          doFAClearAll : async (p1, p2) => {
         $xui.clearAll();
         //# sourceURL=main-doFAClearAll.js;
         },}
 
         store.actions={
-          doDPTestAPI : (p1, p2) => {
+          doDPTestAPI : async (p1, p2) => {
         console.debug($xui.vuejs.$store.state.main.currentAPI);
         $xui.callAPI($xui.vuejs.$store.state.main.currentAPI);
         //# sourceURL=store-doDPTestAPI.js;
@@ -1904,10 +1987,10 @@
             }
            </style>
    <script defer src="https://cdn.jsdelivr.net/npm/v-jsoneditor@1.4.2/dist/v-jsoneditor.min.js"></script>
-   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/prism.min.js"></script>
-   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.19.0/components/prism-json.min.js"></script>
-   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.25.0/components/prism-css.min.js"></script>
-   <script defer src="https://unpkg.com/vue-prism-editor"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/prism.min.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/components/prism-json.min.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/components/prism-css.min.js"></script>
+   <script defer src="https://cdn.jsdelivr.net/npm/vue-prism-editor@1.3.0/dist/prismeditor.umd.production.min.js"></script>
    <script defer src="app/clsHelper.js"></script>
    <script defer src="app/clsFileSaver.js"></script>
    <script defer src="app/frameDesignerError.js"></script>
@@ -1921,6 +2004,7 @@
    <script defer src="app/frameDesignerData.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb-min.js"></script>
    <script defer src="https://cdn.jsdelivr.net/npm/qrcode-js-package@1.0.4/qrcode.min.js"></script>
+   <script src="app/frameDesignerFirebase.js" type="module"></script>
    <script type="module">
 
 		import "./app/vue/vue2frame.js";

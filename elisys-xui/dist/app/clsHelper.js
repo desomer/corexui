@@ -42,6 +42,7 @@ globalThis.requireXUI = (function () {
     require.cache = cache;
     require.resolve = resolve;
     require.requireCache = requireCache;
+    require.require = require;
     return require;
 }());
 

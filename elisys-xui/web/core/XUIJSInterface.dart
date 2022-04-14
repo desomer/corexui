@@ -41,6 +41,8 @@ class FileDesignInfo {
 
   external String get saveStoreModuleNamespace;
   external set saveStoreModuleNamespace(String json);
+
+  bool mustReselectCmp = false;
 }
 
 @JS()

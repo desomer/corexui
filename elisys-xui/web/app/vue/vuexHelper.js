@@ -1,14 +1,14 @@
 globalThis.$xui.generateApplicationStoreJS = (listState) =>
 {
 
-    const modulesManager = new $xui.VuexModuleManager();
+    const modulesManager = new $xui.VuexModuleManager($xui.vuejs);
 
     for (const bindstate of listState) {
         const jsonState = JSON.parse(`{${bindstate.state}}`);
         modulesManager.addModule(bindstate.namespace, jsonState);
 
         for (const mth of bindstate.actions) {
-            const m = `(p1, p2) => {\n${mth.code}\n//# sourceURL=${bindstate.namespace}-${mth.name}.js;\n}`;
+            const m = `async (p1, p2) => {\n${mth.code}\n//# sourceURL=${bindstate.namespace}-${mth.name}.js;\n}`;
             modulesManager.modulesDesc[bindstate.namespace].actions[mth.name]=m;
         }
     }
@@ -33,6 +33,10 @@ class VuexModuleManager {
     modulesDesc = {};
     store;
     modules = {};
+
+    constructor(vuejs) {
+        this.$vue = vuejs;
+    }
 
     setStore(store) {
         this.store = store;
@@ -88,8 +92,6 @@ class VuexModuleManager {
             computed,
             methods: {
                 $mth() {
-                    // console.debug("do eval mth", arguments, this);
-
                     if (arguments[1].type=="click") {
                         const elem = arguments[1].target;
                         const targetAction = elem.closest("[data-for-idx]");
@@ -128,7 +130,6 @@ class VuexModuleManager {
     }
 
     reload() {
-        const modules = {}
 
         const newModules = {};
 
@@ -153,7 +154,7 @@ class VuexModuleManager {
     getCode() {
         let result = `globalThis.initialiseAppState = () => {\n`;
         
-        result += `const modulesManager = new VuexModuleManager();\n\n`;
+        result += `const modulesManager = new VuexModuleManager($xui.vuejs);\n\n`;
         let listModule = "";
 
         for (const [namespace, desc] of Object.entries(this.modulesDesc)) {
@@ -319,7 +320,7 @@ class VuexModuleDesc {
         }, {});
 
         return obj;
-    };
+    }
 
 
     syncArray(paths) {

@@ -56,7 +56,7 @@
         let winFrame = document.querySelector("#rootFrame");
         winFrame.srcdoc = html;
         setTimeout(() => {
-            console.debug(window.location.hash);
+            console.debug("*************** set hash on frame <"+window.location.hash + "> ***************");
             winFrame.contentWindow.location.hash = window.location.hash;
         }, 100);
     };

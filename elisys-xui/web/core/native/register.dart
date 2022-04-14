@@ -193,11 +193,12 @@ class NativeInjectFile extends XUIElementNative {
 
 // ignore: constant_identifier_names
 const JS_BINDING="data-binding";
+const CSS_BINDING= "data-css";
 
 ///------------------------------------------------------------------
 class NativeInjectText extends XUIElementNative {
   // dictionnaire de cache de fichier
-  static var cacheText = { JS_BINDING:  StringBuffer() };   //gestion 
+  static var cacheText = { JS_BINDING:  StringBuffer(), CSS_BINDING : StringBuffer() };   //gestion 
 
   static StringBuffer? getcacheText(idResource)
   {
