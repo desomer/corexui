@@ -33,6 +33,54 @@
       </template>
       <template id="page-0">
          <v-app style="width:100vw">
+            <v-app-bar app light flat color="white">
+               <v-app-bar-nav-icon @click.stop="main.isNavdrawerOpen = !main.isNavdrawerOpen"></v-app-bar-nav-icon>
+               <v-toolbar-title>
+                  <span class="font-weight-medium">Elisys App Code Generator</span>
+               </v-toolbar-title>
+               <v-spacer></v-spacer>
+               <v-btn icon>
+                  <v-icon>mdi-help mdi-36px</v-icon>
+               </v-btn>
+               <v-btn @click="$mth('main/doLogin', ...arguments)" icon>
+                  <v-icon>mdi-account mdi-36px</v-icon>
+               </v-btn>
+            </v-app-bar>
+            <v-navigation-drawer v-model="main.isNavdrawerOpen" temporary app>
+            </v-navigation-drawer>
+            <v-main>
+               <transition :duration="main.animationDuration" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
+                  <router-view ref="routerview"></router-view>
+               </transition>
+            </v-main>
+            <v-footer app height="32" light color="white" class="pt-1">
+               <v-spacer></v-spacer>
+               <span>Version 0.8.7   27/04/22 &#169; Desomer Gauthier</span>
+            </v-footer>
+            <template id="xui-condidional">
+               <v-dialog v-model="main.showLogin" max-width="500">
+                  <div class="fill-height xui-p-relative">
+                     <v-card>
+                        <v-img height="180px" src="https://www.pngmart.com/files/3/Sign-Up-Button-PNG-Photos.png">
+                        </v-img>
+                        <v-card-text>
+                           <v-row class="flex-column  fill-height" style="flex-direction: column;">
+                              <v-col class="xui-column">
+                                 <v-text-field dense hide-details v-model="main.login" label="Mail"></v-text-field>
+                              </v-col>
+                              <v-col class="xui-column">
+                                 <v-text-field dense hide-details v-model="main.password" label="Password"></v-text-field>
+                              </v-col>
+                              <v-col class="xui-column">
+                                 <v-btn @click="$mth('main/doConnect', ...arguments)">Login</v-btn>
+                                 <v-btn class="ml-5" @click="$mth('main/doDisconnect', ...arguments)">Logout</v-btn>
+                              </v-col>
+                           </v-row>
+                        </v-card-text>
+                     </v-card>
+                  </div>
+               </v-dialog>
+            </template>
             <template id="page-0-route-0">
                <v-container fluid fill-height align-start pa-0>
                   <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;" centered v-model="home.idxHomeMainTab">
@@ -78,7 +126,7 @@
                      <v-tab-item eager>
                         <v-row class="ma-1" data-for-map="home.listTemplate">
                            <v-col @click="$mth('home/doSelectTemplate', ...arguments)" cols="2" v-bind:data-for-idx="listTemplate_index" v-for="(listTemplate_item, listTemplate_index) in home.listTemplate">
-                              <v-card v-pressanimation="{link:'/page1'}" v-ripple="{ center: false, class: 'black--text' }" class="elevation-4">
+                              <v-card v-pressanimation="{link:'/page1'}" class="elevation-4">
                                  <v-img height="380px" contain v-bind:src="listTemplate_item.picture">
                                  </v-img>
                                  <v-card-text>
@@ -98,58 +146,177 @@
                   </v-tabs>
                </v-container>
             </template>
-            <v-app-bar app light flat color="white">
-               <v-app-bar-nav-icon @click.stop="main.isNavdrawerOpen = !main.isNavdrawerOpen"></v-app-bar-nav-icon>
+         </v-app>
+      </template>
+      <template id="page-1">
+         <v-app style="width:100vw">
+            <v-overlay z-index="6" opacity="0.7" :value="main.overlay">
+               <div style="width: 100%;height: 100%;z-index:1" @click="$xui.modePreview()"></div>
+            </v-overlay>
+            <v-snackbar ref="snack" class="pt-0" elevation="12" v-model="main.snackbar" :timeout="main.snackbar_timeout" top app color="blue-grey">
+
+        {{ main.snackbar_text }}
+                       <template v-slot:action="{ attrs }">
+                  <v-btn color="white" text v-bind="attrs" @click="main.snackbar = false">
+                Close
+            </v-btn>
+               </template>
+            </v-snackbar>
+            <div id="xui-display-selector-popup" class="xui-popup-class" style="position:absolute; top:100px; left: 100px;" @mouseleave="$xui.onActionOver('leave', null)">
+               <v-list dense>
+                  <v-list-item style="min-height: 10px;" v-for="(itemPopup, j) in main.listPopupAdd" :key="j" @click="$xui.doActionPopup(itemPopup)" @mouseenter="$xui.onActionOver('enter',itemPopup)">
+                     <template v-if="itemPopup.type=='divider'">
+                        <v-divider></v-divider>
+                     </template>
+                     <template v-else>
+                        <v-list-item-icon>
+                           <v-icon>{{itemPopup.icon}}</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                           <v-list-item-title>
+                              <span>{{itemPopup.title}}</span>
+                           </v-list-item-title>
+                        </v-list-item-content>
+                     </template>
+                  </v-list-item>
+               </v-list>
+            </div>
+            <v-dialog v-model="main.openDialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
+               <v-card>
+                  <div class="white--text elevation-6" style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
+                     <v-card-title>Class & style</v-card-title>
+                  </div>
+                  <div style="height:65vh; overflow-y: scroll;">
+                     <cmp-list-class></cmp-list-class>
+                  </div>
+                  <v-card-actions class="elevation-6">
+                     <v-btn text @click="main.openDialogClass=false;">Cancel</v-btn>
+                     <v-btn text @click="$xui.saveClassEditor(); main.openDialogClass=false;">Save</v-btn>
+                  </v-card-actions>
+               </v-card>
+            </v-dialog>
+            <v-dialog ref="dialogBind" v-model="main.openDialogBinding" v-on:click:outside="$xui.saveBindingEditor()" width="80vw">
+               <v-card>
+                  <div class="white--text elevation-6" style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
+                     <v-card-title>Binding & watch</v-card-title>
+                  </div>
+                  <div style="height:65vh; overflow-y: scroll;">
+                     <cmp-bind-editor ref="jsonEditorBindingCont" :options-editor="main.jsonEditorOptions"></cmp-bind-editor>
+                  </div>
+                  <v-card-actions class="elevation-6">
+                     <v-btn text @click="main.openDialogBinding=false;">Cancel</v-btn>
+                     <v-btn text @click="$xui.saveBindingEditor(); main.openDialogBinding=false;">Save</v-btn>
+                  </v-card-actions>
+               </v-card>
+            </v-dialog>
+            <div style="position:absolute; bottom:0px ;width: 100%;">
+               <v-snackbar style="position:relative; height:60px" v-for="(item, index) in main.messages" :key="index" v-model="item.snackbar" :timeout="item.timeout">
+            {{ item.text }}
+        </v-snackbar>
+            </div>
+            <v-dialog ref="dialogError" v-model="main.openDialogError">
+               <v-snackbar v-model="main.openDialogError" class="pt-0" elevation="12" centered color="red">
+ 
+            {{ main.dialogError_text }}
+                              <template v-slot:action="{ attrs }">
+                     <v-btn color="white" text v-bind="attrs" @click="main.openDialogError = false">
+                    Close
+                </v-btn>
+                  </template>
+               </v-snackbar>
+            </v-dialog>
+            <div id="firebaseui-auth-container"></div>
+            <v-app-bar app dark height="32" color="#ff5900">
+               <v-app-bar-nav-icon></v-app-bar-nav-icon>
                <v-toolbar-title>
-                  <span class="font-weight-medium">Elisys App Code Generator</span>
+                  <template v-for="(breadcrumb_item, breadcrumb_index) in main.breadcrumb">
+                     <div class="d-inline-block" v-bind:data-for-idx="breadcrumb_index" data-for-map="main.breadcrumb">
+                        <v-btn class="pa-0 text-decoration-underline text-body-1 text-transform-none" text x-small @click="$mth('main/doSelectPath', ...arguments)">{{breadcrumb_item.name}}</v-btn>
+                        <template v-if="breadcrumb_index < main.breadcrumb.length-1">
+                           <span class="mr-1">></span>
+                        </template>
+                     </div>
+                  </template>
                </v-toolbar-title>
                <v-spacer></v-spacer>
-               <v-btn icon>
-                  <v-icon>mdi-help mdi-36px</v-icon>
+               <v-btn @click="$mth('main/doMDFullScreen', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+                  <v-icon>mdi-fullscreen</v-icon>
                </v-btn>
-               <v-btn @click="$mth('main/doLogin', ...arguments)" icon>
-                  <v-icon>mdi-account mdi-36px</v-icon>
+               <v-btn @click="$mth('main/doMDMobile', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+                  <v-icon>mdi-monitor-cellphone</v-icon>
+               </v-btn>
+               <v-btn @click="$mth('main/doMDPreview', ...arguments)" class="mx-7" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+                  <v-icon>mdi-television-play</v-icon>
+               </v-btn>
+               <v-btn @click="$mth('main/doRefresh', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+                  <v-icon>mdi-refresh</v-icon>
                </v-btn>
             </v-app-bar>
-            <v-navigation-drawer v-model="main.isNavdrawerOpen" temporary app>
+            <v-navigation-drawer temporary app>
             </v-navigation-drawer>
             <v-main>
                <transition :duration="main.animationDuration" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
                   <router-view ref="routerview"></router-view>
                </transition>
             </v-main>
-            <v-footer app height="32" light color="white" class="pt-1">
+            <v-footer app height="32" dark color="#ff5900" class="pt-1" style="z-index:5">
+               <v-btn @click="$mth('main/doFADelete', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+                  <v-icon>mdi-delete</v-icon>
+               </v-btn>
+               <v-btn @click="$mth('main/doFACut', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+                  <v-icon>mdi-content-cut</v-icon>
+               </v-btn>
+               <v-btn @click="$mth('main/doFACopy', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+                  <v-icon>mdi-content-copy</v-icon>
+               </v-btn>
+               <v-btn @click="$mth('main/doFAPaste', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.pasteDisabled" small color="#ffffff00">
+                  <v-icon>mdi-content-paste</v-icon>
+               </v-btn>
+               <v-btn @click="$mth('main/doFAUndo', ...arguments)" class="ml-6" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.undoDisabled" small color="#ffffff00">
+                  <v-icon>mdi-undo</v-icon>
+               </v-btn>
+               <v-btn @click="$mth('main/doFARedo', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.redoDisabled" small color="#ffffff00">
+                  <v-icon>mdi-redo</v-icon>
+               </v-btn>
+               <div style="width:50px">
+               </div>
+               <v-btn @click="$mth('main/doFAClearAll', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
+                  <v-icon>mdi-delete</v-icon>
+               </v-btn>
                <v-spacer></v-spacer>
-               <span>Version 0.8.5   06/03/22 &#169; Desomer G</span>
+               <span>Version 0.8.7   27/04/22 &#169; Desomer Gauthier</span>
             </v-footer>
-            <template>
-               <v-dialog v-model="main.showLogin" max-width="500">
-                  <div class="fill-height xui-p-relative">
-                     <v-card v-ripple="{ center: false, class: 'black--text' }">
-                        <v-img height="150px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5joF9bHglsIgbGwAIRccZHgAeT3VW9qvtwiYMQdVvwlvQ5m0B6T615teyl35Vll_7PzU&usqp=CAU">
-                        </v-img>
-                        <v-card-text>
-                           <v-row class="flex-column  fill-height" style="flex-direction: column;">
-                              <v-col class="xui-column">
-                                 <v-text-field dense hide-details v-model="main.login" label="Mail"></v-text-field>
-                              </v-col>
-                              <v-col class="xui-column">
-                                 <v-text-field dense hide-details v-model="main.password" label="Password"></v-text-field>
-                              </v-col>
-                              <v-col class="xui-column">
-                                 <v-btn @click="$mth('main/doConnect', ...arguments)">Login</v-btn>
-                                 <v-btn class="ml-5" @click="$mth('main/doDisconnect', ...arguments)">Logout</v-btn>
-                              </v-col>
-                           </v-row>
-                        </v-card-text>
-                     </v-card>
-                  </div>
+            <template id="xui-condidional">
+               <v-dialog v-model="main.showEditCmp" max-width="80%">
+                  <v-card>
+                     <v-img height="0px">
+                     </v-img>
+                     <v-card-text class="pa-0">
+                        <v-tabs class="xui-tabs fill-height" height="48px" style="--xui-tab-h:48px;height:40vw">
+                           <v-tab>
+                              <span>Info</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                           </v-tab-item>
+                           <v-tab>
+                              <v-icon class="mr-2">mdi-code-tags</v-icon>
+                              <span>Code</span>
+                           </v-tab>
+                           <v-tab-item eager>
+                              <pre class="fill-height">
+                                 <code id="xui-code-editor-cmp" spellcheck></code>
+                              </pre>
+                           </v-tab-item>
+                        </v-tabs>
+                     </v-card-text>
+                     <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn @click="$mth('main/doCloseCmpEditor', ...arguments)">Cancel</v-btn>
+                        <v-btn>Save</v-btn>
+                     </v-card-actions>
+                  </v-card>
                </v-dialog>
             </template>
-         </v-app>
-      </template>
-      <template id="page-1">
-         <v-app style="width:100vw">
             <template id="page-1-route-0">
                <v-container fluid fill-height align-start pa-0>
                   <v-tabs class="xui-tabs fill-height tabs-dense" height="100%" style="--xui-tab-h:100%;" vertical dark v-model="main.idxTabMain">
@@ -298,12 +465,12 @@
                            <v-tab-item eager>
                               <v-row class="fill-height" no-gutters>
                                  <v-col cols="3">
-                                    <v-row class="flex-column  fill-height" style="flex-direction: column;">
-                                       <v-col class="xui-column" style="height: 40px" cols="auto">
+                                    <v-row class="flex-column  fill-height" style="flex-direction: column;" no-gutters>
+                                       <v-col class="xui-column" style="height: 50px" cols="auto">
                                           <v-subheader class="elevation-2 my-0 py-0" style="white-space: pre-wrap;">List Routes</v-subheader>
                                        </v-col>
                                        <v-col class="xui-column">
-                                          <v-treeview color="red" :transition="true" :items="main.listRoute" hoverable return-object activatable>
+                                          <v-treeview color="red" :transition="true" :items="route.listRoute" hoverable return-object activatable :active.sync="route.listRouteActive" @update:active="$mth('route/doSelectActiveRoute', ...arguments)">
                                           </v-treeview>
                                        </v-col>
                                     </v-row>
@@ -320,7 +487,7 @@
                                           <v-container fuild class="xui-form pa-8">
                                              <v-row class="xui-form-gutter">
                                                 <v-col>
-                                                   <v-text-field dense hide-details label="short name"></v-text-field>
+                                                   <v-text-field dense hide-details v-model="route.currentShortName" label="short name"></v-text-field>
                                                 </v-col>
                                              </v-row>
                                              <v-row class="xui-form-gutter">
@@ -476,7 +643,7 @@
                                                 </v-toolbar>
                                              </v-col>
                                              <v-col class="xui-column">
-                                                <div style="height: calc(100vh - 200px);">
+                                                <div style="height: calc(100vh - 210px);">
                                                    <prism-editor class="js-editor" v-model="listStoreModule_item.currentCode" :highlight="$xui.highlighterJS" line-numbers></prism-editor>
                                                 </div>
                                              </v-col>
@@ -780,143 +947,6 @@
                   </v-tabs>
                </v-container>
             </template>
-            <v-overlay z-index="6" opacity="0.7" :value="main.overlay">
-               <div style="width: 100%;height: 100%;z-index:1" @click="$xui.modePreview()"></div>
-            </v-overlay>
-            <v-snackbar ref="snack" class="pt-0" elevation="12" v-model="main.snackbar" :timeout="main.snackbar_timeout" top app color="blue-grey">
-
-        {{ main.snackbar_text }}
-                       <template v-slot:action="{ attrs }">
-                  <v-btn color="white" text v-bind="attrs" @click="main.snackbar = false">
-                Close
-            </v-btn>
-               </template>
-            </v-snackbar>
-            <div id="xui-display-selector-popup" class="xui-popup-class" style="position:absolute; top:100px; left: 100px;" @mouseleave="$xui.onActionOver('leave', null)">
-               <v-list dense>
-                  <v-list-item style="min-height: 10px;" v-for="(itemPopup, j) in main.listPopupAdd" :key="j" @click="$xui.doActionPopup(itemPopup)" @mouseenter="$xui.onActionOver('enter',itemPopup)">
-                     <template v-if="itemPopup.type=='divider'">
-                        <v-divider></v-divider>
-                     </template>
-                     <template v-else>
-                        <v-list-item-icon>
-                           <v-icon>{{itemPopup.icon}}</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-content>
-                           <v-list-item-title>
-                              <span>{{itemPopup.title}}</span>
-                           </v-list-item-title>
-                        </v-list-item-content>
-                     </template>
-                  </v-list-item>
-               </v-list>
-            </div>
-            <v-dialog v-model="main.openDialogClass" v-on:click:outside="$xui.saveClassEditor()" max-width="80vw">
-               <v-card>
-                  <div class="white--text elevation-6" style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
-                     <v-card-title>Class & style</v-card-title>
-                  </div>
-                  <div style="height:65vh; overflow-y: scroll;">
-                     <cmp-list-class></cmp-list-class>
-                  </div>
-                  <v-card-actions class="elevation-6">
-                     <v-btn text @click="main.openDialogClass=false;">Cancel</v-btn>
-                     <v-btn text @click="$xui.saveClassEditor(); main.openDialogClass=false;">Save</v-btn>
-                  </v-card-actions>
-               </v-card>
-            </v-dialog>
-            <v-dialog ref="dialogBind" v-model="main.openDialogBinding" v-on:click:outside="$xui.saveBindingEditor()" width="80vw">
-               <v-card>
-                  <div class="white--text elevation-6" style="height:50px; background-image: linear-gradient(20deg, #484848, black);">
-                     <v-card-title>Binding & watch</v-card-title>
-                  </div>
-                  <div style="height:65vh; overflow-y: scroll;">
-                     <cmp-bind-editor ref="jsonEditorBindingCont" :options-editor="main.jsonEditorOptions"></cmp-bind-editor>
-                  </div>
-                  <v-card-actions class="elevation-6">
-                     <v-btn text @click="main.openDialogBinding=false;">Cancel</v-btn>
-                     <v-btn text @click="$xui.saveBindingEditor(); main.openDialogBinding=false;">Save</v-btn>
-                  </v-card-actions>
-               </v-card>
-            </v-dialog>
-            <div style="position:absolute; bottom:0px ;width: 100%;">
-               <v-snackbar style="position:relative; height:60px" v-for="(item, index) in main.messages" :key="index" v-model="item.snackbar" :timeout="item.timeout">
-            {{ item.text }}
-        </v-snackbar>
-            </div>
-            <v-dialog ref="dialogError" v-model="main.openDialogError">
-               <v-snackbar v-model="main.openDialogError" class="pt-0" elevation="12" centered color="red">
- 
-            {{ main.dialogError_text }}
-                              <template v-slot:action="{ attrs }">
-                     <v-btn color="white" text v-bind="attrs" @click="main.openDialogError = false">
-                    Close
-                </v-btn>
-                  </template>
-               </v-snackbar>
-            </v-dialog>
-            <div id="firebaseui-auth-container"></div>
-            <v-app-bar app dark height="32" color="#ff5900">
-               <v-app-bar-nav-icon></v-app-bar-nav-icon>
-               <v-toolbar-title>
-                  <template v-for="(breadcrumb_item, breadcrumb_index) in main.breadcrumb">
-                     <div class="d-inline-block" v-bind:data-for-idx="breadcrumb_index" data-for-map="main.breadcrumb">
-                        <v-btn class="pa-0 text-decoration-underline text-body-1 text-transform-none" text x-small @click="$mth('main/doSelectPath', ...arguments)">{{breadcrumb_item.name}}</v-btn>
-                        <template v-if="breadcrumb_index < main.breadcrumb.length-1">
-                           <span class="mr-1">></span>
-                        </template>
-                     </div>
-                  </template>
-               </v-toolbar-title>
-               <v-spacer></v-spacer>
-               <v-btn @click="$mth('main/doMDFullScreen', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
-                  <v-icon>mdi-fullscreen</v-icon>
-               </v-btn>
-               <v-btn @click="$mth('main/doMDMobile', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
-                  <v-icon>mdi-monitor-cellphone</v-icon>
-               </v-btn>
-               <v-btn @click="$mth('main/doMDPreview', ...arguments)" class="mx-7" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
-                  <v-icon>mdi-television-play</v-icon>
-               </v-btn>
-               <v-btn @click="$mth('main/doRefresh', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
-                  <v-icon>mdi-refresh</v-icon>
-               </v-btn>
-            </v-app-bar>
-            <v-navigation-drawer temporary app>
-            </v-navigation-drawer>
-            <v-main>
-               <transition :duration="main.animationDuration" name="xui-class-transition" :enter-active-class="main.animationNameEnter" :leave-active-class="main.animationNameExit">
-                  <router-view ref="routerview"></router-view>
-               </transition>
-            </v-main>
-            <v-footer app height="32" dark color="#ff5900" class="pt-1" style="z-index:5">
-               <v-btn @click="$mth('main/doFADelete', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
-                  <v-icon>mdi-delete</v-icon>
-               </v-btn>
-               <v-btn @click="$mth('main/doFACut', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
-                  <v-icon>mdi-content-cut</v-icon>
-               </v-btn>
-               <v-btn @click="$mth('main/doFACopy', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
-                  <v-icon>mdi-content-copy</v-icon>
-               </v-btn>
-               <v-btn @click="$mth('main/doFAPaste', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.pasteDisabled" small color="#ffffff00">
-                  <v-icon>mdi-content-paste</v-icon>
-               </v-btn>
-               <v-btn @click="$mth('main/doFAUndo', ...arguments)" class="ml-6" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.undoDisabled" small color="#ffffff00">
-                  <v-icon>mdi-undo</v-icon>
-               </v-btn>
-               <v-btn @click="$mth('main/doFARedo', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr v-bind:disabled="main.redoDisabled" small color="#ffffff00">
-                  <v-icon>mdi-redo</v-icon>
-               </v-btn>
-               <div style="width:50px">
-               </div>
-               <v-btn @click="$mth('main/doFAClearAll', ...arguments)" style="width:30px;min-width:30px !important;margin-top:-2px" nr small color="#ffffff00">
-                  <v-icon>mdi-delete</v-icon>
-               </v-btn>
-               <v-spacer></v-spacer>
-               <span>Version 0.8.5   06/03/22 &#169; Desomer G</span>
-            </v-footer>
-            <template></template>
          </v-app>
       </template>
    </body>
@@ -1663,32 +1693,10 @@
         globalThis.initialiseAppState = () => {
         const modulesManager = new VuexModuleManager($xui.vuejs);
 
-        const home = modulesManager.addModule("home", {
-            "listTemplate": [
-                {
-                    "picture": "",
-                    "id": "Empty",
-                    "frameName": "frame1",
-                    "frameTemplate": "template/frameEmpty"
-                },
-                {
-                    "picture": "app/template/ecommerce.png",
-                    "id": "eCommerce",
-                    "frameName": "frame1",
-                    "frameTemplate": "template/frameTest1"
-                },
-                {
-                    "picture": "app/template/designer.png",
-                    "id": "Designer",
-                    "frameName": "frame1",
-                    "frameTemplate": "frameDesignerMain"
-                }
-            ]
-        });
-
         const main = modulesManager.addModule("main", {
             "idxHomeMainTab": 0,
             "showLogin": false,
+            "showEditCmp": false,
             "login": "",
             "password": "",
             "urlApp": "urlapp",
@@ -1717,11 +1725,6 @@
             "activeSlot": [],
             "openSlot": [],
             "expandAllCmp": false,
-            "listRoute": [
-                {
-                    "name": "route0"
-                }
-            ],
             "childrenSlots": [
                 {
                     "name": "path1"
@@ -1770,6 +1773,41 @@
             "version": 2
          , ...$xui.rootdata });
 
+        const home = modulesManager.addModule("home", {
+            "listTemplate": [
+                {
+                    "picture": "",
+                    "id": "Empty",
+                    "frameName": "frame1",
+                    "frameTemplate": "template/frameEmpty"
+                },
+                {
+                    "picture": "app/template/ecommerce.png",
+                    "id": "eCommerce",
+                    "frameName": "frame1",
+                    "frameTemplate": "template/frameTest1"
+                },
+                {
+                    "picture": "app/template/designer.png",
+                    "id": "Designer",
+                    "frameName": "frame1",
+                    "frameTemplate": "frameDesignerMain"
+                }
+            ]
+        });
+
+        const route = modulesManager.addModule("route", {
+            "listRoute": [
+                {
+                    "name": "route0"
+                }
+            ],
+            "listRouteActive": [
+                {}
+            ],
+            "currentShortName": ""
+        });
+
         const store = modulesManager.addModule("store", {
             "listStoreModule": [
                 {
@@ -1809,20 +1847,6 @@
             "idxTabStoreModule": 0
         });
 
-        home.actions={
-          goToTemplate : async (p1, p2) => {
-        const state = $xui.vuejs.$store.state;
-        state.home.idxHomeMainTab=2;
-        //# sourceURL=home-goToTemplate.js;
-        },
-          doSelectTemplate : async (p1, p2) => {
-        const state = $xui.vuejs.$store.state;
-         const sel = state.home.listTemplate[$xui.info["home.listTemplate"]];
-         console.debug("doSelectTemplate", sel );
-         $xui.doInitPage(sel);
-        //# sourceURL=home-doSelectTemplate.js;
-        },}
-
         main.actions={
           doLogin : async (p1, p2) => {
         $xui.getAppState().main.showLogin=true;
@@ -1835,44 +1859,6 @@
           doDisconnect : async (p1, p2) => {
         $xui.disconnect();
         //# sourceURL=main-doDisconnect.js;
-        },
-          doSelectChildPath : async (p1, p2) => {
-        $xui.selectChildPath();
-        //# sourceURL=main-doSelectChildPath.js;
-        },
-          doSelectConditionalPath : async (p1, p2) => {
-        $xui.selectConditionalPath();
-        //# sourceURL=main-doSelectConditionalPath.js;
-        },
-          onActiveSlot : async (p1, p2) => {
-        $xui.selectCmp();
-        //# sourceURL=main-onActiveSlot.js;
-        },
-          doExportFile : async (p1, p2) => {
-        $xui.downloadPage();
-        //# sourceURL=main-doExportFile.js;
-        },
-          doExportXUIClipboard : async (p1, p2) => {
-        $xui.XUIToClipboard();
-        //# sourceURL=main-doExportXUIClipboard.js;
-        },
-          doImportFile : async (p1, p2) => {
-        console.debug("doImportFile", p1, p2);
-        $xui.importPage(p2[0]);
- 
-        //# sourceURL=main-doImportFile.js;
-        },
-          doDPDeploy : async (p1, p2) => {
-        $xui.deploy();
-        //# sourceURL=main-doDPDeploy.js;
-        },
-          doDPOpenApp : async (p1, p2) => {
-        $xui.sendInTab();
-        //# sourceURL=main-doDPOpenApp.js;
-        },
-          doDPSendAppUrl : async (p1, p2) => {
-        $xui.sendByMail();
-        //# sourceURL=main-doDPSendAppUrl.js;
         },
           doSelectPath : async (p1, p2) => {
         $xui.selectPath();
@@ -1921,6 +1907,69 @@
           doFAClearAll : async (p1, p2) => {
         $xui.clearAll();
         //# sourceURL=main-doFAClearAll.js;
+        },
+          doCloseCmpEditor : async (p1, p2) => {
+        const rootdata = $xui.getAppState().main;
+        rootdata.showEditCmp=false;
+        //# sourceURL=main-doCloseCmpEditor.js;
+        },
+          doSelectChildPath : async (p1, p2) => {
+        $xui.selectChildPath();
+        //# sourceURL=main-doSelectChildPath.js;
+        },
+          doSelectConditionalPath : async (p1, p2) => {
+        $xui.selectConditionalPath();
+        //# sourceURL=main-doSelectConditionalPath.js;
+        },
+          onActiveSlot : async (p1, p2) => {
+        $xui.selectCmp();
+        //# sourceURL=main-onActiveSlot.js;
+        },
+          doExportFile : async (p1, p2) => {
+        $xui.downloadPage();
+        //# sourceURL=main-doExportFile.js;
+        },
+          doExportXUIClipboard : async (p1, p2) => {
+        $xui.XUIToClipboard();
+        //# sourceURL=main-doExportXUIClipboard.js;
+        },
+          doImportFile : async (p1, p2) => {
+        console.debug("doImportFile", p1, p2);
+        $xui.importPage(p2[0]);
+ 
+        //# sourceURL=main-doImportFile.js;
+        },
+          doDPDeploy : async (p1, p2) => {
+        $xui.deploy();
+        //# sourceURL=main-doDPDeploy.js;
+        },
+          doDPOpenApp : async (p1, p2) => {
+        $xui.sendInTab();
+        //# sourceURL=main-doDPOpenApp.js;
+        },
+          doDPSendAppUrl : async (p1, p2) => {
+        $xui.sendByMail();
+        //# sourceURL=main-doDPSendAppUrl.js;
+        },}
+
+        home.actions={
+          goToTemplate : async (p1, p2) => {
+        const state = $xui.vuejs.$store.state;
+        state.home.idxHomeMainTab=2;
+        //# sourceURL=home-goToTemplate.js;
+        },
+          doSelectTemplate : async (p1, p2) => {
+        const state = $xui.vuejs.$store.state;
+         const sel = state.home.listTemplate[$xui.info["home.listTemplate"]];
+         console.debug("doSelectTemplate", sel );
+         $xui.doInitPage(sel);
+        //# sourceURL=home-doSelectTemplate.js;
+        },}
+
+        route.actions={
+          doSelectActiveRoute : async (p1, p2) => {
+        $xui.doSelectActiveRoute();
+        //# sourceURL=route-doSelectActiveRoute.js;
         },}
 
         store.actions={
@@ -1932,8 +1981,9 @@
 
         modulesManager.setStore(new Vuex.Store({
                             modules : {
-        						home,
         						main,
+        						home,
+        						route,
         						store,
                             },
                             plugins : [$xui.logger],

@@ -43,6 +43,7 @@ class NativeSlot extends XUIElementNative {
     }
 
     final isModeDesign = engine.isModeDesign() || XUIConfigManager.forceSlotInfo;
+    final activeDataXid =  engine.isActiveDataXid();
     String? xidCal;
     if (isModeDesign && html.originElemXUI != null) {
       xidCal = html.calculatePropertyXUI(html.originElemXUI!.xid, null);
@@ -83,7 +84,7 @@ class NativeSlot extends XUIElementNative {
     html.children?.forEach((childHtml) {
 
       // affecte le nom du slot sur les enfants si doit etre accessible (avoir un slot xid)
-      if (isModeDesign && isSlotButNotCopyzone) {
+      if (isSlotButNotCopyzone && activeDataXid) {
         childHtml.attributes ??= HashMap<String, XUIProperty>();
         // affecte le xid-slot sur les enfant non slot
         if (childHtml is! XUIElementHTMLText) {
@@ -125,7 +126,7 @@ class NativeSlot extends XUIElementNative {
       }
     });
 
-    if (isModeDesign && xidCal!=null && (nbChildNoSlot == 0) && !isFlow) {
+    if (activeDataXid && xidCal!=null && (nbChildNoSlot == 0) && !isFlow) {
       //recherche un parent affichable pour gerer la selection des slot (displaySelectorByXid)
       var p = html.parent;
       while (p != null) {

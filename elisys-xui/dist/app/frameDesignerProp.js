@@ -204,6 +204,7 @@ $xui.saveCodeAction = async (storeModule) => {
         const ok = acorn.parse("let fct = async ()=> {\n"+ storeModule.currentCode +" }", {ecmaVersion: "latest"});
         console.debug("*********** AST *************", ok);
     } catch (error) {
+        console.debug("code =", storeModule.currentCode)
         console.debug(error.message, error);
         rootdata.openDialogError =true;
         rootdata.dialogError_text = error.message;

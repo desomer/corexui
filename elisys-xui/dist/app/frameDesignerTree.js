@@ -3,9 +3,8 @@
 //--------------------------------------------------------------------------------------------------------
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-function _initPathTo(pathTo) {
-    const rootdata = $xui.getAppState().main;
-    let parent = rootdata.activeSlot[0];
+function _initPathTo(pathTo, aSlotTree) {
+    let parent = aSlotTree; 
     let hasRouteDefine = false;
     do {
         if (parent.toPath != null) {
@@ -23,6 +22,20 @@ function _initPathTo(pathTo) {
         }
         parent = parent.parent;
     } while (parent != null);
+}
+
+$xui.doPathSelectAction = async (pathTo)=> {
+    for (const action of pathTo) {
+        console.debug("selectCmp pathTo " + action);
+        if (action.startsWith("router:")) {
+            const url = action.substring(7);
+            await $xui.goToRoute(url);
+        }
+        if (action.startsWith("click:")) {
+            var xidc = action.substring(6);
+            await $xui.goToClick(xidc);
+        }
+    }
 }
 
 $xui.selectPath = ()=> {
@@ -53,7 +66,7 @@ $xui.selectConditionalPath = ()=> {
 // select le composant a partir du tree
 $xui.selectCmp = async () => {
     const rootdata = $xui.getAppState().main;
-    console.debug(rootdata.activeSlot);
+    //console.debug("selectCmp " + rootdata.activeSlot);
     if (!$xui.modeDisplaySelection) 
     {
         $xui.modeDisplaySelection=true;
@@ -63,37 +76,88 @@ $xui.selectCmp = async () => {
     if (rootdata.activeSlot.length>0)
     {
         const pathTo = [];
-        _initPathTo(pathTo);
+        _initPathTo(pathTo, rootdata.activeSlot[0]);
+        await $xui.doPathSelectAction(pathTo);
 
-        for (const action of pathTo) {
-            if (action.startsWith("router:"))
-            {
-                const url = action.substring(7);
-                await $xui.goToRoute(url);
-            }
-            if (action.startsWith("click:"))
-            {
-                var xid = action.substring(6);
-                await $xui.goToClick(xid);
-            }
-        }
-
-        xid = rootdata.activeSlot[0].id;
+        const xid = rootdata.activeSlot[0].id;
         $xui.SelectorManager.displaySelectorByXid(xid, xid, false);
     }
 }
 
-$xui.goToClick =async (xid) => {
-    let node = document.querySelector("#rootFrame").contentWindow.document.querySelectorAll(`[data-xid-slot=${xid}]`);
+// $xui.selectCmpByXid= async (xid) => {
+//     const rootdata = $xui.getAppState().main;
+//     const listSlot = rootdata.listSlot;
 
-    if (node.lenght==0)
+//     if (xid.startsWith("_slot-"))
+//     {
+//         xid=xid.substring(6);
+//     }    
+//     console.debug("selectCmpByXid search " + xid);  
+
+//     const found = _searchPathTo(xid, listSlot[0] );
+//     if (found!=null)
+//     {
+//         const pathTo = [];
+//         _initPathTo(pathTo, found);
+//         await $xui.doPathSelectAction(pathTo);
+//     }
+// }
+
+$xui.getPathActionByXid= (xid) => {
+    const rootdata = $xui.getAppState().main;
+    const listSlot = rootdata.listSlot;
+
+    if (xid.startsWith("_slot-"))
     {
-        document.querySelector("#rootFrame").contentWindow.document.querySelectorAll(`[data-xid-slot-${xid}=true]`);
+        xid=xid.substring(6);
+    }    
+    console.debug("getPathActionByXid search " + xid);  
+
+    const found = _searchPathTo(xid, listSlot[0] );
+    if (found!=null)
+    {
+        const pathTo = [];
+        _initPathTo(pathTo, found);
+        return pathTo;
+    }
+    return null;
+}
+
+function _searchPathTo(id, elem) {
+    if (elem.id==id)
+    {
+        return elem;
+    }
+    if (elem.children!=null)
+    {
+        for (let index = 0; index < elem.children.length; index++) {
+            const child = elem.children[index];
+            const ret = _searchPathTo(id, child);
+            if (ret!=null) {
+                return ret;
+            }
+        }
+    }
+    return null;
+}
+
+
+$xui.goToClick =async (xid) => {
+    console.debug("goToClick "+xid)
+    var str = "[data-xid-slot="+xid+"]";
+    var nodetoClick = document.querySelector("#rootFrame").contentWindow.document.querySelectorAll(str);
+
+    if (nodetoClick.length==0)
+    {
+        nodetoClick=document.querySelector("#rootFrame").contentWindow.document.querySelectorAll(`[data-xid-slot-${xid}=true]`);
     }
 
-    if (node.lenght>=0)
-        node[0].click();
-    await pause(300);
+    if (nodetoClick.length>0)
+        nodetoClick[0].click();
+    else
+        console.debug("goToClick nofound <"+str+">");
+        
+    await pause(300); //300
 }
 
 $xui.goToRoute =async (url) => {
@@ -114,8 +178,5 @@ $xui.goToRoute =async (url) => {
         await pause(400);
     }
 }
-
-
-
 
 

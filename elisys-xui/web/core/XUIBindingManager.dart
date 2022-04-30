@@ -172,9 +172,9 @@ class XUIBindingManager {
     });
 
 
-    var store = "";
+    var storeCode = "";
     try {
-      store = generateApplicationStoreJS(mapState);
+      storeCode = generateApplicationStoreJS(mapState);
      // print(store);
     } catch (e) {
       XUIConfigManager.printc("error" + e.toString());
@@ -188,7 +188,7 @@ class XUIBindingManager {
     StringBuffer buf = NativeInjectText.getcacheText(JS_BINDING)!;
     buf.clear();
     // affecte le js du store
-    buf.write(store);
+    buf.write(storeCode);
 
   }
 

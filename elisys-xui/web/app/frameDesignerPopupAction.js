@@ -103,7 +103,7 @@ $xui.doSurroundCmp = (info, infoFile, actionId) => {
 
 $xui.onActionOver= async (state, item) => 
 {
-    console.debug(`onAction : ${state}`, item);
+    //console.debug(`onAction : ${state}`, item);
     let node = document.getElementById("xui-action-selector");
     if (node == null) {
         /************************************************* */
@@ -112,7 +112,7 @@ $xui.onActionOver= async (state, item) =>
         node.id = "xui-action-selector";
         node.classList.add("xui-action-selector");
 
-        nodeTop = document.createElement("div");
+        const nodeTop = document.createElement("div");
         nodeTop.id = "xui-action-selector-arrow";
         node.appendChild(nodeTop);
 
@@ -139,7 +139,7 @@ $xui.onActionOver= async (state, item) =>
             node.style.width = `${position.width}px`;
             node.style.display = null;   //affiche la div de selection
 
-            var nodeTop = document.getElementById("xui-action-selector-arrow");
+            const nodeTop = document.getElementById("xui-action-selector-arrow");
             nodeTop.removeAttribute('class');
 
             if (item.title.includes("row") && item.title.includes("before"))
@@ -199,4 +199,27 @@ $xui.displayPropActionByXid= (xid, xid_slot) => {
 };
 
 
+/***************************************************************************************************************/
+$xui.editCmp = ()=> {
+    const rootdata = $xui.getAppState().main;
+    rootdata.showEditCmp=true;
+    console.debug("showEditCmp", rootdata);
+
+    const xid = $xui.propertiesDesign.xid;   //, $xui.propertiesDesign.xidSlot
+
+    const infoFileCmp = $xui.pageDesignManager.getInfoFile("preview");
+    infoFileCmp.partXID=xid;
+    infoFileCmp.action = "showCode";   // pas de store
+
+    const prom = getPromise(`getVueCmp${xid}`);
+    $xuicore.getHtmlFromXUI(infoFileCmp, `getVueCmp${xid}`);
+    prom.then(html => {
+        const codeElem = document.querySelector("#xui-code-editor-cmp");
+        if (codeElem != null) {
+            const code = Prism.highlight(html, Prism.languages.html, 'html');
+            codeElem.innerHTML = code;
+        }
+    });
+
+}
 

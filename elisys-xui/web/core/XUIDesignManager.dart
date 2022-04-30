@@ -47,7 +47,7 @@ class XUIDesignManager {
   Future<String?> getHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
     var bufferHtml = XUIHtmlBuffer();
-    await getXUIEngine().processPhases(bufferHtml, xid, ctx);
+    await getXUIEngine().processAllPhases(bufferHtml, xid, ctx);
     return Future.value(bufferHtml.html.toString());
   }
 
@@ -55,7 +55,7 @@ class XUIDesignManager {
   /// generation de l'arbre XUIElementHTML sans buffer html
   Future initHtml(XUIContext ctx, String uri, String xid) async {
     await initEngine(uri, ctx);
-    await getXUIEngine().processPhases(null, xid, ctx);
+    await getXUIEngine().processAllPhases(null, xid, ctx);
   }
 
   ///------------------------------------------------------------------------------------------

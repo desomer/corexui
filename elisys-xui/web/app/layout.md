@@ -81,3 +81,19 @@ on hover
 https://codepen.io/johnjleider/pen/GRppRJZ
 
 https://stackoverflow.com/questions/51461723/import-umd-javascript-modules-into-browser
+
+
+/*************************************************************************************************/
+ @font-face {
+    font-family: 'Museo Slab';
+    src: url('https://www.illicado.com/static/version1649225310/frontend/Magento/illicado/fr_FR/fonts/MuseoSlab/300/356555_2_0.woff2');
+    font-weight: 300;
+    font-style: normal
+}
+ 
+ .v-application {
+	 font-family: 'Museo Slab', serif, sans-serif !important;
+}
+ .v-application .headline, .v-application [class*='display-'], .v-application [class*='text-'] {
+	 font-family: 'Museo Slab', serif, sans-serif !important;
+}

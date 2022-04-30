@@ -42,11 +42,11 @@ abstract class XUIElement {
 class XUIElementHTML extends XUIElement {
   static XUIElement notElem = XUIElementHTML();
 
+  String? lastCalXid;
   XUIElementHTML? parent;
   XUIElementXUI? originElemXUI;
   List<XUIComponent>? implementBy;
   List<XUIDesign>? designBy;
-
 
   bool canSurround(FileDesignInfo fileInfo)
   {
@@ -231,7 +231,7 @@ class XUIElementHTML extends XUIElement {
             varitems=varitems.substring(varitems.indexOf(".")+1);  // retrait du scope
             name= "$varitems[].$name";
             isArray = name.lastIndexOf("[]");
-            print("B ==================> " + (prop.cacheBinding?.toString()??"?"));
+            print("B ======== cacheBinding ==========> " + (prop.cacheBinding?.toString()??"?"));
           }
       }
       
@@ -379,14 +379,14 @@ class XUIElementHTML extends XUIElement {
       }
 
       if (!isRoot && engine.isModeDesign() && hasTagReloader) {
-        var parseInfo = ParseInfo("", null, ParseInfoMode.PROP);
+        // var parseInfo = ParseInfo("", null, ParseInfoMode.PROP);
         // pas de reloader si dans un v-for (manque le passage de l'item au composant xui-reloader) 
-        String? varitems = searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo) as String?;
-        if (varitems==null)
-        {
+        //String? varitems = searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo) as String?;
+       // if (varitems==null)
+       // {
           isReloader = true;
           _doAddReloaderPhase3(engine, buffer);
-        }
+       // }
       }
 
       buffer.trim = propertiesXUI != null && propertiesXUI!.containsKey(ATTR_TRIM_CONTENT);
@@ -437,7 +437,15 @@ class XUIElementHTML extends XUIElement {
     if (propertiesXUI![ATTR_MODE_DISPLAY] != null) {
       modeDisplay = propertiesXUI![ATTR_MODE_DISPLAY]!.content.toString();
     }
-    buffer.html.write('<v-xui-reloader modedisplay="$modeDisplay" partid="$xidCal"></v-xui-reloader>');  
+    String? varitems = searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo) as String?;
+    if (varitems!=null)
+    {
+      var name = '${varitems.split(".").last}_item';
+      var str = '<v-xui-reloader modedisplay="$modeDisplay" partid="$xidCal" :foritems="{ $name }"></v-xui-reloader>';
+      buffer.html.write(str);  
+    }
+    else
+      buffer.html.write('<v-xui-reloader modedisplay="$modeDisplay" partid="$xidCal"></v-xui-reloader>');  
   }
 
 

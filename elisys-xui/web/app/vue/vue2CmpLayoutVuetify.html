@@ -404,6 +404,7 @@
 
         <xui-prop var="class" cat="class" editor="class">class</xui-prop>
         <xui-prop var="style" cat="style" editor="style">style</xui-prop>
+        <xui-prop var="ripple" cat="vstyle" editor="bool">ripple</xui-prop>
         <xui-prop var="routeto" cat="event:route" editor="text">route to (/ ; /route1; /page1/route1)</xui-prop>
     </xui-doc>
 
@@ -429,7 +430,7 @@
             </xui-slot>
     </v-card-text>
 
-    <v-card xid="xui-card-1" [[directive]] v-ripple="{ center: false, class: 'black--text' }" to="[[routeto]]" class="[[class]]"
+    <v-card xid="xui-card-1" [[directive]] if:[[ripple]]:v-ripple="{ center: false, class: 'black--text' }" to="[[routeto]]" class="[[class]]"
         -style="[[style]]">
             <xui-image-1 xid="[[parent-xid]]-CardImage" xui-slot-name="CardImage"
                 height="[[height@1]]">

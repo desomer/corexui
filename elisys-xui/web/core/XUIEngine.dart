@@ -80,9 +80,11 @@ abstract class Provider {
 }
 
 class XUIContext {
-  String mode;
-  String? cause;
+  String mode;     // template, final, preview
+  String? cause;   // getJSDesignInfo, gethtmlFromXUI, reloadTemplate, clear 
+  String? returnAction;
   XUIContext(this.mode);
+  bool forPreview = false;
 
   void setCause(String cause) {
     this.cause = cause;
@@ -411,6 +413,7 @@ class XUIEngine {
   // plus forcement utiliser sauf text avec moustache {{}}
   //var dataBindingInfo = XUIParseJSDataBinding();
 
+
   Future initialize(HTMLReader reader, XUIContext ctx) async {
     xuiFile = XUIResource(reader, ctx);
 
@@ -419,7 +422,22 @@ class XUIEngine {
     return Future.value();
   }
 
-  processPhases(XUIHtmlBuffer? writer, String xid, XUIContext ctx) async {
+  bool isActiveDataXid()
+  {
+      return !xuiFile.context.forPreview && (isModeDesign() || XUIConfigManager.forceSlotInfo);
+  }
+
+  bool isModeDesign() {
+    return xuiFile.context.mode != MODE_FINAL &&
+        xuiFile.context.mode != MODE_PREVIEW;
+  }
+  
+  bool isAddSlotInfo()
+  {
+      return xuiFile.context.forPreview || (isModeDesign() || XUIConfigManager.forceSlotInfo);
+  }
+
+  processAllPhases(XUIHtmlBuffer? writer, String xid, XUIContext ctx) async {
     xuiFile.context = ctx;
     if (writer == null) {
       XUIConfigManager.printc("toHTMLString for only init XUI xid=" + xid);
@@ -437,11 +455,12 @@ class XUIEngine {
     XUIComponent root = listCmp.sort(ctx).first;
 
     XUIElementHTML htmlRoot = XUIElementHTML();
-    if (isModeDesign() || XUIConfigManager.forceSlotInfo) {
+    htmlRoot.lastCalXid=xid;
+    if (isActiveDataXid()) {
       htmlRoot.attributes ??= HashMap<String, XUIProperty>();
       htmlRoot.attributes!["data-" + ATTR_XID] = XUIProperty(xid);
-      htmlRoot.originElemXUI = root.elemXUI;
     }
+    htmlRoot.originElemXUI = root.elemXUI;
 
     if (isModeDesign()) {
       mapSlotInfo.clear(); // vide le slot info contruit dans la Phase2
@@ -453,26 +472,28 @@ class XUIEngine {
 
     await root.processPhase1(this, htmlRoot);
 
-    List<DicoOrdered<XUIDesign>> listInitJsonJS = [];
-    xuiFile.searchDesign(listInitJsonJS, "xui-jsonvalidator");
+    if (ctx.cause != "getHtmlFromXUI" && ctx.cause != "getJSDesignInfo") {
+        List<DicoOrdered<XUIDesign>> listInitJsonJS = [];
+        xuiFile.searchDesign(listInitJsonJS, "xui-jsonvalidator");
 
-    listInitJsonJS.forEach((element) {
-      element.sort(ctx).forEach((aDesign) {
-        aDesign.use=true;
-        aDesign.elemXUI.children?.forEach((element) {
-          if (element.tag == "script") {
-            String? xid = (element as XUIElementXUI).xid;
-            StringBuffer bufJs = StringBuffer();
-            element.children?.forEach((element) {
-              var e = element as XUIElementText;
-              bufJs.write(e.content);
+        listInitJsonJS.forEach((element) {
+          element.sort(ctx).forEach((aDesign) {
+            aDesign.use=true;
+            aDesign.elemXUI.children?.forEach((element) {
+              if (element.tag == "script") {
+                String? xid = (element as XUIElementXUI).xid;
+                StringBuffer bufJs = StringBuffer();
+                element.children?.forEach((element) {
+                  var e = element as XUIElementText;
+                  bufJs.write(e.content);
+                });
+                // print(xid! + " => " + bufJs.toString());
+                bindingManager.afterJsonValidator[xid!] = bufJs;
+              }
             });
-            // print(xid! + " => " + bufJs.toString());
-            bindingManager.afterJsonValidator[xid!] = bufJs;
-          }
+          });
         });
-      });
-    });
+    }
 
     await root.processPhase2(this, htmlRoot, null);
 
@@ -496,21 +517,30 @@ class XUIEngine {
     }
 
     if (ctx.cause != "getHtmlFromXUI" && ctx.cause != "getJSDesignInfo") {
+      // gestion du mapping
       bindingManager.processPhase2JS(ctx);
+
+      //gestion des not use design
+      xuiFile.onNotUseDesign(ctx.mode);
+
+      
+      StringBuffer buf = NativeInjectText.getcacheText(CSS_BINDING)!;
+      String lastVal = buf.toString();
+      buf.clear();
+      String CssText="";
+      XUIProperty? propCSS =  this.getXUIPropertyFromDesign("root", "rootcss");
+      if(propCSS!=null) {
+        CssText = "\t<style id='xui-style-user'>\n"+propCSS.content+"\n\t</style>\n";
+        buf.write(CssText);
+      }
+      if (CssText!=lastVal && ctx.cause=="reloadTemplate")
+      {
+        print("CSS CHANGE  ");
+        ctx.returnAction="doReloadAllPage";
+      }
     }
 
-
-    //gestion des not use design
-    xuiFile.onNotUseDesign(ctx.mode);
-
-    
-    StringBuffer buf = NativeInjectText.getcacheText(CSS_BINDING)!;
-    buf.clear();
-    XUIProperty? propCSS =  this.getXUIPropertyFromDesign("root", "rootcss");
-    if(propCSS!=null) {
-      buf.write("\t<style id='xui-style-user'>\n"+propCSS.content+"\n\t</style>\n");
-    }
-
+    //******************************************************** */
     if (writer != null) {
       return Future.sync(() => htmlRoot.processPhase3(this, writer));
     }
@@ -556,19 +586,19 @@ class XUIEngine {
           html.originElemXUI!.propertiesXUI != null &&
           html.originElemXUI!.propertiesXUI!.containsKey(ATTR_RELOADER)) 
       {
-        var parseInfo = ParseInfo("", null, ParseInfoMode.PROP);
+        // var parseInfo = ParseInfo("", null, ParseInfoMode.PROP);
         // pas de reloader si dans un v-for (manque le passage de l'item au composant xui-reloader) 
-        String? varitems = html.searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo) as String?;
-        if (varitems==null)
-        {
+        // String? varitems = html.searchPropertyXUI(PROP_VAR_ITEMS+"@1+", 0, parseInfo) as String?;
+        // if (varitems==null)
+        // {
           reloaderId = html.calculatePropertyXUI(html.originElemXUI!.xid, null);
           html = null;
-        }
-        else {
-          // must reselect tab
-          fileInfo.mustReselectCmp = true;
-          html = html.parent;
-        }
+        // }
+        // else {
+        //   // must reselect tab
+        //   fileInfo.mustReselectCmp = true;
+        //   html = html.parent;
+        // }
 
       } else {
         html = html.parent;
@@ -610,10 +640,7 @@ class XUIEngine {
     return listDesignInfo;
   }
 
-  bool isModeDesign() {
-    return xuiFile.context.mode != MODE_FINAL &&
-        xuiFile.context.mode != MODE_PREVIEW;
-  }
+
 }
 
 ///------------------------------------------------------------------

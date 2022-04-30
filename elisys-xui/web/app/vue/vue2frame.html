@@ -148,9 +148,10 @@
 				xid="[[parent-xid]]-main-float-action" xui-slot-name="float action"></xui-slot>
 		</v-fab-transition>
 		<xui-cond-1 xid="[[parent-xid]]-cond"></xui-cond-1>
+		<xui-route-template xid="page-[[idxpage@0+]]-route" xui-for-nbvar="nbroute@0+"></xui-route-template>
 	</v-app>
 
-	<template xid="xui-cond-1" xui-for="idxconditional" xui-for-nbvar="zero:nbCond@1">
+	<template xid="xui-cond-1" id="xui-condidional" xui-for="idxconditional" xui-for-nbvar="zero:nbCond@1">
 		<xui-slot style-slot="position:absolute; bottom:50vh; right:50vw; z-index:10" xid="[[parent-xid]]-conditional-[[idxconditional@2]]" 
 		 xui-slot-name="Dialog slot [[idxconditional@2]]"></xui-slot>
 	</template>
@@ -166,7 +167,6 @@
 		<template xid="[[parent-xid]]-[[idxpage@0+]]" xui-no-design id="[[parent-xid]]-[[idxpage@0+]]">
 			<xui-app-1 xid="[[parent-xid]]-content" xui-topath="router:/page[[idxpage@0+]]"
 				xui-slot-name="Page [[idxpage@0+]]">
-				<xui-route-template xid="page-[[idxpage@0+]]-route" xui-for-nbvar="nbroute@0+"></xui-route-template>
 			</xui-app-1>
 			<!-- les autres route -->
 		</template>

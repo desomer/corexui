@@ -47,11 +47,38 @@ export class EventManager {
         // gestion de la fermeture par ctrl Q
         document.addEventListener("keydown", (event) => {
 
-            if (event.ctrlKey && event.keyCode == 80) {    // ctrl + P
-                // mode preview  : gestion de l'ouverture par ctrl P
-                event.stopPropagation();
-                event.preventDefault();
-                $xui.modePreview();
+
+            if (document.activeElement.tagName=="INPUT")
+                return;
+
+            const rootdata = $xui.getAppState().main;
+            if (rootdata.idxTabMain != $xui.MainTabEnum.DESIGN || rootdata.idxTabDesigner !=  $xui.DesignTabEnum.DESIGN )
+                return;
+
+            if (rootdata.showEditCmp || rootdata.showLogin || rootdata.openDialogClass)
+                return;    // pas de copier coller si mode edit 
+
+            //console.debug( event.keyCode, document.activeElement.tagName );
+
+            var listShortCut = [
+                { ctrl: true, keyCode: 80, action: "ctrlP" },  // preview
+                { ctrl: true, keyCode: 67, action: "ctrlC" },
+                { ctrl: true, keyCode: 88, action: "ctrlX" },
+                { ctrl: true, keyCode: 86, action: "ctrlV" },
+                { ctrl: true, keyCode: 90, action: "ctrlZ" },
+                { ctrl: true, keyCode: 89, action: "ctrlY" },
+                { ctrl: false, keyCode: 46, action: "delete" },  
+                { ctrl: false, keyCode: 8, action: "delete" }   // backSpace
+            ];
+        
+            for (const shortKey of listShortCut) {
+                if (event.ctrlKey == shortKey.ctrl && event.keyCode == shortKey.keyCode) {
+                    event.preventDefault();
+                    var message = {
+                        action: shortKey.action,
+                    };
+                    window.postMessage(message, "*");
+                }
             }
 
         });

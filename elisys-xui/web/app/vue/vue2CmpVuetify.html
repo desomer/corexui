@@ -431,12 +431,12 @@
         <xui-prop id="icon">mdi-chevron-triple-right</xui-prop>
         <xui-prop id="desc">Une fil d'ariane</xui-prop>
         <xui-prop id="componentAs">spacer</xui-prop>
-        <xui-prop var=":items" editor="var" cat="event:bind">var items</xui-prop>
-        <xui-prop var="vertical" editor="text">divider</xui-prop>
+        <xui-prop var=":items" editor="var" cat="event:bind" bind-type="array">var items</xui-prop>
+        <xui-prop var="divider" editor="text">divider</xui-prop>
     </xui-doc>
 
     <v-breadcrumbs xid="xui-breadcrumbs-1"
-         :items="[:items]"
+         :items="[[:items]]"
         divider="[[divider]]">
     </v-breadcrumbs>
 

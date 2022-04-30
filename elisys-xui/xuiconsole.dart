@@ -32,7 +32,7 @@ void main() async {
     var xuiEngine = XUIEngine();
     var ctx = XUIContext(cst.MODE_FINAL);
     await xuiEngine.initialize(reader, ctx);
-    await xuiEngine.processPhases(bufferHtml, "root", ctx);
+    await xuiEngine.processAllPhases(bufferHtml, "root", ctx);
 
     print(bufferHtml.html);
 
@@ -61,7 +61,7 @@ void main() async {
 
    // await XUIActionManager(xuiEngine).addDesign("onglet-tab-0", "<xui-design><xui-card-1 xid='test'><xui-card-1></xui-design>");
 
-    await xuiEngine.processPhases(bufferHtml, "root", ctx);
+    await xuiEngine.processAllPhases(bufferHtml, "root", ctx);
 
    // XUIActionManager(xuiEngine).removeDesign("onglet", null);
 

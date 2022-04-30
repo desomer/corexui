@@ -128,7 +128,14 @@ export class PageDesignManager {
 
         } else if (param.mode == "final") {
             // ne fait rien a part afficher le code
+        } else if (param.mode == "templateAll") {
+            setTimeout(() => {
+                const infoFile = $xui.pageDesignManager.getInfoFile("design");
+                $xuicore.initPageXUI(infoFile);
+            }, 100);
         }
+
+
 
         this.codeHtml = param.html;
         this.codeXUIdata = param.xuidata;

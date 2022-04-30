@@ -103,10 +103,8 @@ class XUIModel implements Comparable<XUIModel> {
     await _processPhase1Component(engine, elemHtml);
 
     // affecte les xid uniquement si child (pas design ni component)
-    if (elemXUI.xid != null &&
-        (engine.isModeDesign() ||
-            XUIConfigManager
-                .forceSlotInfo) /*&& engine.xuiFile.context.mode != MODE_FINAL*/) {
+    elemHtml.lastCalXid=xidCal;
+    if (elemXUI.xid != null && engine.isActiveDataXid() ) {
       elemHtml.attributes ??= HashMap<String, XUIProperty>();
       if (this is! XUIComponent && this is! XUIDesign) {
         elemHtml.attributes!["data-" + ATTR_XID] = XUIProperty(xidCal);
@@ -146,7 +144,7 @@ class XUIModel implements Comparable<XUIModel> {
 
   Future _processPhase1Children(
       XUIElementHTML elemHtml, XUIEngine engine) async {
-    /**************** FOR  *****************/
+    /**************** XUI-FOR  *****************/
     int nbFor = 1;
     String? varIdx;
     if (elemHtml.propertiesXUI != null) {
@@ -262,11 +260,13 @@ class XUIModel implements Comparable<XUIModel> {
       elemXUI.propertiesXUI!.entries.forEach((prop) {
         elemHtml.propertiesXUI ??= HashMap<String, XUIProperty>();
 
-        if (prop.key.toLowerCase() == cst.ATTR_NO_DOM) {
+        var keyLowercase = prop.key.toLowerCase();
+
+        if (keyLowercase == cst.ATTR_NO_DOM) {
           elemHtml.tag = TAG_NO_DOM; // si xui-no-dom alors retire la tag
         }
 
-        if (prop.key.toLowerCase() != cst.ATTR_XID) {
+        if (keyLowercase != cst.ATTR_XID) {
           // n'affecte pas le XID car gerer par attribut xid  => affecte tous les autres
           XUIProperty p = prop.value;
 
@@ -325,8 +325,8 @@ class XUIModel implements Comparable<XUIModel> {
     bool addSlotInfo = false;
     if (elemHtml.attributes != null && elemHtml is! XUIElementHTMLText) {
       // recherche les info de slot designable
-      var xid = elemHtml.attributes!["data-" + ATTR_XID]?.content;
-      slotInfo.xid = xid;
+      //var xid = elemHtml.attributes!["data-" + ATTR_XID]?.content;
+      slotInfo.xid = elemHtml.lastCalXid;   //xid;
 
       if (slotInfo.xid != null) {
         addSlotInfo = true;
@@ -345,8 +345,7 @@ class XUIModel implements Comparable<XUIModel> {
         // affecte, pour le designer, un xid sur les slot sans xid
         var xidslot = elemHtml.attributes!["data-" + ATTR_XID_SLOT]?.content;
         if (xidslot != null) {
-          elemHtml.attributes!["data-" + ATTR_XID] =
-              XUIProperty(SLOT_PREFIX + xidslot);
+          elemHtml.attributes!["data-" + ATTR_XID] = XUIProperty(SLOT_PREFIX + xidslot);
         }
       }
     }
@@ -360,8 +359,7 @@ class XUIModel implements Comparable<XUIModel> {
     }
 
     //genere les infos de design (info, doc, etc...)
-    if (addSlotInfo &&
-        (XUIConfigManager.forceSlotInfo || engine.isModeDesign())) {
+    if (addSlotInfo &&  engine.isAddSlotInfo()) {
       slotInfo.parentXid = parentXId;
 
       slotInfo.idRessource = elemHtml.originElemXUI!.idRessource;

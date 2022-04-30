@@ -493,13 +493,33 @@ void getHtmlFromXUI(FileDesignInfo fileInfo, String idPromise) async {
   if (fileInfo.partXID == null) {
     html = await designMgr.getHtml(ctx, fileInfo.file, fileInfo.xid);
   } else {
-    SlotInfo info = designMgr
+    if (designMgr.getXUIEngine().xuiFile.context.mode!=ctx.mode && ctx.mode==MODE_PREVIEW) {
+      // reinit pour le recup de code source de EditorCmp
+      ctx.setCause("reloadTemplate");
+      ctx.mode=MODE_FINAL;
+      ctx.forPreview = true;
+     // print("reload getHtmlFromXUI " + ctx.mode);
+      await designMgr.initHtml(ctx, fileInfo.file, fileInfo.xid);
+
+    }
+
+
+    SlotInfo? info = designMgr
         .getXUIEngine()
-        .getSlotInfo(fileInfo.partXID!, fileInfo.partXID!)!;
-    //print("part = " + info.elementHTML.tag);
-    var bufferHtml = XUIHtmlBuffer();
-    info.elementHTML!.processPhase3(designMgr.getXUIEngine(), bufferHtml);
-    html = bufferHtml.html.toString();
+        .getSlotInfo(fileInfo.partXID!, fileInfo.partXID!);
+
+    if (info==null)
+    {
+      print("error part = " + fileInfo.partXID!);
+      html="";
+    }
+    else {
+      designMgr.getXUIEngine().xuiFile.context=ctx;
+      var bufferHtml = XUIHtmlBuffer();
+      info.elementHTML!.processPhase3(designMgr.getXUIEngine(), bufferHtml);
+      html = bufferHtml.html.toString();
+    }
+
   }
 
   doPromiseJS(idPromise, html);
@@ -529,6 +549,7 @@ Future _reloadTemplate(FileDesignInfo fileInfo) async {
  
   var ctx = XUIContext(fileInfo.mode);
   ctx.setCause("reloadTemplate");
+  
   var options = Options(mode: fileInfo.mode);
   if (listReloader.isEmpty) {
     if (XUIConfigManager.verboseReloader) {
@@ -551,6 +572,9 @@ Future _reloadTemplate(FileDesignInfo fileInfo) async {
   //options.binding = designMgr.getXUIEngine().getBindingInfo();
   options.treeSlot = new XUISlotTreeManager(designMgr.getXUIEngine()).getSlotTree();
 
+  if (ctx.returnAction=="doReloadAllPage")
+    options.mode="templateAll";
+  
   changePageJS(options);
 }
 

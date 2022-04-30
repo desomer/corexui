@@ -31,6 +31,8 @@ import("./clsSelectorManager.js").then((module) => {
 });
 
 /****************************************************************************************/
+// lancer sur la selection du template
+/******************************************************************* */
 $xui.doInitPage = (pageInfo) => {
     const rootdata = $xui.getAppState().main;
     const rootStore = $xui.getAppState().store;
@@ -45,6 +47,7 @@ $xui.doInitPage = (pageInfo) => {
     $xui.getStoreModuleByName("main");  // creation du store main
     rootStore.idxTabStoreModule=0;
     rootdata.stateDataSource="";
+    $xui.selectPathCmp=null;
 
     rootdata.idxTabMain=0;
     if (document.querySelector("#rootFrame")!=null)
@@ -53,9 +56,9 @@ $xui.doInitPage = (pageInfo) => {
     } 
     const state = $xui.vuejs.$store.state;
 
-    if (state.main.version==null) { // mode version 1
-        $xui.router.push("/page1");
-    }
+    // if (state.main.version==null) { // mode version 1
+    //     $xui.router.push("/page1"); 
+    // }
 
     waitForXuiLib("initPageXUI", () => {
 
@@ -79,11 +82,6 @@ $xui.loadPageJS = (html, options) => {
 $xui.changePageJS = (param) => {
     console.debug("changePageJS options ---- ", param);
     $xui.pageDesignManager.changePageOnFrame(param);
-    if ($xui.selectPathCmp!=null)
-    {
-        console.debug("reselect path " + $xui.selectPathCmp);
-        $xui.doPathSelectAction($xui.selectPathCmp);
-    }
     doPromiseJS("AfterChangeDisplayProperties");
 };
 
@@ -199,7 +197,7 @@ $xui.setCurrentAction = (actionName, onXid) => {
 
     let pathCmp = $xui.getPathActionByXid(onXid??$xui.propertiesDesign.xid);    
 
-    if (pathCmp!=null)
+    if (pathCmp!=null && pathCmp.length>0)
         $xui.selectPathCmp=pathCmp;
 
     // setCurrentAction  => puis appel XUI
@@ -208,11 +206,16 @@ $xui.setCurrentAction = (actionName, onXid) => {
     // puis  <changePageFinish>   (apres le modif sur iframe)  : retour de l'iframe
 
     let prom = getPromise("AfterChangeSelectByXid");
-    prom.then(() => {
+    prom.then(async () => {
         rootdata.saveLayout = false;
         currentAction = null;
 
-        console.debug(`END changePageFinish ------ ${actionName} ------`)
+        if ($xui.selectPathCmp!=null)
+        {
+                console.debug("reselect path " + $xui.selectPathCmp);
+                $xui.doPathSelectAction($xui.selectPathCmp);
+        }
+
         if (selectionMode == "current") {
             if (reselect)
                 $xui.modeDisplaySelection = true;
@@ -226,6 +229,8 @@ $xui.setCurrentAction = (actionName, onXid) => {
                 }, 50);
             }
         }
+
+        console.debug(`END changePageFinish ------ ${actionName} ------`)
     });
 
     prom = getPromise("AfterChangeDisplayProperties");
@@ -255,6 +260,7 @@ $xui.clearAll = () => {
     rootdata.overlayEvent=false;
     rootdata.overlay=true;
     document.querySelector("#rootFrame").style.display = 'none';
+    $xui.selectPathCmp=null;
    
     const infoFile = $xui.pageDesignManager.getInfoFile("design");
     $xuicore.initPageXUI(infoFile);
@@ -587,6 +593,7 @@ $xui.importPage = (file) => {
         $xui.pageDesignManager.clearAll();
         $xui.pageDesignManager.codeXUIdata = event.target.result;
         $xui.pageDesignManager.store();
+        $xui.selectPathCmp=null;
         const infoFile = $xui.pageDesignManager.getInfoFile("design");
         $xuicore.initPageXUI(infoFile);
         rootdata.idxTabMain = 0;

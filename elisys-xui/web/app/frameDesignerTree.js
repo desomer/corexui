@@ -66,7 +66,7 @@ $xui.selectConditionalPath = ()=> {
 // select le composant a partir du tree
 $xui.selectCmp = async () => {
     const rootdata = $xui.getAppState().main;
-    console.debug("selectCmp " + rootdata.activeSlot);
+    //console.debug("selectCmp " + rootdata.activeSlot);
     if (!$xui.modeDisplaySelection) 
     {
         $xui.modeDisplaySelection=true;
@@ -157,7 +157,7 @@ $xui.goToClick =async (xid) => {
     else
         console.debug("goToClick nofound <"+str+">");
         
-    await pause(30); //300
+    await pause(300); //300
 }
 
 $xui.goToRoute =async (url) => {

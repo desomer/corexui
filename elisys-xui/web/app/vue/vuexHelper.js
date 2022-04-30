@@ -13,7 +13,7 @@ globalThis.$xui.generateApplicationStoreJS = (listState) =>
         }
     }
 
-    ret =  modulesManager.getCode();
+    const ret =  modulesManager.getCode();
     //console.debug(">>>>>>>>> generateApplicationStoreJS\n");
     return ret;
 }

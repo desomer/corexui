@@ -55,6 +55,9 @@ export class EventManager {
             if (rootdata.idxTabMain != $xui.MainTabEnum.DESIGN || rootdata.idxTabDesigner !=  $xui.DesignTabEnum.DESIGN )
                 return;
 
+            if (rootdata.showEditCmp || rootdata.showLogin || rootdata.openDialogClass)
+                return;    // pas de copier coller si mode edit 
+
             //console.debug( event.keyCode, document.activeElement.tagName );
 
             var listShortCut = [

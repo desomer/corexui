@@ -9,10 +9,16 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
     Vue.component("v-xui-reloader",
         {
             template: '<component v-bind:is="componentToReload"></component>',
-            props: ['partid', 'modedisplay'],
+            props: ['partid', 'modedisplay', 'foritems'],
             data: () => { return { componentToReload: "", id: 1 }; },
             methods: {
                 doChangeComponent(e) {
+
+                    //console.debug("foritems reloader", this.foritems); 
+                    if ( this.foritems==null)
+                    {
+                        this.foritems={};
+                    }
 
                     var oldId = `${this.partid}-${this.id}`;
                     //console.debug("doChangeComponent " + oldId + " reponse **************", e)
@@ -25,6 +31,7 @@ $xui.initComponentVuejs.push(() => { //register VueComponent from XUI File
                     Vue.component(newId,
                         {
                             template: `<div style="display:${this.modedisplay}">${e.template}</div>`,
+                            data: () => { return this.foritems; },
                             mixins: [$xui.mixinStore],
                         }
                     );
@@ -273,7 +280,7 @@ function jsonPathToValue(data, path) {
 
 window.addEventListener('message', (e) => {
     const data = e.data;
-    if (data.action != "getInfoForSelector") {
+    if (data.action != "getInfoForSelector" && data.action!="doChangeComponent") {
         console.debug("--- CORE --- message ", data);
     }
 
@@ -424,22 +431,25 @@ function doChangeContent(data) {
         if (styleXui != null) {
             console.debug("+++++++++++>  move style to header");
             styleXui.remove();
-            document.head.appendChild(styleXui);
+            document.head.appendChild(styleXui);  // copie vers le header
         }
 
         document.body.innerHTML = data.param.html; // change tous le body
 
-        // const code =  $xui.modulesManager.getCode();    // code avec le code en code
-        // eval(code);
-
-        //console.debug("++++++ initialiseAppState +++++>", globalThis.initialiseAppState);
 
         $xui.loadApplicationJS(true);    // true = ne change pas store
+        
         console.debug("+++++++++++>  post le reloader finish vers le designer");
-        const messageOk = {
-            action: "reloader finish"
-        };
-        window.parent.postMessage(messageOk, "*");
+
+        if ($xui.nbRefeshReloader==null || $xui.nbRefeshReloader==0) { // uniquement si pas de reloader
+            $xui.vuejs.$nextTick(function () { 
+                const messageOk = {
+                    action: "reloader finish"
+                };
+                window.parent.postMessage(messageOk, "*");
+            });   
+        }
+
     }
 }
 
@@ -489,7 +499,7 @@ document.addEventListener("keydown", function (event) {
         { ctrl: false, keyCode: 8, action: "delete" }   // backSpace
     ];
 
-    console.debug( event.keyCode );
+    //console.debug( event.keyCode );
 
     for (const shortKey of listShortCut) {
         if (event.ctrlKey == shortKey.ctrl && event.keyCode == shortKey.keyCode) {
